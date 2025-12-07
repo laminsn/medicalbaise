@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Crown } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Crown, Phone } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import { useConversation } from '@/hooks/useMessages';
 import { useTranslation } from 'react-i18next';
+import { useCall } from '@/contexts/CallContext';
 import { format, isToday, isYesterday } from 'date-fns';
 
 export default function Chat() {
@@ -16,6 +17,7 @@ export default function Chat() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { conversation, messages, loading, sending, sendMessage } = useConversation(id);
+  const { startCall } = useCall();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -127,6 +129,18 @@ export default function Chat() {
               <p className="text-xs text-muted-foreground truncate">{conversation.job.title}</p>
             )}
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-primary hover:bg-primary/10"
+            onClick={() => startCall(
+              conversation.other_user_id,
+              conversation.other_user_name || 'User',
+              undefined
+            )}
+          >
+            <Phone className="w-5 h-5" />
+          </Button>
         </div>
 
         {/* Messages */}

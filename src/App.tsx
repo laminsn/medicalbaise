@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CallProvider } from "@/contexts/CallContext";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import Index from "./pages/Index";
@@ -55,51 +56,54 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <MessageNotificationProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/browse" element={<Browse />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/categories/:categoryId" element={<CategoryDetail />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/edit" element={<ProfileEdit />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/payments" element={<Payments />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/referral" element={<Referral />} />
-                <Route path="/provider/:id" element={<ProviderProfile />} />
-                <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-                <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-                <Route path="/jobs" element={<JobsMarketplace />} />
-                <Route path="/job/:id" element={<JobDetails />} />
-                <Route path="/job/:id/bid" element={<SubmitBid />} />
-                <Route path="/my-jobs" element={<MyJobs />} />
-                <Route path="/my-bids" element={<MyBids />} />
-                <Route path="/my-quotes" element={<MyQuotes />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/map" element={<MapView />} />
-                <Route path="/chat/:id" element={<Chat />} />
-                <Route path="/feed" element={<SocialFeed />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/reviews" element={<Reviews />} />
-                <Route path="/services" element={<ServicesSettings />} />
-                <Route path="/services/:serviceId" element={<ServiceEditor />} />
-                <Route path="/subscription" element={<Subscription />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/integrations" element={<Integrations />} />
-                <Route path="/payouts" element={<Payouts />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <NotificationPermissionBanner />
-            </MessageNotificationProvider>
-          </BrowserRouter>
-        </TooltipProvider>
+        <CallProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <MessageNotificationProvider>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/browse" element={<Browse />} />
+                  <Route path="/categories" element={<Categories />} />
+                  <Route path="/categories/:categoryId" element={<CategoryDetail />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile/edit" element={<ProfileEdit />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/payments" element={<Payments />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/referral" element={<Referral />} />
+                  <Route path="/provider/:id" element={<ProviderProfile />} />
+                  <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+                  <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+                  <Route path="/jobs" element={<JobsMarketplace />} />
+                  <Route path="/job/:id" element={<JobDetails />} />
+                  <Route path="/job/:id/bid" element={<SubmitBid />} />
+                  <Route path="/my-jobs" element={<MyJobs />} />
+                  <Route path="/my-bids" element={<MyBids />} />
+                  <Route path="/my-quotes" element={<MyQuotes />} />
+                  <Route path="/favorites" element={<Favorites />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/map" element={<MapView />} />
+                  <Route path="/chat/:id" element={<Chat />} />
+                  <Route path="/feed" element={<SocialFeed />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/reviews" element={<Reviews />} />
+                  <Route path="/services" element={<ServicesSettings />} />
+                  <Route path="/services/:serviceId" element={<ServiceEditor />} />
+                  <Route path="/subscription" element={<Subscription />} />
+                  <Route path="/team" element={<Team />} />
+                  <Route path="/integrations" element={<Integrations />} />
+                  <Route path="/payouts" element={<Payouts />} />
+                  <Route path="/post-job" element={<PostJob />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <NotificationPermissionBanner />
+              </MessageNotificationProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CallProvider>
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
