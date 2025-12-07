@@ -1,18 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SERVICE_CATEGORIES } from '@/lib/constants';
-
-// Top 10 most popular categories for homepage display
-const POPULAR_CATEGORY_IDS = [
-  'cleaning', 'plumbing', 'electrical', 'painting', 'handyman',
-  'landscaping', 'hvac', 'carpentry', 'moving', 'appliance'
-];
+import { SERVICE_CATEGORIES, POPULAR_SPECIALTIES } from '@/lib/constants';
 
 export function CategoryGrid() {
   const { t, i18n } = useTranslation();
 
   const popularCategories = SERVICE_CATEGORIES.filter(cat => 
-    POPULAR_CATEGORY_IDS.includes(cat.id)
+    POPULAR_SPECIALTIES.includes(cat.id)
   );
 
   return (
