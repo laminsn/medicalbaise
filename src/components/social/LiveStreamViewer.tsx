@@ -8,12 +8,15 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useLiveStream, LiveStream, StreamMessage } from '@/hooks/useLiveStream';
 
 interface LiveStreamViewerProps {
@@ -104,6 +107,10 @@ export function LiveStreamViewer({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+        <VisuallyHidden>
+          <DialogTitle>{stream.title} - Live Stream</DialogTitle>
+          <DialogDescription>Watch {stream.providerName}'s live stream</DialogDescription>
+        </VisuallyHidden>
         <div className="flex h-[80vh]">
           {/* Video Section */}
           <div className="flex-1 bg-black relative">
