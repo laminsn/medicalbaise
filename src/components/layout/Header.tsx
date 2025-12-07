@@ -23,9 +23,9 @@ export function Header() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-black flex items-center justify-center">
-            <span className="text-lg font-bold text-primary-foreground">M</span>
+            <span className="text-lg font-bold text-primary-foreground">MD</span>
           </div>
-          <span className="font-bold text-xl text-foreground">Medical<span className="text-primary">Base</span></span>
+          <span className="font-bold text-xl text-foreground">MD <span className="text-primary">Baise</span></span>
         </Link>
 
         {/* Desktop Navigation */}

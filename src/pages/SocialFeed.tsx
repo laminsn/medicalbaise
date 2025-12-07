@@ -164,7 +164,7 @@ export default function SocialFeed() {
     return (
       <AppLayout>
         <Helmet>
-          <title>{t('socialFeed.title')} | MedicalBase</title>
+          <title>{t('socialFeed.title')} | MD Baise</title>
         </Helmet>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
@@ -182,7 +182,7 @@ export default function SocialFeed() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('socialFeed.title', 'Feed Médico')} | MedicalBase</title>
+        <title>{t('socialFeed.title', 'Feed Médico')} | MD Baise</title>
         <meta name="description" content={t('socialFeed.description', 'Acompanhe as últimas publicações de profissionais de saúde')} />
       </Helmet>
 

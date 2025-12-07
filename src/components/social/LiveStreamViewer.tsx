@@ -94,7 +94,7 @@ export function LiveStreamViewer({
     try {
       await navigator.share({
         title: stream.title,
-        text: `Watch ${stream.providerName} live on MedicalBase!`,
+        text: `Watch ${stream.providerName} live on MD Baise!`,
         url: window.location.href
       });
     } catch (err) {
