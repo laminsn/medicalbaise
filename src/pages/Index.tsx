@@ -12,7 +12,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>MedicalBase by Baise - Find Trusted Doctors & Healthcare Professionals</title>
+        <title>MD Baise - Find Trusted Doctors & Healthcare Professionals</title>
         <meta name="description" content="Connect with verified doctors, specialists, and healthcare providers. Book consultations, teleconsultations, and appointments. Trusted by thousands of patients." />
         <meta name="keywords" content="doctors, healthcare, medical, consultation, teleconsultation, appointment, specialist, clinic" />
       </Helmet>
