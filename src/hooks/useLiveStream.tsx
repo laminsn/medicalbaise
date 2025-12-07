@@ -6,10 +6,13 @@ export interface LiveStream {
   providerId: string;
   providerName: string;
   title: string;
-  description: string;
+  description?: string;
   viewerCount: number;
   startedAt: Date;
   isLive: boolean;
+  specialty?: string;
+  location?: string;
+  categoryId?: string;
 }
 
 export interface StreamMessage {
