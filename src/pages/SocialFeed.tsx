@@ -133,7 +133,7 @@ export default function SocialFeed() {
     return (
       <AppLayout>
         <Helmet>
-          <title>{t('socialFeed.title')} | Brasil Base</title>
+          <title>{t('socialFeed.title')} | MedicalBase</title>
         </Helmet>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
@@ -151,7 +151,7 @@ export default function SocialFeed() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('socialFeed.title')} | Brasil Base</title>
+        <title>{t('socialFeed.title')} | MedicalBase</title>
         <meta name="description" content={t('socialFeed.description')} />
       </Helmet>
 
