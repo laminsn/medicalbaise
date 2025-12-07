@@ -51,23 +51,33 @@ export function LanguageFluencySelector({
         </div>
       )}
       <div className="grid grid-cols-2 gap-2">
-        {AVAILABLE_LANGUAGES.map((lang) => (
-          <div
-            key={lang.code}
-            className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
-              selectedLanguages.includes(lang.code)
-                ? 'border-primary bg-primary/5'
-                : 'border-border hover:border-primary/50'
-            }`}
-            onClick={() => toggleLanguage(lang.code)}
-          >
-            <Checkbox
-              checked={selectedLanguages.includes(lang.code)}
-              onCheckedChange={() => toggleLanguage(lang.code)}
-            />
-            <span className="text-sm">{getLanguageLabel(lang)}</span>
-          </div>
-        ))}
+        {AVAILABLE_LANGUAGES.map((lang) => {
+          const isSelected = selectedLanguages.includes(lang.code);
+          return (
+            <label
+              key={lang.code}
+              htmlFor={`lang-${lang.code}`}
+              className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
+                isSelected
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <Checkbox
+                id={`lang-${lang.code}`}
+                checked={isSelected}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    onLanguagesChange([...selectedLanguages, lang.code]);
+                  } else {
+                    onLanguagesChange(selectedLanguages.filter((l) => l !== lang.code));
+                  }
+                }}
+              />
+              <span className="text-sm">{getLanguageLabel(lang)}</span>
+            </label>
+          );
+        })}
       </div>
     </div>
   );
