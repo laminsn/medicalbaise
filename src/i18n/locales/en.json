@@ -1399,5 +1399,35 @@
     "warrantyUpdated": "Warranty & guarantee information updated",
     "noProviderProfile": "No provider profile found",
     "saveFailed": "Failed to save"
+  },
+  "feed": {
+    "filters": "Filters",
+    "filterContent": "Filter Content",
+    "clearAll": "Clear All",
+    "medicalSpecialty": "Medical Specialty",
+    "allSpecialties": "All Specialties",
+    "location": "Location",
+    "allLocations": "All Locations",
+    "applyFilters": "Apply Filters"
+  },
+  "liveStream": {
+    "liveNow": "Live Now",
+    "live": "LIVE",
+    "watching": "watching",
+    "guest": "Guest",
+    "goLive": "Go Live",
+    "endStream": "End Stream",
+    "viewers": "viewers",
+    "startBroadcast": "Start Broadcast",
+    "streamTitle": "Stream Title",
+    "streamDescription": "Description",
+    "cameraError": "Camera access error",
+    "streamStarted": "Stream started",
+    "streamEnded": "Stream ended",
+    "joinStream": "Watch",
+    "leaveStream": "Leave",
+    "sendMessage": "Send message",
+    "typeMessage": "Type your message...",
+    "chat": "Live Chat"
   }
 }

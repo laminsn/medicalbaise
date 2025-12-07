@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { Plus, TrendingUp, MessageSquare, Bell, Radio } from 'lucide-react';
+import { Plus, TrendingUp, MessageSquare, Bell, Radio, Stethoscope } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +12,7 @@ import { CreatePostDialog } from '@/components/social/CreatePostDialog';
 import { AdManagerDialog } from '@/components/social/AdManagerDialog';
 import { LiveBroadcastDialog } from '@/components/social/LiveBroadcastDialog';
 import { LiveStreamsSection } from '@/components/social/LiveStreamsSection';
+import { FeedFilters } from '@/components/social/FeedFilters';
 import { toast } from 'sonner';
 
 interface SocialPost {
@@ -28,6 +29,8 @@ interface SocialPost {
     id: string;
     business_name: string;
     user_id: string;
+    specialty_id?: string;
+    address?: string;
   };
 }
 
@@ -36,6 +39,7 @@ export default function SocialFeed() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<SocialPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProvider, setIsProvider] = useState(false);
   const [providerId, setProviderId] = useState<string | null>(null);
@@ -46,6 +50,10 @@ export default function SocialFeed() {
   const [viewStartTime] = useState(Date.now());
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Filter states
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   // Check if user is a provider
   useEffect(() => {
@@ -95,7 +103,7 @@ export default function SocialFeed() {
         .from('social_posts')
         .select(`
           *,
-          provider:providers(id, business_name, user_id)
+          provider:providers(id, business_name, user_id, specialty_id, address)
         `)
         .order('is_promoted', { ascending: false })
         .order('created_at', { ascending: false })
@@ -128,6 +136,25 @@ export default function SocialFeed() {
     };
   }, [t]);
 
+  // Filter posts based on selected filters
+  useEffect(() => {
+    let filtered = posts;
+
+    if (selectedSpecialty) {
+      filtered = filtered.filter(post => 
+        post.provider?.specialty_id === selectedSpecialty
+      );
+    }
+
+    if (selectedLocation) {
+      filtered = filtered.filter(post => 
+        post.provider?.address?.includes(selectedLocation)
+      );
+    }
+
+    setFilteredPosts(filtered);
+  }, [posts, selectedSpecialty, selectedLocation]);
+
   const handlePostCreated = () => {
     setShowCreatePost(false);
     toast.success(t('socialFeed.postCreated'));
@@ -155,15 +182,18 @@ export default function SocialFeed() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('socialFeed.title')} | MedicalBase</title>
-        <meta name="description" content={t('socialFeed.description')} />
+        <title>{t('socialFeed.title', 'Feed Médico')} | MedicalBase</title>
+        <meta name="description" content={t('socialFeed.description', 'Acompanhe as últimas publicações de profissionais de saúde')} />
       </Helmet>
 
       <div className="max-w-lg mx-auto pb-20">
         {/* Header */}
         <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border px-4 py-3">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">{t('socialFeed.title')}</h1>
+            <div className="flex items-center gap-2">
+              <Stethoscope className="h-5 w-5 text-primary" />
+              <h1 className="text-xl font-bold">{t('socialFeed.title', 'Feed Médico')}</h1>
+            </div>
             <div className="flex items-center gap-1">
               {isProvider && (
                 <>
@@ -209,27 +239,40 @@ export default function SocialFeed() {
           </div>
         </div>
 
+        {/* Feed Filters */}
+        <FeedFilters
+          selectedSpecialty={selectedSpecialty}
+          selectedLocation={selectedLocation}
+          onSpecialtyChange={setSelectedSpecialty}
+          onLocationChange={setSelectedLocation}
+        />
+
         {/* Live Streams Section */}
-        <LiveStreamsSection />
+        <LiveStreamsSection 
+          specialtyFilter={selectedSpecialty}
+          locationFilter={selectedLocation}
+        />
 
         {/* Posts Feed */}
         <div className="divide-y divide-border">
           {loading ? (
             <div className="p-8 text-center text-muted-foreground">
-              {t('common.loading')}
+              {t('common.loading', 'Carregando...')}
             </div>
-          ) : posts.length === 0 ? (
+          ) : filteredPosts.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
-              <p className="mb-4">{t('socialFeed.noPosts')}</p>
-              {isProvider && (
+              <p className="mb-4">{selectedSpecialty || selectedLocation 
+                ? t('socialFeed.noPostsFiltered', 'Nenhuma publicação encontrada com esses filtros')
+                : t('socialFeed.noPosts', 'Nenhuma publicação ainda')}</p>
+              {isProvider && !selectedSpecialty && !selectedLocation && (
                 <Button onClick={() => setShowCreatePost(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  {t('socialFeed.createPost')}
+                  {t('socialFeed.createPost', 'Criar Publicação')}
                 </Button>
               )}
             </div>
           ) : (
-            posts.map((post) => (
+            filteredPosts.map((post) => (
               <SocialPostCard
                 key={post.id}
                 post={post}

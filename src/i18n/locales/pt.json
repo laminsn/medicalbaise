@@ -1374,5 +1374,35 @@
     "warrantyUpdated": "Informações de garantia atualizadas",
     "noProviderProfile": "Perfil de prestador não encontrado",
     "saveFailed": "Falha ao salvar"
+  },
+  "feed": {
+    "filters": "Filtros",
+    "filterContent": "Filtrar Conteúdo",
+    "clearAll": "Limpar Tudo",
+    "medicalSpecialty": "Especialidade Médica",
+    "allSpecialties": "Todas as Especialidades",
+    "location": "Localização",
+    "allLocations": "Todas as Localizações",
+    "applyFilters": "Aplicar Filtros"
+  },
+  "liveStream": {
+    "liveNow": "Transmissões Ao Vivo",
+    "live": "AO VIVO",
+    "watching": "assistindo",
+    "guest": "Convidado",
+    "goLive": "Iniciar Transmissão",
+    "endStream": "Encerrar",
+    "viewers": "espectadores",
+    "startBroadcast": "Iniciar Transmissão",
+    "streamTitle": "Título da Transmissão",
+    "streamDescription": "Descrição",
+    "cameraError": "Erro ao acessar câmera",
+    "streamStarted": "Transmissão iniciada",
+    "streamEnded": "Transmissão encerrada",
+    "joinStream": "Assistir",
+    "leaveStream": "Sair",
+    "sendMessage": "Enviar mensagem",
+    "typeMessage": "Digite sua mensagem...",
+    "chat": "Chat ao vivo"
   }
 }
