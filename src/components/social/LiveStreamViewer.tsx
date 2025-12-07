@@ -53,11 +53,9 @@ export function LiveStreamViewer({
     }
     
     return () => {
-      if (isWatching) {
-        leaveStream();
-      }
+      leaveStream();
     };
-  }, [open, stream.id, userId, userName]);
+  }, [open, stream.id, userId, userName, joinStream, leaveStream]);
 
   // Handle close
   const handleClose = () => {
