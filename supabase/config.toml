@@ -1,1 +1,16 @@
 project_id = "hnmkchpbfcijkupqitzc"
+
+[functions.ai-chat]
+verify_jwt = false
+
+[functions.get-mapbox-token]
+verify_jwt = false
+
+[functions.send-analytics-report]
+verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.live-stream-signal]
+verify_jwt = false
