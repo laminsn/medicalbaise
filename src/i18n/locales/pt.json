@@ -1404,5 +1404,23 @@
     "sendMessage": "Enviar mensagem",
     "typeMessage": "Digite sua mensagem...",
     "chat": "Chat ao vivo"
+  },
+  "call": {
+    "calling": "Chamando...",
+    "ringing": "Tocando...",
+    "incomingCall": "Chamada recebida",
+    "connecting": "Conectando",
+    "connected": "Conectado",
+    "ended": "Chamada encerrada",
+    "noAnswer": "Sem resposta",
+    "declined": "Chamada recusada",
+    "callButton": "Ligar",
+    "endCall": "Encerrar chamada",
+    "answer": "Atender",
+    "decline": "Recusar",
+    "mute": "Mudo",
+    "unmute": "Com som",
+    "speaker": "Alto-falante",
+    "speakerOff": "Alto-falante desligado"
   }
 }

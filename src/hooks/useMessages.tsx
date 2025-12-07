@@ -21,6 +21,7 @@ export interface Conversation {
   } | null;
   last_message?: Message | null;
   unread_count?: number;
+  other_user_id?: string;
   other_user_name?: string;
   other_user_avatar?: string;
 }
@@ -97,10 +98,15 @@ export const useMessages = () => {
               : 'Customer';
           }
 
+          const otherUserId = isCustomer 
+            ? (conv.provider?.user_id || conv.provider_id) 
+            : conv.customer_id;
+
           return {
             ...conv,
             last_message: lastMsg,
             unread_count: unreadCount || 0,
+            other_user_id: otherUserId,
             other_user_name: otherUserName,
           };
         })
@@ -171,8 +177,13 @@ export const useConversation = (conversationId: string | undefined) => {
           : 'Customer';
       }
 
+      const otherUserId = isCustomer 
+        ? (convData.provider?.user_id || convData.provider_id) 
+        : convData.customer_id;
+
       setConversation({
         ...convData,
+        other_user_id: otherUserId,
         other_user_name: otherUserName,
       });
 

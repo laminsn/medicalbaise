@@ -1429,5 +1429,23 @@
     "sendMessage": "Send message",
     "typeMessage": "Type your message...",
     "chat": "Live Chat"
+  },
+  "call": {
+    "calling": "Calling...",
+    "ringing": "Ringing...",
+    "incomingCall": "Incoming call",
+    "connecting": "Connecting",
+    "connected": "Connected",
+    "ended": "Call ended",
+    "noAnswer": "No answer",
+    "declined": "Call declined",
+    "callButton": "Call",
+    "endCall": "End call",
+    "answer": "Answer",
+    "decline": "Decline",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "speaker": "Speaker",
+    "speakerOff": "Speaker off"
   }
 }
