@@ -12,7 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Camera, Loader2, User } from 'lucide-react';
+import { ArrowLeft, Camera, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ProviderServicesEditor } from '@/components/provider/ProviderServicesEditor';
 import { WarrantyGuaranteeEditor } from '@/components/provider/WarrantyGuaranteeEditor';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
@@ -218,14 +219,24 @@ export default function ProfileEdit() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="status">{t('profile.status', 'Status')}</Label>
-                  <Input
-                    id="status"
-                    placeholder={t('profile.statusPlaceholder', 'What are you up to?')}
-                    value={formData.status}
-                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                    maxLength={100}
-                  />
-                  <p className="text-xs text-muted-foreground">{formData.status.length}/100</p>
+                  <Select 
+                    value={formData.status} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('profile.selectStatus', 'Select your status')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Available">{t('profile.statusAvailable', 'Available')}</SelectItem>
+                      <SelectItem value="Busy">{t('profile.statusBusy', 'Busy')}</SelectItem>
+                      <SelectItem value="On Vacation">{t('profile.statusVacation', 'On Vacation')}</SelectItem>
+                      <SelectItem value="Invested!">{t('profile.statusInvested', 'Invested!')}</SelectItem>
+                      <SelectItem value="Open to Work">{t('profile.statusOpenToWork', 'Open to Work')}</SelectItem>
+                      <SelectItem value="Hiring">{t('profile.statusHiring', 'Hiring')}</SelectItem>
+                      <SelectItem value="Learning">{t('profile.statusLearning', 'Learning')}</SelectItem>
+                      <SelectItem value="Building">{t('profile.statusBuilding', 'Building')}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
