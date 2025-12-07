@@ -12,10 +12,15 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { t } = useTranslation();
+
+  const initials = profile 
+    ? `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`.toUpperCase() 
+    : 'U';
 
   return (
     <header className="sticky top-0 z-40 bg-card border-b border-border">
@@ -80,9 +85,12 @@ export function Header() {
               </DropdownMenu>
               <NotificationBell />
               <Link to="/profile">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  {t('nav.profile')}
-                </Button>
+                <Avatar className="w-8 h-8 cursor-pointer ring-2 ring-transparent hover:ring-primary transition-all">
+                  <AvatarImage src={profile?.avatar_url || ''} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
               </Link>
             </>
           ) : (
