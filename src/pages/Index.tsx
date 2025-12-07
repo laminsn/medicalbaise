@@ -12,8 +12,8 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Brasil Base - Find Trusted Home Service Professionals</title>
-        <meta name="description" content="Connect with verified plumbers, electricians, cleaners, and more. Get competitive bids or book directly. Trusted by thousands across Brazil." />
+        <title>MedicalBase by Baise - Find Trusted Medical Service Professionals</title>
+        <meta name="description" content="Connect with verified medical professionals and healthcare providers. Get competitive quotes or book directly. Trusted by thousands." />
       </Helmet>
       <AppLayout>
         <main className="flex flex-col min-h-screen">

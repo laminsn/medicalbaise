@@ -6,10 +6,10 @@
 
 @layer base {
   :root {
-    /* === FIVERR-INSPIRED GREEN PALETTE === */
-    --fiverr-green: 160 76% 44%;  /* #1dbf73 - Fiverr hero green */
-    --fiverr-green-dark: 160 76% 38%;
-    --fiverr-green-light: 160 76% 52%;
+    /* === AQUA BLUE PALETTE === */
+    --aqua-blue: 187 100% 42%;     /* #00b8d4 - Vibrant aqua */
+    --aqua-blue-dark: 187 100% 35%;
+    --aqua-blue-light: 187 100% 50%;
 
     /* === DARK BACKGROUND PALETTE === */
     --dark-950: 0 0% 4%;          /* #0a0a0a */
@@ -37,7 +37,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 7%;
 
-    --primary: 160 76% 44%;       /* Fiverr green */
+    --primary: 187 100% 42%;       /* Aqua blue */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%;
@@ -46,20 +46,20 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 160 76% 95%;
-    --accent-foreground: 160 76% 30%;
+    --accent: 187 100% 95%;
+    --accent-foreground: 187 100% 25%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 160 76% 44%;
+    --ring: 187 100% 42%;
 
     --radius: 0.5rem;
 
     /* === STATUS COLORS === */
-    --success: 160 76% 44%;
+    --success: 187 100% 42%;
     --success-foreground: 0 0% 100%;
     --warning: 45 100% 51%;
     --warning-foreground: 0 0% 7%;
@@ -69,7 +69,7 @@
     --error-foreground: 0 0% 100%;
 
     /* === GRADIENTS === */
-    --gradient-primary: linear-gradient(90deg, hsl(160 76% 24%) 0%, hsl(0 0% 0%) 100%);
+    --gradient-primary: linear-gradient(90deg, hsl(187 100% 42%) 0%, hsl(0 0% 0%) 100%);
 
     /* === SHADOWS === */
     --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
@@ -83,7 +83,7 @@
   }
 
   .dark {
-    /* === DARK THEME (Fiverr-inspired) === */
+    /* === DARK THEME (Aqua Blue) === */
     --background: 0 0% 7%;           /* #111111 */
     --foreground: 0 0% 100%;         /* white */
 
@@ -93,7 +93,7 @@
     --popover: 0 0% 10%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 160 76% 44%;          /* Fiverr green #1dbf73 */
+    --primary: 187 100% 42%;         /* Aqua blue #00b8d4 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 15%;           /* #262626 */
@@ -102,18 +102,18 @@
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 60%;    /* #999 */
 
-    --accent: 160 76% 20%;
-    --accent-foreground: 160 76% 70%;
+    --accent: 187 100% 20%;
+    --accent-foreground: 187 100% 70%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 20%;              /* #333 */
     --input: 0 0% 20%;
-    --ring: 160 76% 44%;
+    --ring: 187 100% 42%;
 
     /* Status colors - dark mode */
-    --success: 160 76% 44%;
+    --success: 187 100% 42%;
     --warning: 45 100% 51%;
     --info: 217 91% 60%;
     --error: 0 84% 60%;
