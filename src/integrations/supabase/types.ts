@@ -540,6 +540,7 @@ export type Database = {
       }
       jobs_posted: {
         Row: {
+          appointment_type: string | null
           bid_deadline: string | null
           budget_disclosed: boolean | null
           budget_max: number | null
@@ -551,6 +552,7 @@ export type Database = {
           id: string
           insurance_required: boolean | null
           is_featured: boolean | null
+          is_teleconsultation: boolean | null
           is_urgent: boolean | null
           license_required: boolean | null
           location_address: string | null
@@ -558,6 +560,7 @@ export type Database = {
           location_lng: number | null
           materials_included: string | null
           max_bids: number | null
+          patient_notes: string | null
           preferred_end_date: string | null
           preferred_start_date: string | null
           status: Database["public"]["Enums"]["job_status"] | null
@@ -566,6 +569,7 @@ export type Database = {
           urgency: Database["public"]["Enums"]["urgency_level"] | null
         }
         Insert: {
+          appointment_type?: string | null
           bid_deadline?: string | null
           budget_disclosed?: boolean | null
           budget_max?: number | null
@@ -577,6 +581,7 @@ export type Database = {
           id?: string
           insurance_required?: boolean | null
           is_featured?: boolean | null
+          is_teleconsultation?: boolean | null
           is_urgent?: boolean | null
           license_required?: boolean | null
           location_address?: string | null
@@ -584,6 +589,7 @@ export type Database = {
           location_lng?: number | null
           materials_included?: string | null
           max_bids?: number | null
+          patient_notes?: string | null
           preferred_end_date?: string | null
           preferred_start_date?: string | null
           status?: Database["public"]["Enums"]["job_status"] | null
@@ -592,6 +598,7 @@ export type Database = {
           urgency?: Database["public"]["Enums"]["urgency_level"] | null
         }
         Update: {
+          appointment_type?: string | null
           bid_deadline?: string | null
           budget_disclosed?: boolean | null
           budget_max?: number | null
@@ -603,6 +610,7 @@ export type Database = {
           id?: string
           insurance_required?: boolean | null
           is_featured?: boolean | null
+          is_teleconsultation?: boolean | null
           is_urgent?: boolean | null
           license_required?: boolean | null
           location_address?: string | null
@@ -610,6 +618,7 @@ export type Database = {
           location_lng?: number | null
           materials_included?: string | null
           max_bids?: number | null
+          patient_notes?: string | null
           preferred_end_date?: string | null
           preferred_start_date?: string | null
           status?: Database["public"]["Enums"]["job_status"] | null
@@ -1373,18 +1382,22 @@ export type Database = {
       }
       providers: {
         Row: {
+          accepted_insurance: string[] | null
           address: string | null
           avg_rating: number | null
           bids_remaining_this_month: number | null
           bio: string | null
           business_name: string
           business_type: string | null
+          consultation_duration_minutes: number | null
           contact_email: string | null
           contact_phone: string | null
           cpf_cnpj: string | null
           created_at: string | null
+          crm_number: string | null
           google_analytics_id: string | null
           guarantee_info: string | null
+          hospital_affiliations: string[] | null
           id: string
           id_type: string | null
           is_background_checked: boolean | null
@@ -1399,10 +1412,12 @@ export type Database = {
           requires_background_check: boolean | null
           response_time_hours: number | null
           service_radius_km: number | null
+          specialty_id: string | null
           subscription_tier:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline: string | null
+          teleconsultation_available: boolean | null
           total_jobs: number | null
           total_reviews: number | null
           updated_at: string | null
@@ -1411,18 +1426,22 @@ export type Database = {
           years_experience: number | null
         }
         Insert: {
+          accepted_insurance?: string[] | null
           address?: string | null
           avg_rating?: number | null
           bids_remaining_this_month?: number | null
           bio?: string | null
           business_name: string
           business_type?: string | null
+          consultation_duration_minutes?: number | null
           contact_email?: string | null
           contact_phone?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
+          crm_number?: string | null
           google_analytics_id?: string | null
           guarantee_info?: string | null
+          hospital_affiliations?: string[] | null
           id?: string
           id_type?: string | null
           is_background_checked?: boolean | null
@@ -1437,10 +1456,12 @@ export type Database = {
           requires_background_check?: boolean | null
           response_time_hours?: number | null
           service_radius_km?: number | null
+          specialty_id?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
+          teleconsultation_available?: boolean | null
           total_jobs?: number | null
           total_reviews?: number | null
           updated_at?: string | null
@@ -1449,18 +1470,22 @@ export type Database = {
           years_experience?: number | null
         }
         Update: {
+          accepted_insurance?: string[] | null
           address?: string | null
           avg_rating?: number | null
           bids_remaining_this_month?: number | null
           bio?: string | null
           business_name?: string
           business_type?: string | null
+          consultation_duration_minutes?: number | null
           contact_email?: string | null
           contact_phone?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
+          crm_number?: string | null
           google_analytics_id?: string | null
           guarantee_info?: string | null
+          hospital_affiliations?: string[] | null
           id?: string
           id_type?: string | null
           is_background_checked?: boolean | null
@@ -1475,10 +1500,12 @@ export type Database = {
           requires_background_check?: boolean | null
           response_time_hours?: number | null
           service_radius_km?: number | null
+          specialty_id?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
+          teleconsultation_available?: boolean | null
           total_jobs?: number | null
           total_reviews?: number | null
           updated_at?: string | null
@@ -1486,7 +1513,15 @@ export type Database = {
           warranty_info?: string | null
           years_experience?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "providers_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quote_requests: {
         Row: {

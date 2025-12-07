@@ -17,12 +17,12 @@ export function HeroSection() {
     }
   };
 
-  const popularServices = [
-    { key: 'cleaning', en: 'Cleaning', pt: 'Limpeza' },
-    { key: 'plumbing', en: 'Plumber', pt: 'Encanador' },
-    { key: 'electrical', en: 'Electrician', pt: 'Eletricista' },
-    { key: 'painting', en: 'Painter', pt: 'Pintor' },
-    { key: 'landscaping', en: 'Landscaper', pt: 'Jardineiro' },
+  const popularSpecialties = [
+    { key: 'general', en: 'General Practice', pt: 'Clínica Geral' },
+    { key: 'cardiology', en: 'Cardiology', pt: 'Cardiologia' },
+    { key: 'dermatology', en: 'Dermatology', pt: 'Dermatologia' },
+    { key: 'pediatrics', en: 'Pediatrics', pt: 'Pediatria' },
+    { key: 'dentistry', en: 'Dentistry', pt: 'Odontologia' },
   ];
 
   return (
@@ -58,20 +58,20 @@ export function HeroSection() {
           </div>
         </form>
 
-        {/* Popular searches */}
+        {/* Popular specialties */}
         <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="text-sm text-muted-foreground">
             {t('common.popular')}:
           </span>
-          {popularServices.map((service) => (
+          {popularSpecialties.map((specialty) => (
             <Button
-              key={service.key}
+              key={specialty.key}
               variant="outline"
               size="sm"
               className="rounded-full border-border hover:border-primary hover:text-primary bg-card/50"
-              onClick={() => navigate(`/browse?q=${encodeURIComponent(service.key)}`)}
+              onClick={() => navigate(`/browse?q=${encodeURIComponent(specialty.key)}`)}
             >
-              {i18n.language === 'pt' ? service.pt : service.en}
+              {i18n.language === 'pt' ? specialty.pt : specialty.en}
             </Button>
           ))}
         </div>
