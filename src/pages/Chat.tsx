@@ -1,0 +1,188 @@
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Send, Loader2, Crown } from 'lucide-react';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/hooks/useAuth';
+import { useConversation } from '@/hooks/useMessages';
+import { useTranslation } from 'react-i18next';
+import { format, isToday, isYesterday } from 'date-fns';
+
+export default function Chat() {
+  const { id } = useParams<{ id: string }>();
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { conversation, messages, loading, sending, sendMessage } = useConversation(id);
+  const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check if user has Elite+ tier access
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!user) {
+        setHasAccess(false);
+        return;
+      }
+      // For now, grant access to all authenticated users
+      // In production, check provider subscription tier or customer status
+      setHasAccess(true);
+    };
+    checkAccess();
+  }, [user]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!newMessage.trim() || sending) return;
+    const content = newMessage;
+    setNewMessage('');
+    await sendMessage(content);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const formatMessageTime = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isToday(date)) {
+      return format(date, 'HH:mm');
+    } else if (isYesterday(date)) {
+      return t('messages.yesterday') + ' ' + format(date, 'HH:mm');
+    }
+    return format(date, 'dd/MM HH:mm');
+  };
+
+  if (!user) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <p className="text-muted-foreground mb-4">{t('messages.loginToViewDescription')}</p>
+          <Button onClick={() => navigate('/auth')}>{t('auth.login')}</Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (hasAccess === false) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mb-4">
+            <Crown className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">{t('messages.eliteFeature')}</h2>
+          <p className="text-muted-foreground mb-6">{t('messages.upgradeToAccess')}</p>
+          <Button onClick={() => navigate('/profile')}>{t('common.upgrade')}</Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!conversation) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <p className="text-muted-foreground mb-4">{t('messages.conversationNotFound')}</p>
+          <Button onClick={() => navigate('/messages')}>{t('common.back')}</Button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout>
+      <div className="flex flex-col h-[calc(100vh-140px)]">
+        {/* Header */}
+        <div className="flex items-center gap-3 p-4 border-b border-border bg-card">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/messages')}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Avatar className="w-10 h-10">
+            <AvatarFallback>{conversation.other_user_name?.[0] || '?'}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-foreground truncate">{conversation.other_user_name}</h2>
+            {conversation.job && (
+              <p className="text-xs text-muted-foreground truncate">{conversation.job.title}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground">{t('messages.startConversation')}</p>
+            </div>
+          ) : (
+            messages.map((message) => {
+              const isOwn = message.sender_id === user.id;
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                      isOwn
+                        ? 'bg-primary text-primary-foreground rounded-br-sm'
+                        : 'bg-muted text-foreground rounded-bl-sm'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    <p className={`text-xs mt-1 ${isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                      {formatMessageTime(message.created_at)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input */}
+        <div className="p-4 border-t border-border bg-card">
+          <div className="flex gap-2">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder={t('messages.typeMessage')}
+              className="flex-1"
+              disabled={sending}
+            />
+            <Button onClick={handleSend} disabled={!newMessage.trim() || sending}>
+              {sending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  );
+}

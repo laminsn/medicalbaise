@@ -1,0 +1,301 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* === FIVERR-INSPIRED GREEN PALETTE === */
+    --fiverr-green: 160 76% 44%;  /* #1dbf73 - Fiverr hero green */
+    --fiverr-green-dark: 160 76% 38%;
+    --fiverr-green-light: 160 76% 52%;
+
+    /* === DARK BACKGROUND PALETTE === */
+    --dark-950: 0 0% 4%;          /* #0a0a0a */
+    --dark-900: 0 0% 7%;          /* #111111 */
+    --dark-800: 0 0% 10%;         /* #1a1a1a */
+    --dark-700: 0 0% 15%;         /* #262626 */
+    --dark-600: 0 0% 20%;         /* #333333 */
+    --dark-500: 0 0% 30%;         /* #4d4d4d */
+    --dark-400: 0 0% 45%;         /* #737373 */
+    --dark-300: 0 0% 60%;         /* #999999 */
+    --dark-200: 0 0% 75%;         /* #bfbfbf */
+    --dark-100: 0 0% 90%;         /* #e6e6e6 */
+
+    /* === ACCENT COLORS === */
+    --accent-orange: 28 100% 50%; /* #ff8c00 */
+    --accent-yellow: 45 100% 51%; /* #ffc107 */
+
+    /* === LIGHT THEME (optional, but dark is default) === */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 7%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+
+    --primary: 160 76% 44%;       /* Fiverr green */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 7%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 160 76% 95%;
+    --accent-foreground: 160 76% 30%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 160 76% 44%;
+
+    --radius: 0.5rem;
+
+    /* === STATUS COLORS === */
+    --success: 160 76% 44%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 100% 51%;
+    --warning-foreground: 0 0% 7%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+    --error: 0 72% 51%;
+    --error-foreground: 0 0% 100%;
+
+    /* === GRADIENTS === */
+    --gradient-primary: linear-gradient(90deg, hsl(160 76% 24%) 0%, hsl(0 0% 0%) 100%);
+
+    /* === SHADOWS === */
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.1);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1);
+
+    /* === MOBILE SAFE AREAS === */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  }
+
+  .dark {
+    /* === DARK THEME (Fiverr-inspired) === */
+    --background: 0 0% 7%;           /* #111111 */
+    --foreground: 0 0% 100%;         /* white */
+
+    --card: 0 0% 10%;                /* #1a1a1a */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 160 76% 44%;          /* Fiverr green #1dbf73 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 15%;           /* #262626 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;    /* #999 */
+
+    --accent: 160 76% 20%;
+    --accent-foreground: 160 76% 70%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 20%;              /* #333 */
+    --input: 0 0% 20%;
+    --ring: 160 76% 44%;
+
+    /* Status colors - dark mode */
+    --success: 160 76% 44%;
+    --warning: 45 100% 51%;
+    --info: 217 91% 60%;
+    --error: 0 84% 60%;
+
+    /* Shadows - darker */
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    padding-top: var(--safe-area-inset-top);
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+
+  /* Mobile-first touch improvements */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* === GRADIENT UTILITIES === */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-primary-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: inherit;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-primary);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+
+  .gradient-border:hover::before {
+    background: hsl(var(--primary));
+  }
+
+  /* === STATUS BADGES === */
+  .badge-accepting-bids {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .badge-in-progress {
+    @apply bg-blue-500/10 text-blue-500;
+  }
+
+  .badge-completed {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .badge-cancelled {
+    @apply bg-destructive/10 text-destructive;
+  }
+
+  /* === URGENCY BADGES === */
+  .badge-emergency {
+    @apply bg-destructive text-destructive-foreground font-semibold animate-pulse;
+  }
+
+  .badge-asap {
+    @apply bg-warning text-warning-foreground font-semibold;
+  }
+
+  .badge-flexible {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .badge-scheduled {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* === TIER BADGES === */
+  .badge-tier-free {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .badge-tier-pro {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .badge-tier-elite {
+    @apply bg-gradient-to-r from-primary to-primary/70 text-primary-foreground font-semibold;
+  }
+
+  .badge-tier-enterprise {
+    @apply bg-foreground text-background;
+  }
+
+  /* === MOBILE NAVIGATION === */
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border;
+    padding-bottom: max(0.5rem, var(--safe-area-inset-bottom));
+  }
+
+  /* === CARD INTERACTIONS === */
+  .card-interactive {
+    @apply transition-all duration-300;
+  }
+
+  .card-interactive:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* === BUTTON VARIANTS === */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground font-semibold transition-all duration-200;
+  }
+
+  .btn-primary:hover {
+    @apply bg-primary/90;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Safe area padding */
+  .safe-top {
+    padding-top: max(1rem, var(--safe-area-inset-top));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, var(--safe-area-inset-bottom));
+  }
+
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Shadow utilities */
+  .shadow-emerald {
+    box-shadow: var(--shadow-emerald);
+  }
+
+  .shadow-red {
+    box-shadow: var(--shadow-red);
+  }
+}
