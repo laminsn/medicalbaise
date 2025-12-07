@@ -8,7 +8,7 @@ export const ProTierBanner = () => {
   return (
     <section className="px-4 py-2">
       <Link to="/browse?tier=pro,elite">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#047857] to-black p-4 shadow-lg">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-black p-4 shadow-lg">
           {/* Background decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-1/4 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
