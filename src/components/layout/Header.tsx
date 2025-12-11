@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, MapPin, LayoutDashboard, User, Briefcase } from 'lucide-react';
+import { Menu, MapPin, LayoutDashboard, User, Briefcase, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -54,6 +54,13 @@ export function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {/* Help/Learn Center */}
+          <Link to="/help">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <HelpCircle className="w-5 h-5" />
+            </Button>
+          </Link>
+
           {/* Theme Toggle */}
           <ThemeToggle />
           
