@@ -42,6 +42,7 @@ import Subscription from "./pages/Subscription";
 import Team from "./pages/Team";
 import Integrations from "./pages/Integrations";
 import Payouts from "./pages/Payouts";
+import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -97,6 +98,7 @@ const App = () => (
                   <Route path="/integrations" element={<Integrations />} />
                   <Route path="/payouts" element={<Payouts />} />
                   <Route path="/post-job" element={<PostJob />} />
+                  <Route path="/learn" element={<Learn />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <NotificationPermissionBanner />
