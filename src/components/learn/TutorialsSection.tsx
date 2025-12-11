@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { 
   BookOpen, Clock, ChevronRight, CheckCircle2, Circle, 
   User, Calendar, Search, MessageSquare, Star, Video, 
-  Settings, CreditCard, Shield, FileText
+  Settings, CreditCard, Shield, FileText, AlertCircle
 } from 'lucide-react';
 
 interface TutorialsSectionProps {
