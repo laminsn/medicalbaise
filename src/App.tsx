@@ -98,7 +98,7 @@ const App = () => (
                   <Route path="/integrations" element={<Integrations />} />
                   <Route path="/payouts" element={<Payouts />} />
                   <Route path="/post-job" element={<PostJob />} />
-                  <Route path="/learn" element={<Learn />} />
+                  <Route path="/help" element={<Learn />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <NotificationPermissionBanner />
