@@ -2,21 +2,22 @@ import { useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, HelpCircle } from 'lucide-react';
-import { faqs, faqCategories } from '@/data/learningCenterSOPsVideos';
-import { User, Calendar, CreditCard, Video, Shield } from 'lucide-react';
+import { MessageSquare, HelpCircle, User, Calendar, CreditCard, Video, Shield, Star, Settings } from 'lucide-react';
+import { faqs } from '@/data/learningCenterData';
+import { faqCategories } from '@/data/learningCenterSOPsVideos';
 
 interface FAQSectionProps {
   searchQuery: string;
 }
 
 const iconMap: Record<string, any> = {
+  all: HelpCircle,
   account: User,
   booking: Calendar,
   payments: CreditCard,
   teleconsultation: Video,
   providers: Shield,
-  features: HelpCircle,
+  features: Star,
   support: MessageSquare,
 };
 
@@ -35,22 +36,25 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
     <div className="space-y-6">
       {/* Category Filters */}
       <div className="flex flex-wrap gap-2">
-        {faqCategories.map((cat) => (
-          <Button
-            key={cat.id}
-            variant={selectedCategory === cat.id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedCategory(cat.id)}
-            className={
-              selectedCategory === cat.id
-                ? 'bg-cyan-500 hover:bg-cyan-600 text-white'
-                : 'border-border/50 hover:border-cyan-500/30 hover:text-cyan-400'
-            }
-          >
-            <cat.icon className="w-4 h-4 mr-2" />
-            {cat.label}
-          </Button>
-        ))}
+        {faqCategories.map((cat) => {
+          const Icon = iconMap[cat.id] || HelpCircle;
+          return (
+            <Button
+              key={cat.id}
+              variant={selectedCategory === cat.id ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedCategory(cat.id)}
+              className={
+                selectedCategory === cat.id
+                  ? 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                  : 'border-border/50 hover:border-cyan-500/30 hover:text-cyan-400'
+              }
+            >
+              <Icon className="w-4 h-4 mr-2" />
+              {cat.label}
+            </Button>
+          );
+        })}
       </div>
 
       {/* FAQ Accordion */}
