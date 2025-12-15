@@ -293,8 +293,8 @@
     "selectCategory": "Select a specialty",
     "description": "Description",
     "descriptionPlaceholder": "Describe your symptoms, concerns, or what you need help with...",
-    "location": "Preferred Location",
-    "locationPlaceholder": "Address or neighborhood",
+    "serviceAddress": "Service Address",
+    "addressConfidentialNotice": "🔒 Your full address remains confidential until your appointment is confirmed",
     "estimatedBudget": "Budget Range",
     "selectRange": "Select a range",
     "urgency": "Urgency",
@@ -307,6 +307,7 @@
     "freePosting": "Free request • Get responses from doctors in minutes",
     "requiredFields": "Required fields",
     "fillTitleDescCategory": "Fill in reason, description and specialty.",
+    "fillAddress": "Please fill in all required address fields.",
     "jobPublished": "Request submitted!",
     "providersCanBid": "Doctors can now respond to your request."
   },
