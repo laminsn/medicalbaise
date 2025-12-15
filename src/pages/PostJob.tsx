@@ -30,7 +30,11 @@ export default function PostJob() {
     title: '',
     description: '',
     category: '',
-    location: '',
+    addressCep: '',
+    addressStreet: '',
+    addressNumber: '',
+    addressComplement: '',
+    addressNeighborhood: '',
     budgetRange: '',
     urgency: 'flexible',
   });
@@ -73,6 +77,11 @@ export default function PostJob() {
       return;
     }
 
+    if (!formData.addressCep || !formData.addressStreet || !formData.addressNumber || !formData.addressNeighborhood) {
+      toast.error(t('postJob.fillAddress'));
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -86,6 +95,15 @@ export default function PostJob() {
         .or(`name_en.eq.${SERVICE_CATEGORIES.find(c => c.id === formData.category)?.name_en},name_pt.eq.${SERVICE_CATEGORIES.find(c => c.id === formData.category)?.name_pt}`)
         .maybeSingle();
 
+      // Build full address string
+      const fullAddress = [
+        formData.addressStreet,
+        formData.addressNumber,
+        formData.addressComplement,
+        formData.addressNeighborhood,
+        formData.addressCep
+      ].filter(Boolean).join(', ');
+
       // Insert job
       const { data: jobData, error: jobError } = await supabase
         .from('jobs_posted')
@@ -94,7 +112,7 @@ export default function PostJob() {
           title: formData.title,
           description: formData.description,
           category_id: categoryData?.id || null,
-          location_address: formData.location || null,
+          location_address: fullAddress,
           budget_min: budgetInfo?.min || null,
           budget_max: budgetInfo?.max || null,
           budget_disclosed: formData.budgetRange !== 'open' && formData.budgetRange !== '',
@@ -179,18 +197,76 @@ export default function PostJob() {
           <p className="text-xs text-muted-foreground">{formData.description.length}/2000</p>
         </div>
 
-        {/* Location */}
-        <div className="space-y-2">
-          <Label htmlFor="location">{t('postJob.location')}</Label>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="location"
-              placeholder={t('postJob.locationPlaceholder')}
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="pl-10"
-            />
+        {/* Address Section */}
+        <div className="space-y-4">
+          <div className="flex items-start gap-2">
+            <MapPin className="w-5 h-5 text-primary mt-0.5" />
+            <div>
+              <Label className="text-base font-medium">{t('postJob.serviceAddress')}</Label>
+              <p className="text-xs text-muted-foreground mt-1">{t('postJob.addressConfidentialNotice')}</p>
+            </div>
+          </div>
+          
+          <div className="bg-muted/50 rounded-lg p-4 space-y-4 border border-border">
+            {/* CEP */}
+            <div className="space-y-2">
+              <Label htmlFor="addressCep">{t('address.cep')} *</Label>
+              <Input
+                id="addressCep"
+                placeholder="00000-000"
+                value={formData.addressCep}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                  const formatted = value.length > 5 ? `${value.slice(0, 5)}-${value.slice(5)}` : value;
+                  setFormData({ ...formData, addressCep: formatted });
+                }}
+                maxLength={9}
+              />
+            </div>
+
+            {/* Street */}
+            <div className="space-y-2">
+              <Label htmlFor="addressStreet">{t('address.street')} *</Label>
+              <Input
+                id="addressStreet"
+                placeholder={t('address.streetPlaceholder')}
+                value={formData.addressStreet}
+                onChange={(e) => setFormData({ ...formData, addressStreet: e.target.value })}
+              />
+            </div>
+
+            {/* Number and Complement */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="addressNumber">{t('address.number')} *</Label>
+                <Input
+                  id="addressNumber"
+                  placeholder={t('address.numberPlaceholder')}
+                  value={formData.addressNumber}
+                  onChange={(e) => setFormData({ ...formData, addressNumber: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="addressComplement">{t('address.complement')}</Label>
+                <Input
+                  id="addressComplement"
+                  placeholder={t('address.complementPlaceholder')}
+                  value={formData.addressComplement}
+                  onChange={(e) => setFormData({ ...formData, addressComplement: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Neighborhood */}
+            <div className="space-y-2">
+              <Label htmlFor="addressNeighborhood">{t('address.neighborhood')} *</Label>
+              <Input
+                id="addressNeighborhood"
+                placeholder={t('address.neighborhoodPlaceholder')}
+                value={formData.addressNeighborhood}
+                onChange={(e) => setFormData({ ...formData, addressNeighborhood: e.target.value })}
+              />
+            </div>
           </div>
         </div>
 
