@@ -1832,42 +1832,55 @@ export type Database = {
       providers: {
         Row: {
           accepted_insurance: string[] | null
+          accepts_new_patients: boolean | null
           address: string | null
+          avatar_url: string | null
           avg_rating: number | null
           bids_remaining_this_month: number | null
           bio: string | null
           business_name: string
           business_type: string | null
+          category_id: string | null
+          city: string | null
           consultation_duration_minutes: number | null
+          consultation_fee: number | null
+          consultation_types: string[] | null
           contact_email: string | null
           contact_phone: string | null
           cpf_cnpj: string | null
           created_at: string | null
           crm_number: string | null
+          emergency_available: boolean | null
           google_analytics_id: string | null
           guarantee_info: string | null
           hospital_affiliations: string[] | null
           id: string
           id_type: string | null
+          insurance_accepted: string[] | null
+          is_active: boolean | null
           is_background_checked: boolean | null
           is_insured: boolean | null
           is_licensed: boolean | null
           is_verified: boolean | null
           languages: string[] | null
+          languages_spoken: string[] | null
           location_lat: number | null
           location_lng: number | null
           meta_pixel_id: string | null
           passport_number: string | null
+          provider_type: string | null
           requires_background_check: boolean | null
           response_time_hours: number | null
           service_radius_km: number | null
           specialty_id: string | null
+          state: string | null
           subscription_tier:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline: string | null
           teleconsultation_available: boolean | null
           total_jobs: number | null
+          total_patients: number | null
           total_reviews: number | null
           updated_at: string | null
           user_id: string
@@ -1876,42 +1889,55 @@ export type Database = {
         }
         Insert: {
           accepted_insurance?: string[] | null
+          accepts_new_patients?: boolean | null
           address?: string | null
+          avatar_url?: string | null
           avg_rating?: number | null
           bids_remaining_this_month?: number | null
           bio?: string | null
           business_name: string
           business_type?: string | null
+          category_id?: string | null
+          city?: string | null
           consultation_duration_minutes?: number | null
+          consultation_fee?: number | null
+          consultation_types?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
           crm_number?: string | null
+          emergency_available?: boolean | null
           google_analytics_id?: string | null
           guarantee_info?: string | null
           hospital_affiliations?: string[] | null
           id?: string
           id_type?: string | null
+          insurance_accepted?: string[] | null
+          is_active?: boolean | null
           is_background_checked?: boolean | null
           is_insured?: boolean | null
           is_licensed?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
+          languages_spoken?: string[] | null
           location_lat?: number | null
           location_lng?: number | null
           meta_pixel_id?: string | null
           passport_number?: string | null
+          provider_type?: string | null
           requires_background_check?: boolean | null
           response_time_hours?: number | null
           service_radius_km?: number | null
           specialty_id?: string | null
+          state?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
           teleconsultation_available?: boolean | null
           total_jobs?: number | null
+          total_patients?: number | null
           total_reviews?: number | null
           updated_at?: string | null
           user_id: string
@@ -1920,42 +1946,55 @@ export type Database = {
         }
         Update: {
           accepted_insurance?: string[] | null
+          accepts_new_patients?: boolean | null
           address?: string | null
+          avatar_url?: string | null
           avg_rating?: number | null
           bids_remaining_this_month?: number | null
           bio?: string | null
           business_name?: string
           business_type?: string | null
+          category_id?: string | null
+          city?: string | null
           consultation_duration_minutes?: number | null
+          consultation_fee?: number | null
+          consultation_types?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
           crm_number?: string | null
+          emergency_available?: boolean | null
           google_analytics_id?: string | null
           guarantee_info?: string | null
           hospital_affiliations?: string[] | null
           id?: string
           id_type?: string | null
+          insurance_accepted?: string[] | null
+          is_active?: boolean | null
           is_background_checked?: boolean | null
           is_insured?: boolean | null
           is_licensed?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
+          languages_spoken?: string[] | null
           location_lat?: number | null
           location_lng?: number | null
           meta_pixel_id?: string | null
           passport_number?: string | null
+          provider_type?: string | null
           requires_background_check?: boolean | null
           response_time_hours?: number | null
           service_radius_km?: number | null
           specialty_id?: string | null
+          state?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
           teleconsultation_available?: boolean | null
           total_jobs?: number | null
+          total_patients?: number | null
           total_reviews?: number | null
           updated_at?: string | null
           user_id?: string
