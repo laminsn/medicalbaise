@@ -1477,5 +1477,17 @@
     "unmute": "Com som",
     "speaker": "Alto-falante",
     "speakerOff": "Alto-falante desligado"
+  },
+  "appointments": {
+    "recentAppointments": "Consultas Recentes",
+    "emergency": "Emergência",
+    "urgent": "Urgente",
+    "routine": "Rotina",
+    "followUp": "Retorno",
+    "doctorAvailable": "médico disponível",
+    "doctorsAvailable": "médicos disponíveis",
+    "viewDetails": "Ver detalhes",
+    "errorLoading": "Falha ao carregar consultas",
+    "noRecentAppointments": "Nenhuma consulta recente"
   }
 }

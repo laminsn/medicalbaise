@@ -210,6 +210,66 @@ export type Database = {
           },
         ]
       }
+      appointments: {
+        Row: {
+          appointment_type: string | null
+          available_slots: number | null
+          category_id: string
+          chief_complaint: string | null
+          consultation_fee_max: number | null
+          consultation_fee_min: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          insurance_provider: string | null
+          location: string | null
+          preferred_datetime: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          urgency: string | null
+          user_id: string | null
+        }
+        Insert: {
+          appointment_type?: string | null
+          available_slots?: number | null
+          category_id: string
+          chief_complaint?: string | null
+          consultation_fee_max?: number | null
+          consultation_fee_min?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          insurance_provider?: string | null
+          location?: string | null
+          preferred_datetime?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          urgency?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          appointment_type?: string | null
+          available_slots?: number | null
+          category_id?: string
+          chief_complaint?: string | null
+          consultation_fee_max?: number | null
+          consultation_fee_min?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          insurance_provider?: string | null
+          location?: string | null
+          preferred_datetime?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          urgency?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
