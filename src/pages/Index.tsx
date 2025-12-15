@@ -4,7 +4,7 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { ProTierBanner } from '@/components/home/ProTierBanner';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { FeaturedProviders } from '@/components/home/FeaturedProviders';
-import { RecentJobs } from '@/components/home/RecentJobs';
+import { RecentAppointments } from '@/components/home/RecentAppointments';
 import { PromoSection } from '@/components/home/PromoSection';
 import AIChatBot from '@/components/chat/AIChatBot';
 
@@ -22,7 +22,7 @@ const Index = () => {
           <ProTierBanner />
           <CategoryGrid />
           <FeaturedProviders />
-          <RecentJobs />
+          <RecentAppointments />
           <PromoSection />
         </main>
         <AIChatBot />

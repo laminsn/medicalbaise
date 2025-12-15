@@ -1500,5 +1500,17 @@
     "unmute": "Unmute",
     "speaker": "Speaker",
     "speakerOff": "Speaker off"
+  },
+  "appointments": {
+    "recentAppointments": "Recent Consultations",
+    "emergency": "Emergency",
+    "urgent": "Urgent",
+    "routine": "Routine",
+    "followUp": "Follow-up",
+    "doctorAvailable": "doctor available",
+    "doctorsAvailable": "doctors available",
+    "viewDetails": "View details",
+    "errorLoading": "Failed to load appointments",
+    "noRecentAppointments": "No recent appointments"
   }
 }
