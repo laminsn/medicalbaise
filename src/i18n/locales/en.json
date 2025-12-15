@@ -1513,7 +1513,10 @@
     "mute": "Mute",
     "unmute": "Unmute",
     "speaker": "Speaker",
-    "speakerOff": "Speaker off"
+    "speakerOff": "Speaker off",
+    "emergency": "Emergency",
+    "recordingDisclaimer": "This call may be recorded for quality and training purposes",
+    "emergencyDisclaimer": "For life-threatening emergencies, please call 192 (SAMU) or go to the nearest emergency room"
   },
   "appointments": {
     "recentAppointments": "Recent Consultations",

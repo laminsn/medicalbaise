@@ -1490,7 +1490,10 @@
     "mute": "Mudo",
     "unmute": "Com som",
     "speaker": "Alto-falante",
-    "speakerOff": "Alto-falante desligado"
+    "speakerOff": "Alto-falante desligado",
+    "emergency": "Emergência",
+    "recordingDisclaimer": "Esta chamada pode ser gravada para fins de qualidade e treinamento",
+    "emergencyDisclaimer": "Para emergências com risco de vida, ligue 192 (SAMU) ou vá ao pronto-socorro mais próximo"
   },
   "appointments": {
     "recentAppointments": "Consultas Recentes",

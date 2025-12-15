@@ -7,10 +7,13 @@ import {
   Volume2, 
   VolumeX,
   User,
-  Loader2 
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { CallStatus } from '@/hooks/useWebRTCCall';
 
@@ -23,6 +26,8 @@ interface InAppCallProps {
   isMuted: boolean;
   isSpeakerOn: boolean;
   callDuration: number;
+  callType?: 'consultation' | 'follow-up' | 'emergency' | 'general';
+  callerSpecialty?: string;
   onAnswer: () => void;
   onDecline: () => void;
   onEndCall: () => void;
@@ -39,6 +44,8 @@ export function InAppCall({
   isMuted,
   isSpeakerOn,
   callDuration,
+  callType = 'general',
+  callerSpecialty,
   onAnswer,
   onDecline,
   onEndCall,
@@ -74,8 +81,24 @@ export function InAppCall({
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-b from-primary/90 to-primary/70 dark:from-primary/80 dark:to-background/95 flex flex-col items-center justify-between p-8">
+      {/* Emergency Disclaimer */}
+      {callType === 'emergency' && (
+        <Alert variant="destructive" className="mb-4 max-w-sm">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {t('call.emergencyDisclaimer', 'For life-threatening emergencies, please call 192 (SAMU) or go to the nearest emergency room')}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Header */}
       <div className="text-center">
+        {callType === 'emergency' && (
+          <Badge variant="destructive" className="mb-2">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            {t('call.emergency', 'Emergency')}
+          </Badge>
+        )}
         <p className="text-primary-foreground/80 text-sm font-medium">
           {getStatusText()}
         </p>
@@ -102,6 +125,11 @@ export function InAppCall({
         <h2 className="text-2xl font-bold text-primary-foreground mb-2">
           {callerName}
         </h2>
+        {callerSpecialty && (
+          <p className="text-sm text-primary-foreground/70 mb-4">
+            {callerSpecialty}
+          </p>
+        )}
         {status === 'connecting' && (
           <div className="flex items-center gap-2 text-primary-foreground/80">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -157,6 +185,13 @@ export function InAppCall({
             <PhoneOff className="h-7 w-7" />
           </Button>
         </div>
+
+        {/* Recording Disclaimer */}
+        {status === 'connected' && (
+          <p className="text-xs text-primary-foreground/60 text-center mt-4">
+            {t('call.recordingDisclaimer', 'This call may be recorded for quality and training purposes')}
+          </p>
+        )}
       </div>
     </div>
   );
