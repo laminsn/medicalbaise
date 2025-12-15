@@ -233,6 +233,167 @@ export const gettingStartedGuides: GettingStartedGuide[] = [
       'Configure appointment reminders',
       'Set quiet hours'
     ]
+  },
+  // NEW: HIPAA Compliance Guides
+  {
+    id: 11,
+    title: 'Understanding HIPAA Compliance',
+    description: 'Learn about data privacy, encrypted communications, and patient rights',
+    duration: '5 min',
+    steps: 6,
+    category: 'Security',
+    difficulty: 'Intermediate',
+    keyPoints: [
+      'All communications are end-to-end encrypted',
+      'Audit logs track all data access',
+      'Patient consent forms are digital and secure',
+      'You control who sees your medical information',
+      'Request data export anytime',
+      'Right to data deletion under LGPD/HIPAA'
+    ]
+  },
+  {
+    id: 12,
+    title: 'Sign Patient Consent Forms',
+    description: 'Electronically sign consent forms before consultations',
+    duration: '2 min',
+    steps: 4,
+    category: 'Security',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Review consent form details carefully',
+      'Electronic signatures are legally binding',
+      'Access signed forms anytime in your profile',
+      'Revoke consent when no longer needed'
+    ]
+  },
+  // NEW: Prescription Management Guides
+  {
+    id: 13,
+    title: 'View Your Prescriptions',
+    description: 'Access current and past prescriptions from your providers',
+    duration: '2 min',
+    steps: 3,
+    category: 'Prescriptions',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'View active and expired prescriptions',
+      'Check medication dosage and instructions',
+      'Track refills remaining',
+      'Send prescriptions to your pharmacy'
+    ]
+  },
+  {
+    id: 14,
+    title: 'Request Prescription Refills',
+    description: 'Request refills for ongoing medications',
+    duration: '3 min',
+    steps: 4,
+    category: 'Prescriptions',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Check refill eligibility',
+      'Request through your patient portal',
+      'Provider reviews within 24-48 hours',
+      'Get notified when ready'
+    ]
+  },
+  // NEW: Medical Records Guides
+  {
+    id: 15,
+    title: 'Upload Medical Records',
+    description: 'Securely upload lab results, imaging, and health documents',
+    duration: '3 min',
+    steps: 5,
+    category: 'Medical Records',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Supported formats: PDF, JPG, PNG, DICOM',
+      'Files are encrypted at rest and in transit',
+      'Share selectively with providers',
+      'Organize by record type and date',
+      'Download your records anytime'
+    ]
+  },
+  {
+    id: 16,
+    title: 'Share Records with Providers',
+    description: 'Grant access to your medical records for better care',
+    duration: '2 min',
+    steps: 3,
+    category: 'Medical Records',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Choose what to share',
+      'Set access duration',
+      'Revoke access anytime',
+      'View access history'
+    ]
+  },
+  // NEW: Video Consultation Enhanced Guides
+  {
+    id: 17,
+    title: 'Start a Video Consultation',
+    description: 'Complete guide to joining secure video calls with providers',
+    duration: '4 min',
+    steps: 6,
+    category: 'Video',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'WebRTC-based secure connection',
+      'No downloads required',
+      'Screen sharing available',
+      'In-call chat and file sharing',
+      'Recording with consent only',
+      'Post-consultation summary'
+    ]
+  },
+  // NEW: Insurance Verification Guides
+  {
+    id: 18,
+    title: 'Upload Insurance Information',
+    description: 'Add your insurance cards for eligibility verification',
+    duration: '3 min',
+    steps: 4,
+    category: 'Insurance',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Upload front and back of insurance card',
+      'Real-time eligibility checking',
+      'See coverage details before booking',
+      'Multiple insurance plans supported'
+    ]
+  },
+  {
+    id: 19,
+    title: 'Check Insurance Eligibility',
+    description: 'Verify your coverage before booking appointments',
+    duration: '2 min',
+    steps: 3,
+    category: 'Insurance',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Instant eligibility verification',
+      'See copay estimates',
+      'View covered services',
+      'Check deductible status'
+    ]
+  },
+  // NEW: Appointment Reminders Guides
+  {
+    id: 20,
+    title: 'Set Up Appointment Reminders',
+    description: 'Never miss an appointment with SMS, email, and calendar reminders',
+    duration: '2 min',
+    steps: 4,
+    category: 'Reminders',
+    difficulty: 'Beginner',
+    keyPoints: [
+      'Choose reminder timing (24h, 2h, 30min)',
+      'Multiple channels: SMS, email, push',
+      'Sync with Google/Apple Calendar',
+      'Customize per appointment type'
+    ]
   }
 ];
 
@@ -494,6 +655,136 @@ export const faqs: FAQ[] = [
     question: 'What should I do if I have a complaint about a provider?',
     answer: 'If you have a concern about a provider: 1) Leave an honest review describing your experience, 2) Use the "Report" button on their profile for serious issues, 3) Contact our support team with details. We investigate all reports and take appropriate action to maintain platform quality.',
     category: 'support'
+  },
+
+  // HIPAA & Security FAQs
+  {
+    id: 41,
+    question: 'How does MDBaise protect my medical information (HIPAA)?',
+    answer: 'MDBaise implements comprehensive HIPAA-compliant security measures: all communications use end-to-end encryption, data is encrypted at rest using AES-256, we maintain detailed audit logs of all data access, access is strictly role-based, and we conduct regular security audits. Our systems comply with both Brazilian LGPD and US HIPAA regulations.',
+    category: 'security'
+  },
+  {
+    id: 42,
+    question: 'What are audit logs and how do they protect me?',
+    answer: 'Audit logs are automatic records of every action taken with your health data - who accessed it, when, and what they did. You can view your personal audit trail in Settings > Privacy > Data Access Log. This transparency ensures accountability and helps detect any unauthorized access to your medical information.',
+    category: 'security'
+  },
+  {
+    id: 43,
+    question: 'How do patient consent forms work?',
+    answer: 'Before any consultation, you\'ll be asked to sign digital consent forms covering treatment consent, data sharing permissions, and teleconsultation terms. You can review, sign, and manage all consent forms in your profile under "Consent Forms". Consents can be revoked at any time, and you\'ll receive copies of everything you sign.',
+    category: 'security'
+  },
+  {
+    id: 44,
+    question: 'Is my data encrypted?',
+    answer: 'Yes, all your data is protected with enterprise-grade encryption. Data in transit uses TLS 1.3 encryption, and data at rest uses AES-256 encryption. This includes your medical records, messages, video calls, and all personal information. Even our team cannot access your encrypted data without proper authorization.',
+    category: 'security'
+  },
+
+  // Prescription Management FAQs
+  {
+    id: 45,
+    question: 'How do I view my prescriptions?',
+    answer: 'Access your prescriptions from Dashboard > Prescriptions. You\'ll see all active prescriptions with medication name, dosage, frequency, and instructions. You can also view prescription history, check refill status, and download prescriptions to share with pharmacies.',
+    category: 'prescriptions'
+  },
+  {
+    id: 46,
+    question: 'How do I request a prescription refill?',
+    answer: 'For medications with remaining refills, go to the prescription details and click "Request Refill". Your provider will be notified and typically responds within 24-48 hours. You\'ll receive a notification when the refill is approved and ready for pickup or delivery.',
+    category: 'prescriptions'
+  },
+  {
+    id: 47,
+    question: 'Can I send my prescription to any pharmacy?',
+    answer: 'Yes, you can send your e-prescription to any pharmacy that accepts electronic prescriptions. From the prescription details, click "Send to Pharmacy" and enter the pharmacy\'s details. Many pharmacies are already integrated for one-click sending.',
+    category: 'prescriptions'
+  },
+  {
+    id: 48,
+    question: 'How long are prescriptions valid?',
+    answer: 'Prescription validity depends on the medication type and your provider\'s settings. Most prescriptions are valid for 30-90 days. Controlled substances have stricter limits per regulations. Check the "Valid Until" date on each prescription for specific expiration.',
+    category: 'prescriptions'
+  },
+
+  // Medical Records FAQs
+  {
+    id: 49,
+    question: 'How do I upload medical records?',
+    answer: 'Go to Dashboard > Medical Records and click "Upload Document". You can upload lab results, imaging reports, previous medical records, and health documents. Supported formats include PDF, JPG, PNG, and DICOM for medical imaging. All uploads are encrypted and securely stored.',
+    category: 'records'
+  },
+  {
+    id: 50,
+    question: 'How do I share records with my doctor?',
+    answer: 'When booking an appointment or during a consultation, you can select which records to share with your provider. Go to Medical Records, select the files, and click "Share". You can set time-limited access or permanent sharing. Revoke access anytime from the same menu.',
+    category: 'records'
+  },
+  {
+    id: 51,
+    question: 'What types of medical records can I store?',
+    answer: 'You can store: lab results, imaging reports (X-rays, MRIs, CT scans), vaccination records, allergy lists, medication history, surgical reports, hospital discharge summaries, specialist referrals, and any other health-related documents.',
+    category: 'records'
+  },
+  {
+    id: 52,
+    question: 'Can I download all my medical records?',
+    answer: 'Yes, you can export all your medical records at any time. Go to Settings > Privacy > Export My Data to download a complete copy of your health records, prescriptions, consultation notes, and other medical information in a portable format.',
+    category: 'records'
+  },
+
+  // Insurance FAQs
+  {
+    id: 53,
+    question: 'How do I add my insurance information?',
+    answer: 'Go to Profile > Insurance and click "Add Insurance". Upload photos of your insurance card (front and back), enter your policy number, group number, and member ID. Your information will be verified automatically for most major insurance providers.',
+    category: 'insurance'
+  },
+  {
+    id: 54,
+    question: 'How does insurance eligibility verification work?',
+    answer: 'When you add your insurance or before booking with an insured provider, we perform real-time eligibility checks. You\'ll see your coverage status, estimated copay, deductible information, and which services are covered before you book.',
+    category: 'insurance'
+  },
+  {
+    id: 55,
+    question: 'What if my insurance isn\'t accepted by a provider?',
+    answer: 'You can still book with out-of-network providers and pay out-of-pocket. Some insurance plans offer out-of-network reimbursement - we provide itemized receipts you can submit for reimbursement. Check with your insurance about their out-of-network policies.',
+    category: 'insurance'
+  },
+  {
+    id: 56,
+    question: 'How do I update or remove my insurance information?',
+    answer: 'Go to Profile > Insurance to view your saved plans. Click on any insurance to edit details or upload new card images. To remove insurance, click the delete button. Changes take effect immediately for future bookings.',
+    category: 'insurance'
+  },
+
+  // Appointment Reminders FAQs
+  {
+    id: 57,
+    question: 'How do I set up appointment reminders?',
+    answer: 'Go to Settings > Notifications > Appointment Reminders. You can choose reminder timing (24h, 2h, 30min before), select channels (email, SMS, push notification), and sync with your calendar (Google, Apple, Outlook). Reminders are on by default.',
+    category: 'reminders'
+  },
+  {
+    id: 58,
+    question: 'Can I sync appointments with my calendar?',
+    answer: 'Yes! When you book an appointment, you\'ll see an "Add to Calendar" option. You can also enable automatic sync in Settings > Calendar Integration to have all appointments appear in your Google Calendar, Apple Calendar, or Outlook automatically.',
+    category: 'reminders'
+  },
+  {
+    id: 59,
+    question: 'How do I customize reminder timing?',
+    answer: 'In Settings > Notifications > Reminder Timing, you can set exactly when you want to be reminded. Options range from 1 week before to 15 minutes before. You can set multiple reminders at different times for important appointments.',
+    category: 'reminders'
+  },
+  {
+    id: 60,
+    question: 'Can providers send me custom reminders?',
+    answer: 'Yes, providers can send preparation reminders with specific instructions (like fasting before blood tests). These appear as special notifications and are also stored in your appointment details. You\'ll receive them via your preferred notification channels.',
+    category: 'reminders'
   }
 ];
 
