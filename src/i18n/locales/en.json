@@ -152,7 +152,10 @@
     "cta": "Book Appointment"
   },
   "categories": {
-    "title": "Medical Specialties",
+    "title": "Popular Specialties",
+    "browse": "Browse",
+    "noSpecialties": "No specialties available",
+    "showingCount": "Showing {{count}} of {{total}} specialties",
     "general": "General Practice",
     "cardiology": "Cardiology",
     "dermatology": "Dermatology",
