@@ -352,6 +352,217 @@ export const sops: SOP[] = [
       'Appointment slot released for other patients'
     ],
     relatedSOPs: ['SOP-PAT-001 Booking', 'SOP-FIN-002 Refunds']
+  },
+  // NEW: HIPAA Compliance SOPs
+  {
+    id: 11,
+    title: 'HIPAA Compliance and Data Protection',
+    code: 'SOP-SEC-002',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'admin',
+    department: 'Compliance',
+    overview: 'Standard procedure for maintaining HIPAA compliance, protecting patient health information, and ensuring regulatory adherence.',
+    scope: 'All staff, providers, and systems handling protected health information (PHI).',
+    responsibilities: [
+      'All Users: Follow data protection protocols, complete HIPAA training, report incidents',
+      'Compliance Team: Monitor compliance, conduct audits, manage training programs',
+      'IT Security: Implement technical safeguards, monitor access logs, respond to breaches',
+      'Providers: Obtain proper consent, limit data access to minimum necessary, secure communications'
+    ],
+    steps: [
+      { step: 1, title: 'Data Classification', description: 'Identify and classify all data as PHI, PII, or general. PHI requires highest protection level.', notes: 'PHI includes diagnoses, treatments, prescriptions, lab results.', timeEstimate: 'Ongoing' },
+      { step: 2, title: 'Access Controls', description: 'Implement role-based access. Users only access data necessary for their function.', notes: 'Regular access reviews required. Remove access when no longer needed.', timeEstimate: 'Per access request' },
+      { step: 3, title: 'Encryption Verification', description: 'Ensure all PHI is encrypted in transit (TLS 1.3) and at rest (AES-256).', notes: 'Never transmit PHI via unencrypted channels.', timeEstimate: 'System level' },
+      { step: 4, title: 'Audit Logging', description: 'Maintain detailed logs of all PHI access, modifications, and transmissions.', notes: 'Logs retained for 6 years per HIPAA requirements.', timeEstimate: 'Automatic' },
+      { step: 5, title: 'Consent Management', description: 'Obtain documented consent before collecting or sharing PHI. Provide privacy notices.', notes: 'Digital signatures are legally binding. Store consent records securely.', timeEstimate: 'Per patient interaction' },
+      { step: 6, title: 'Incident Response', description: 'Report any potential breach within 24 hours. Follow breach notification procedures if confirmed.', notes: 'Breaches affecting 500+ individuals require public notification.', timeEstimate: 'Immediate' },
+      { step: 7, title: 'Training Compliance', description: 'Complete annual HIPAA training. Maintain training records for all staff.', notes: 'New employees trained within 30 days of hire.', timeEstimate: 'Annual' }
+    ],
+    qualityChecks: [
+      'All staff completed HIPAA training within required timeframe',
+      'Access controls reviewed quarterly',
+      'Audit logs reviewed monthly for anomalies',
+      'Consent forms obtained before all consultations',
+      'Encryption verified for all data transmissions',
+      'Incident response plan tested annually'
+    ],
+    relatedSOPs: ['SOP-SEC-001 Data Security', 'SOP-EMG-002 Breach Response']
+  },
+  {
+    id: 12,
+    title: 'Patient Consent Form Management',
+    code: 'SOP-CON-001',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'patient',
+    department: 'Patient Services',
+    overview: 'Standard procedure for presenting, collecting, and managing patient consent forms for treatment and data sharing.',
+    scope: 'All patient interactions requiring informed consent.',
+    responsibilities: [
+      'Patient: Review and sign consent forms, ask questions if unclear, manage consents',
+      'Provider: Present appropriate consent forms, explain terms, document signed consents',
+      'System: Display forms, capture signatures, store securely, track consent status'
+    ],
+    steps: [
+      { step: 1, title: 'Form Presentation', description: 'Display appropriate consent form before consultation begins. Forms include treatment consent, data sharing, and teleconsultation terms.', notes: 'Forms must be accessible and readable on all devices.', timeEstimate: '1 minute' },
+      { step: 2, title: 'Patient Review', description: 'Allow patient time to read entire form. Provide explanation of key terms if requested.', notes: 'Never rush consent process. Answer all questions.', timeEstimate: '2-5 minutes' },
+      { step: 3, title: 'Digital Signature', description: 'Patient signs electronically using finger/stylus on mobile or typed signature on desktop.', notes: 'Capture timestamp, IP address, and device info with signature.', timeEstimate: '30 seconds' },
+      { step: 4, title: 'Confirmation', description: 'Display confirmation of signed consent. Provide downloadable copy.', notes: 'Copy also sent via email automatically.', timeEstimate: 'Immediate' },
+      { step: 5, title: 'Secure Storage', description: 'Store signed consent in encrypted patient record. Link to relevant appointment/consultation.', notes: 'Consents retained per regulatory requirements (typically 7 years).', timeEstimate: 'Automatic' },
+      { step: 6, title: 'Consent Management', description: 'Patient can view all consents in profile. Option to revoke applicable consents.', notes: 'Some consents cannot be revoked retroactively.', timeEstimate: 'As needed' }
+    ],
+    qualityChecks: [
+      'Consent obtained before consultation begins',
+      'All required consent types collected',
+      'Patient received copy of signed consent',
+      'Consent linked to appropriate medical record',
+      'Revocation requests processed within 24 hours'
+    ],
+    relatedSOPs: ['SOP-SEC-002 HIPAA Compliance', 'SOP-PAT-001 Booking']
+  },
+  // NEW: Prescription Management SOPs
+  {
+    id: 13,
+    title: 'E-Prescription Management',
+    code: 'SOP-RX-001',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'provider',
+    department: 'Clinical Operations',
+    overview: 'Standard procedure for creating, managing, and transmitting electronic prescriptions.',
+    scope: 'All licensed providers authorized to prescribe medications.',
+    responsibilities: [
+      'Provider: Verify patient identity, prescribe appropriately, monitor medication history',
+      'Patient: Verify prescription accuracy, report adverse reactions, request refills properly',
+      'System: Validate prescriptions, transmit to pharmacies, track refills and expirations',
+      'Pharmacy: Receive e-prescriptions, verify accuracy, dispense medications'
+    ],
+    steps: [
+      { step: 1, title: 'Patient Verification', description: 'Confirm patient identity and review current medication list and allergies.', notes: 'Check for drug interactions before prescribing.', timeEstimate: '2 minutes' },
+      { step: 2, title: 'Prescription Creation', description: 'Enter medication name, dosage, frequency, duration, quantity, and refills allowed.', notes: 'Use standard medication database for accuracy.', timeEstimate: '2-3 minutes' },
+      { step: 3, title: 'Clinical Review', description: 'System checks for drug interactions, allergies, and dosing appropriateness.', notes: 'Override requires documentation of clinical justification.', timeEstimate: '30 seconds' },
+      { step: 4, title: 'Digital Signature', description: 'Provider authenticates and signs prescription electronically.', notes: 'Two-factor authentication required for controlled substances.', timeEstimate: '30 seconds' },
+      { step: 5, title: 'Pharmacy Transmission', description: 'E-prescription transmitted to patient\'s selected pharmacy.', notes: 'Patient can choose pharmacy or pick up paper prescription.', timeEstimate: 'Immediate' },
+      { step: 6, title: 'Patient Notification', description: 'Patient receives notification with prescription details and pharmacy information.', notes: 'Instructions included in patient-facing summary.', timeEstimate: 'Immediate' },
+      { step: 7, title: 'Refill Management', description: 'System tracks refills used and remaining. Patient can request refills through portal.', notes: 'Provider reviews and approves refill requests.', timeEstimate: 'As needed' }
+    ],
+    qualityChecks: [
+      'Patient allergies verified before prescribing',
+      'Drug interaction check completed',
+      'Prescription accurately transmitted to pharmacy',
+      'Patient received prescription notification',
+      'Refill tracking accurate and current',
+      'Controlled substance prescriptions comply with regulations'
+    ],
+    relatedSOPs: ['SOP-PAT-002 Teleconsultation', 'SOP-CON-001 Consent']
+  },
+  // NEW: Medical Records SOPs
+  {
+    id: 14,
+    title: 'Medical Records Management',
+    code: 'SOP-MR-001',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'admin',
+    department: 'Health Information',
+    overview: 'Standard procedure for uploading, organizing, sharing, and securing patient medical records.',
+    scope: 'All medical documents, lab results, imaging, and health records.',
+    responsibilities: [
+      'Patient: Upload accurate records, manage sharing permissions, verify document ownership',
+      'Provider: Review shared records, add clinical notes, maintain record accuracy',
+      'System: Store securely, validate formats, manage access permissions, enable sharing',
+      'HIM Team: Audit records, ensure compliance, respond to record requests'
+    ],
+    steps: [
+      { step: 1, title: 'Document Upload', description: 'Patient uploads document via Medical Records section. Supported: PDF, images, DICOM.', notes: 'Maximum file size 50MB. Automatic virus scan on upload.', timeEstimate: '1-3 minutes' },
+      { step: 2, title: 'Document Classification', description: 'Categorize document type: lab result, imaging, prescription, clinical note, etc.', notes: 'AI-assisted classification suggested, patient confirms.', timeEstimate: '30 seconds' },
+      { step: 3, title: 'Metadata Entry', description: 'Add document date, source facility, ordering provider if applicable.', notes: 'Accurate metadata improves searchability and organization.', timeEstimate: '1 minute' },
+      { step: 4, title: 'Secure Storage', description: 'Document encrypted and stored in patient\'s secure health record.', notes: 'Data redundancy ensures no loss. Accessible indefinitely.', timeEstimate: 'Automatic' },
+      { step: 5, title: 'Sharing Configuration', description: 'Patient sets sharing permissions: which providers, for how long.', notes: 'Default is private. Sharing requires explicit action.', timeEstimate: '1 minute' },
+      { step: 6, title: 'Access Logging', description: 'All access to records logged with viewer identity, timestamp, and action.', notes: 'Patient can view access log anytime.', timeEstimate: 'Automatic' },
+      { step: 7, title: 'Export/Download', description: 'Patient can download individual documents or entire record set.', notes: 'Export formats: PDF bundle or FHIR standard for interoperability.', timeEstimate: '1-5 minutes' }
+    ],
+    qualityChecks: [
+      'All uploads encrypted before storage',
+      'Document classification accurate',
+      'Sharing permissions correctly applied',
+      'Access logs complete and accurate',
+      'Export functionality working correctly',
+      'HIPAA-compliant retention policies enforced'
+    ],
+    relatedSOPs: ['SOP-SEC-002 HIPAA Compliance', 'SOP-CON-001 Consent']
+  },
+  // NEW: Insurance Verification SOPs
+  {
+    id: 15,
+    title: 'Insurance Eligibility Verification',
+    code: 'SOP-INS-001',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'admin',
+    department: 'Revenue Cycle',
+    overview: 'Standard procedure for verifying patient insurance eligibility and coverage details.',
+    scope: 'All patients with insurance seeking covered services.',
+    responsibilities: [
+      'Patient: Provide accurate insurance information, upload current cards, report changes',
+      'System: Verify eligibility in real-time, display coverage details, calculate patient responsibility',
+      'Provider: Review coverage before treatment, bill appropriately',
+      'Billing Team: Process claims, follow up on denials, update coverage records'
+    ],
+    steps: [
+      { step: 1, title: 'Insurance Entry', description: 'Patient enters insurance details: provider, policy number, group number, member ID.', notes: 'Upload card images for verification reference.', timeEstimate: '2-3 minutes' },
+      { step: 2, title: 'Card Image Capture', description: 'Patient uploads photos of insurance card front and back.', notes: 'OCR extracts data to reduce manual entry errors.', timeEstimate: '1 minute' },
+      { step: 3, title: 'Eligibility Check', description: 'System queries payer database for real-time eligibility verification.', notes: 'Results typically returned within 5-15 seconds.', timeEstimate: '15 seconds' },
+      { step: 4, title: 'Coverage Display', description: 'Show patient: active/inactive status, deductible, copay, covered services.', notes: 'Estimated costs displayed before booking.', timeEstimate: 'Immediate' },
+      { step: 5, title: 'Service Verification', description: 'Confirm specific service is covered under patient\'s plan.', notes: 'Some services require prior authorization.', timeEstimate: '1 minute' },
+      { step: 6, title: 'Cost Estimate', description: 'Calculate and display estimated patient responsibility based on coverage.', notes: 'Actual costs may vary based on services rendered.', timeEstimate: 'Automatic' },
+      { step: 7, title: 'Documentation', description: 'Store verification results for billing reference and audit trail.', notes: 'Re-verify for services 30+ days after initial check.', timeEstimate: 'Automatic' }
+    ],
+    qualityChecks: [
+      'Insurance information accurately entered',
+      'Eligibility verified within 24 hours of appointment',
+      'Coverage details correctly displayed to patient',
+      'Cost estimates within 10% of actual charges',
+      'Prior authorization obtained when required',
+      'Verification documented for billing compliance'
+    ],
+    relatedSOPs: ['SOP-FIN-001 Payment Processing', 'SOP-PAT-001 Booking']
+  },
+  // NEW: Appointment Reminders SOPs
+  {
+    id: 16,
+    title: 'Appointment Reminder System',
+    code: 'SOP-REM-001',
+    version: '1.0',
+    lastUpdated: '2024-12-10',
+    category: 'admin',
+    department: 'Patient Engagement',
+    overview: 'Standard procedure for configuring and delivering appointment reminders via multiple channels.',
+    scope: 'All confirmed appointments requiring patient notification.',
+    responsibilities: [
+      'Patient: Configure preferred reminder settings, act on reminders, update contact info',
+      'System: Send reminders at configured times, track delivery status, log interactions',
+      'Provider: Set appointment-specific instructions, customize reminder templates'
+    ],
+    steps: [
+      { step: 1, title: 'Preference Configuration', description: 'Patient sets reminder preferences: timing (24h, 2h, 30min), channels (email, SMS, push).', notes: 'Default: email 24h before, push 2h before.', timeEstimate: '2 minutes' },
+      { step: 2, title: 'Calendar Integration', description: 'Sync appointments with external calendars (Google, Apple, Outlook).', notes: 'Calendar events include appointment details and join links.', timeEstimate: '2 minutes' },
+      { step: 3, title: 'Reminder Scheduling', description: 'System schedules reminders based on appointment time and patient preferences.', notes: 'Handles timezone differences automatically.', timeEstimate: 'Automatic' },
+      { step: 4, title: 'Content Personalization', description: 'Include appointment details, provider info, preparation instructions.', notes: 'Provider can add custom pre-appointment instructions.', timeEstimate: 'Automatic' },
+      { step: 5, title: 'Delivery Execution', description: 'Send reminder via configured channels at scheduled time.', notes: 'Retry failed deliveries. Log delivery status.', timeEstimate: 'Automatic' },
+      { step: 6, title: 'Confirmation Tracking', description: 'Track whether patient opened/acknowledged reminder.', notes: 'Follow up if no acknowledgment 4 hours before appointment.', timeEstimate: 'Ongoing' },
+      { step: 7, title: 'No-Show Prevention', description: 'Send final reminder 1 hour before. Offer easy reschedule option if needed.', notes: 'Reduces no-show rate by up to 50%.', timeEstimate: 'Automatic' }
+    ],
+    qualityChecks: [
+      'Reminders sent at configured times',
+      'Delivery rate above 98%',
+      'Calendar sync functional for major providers',
+      'Preparation instructions included when applicable',
+      'No-show rate tracked and trending downward',
+      'Patient can easily modify preferences'
+    ],
+    relatedSOPs: ['SOP-PAT-001 Booking', 'SOP-PAT-003 Cancellation']
   }
 ];
 
@@ -591,6 +802,84 @@ export const videos: Video[] = [
       { time: '2:00', title: 'Booking Process' },
       { time: '3:30', title: 'Managing Appointments' }
     ]
+  },
+  // NEW: HIPAA & Security Videos
+  {
+    id: 16,
+    title: 'Understanding HIPAA: Your Data Privacy Rights',
+    description: 'Learn how MDBaise protects your medical information with HIPAA-compliant security measures.',
+    category: 'features',
+    duration: '8:30',
+    views: 8900,
+    likes: 712,
+    isNew: true,
+    chapters: [
+      { time: '0:00', title: 'What is HIPAA?' },
+      { time: '2:30', title: 'How We Protect Your Data' },
+      { time: '5:00', title: 'Your Privacy Rights' },
+      { time: '7:00', title: 'Managing Consent Forms' }
+    ]
+  },
+  {
+    id: 17,
+    title: 'Managing Your Prescriptions',
+    description: 'View prescriptions, request refills, and send e-prescriptions to your pharmacy.',
+    category: 'features',
+    duration: '6:45',
+    views: 12300,
+    likes: 945,
+    isNew: true,
+    chapters: [
+      { time: '0:00', title: 'Viewing Prescriptions' },
+      { time: '2:00', title: 'Requesting Refills' },
+      { time: '4:00', title: 'Sending to Pharmacy' }
+    ]
+  },
+  {
+    id: 18,
+    title: 'Uploading and Sharing Medical Records',
+    description: 'Securely store lab results, imaging, and health documents in your personal health record.',
+    category: 'features',
+    duration: '7:20',
+    views: 9800,
+    likes: 823,
+    isNew: true,
+    chapters: [
+      { time: '0:00', title: 'Uploading Documents' },
+      { time: '2:30', title: 'Organizing Records' },
+      { time: '4:30', title: 'Sharing with Providers' },
+      { time: '6:00', title: 'Downloading Your Records' }
+    ]
+  },
+  {
+    id: 19,
+    title: 'Insurance Verification Made Easy',
+    description: 'Add your insurance, check eligibility, and see coverage before booking.',
+    category: 'features',
+    duration: '5:50',
+    views: 7600,
+    likes: 589,
+    isNew: true,
+    chapters: [
+      { time: '0:00', title: 'Adding Insurance' },
+      { time: '2:00', title: 'Eligibility Checks' },
+      { time: '4:00', title: 'Understanding Coverage' }
+    ]
+  },
+  {
+    id: 20,
+    title: 'Setting Up Appointment Reminders',
+    description: 'Configure SMS, email, and calendar reminders so you never miss an appointment.',
+    category: 'tips',
+    duration: '4:30',
+    views: 14200,
+    likes: 1120,
+    isNew: true,
+    chapters: [
+      { time: '0:00', title: 'Reminder Options' },
+      { time: '1:30', title: 'Calendar Sync' },
+      { time: '3:00', title: 'Custom Timing' }
+    ]
   }
 ];
 
@@ -603,7 +892,12 @@ export const faqCategories = [
   { id: 'teleconsultation', label: 'Teleconsultation' },
   { id: 'providers', label: 'For Providers' },
   { id: 'features', label: 'Features' },
-  { id: 'support', label: 'Support' }
+  { id: 'support', label: 'Support' },
+  { id: 'security', label: 'Security & HIPAA' },
+  { id: 'prescriptions', label: 'Prescriptions' },
+  { id: 'records', label: 'Medical Records' },
+  { id: 'insurance', label: 'Insurance' },
+  { id: 'reminders', label: 'Reminders' }
 ];
 
 export const tutorialCategories = [

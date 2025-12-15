@@ -143,6 +143,109 @@ export type Database = {
           },
         ]
       }
+      appointment_reminders: {
+        Row: {
+          channel: string | null
+          created_at: string
+          id: string
+          job_id: string
+          message: string | null
+          metadata: Json | null
+          patient_id: string
+          provider_id: string | null
+          reminder_type: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          message?: string | null
+          metadata?: Json | null
+          patient_id: string
+          provider_id?: string | null
+          reminder_type: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          message?: string | null
+          metadata?: Json | null
+          patient_id?: string
+          provider_id?: string | null
+          reminder_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_posted"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_reminders_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_reminders_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bid_portfolio_items: {
         Row: {
           bid_id: string
@@ -462,6 +565,78 @@ export type Database = {
           },
         ]
       }
+      insurance_verifications: {
+        Row: {
+          card_back_url: string | null
+          card_front_url: string | null
+          coverage_details: Json | null
+          created_at: string
+          eligibility_data: Json | null
+          expires_at: string | null
+          group_number: string | null
+          id: string
+          insurance_provider: string
+          member_id: string | null
+          patient_id: string
+          policy_number: string
+          provider_id: string | null
+          updated_at: string
+          verification_status: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          card_back_url?: string | null
+          card_front_url?: string | null
+          coverage_details?: Json | null
+          created_at?: string
+          eligibility_data?: Json | null
+          expires_at?: string | null
+          group_number?: string | null
+          id?: string
+          insurance_provider: string
+          member_id?: string | null
+          patient_id: string
+          policy_number: string
+          provider_id?: string | null
+          updated_at?: string
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          card_back_url?: string | null
+          card_front_url?: string | null
+          coverage_details?: Json | null
+          created_at?: string
+          eligibility_data?: Json | null
+          expires_at?: string | null
+          group_number?: string | null
+          id?: string
+          insurance_provider?: string
+          member_id?: string | null
+          patient_id?: string
+          policy_number?: string
+          provider_id?: string | null
+          updated_at?: string
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_verifications_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_verifications_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_media: {
         Row: {
           id: string
@@ -636,6 +811,78 @@ export type Database = {
           },
         ]
       }
+      medical_records: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_name: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          is_confidential: boolean | null
+          metadata: Json | null
+          mime_type: string | null
+          patient_id: string
+          provider_id: string | null
+          record_date: string | null
+          record_type: string
+          title: string
+          updated_at: string
+          uploaded_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          is_confidential?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          patient_id: string
+          provider_id?: string | null
+          record_date?: string | null
+          record_type: string
+          title: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          is_confidential?: boolean | null
+          metadata?: Json | null
+          mime_type?: string | null
+          patient_id?: string
+          provider_id?: string | null
+          record_date?: string | null
+          record_type?: string
+          title?: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_records_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_records_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -757,6 +1004,66 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      patient_consents: {
+        Row: {
+          consent_text: string
+          consent_type: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          ip_address: unknown
+          is_active: boolean | null
+          patient_id: string
+          provider_id: string | null
+          signature_data: string | null
+          signed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          consent_text: string
+          consent_type: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown
+          is_active?: boolean | null
+          patient_id: string
+          provider_id?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consent_text?: string
+          consent_type?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown
+          is_active?: boolean | null
+          patient_id?: string
+          provider_id?: string | null
+          signature_data?: string | null
+          signed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_consents_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_consents_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_milestones: {
         Row: {
@@ -923,6 +1230,88 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescriptions: {
+        Row: {
+          created_at: string
+          dosage: string
+          duration: string | null
+          expires_at: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          job_id: string | null
+          medication_name: string
+          patient_id: string
+          pharmacy_notes: string | null
+          prescribed_at: string
+          provider_id: string
+          refills_allowed: number | null
+          refills_used: number | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dosage: string
+          duration?: string | null
+          expires_at?: string | null
+          frequency: string
+          id?: string
+          instructions?: string | null
+          job_id?: string | null
+          medication_name: string
+          patient_id: string
+          pharmacy_notes?: string | null
+          prescribed_at?: string
+          provider_id: string
+          refills_allowed?: number | null
+          refills_used?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dosage?: string
+          duration?: string | null
+          expires_at?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          job_id?: string | null
+          medication_name?: string
+          patient_id?: string
+          pharmacy_notes?: string | null
+          prescribed_at?: string
+          provider_id?: string
+          refills_allowed?: number | null
+          refills_used?: number | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_posted"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescriptions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2253,6 +2642,82 @@ export type Database = {
           },
         ]
       }
+      video_sessions: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          created_at: string
+          id: string
+          job_id: string | null
+          patient_id: string
+          provider_id: string
+          recording_consent: boolean | null
+          recording_url: string | null
+          scheduled_end: string | null
+          scheduled_start: string
+          session_notes: string | null
+          status: string | null
+          technical_quality_rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          patient_id: string
+          provider_id: string
+          recording_consent?: boolean | null
+          recording_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start: string
+          session_notes?: string | null
+          status?: string | null
+          technical_quality_rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          patient_id?: string
+          provider_id?: string
+          recording_consent?: boolean | null
+          recording_url?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string
+          session_notes?: string | null
+          status?: string | null
+          technical_quality_rating?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_sessions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs_posted"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_sessions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_sessions_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_testimonials: {
         Row: {
           approved_at: string | null
@@ -2518,6 +2983,15 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_audit_event: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_resource_id?: string
+          p_resource_type: string
+        }
+        Returns: string
       }
     }
     Enums: {
