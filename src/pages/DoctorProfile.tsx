@@ -1,0 +1,1004 @@
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { useFavorites } from '@/hooks/useFavorites';
+import {
+  Star,
+  MapPin,
+  Clock,
+  Award,
+  CheckCircle2,
+  MessageCircle,
+  Calendar,
+  Heart,
+  Share2,
+  ChevronLeft,
+  Languages as LanguagesIcon,
+  ThumbsUp,
+  Crown,
+  BadgeCheck,
+  Phone,
+  Video,
+  Send,
+  GraduationCap,
+  Hospital,
+  CreditCard,
+  Stethoscope,
+  AlertCircle,
+  Loader2,
+  Users,
+  Building2,
+  ShieldCheck,
+} from 'lucide-react';
+import { VideoTestimonialList } from '@/components/testimonials/VideoTestimonialList';
+import { UploadTestimonialDialog } from '@/components/testimonials/UploadTestimonialDialog';
+import { useStartConversation } from '@/hooks/useMessages';
+import { useAuth } from '@/hooks/useAuth';
+import { useTrackProfileView } from '@/hooks/useProfileViews';
+import { toast } from 'sonner';
+import { MEDICAL_CATEGORIES } from '@/lib/constants/medical';
+
+// Mock data for development
+const mockDoctor = {
+  id: '1',
+  business_name: 'Maria Silva',
+  specialty_id: 'cardiology',
+  specialty_name: 'Cardiologia',
+  tagline: 'Especialista em Cardiologia Clínica e Preventiva',
+  bio: 'Médica cardiologista com mais de 15 anos de experiência no diagnóstico e tratamento de doenças cardiovasculares. Graduada pela USP, com residência no InCor e fellowship em cardiologia intervencionista. Atendimento humanizado com foco na prevenção e no bem-estar dos pacientes.',
+  avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400',
+  years_experience: 15,
+  total_patients: 2847,
+  total_reviews: 328,
+  avg_rating: 4.9,
+  response_time_hours: 2,
+  is_verified: true,
+  is_licensed: true,
+  is_board_certified: true,
+  has_hospital_privileges: true,
+  subscription_tier: 'elite',
+  city: 'São Paulo',
+  state: 'SP',
+  crm_number: 'CRM/SP 123456',
+  medical_school: 'Faculdade de Medicina da USP',
+  residency: 'InCor - Instituto do Coração',
+  fellowship: 'Cardiologia Intervencionista - Hospital Sírio-Libanês',
+  languages: ['Português', 'English', 'Español'],
+  consultation_types: ['in-person', 'teleconsultation'],
+  consultation_fee: 350,
+  insurance_accepted: ['Unimed', 'Bradesco Saúde', 'Amil', 'SulAmérica', 'Porto Seguro', 'Golden Cross'],
+  hospital_affiliations: ['Hospital Sírio-Libanês', 'Hospital Israelita Albert Einstein', 'Hospital do Coração (HCor)'],
+  accepts_new_patients: true,
+  telehealth_available: true,
+  emergency_available: false,
+  patient_satisfaction: 96,
+  appointment_punctuality: 94,
+  successful_treatments: 89,
+};
+
+const mockProcedures = [
+  { 
+    id: '1', 
+    name: 'Consulta Cardiológica',
+    name_en: 'Cardiology Consultation',
+    consultation_fee: 350, 
+    description: 'Avaliação completa do sistema cardiovascular com análise de histórico médico e exame físico',
+    description_en: 'Complete cardiovascular system assessment with medical history analysis and physical examination',
+    duration: '45 minutos',
+    preparation: 'Trazer exames cardiológicos anteriores',
+    is_active: true,
+  },
+  { 
+    id: '2', 
+    name: 'Ecocardiograma com Doppler',
+    name_en: 'Echocardiogram with Doppler',
+    consultation_fee: 480, 
+    description: 'Ultrassom do coração para avaliar estrutura, função e fluxo sanguíneo',
+    description_en: 'Heart ultrasound to evaluate structure, function and blood flow',
+    duration: '30 minutos',
+    preparation: 'Jejum de 3 horas',
+    is_active: true,
+  },
+  { 
+    id: '3', 
+    name: 'Teste Ergométrico',
+    name_en: 'Exercise Stress Test',
+    consultation_fee: 420, 
+    description: 'Avaliação cardiovascular durante exercício físico em esteira',
+    description_en: 'Cardiovascular assessment during treadmill exercise',
+    duration: '40 minutos',
+    preparation: 'Roupas leves, tênis e não fazer refeições pesadas 2h antes',
+    is_active: true,
+  },
+  { 
+    id: '4', 
+    name: 'Holter 24 horas',
+    name_en: '24-hour Holter Monitor',
+    consultation_fee: 550, 
+    description: 'Monitoramento contínuo da atividade elétrica do coração por 24 horas',
+    description_en: 'Continuous monitoring of heart electrical activity for 24 hours',
+    duration: 'Instalação: 15 minutos',
+    preparation: 'Retornar no dia seguinte para retirada',
+    is_active: true,
+  },
+];
+
+const mockCredentials = [
+  { 
+    id: '1', 
+    type: 'education',
+    title: 'Graduação em Medicina',
+    title_en: 'Medical Degree',
+    institution: 'Faculdade de Medicina da Universidade de São Paulo (FMUSP)',
+    year: '2004-2009',
+  },
+  { 
+    id: '2', 
+    type: 'residency',
+    title: 'Residência Médica em Cardiologia',
+    title_en: 'Cardiology Residency',
+    institution: 'InCor - Instituto do Coração HC-FMUSP',
+    year: '2010-2012',
+  },
+  { 
+    id: '3', 
+    type: 'fellowship',
+    title: 'Fellowship em Cardiologia Intervencionista',
+    title_en: 'Interventional Cardiology Fellowship',
+    institution: 'Hospital Sírio-Libanês',
+    year: '2012-2014',
+  },
+  { 
+    id: '4', 
+    type: 'certification',
+    title: 'Título de Especialista em Cardiologia',
+    title_en: 'Board Certification in Cardiology',
+    institution: 'Sociedade Brasileira de Cardiologia (SBC)',
+    year: '2013',
+  },
+];
+
+const mockReviews = [
+  {
+    id: '1',
+    customer_name: 'Maria Santos',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
+    rating: 5,
+    date: '2 semanas atrás',
+    comment: 'Excelente profissional! Dra. Maria foi muito atenciosa, explicou tudo com clareza e me deixou super tranquila.',
+    quality_rating: 5,
+    professionalism_rating: 5,
+    punctuality_rating: 5,
+    verified: true,
+    helpful_count: 47,
+    provider_response: 'Muito obrigada Maria! Foi um prazer cuidar da sua saúde.',
+  },
+  {
+    id: '2',
+    customer_name: 'João Pedro',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+    rating: 5,
+    date: '1 mês atrás',
+    comment: 'Depois de passar por vários cardiologistas, finalmente encontrei uma médica que realmente se importa.',
+    quality_rating: 5,
+    professionalism_rating: 5,
+    punctuality_rating: 5,
+    verified: true,
+    helpful_count: 34,
+  },
+];
+
+const mockFAQs = [
+  { 
+    question: 'Preciso de pedido médico para consulta?',
+    question_en: 'Do I need a referral for consultation?',
+    answer: 'Não é necessário pedido médico para primeira consulta. Basta agendar diretamente.',
+    answer_en: 'No referral needed for first consultation. Just schedule directly.'
+  },
+  { 
+    question: 'Quais convênios são aceitos?',
+    question_en: 'Which insurance plans are accepted?',
+    answer: 'Atendo Unimed, Bradesco Saúde, Amil, SulAmérica, Porto Seguro e Golden Cross.',
+    answer_en: 'I accept Unimed, Bradesco Saúde, Amil, SulAmérica, Porto Seguro and Golden Cross.'
+  },
+  { 
+    question: 'Realiza atendimento de emergência?',
+    question_en: 'Do you provide emergency care?',
+    answer: 'Não realizo atendimentos de emergência. Em casos urgentes, procure o pronto-socorro mais próximo.',
+    answer_en: 'I do not provide emergency care. In urgent cases, seek the nearest emergency room.'
+  },
+];
+
+const ratingDistribution = [
+  { stars: 5, percentage: 91 },
+  { stars: 4, percentage: 7 },
+  { stars: 3, percentage: 1 },
+  { stars: 2, percentage: 1 },
+  { stars: 1, percentage: 0 },
+];
+
+export default function DoctorProfile() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const { startConversation } = useStartConversation();
+  const { isFavorited, toggleFavorite } = useFavorites();
+  
+  const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const [isStartingConversation, setIsStartingConversation] = useState(false);
+
+  const doctor = mockDoctor;
+
+  useTrackProfileView(id, 'doctor_profile');
+
+  const { isLoading, error } = useQuery({
+    queryKey: ['doctor-profile', id],
+    queryFn: async () => {
+      if (!id) return null;
+      
+      const { data, error } = await supabase
+        .from('providers')
+        .select('*')
+        .eq('id', id)
+        .eq('provider_type', 'healthcare')
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const canMessage = doctor.subscription_tier === 'elite' || doctor.subscription_tier === 'enterprise';
+
+  const handleMessageDoctor = async () => {
+    if (!user) {
+      toast.error(t('auth.loginRequired'));
+      navigate('/auth?redirect=/doctor/' + id);
+      return;
+    }
+
+    if (!canMessage) {
+      toast.error(t('messages.eliteRequired'));
+      return;
+    }
+
+    try {
+      setIsStartingConversation(true);
+      const conversationId = await startConversation(id || doctor.id);
+      if (conversationId) {
+        navigate(`/chat/${conversationId}`);
+      }
+    } catch {
+      toast.error(t('messages.startError'));
+    } finally {
+      setIsStartingConversation(false);
+    }
+  };
+
+  const handleBookAppointment = () => {
+    if (!user) {
+      toast.error(t('auth.loginRequired'));
+      navigate('/auth?redirect=/doctor/' + id);
+      return;
+    }
+    navigate(`/book-appointment/${id}`);
+  };
+
+  const handleRequestTeleconsultation = () => {
+    if (!user) {
+      toast.error(t('auth.loginRequired'));
+      navigate('/auth?redirect=/doctor/' + id);
+      return;
+    }
+
+    if (!doctor.telehealth_available) {
+      toast.error(t('doctorProfile.telehealthNotAvailable'));
+      return;
+    }
+    
+    navigate(`/book-appointment/${id}?type=teleconsultation`);
+  };
+
+  const handleToggleFavorite = () => {
+    if (!user) {
+      toast.error(t('auth.loginRequired'));
+      navigate('/auth');
+      return;
+    }
+    toggleFavorite(id || doctor.id, doctor.business_name);
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Dr. ${doctor.business_name} - ${doctor.specialty_name}`,
+          text: doctor.tagline,
+          url: url,
+        });
+        toast.success(t('common.shared'));
+      } catch {
+        // User cancelled share
+      }
+    } else {
+      navigator.clipboard.writeText(url);
+      toast.success(t('common.linkCopied'));
+    }
+  };
+
+  const getTierBadge = (tier: string) => {
+    switch (tier) {
+      case 'elite':
+        return (
+          <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 border-0">
+            <Crown className="h-3 w-3 mr-1" /> Elite
+          </Badge>
+        );
+      case 'enterprise':
+        return (
+          <Badge className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 border-0">
+            <Building2 className="h-3 w-3 mr-1" /> Enterprise
+          </Badge>
+        );
+      default:
+        return <Badge variant="secondary">Pro</Badge>;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-sm text-muted-foreground">{t('doctorProfile.loading')}</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="px-4 py-8">
+          <Alert variant="destructive" className="max-w-md mx-auto">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{t('doctorProfile.errorLoading')}</AlertDescription>
+          </Alert>
+          <div className="text-center mt-4">
+            <Button onClick={() => navigate('/browse')} variant="outline">
+              {t('common.backToBrowse')}
+            </Button>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  return (
+    <>
+      <Helmet>
+        <title>Dr. {doctor.business_name} - {doctor.specialty_name} | MDBaise</title>
+        <meta name="description" content={doctor.tagline} />
+      </Helmet>
+      
+      <AppLayout>
+        <div className="pb-24">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-primary/10 to-blue-500/10 px-4 py-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              {t('common.back')}
+            </Button>
+            
+            <div className="flex items-start gap-4">
+              <Avatar className="h-20 w-20 border-4 border-background shadow-lg">
+                <AvatarImage src={doctor.avatar_url} alt={`Dr. ${doctor.business_name}`} />
+                <AvatarFallback>{doctor.business_name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h1 className="text-xl font-bold truncate">Dr. {doctor.business_name}</h1>
+                  {doctor.is_verified && (
+                    <BadgeCheck className="h-5 w-5 text-primary flex-shrink-0" aria-label={t('doctorProfile.verified')} />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{doctor.tagline}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {getTierBadge(doctor.subscription_tier)}
+                  <Badge variant="outline" className="text-xs">
+                    <Stethoscope className="h-3 w-3 mr-1" />
+                    {doctor.specialty_name}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {doctor.city}, {doctor.state}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                  <span className="font-bold">{doctor.avg_rating}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{doctor.total_reviews} {t('doctorProfile.reviews')}</p>
+              </div>
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <p className="font-bold">{doctor.total_patients}</p>
+                <p className="text-xs text-muted-foreground">{t('doctorProfile.patients')}</p>
+              </div>
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <p className="font-bold">{doctor.years_experience}</p>
+                <p className="text-xs text-muted-foreground">{t('doctorProfile.yearsExp')}</p>
+              </div>
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Clock className="h-3 w-3 text-primary" />
+                  <span className="font-bold">&lt;{doctor.response_time_hours}h</span>
+                </div>
+                <p className="text-xs text-muted-foreground">{t('doctorProfile.response')}</p>
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {doctor.is_licensed && (
+                <Badge variant="outline" className="bg-background/80 text-xs">
+                  <ShieldCheck className="h-3 w-3 mr-1 text-green-600" />
+                  {doctor.crm_number}
+                </Badge>
+              )}
+              {doctor.is_board_certified && (
+                <Badge variant="outline" className="bg-background/80 text-xs">
+                  <Award className="h-3 w-3 mr-1 text-green-600" />
+                  {t('doctorProfile.boardCertified')}
+                </Badge>
+              )}
+              {doctor.telehealth_available && (
+                <Badge variant="outline" className="bg-background/80 text-xs">
+                  <Video className="h-3 w-3 mr-1 text-blue-600" />
+                  {t('doctorProfile.telemedicine')}
+                </Badge>
+              )}
+              {doctor.accepts_new_patients && (
+                <Badge variant="outline" className="bg-background/80 text-xs border-green-600 text-green-600">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  {t('doctorProfile.acceptingNewPatients')}
+                </Badge>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <Button className="w-full" onClick={handleBookAppointment} disabled={!doctor.accepts_new_patients}>
+                <Calendar className="h-4 w-4 mr-2" />
+                {t('doctorProfile.bookAppointment')}
+              </Button>
+              <Button variant="outline" onClick={handleRequestTeleconsultation} disabled={!doctor.telehealth_available}>
+                <Video className="h-4 w-4 mr-2" />
+                {t('doctorProfile.teleconsultation')}
+              </Button>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <Button variant="secondary" className="flex-1 relative" onClick={handleMessageDoctor} disabled={isStartingConversation}>
+                {isStartingConversation ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('common.loading')}
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    {t('doctorProfile.messageDoctor')}
+                  </>
+                )}
+                {!canMessage && (
+                  <Badge className="absolute -top-2 -right-2 bg-amber-500 text-[10px] px-1 pointer-events-none">
+                    <Crown className="h-2.5 w-2.5 mr-0.5" />
+                    Elite+
+                  </Badge>
+                )}
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleToggleFavorite}>
+                <Heart className={`h-4 w-4 ${isFavorited(id || doctor.id) ? 'fill-red-500 text-red-500' : ''}`} />
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleShare}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Tabs Content */}
+          <Tabs defaultValue="about" className="px-4 mt-4">
+            <TabsList className="grid w-full grid-cols-5 mb-4">
+              <TabsTrigger value="about" className="text-xs">{t('doctorProfile.about')}</TabsTrigger>
+              <TabsTrigger value="procedures" className="text-xs">{t('doctorProfile.procedures')}</TabsTrigger>
+              <TabsTrigger value="credentials" className="text-xs">{t('doctorProfile.credentials')}</TabsTrigger>
+              <TabsTrigger value="videos" className="text-xs">
+                <Video className="h-3 w-3 mr-1" />
+                {t('doctorProfile.videos')}
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="text-xs">{t('doctorProfile.reviewsTab')}</TabsTrigger>
+            </TabsList>
+
+            {/* About Tab */}
+            <TabsContent value="about" className="space-y-4 mt-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{t('doctorProfile.aboutDoctor')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{doctor.bio}</p>
+                  
+                  <Separator className="my-4" />
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground">{t('doctorProfile.medicalSchool')}</p>
+                        <p className="text-sm font-medium">{doctor.medical_school}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Hospital className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground">{t('doctorProfile.residency')}</p>
+                        <p className="text-sm font-medium">{doctor.residency}</p>
+                      </div>
+                    </div>
+
+                    {doctor.fellowship && (
+                      <div className="flex items-start gap-3">
+                        <Award className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{t('doctorProfile.fellowship')}</p>
+                          <p className="text-sm font-medium">{doctor.fellowship}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-start gap-3">
+                      <LanguagesIcon className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground">{t('doctorProfile.languages')}</p>
+                        <p className="text-sm font-medium">{doctor.languages.join(', ')}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Calendar className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-muted-foreground">{t('doctorProfile.experience')}</p>
+                        <p className="text-sm font-medium">{t('doctorProfile.yearsOfExperience', { years: doctor.years_experience })}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Hospital Affiliations */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Hospital className="h-4 w-4 text-primary" />
+                    {t('doctorProfile.hospitalAffiliations')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {doctor.hospital_affiliations.map((hospital, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span>{hospital}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Insurance Accepted */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-primary" />
+                    {t('doctorProfile.insuranceAccepted')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {doctor.insurance_accepted.map((insurance, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">{insurance}</Badge>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">{t('doctorProfile.insuranceNote')}</p>
+                </CardContent>
+              </Card>
+
+              {/* Consultation Types */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Video className="h-4 w-4 text-primary" />
+                    {t('doctorProfile.consultationTypes')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {doctor.consultation_types.includes('in-person') && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Hospital className="h-4 w-4 text-primary" />
+                        <span>{t('doctorProfile.inPersonConsultation')}</span>
+                      </div>
+                    )}
+                    {doctor.consultation_types.includes('teleconsultation') && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Video className="h-4 w-4 text-primary" />
+                        <span>{t('doctorProfile.videoConsultation')}</span>
+                      </div>
+                    )}
+                    {doctor.consultation_types.includes('phone') && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-4 w-4 text-primary" />
+                        <span>{t('doctorProfile.phoneConsultation')}</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Performance Metrics */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{t('doctorProfile.performanceMetrics')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{t('doctorProfile.patientSatisfaction')}</span>
+                      <span className="font-medium">{doctor.patient_satisfaction}%</span>
+                    </div>
+                    <Progress value={doctor.patient_satisfaction} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{t('doctorProfile.appointmentPunctuality')}</span>
+                      <span className="font-medium">{doctor.appointment_punctuality}%</span>
+                    </div>
+                    <Progress value={doctor.appointment_punctuality} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{t('doctorProfile.treatmentSuccess')}</span>
+                      <span className="font-medium">{doctor.successful_treatments}%</span>
+                    </div>
+                    <Progress value={doctor.successful_treatments} className="h-2" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* FAQ */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{t('doctorProfile.faq')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {mockFAQs.map((faq, index) => (
+                    <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
+                      <p className="font-medium text-sm">
+                        {i18n.language === 'pt' ? faq.question : faq.question_en}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {i18n.language === 'pt' ? faq.answer : faq.answer_en}
+                      </p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Procedures Tab */}
+            <TabsContent value="procedures" className="space-y-3 mt-4">
+              {mockProcedures.map((procedure) => (
+                <Card key={procedure.id}>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-base">
+                          {i18n.language === 'pt' ? procedure.name : procedure.name_en}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {i18n.language === 'pt' ? procedure.description : procedure.description_en}
+                        </p>
+                        <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3 flex-shrink-0" />
+                            <span>{procedure.duration}</span>
+                          </div>
+                          {procedure.preparation && (
+                            <div className="flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                              <span>{procedure.preparation}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-primary text-lg whitespace-nowrap">
+                          R${procedure.consultation_fee}
+                        </p>
+                        <Button size="sm" className="mt-2 w-full min-w-[100px]" onClick={handleBookAppointment}>
+                          <Calendar className="h-3 w-3 mr-1" />
+                          {t('doctorProfile.book')}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+
+            {/* Credentials Tab */}
+            <TabsContent value="credentials" className="space-y-3 mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">{t('doctorProfile.educationTraining')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {mockCredentials.map((cred) => (
+                    <div key={cred.id} className="flex gap-3 pb-4 border-b last:border-0 last:pb-0">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        {cred.type === 'education' && <GraduationCap className="h-5 w-5 text-primary" />}
+                        {cred.type === 'residency' && <Hospital className="h-5 w-5 text-primary" />}
+                        {cred.type === 'fellowship' && <Award className="h-5 w-5 text-primary" />}
+                        {cred.type === 'certification' && <BadgeCheck className="h-5 w-5 text-primary" />}
+                        {cred.type === 'membership' && <Users className="h-5 w-5 text-primary" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm">
+                          {i18n.language === 'pt' ? cred.title : cred.title_en}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">{cred.institution}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{cred.year}</p>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Medical License */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-green-600" />
+                    {t('doctorProfile.medicalLicense')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <ShieldCheck className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{doctor.crm_number}</p>
+                        <p className="text-xs text-muted-foreground">{t('doctorProfile.verifiedActive')}</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="border-green-600 text-green-600">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      {t('doctorProfile.verified')}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Insurance Accepted */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    {t('doctorProfile.insuranceAccepted')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-2">
+                    {doctor.insurance_accepted.map((insurance, idx) => (
+                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg border border-border text-sm">
+                        <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
+                        <span className="truncate">{insurance}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3">{t('doctorProfile.alsoAcceptsSelfPay')}</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Video Testimonials Tab */}
+            <TabsContent value="videos" className="space-y-4 mt-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">{t('videoTestimonials.title')}</h3>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        if (!user) {
+                          toast.error(t('auth.loginRequired'));
+                          navigate('/auth');
+                          return;
+                        }
+                        setIsTestimonialDialogOpen(true);
+                      }}
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      {t('videoTestimonials.leaveTestimonial')}
+                    </Button>
+                  </div>
+                  <VideoTestimonialList providerId={id || doctor.id} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="space-y-4 mt-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <p className="text-4xl font-bold text-primary">{doctor.avg_rating}</p>
+                      <div className="flex gap-0.5 justify-center my-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star 
+                            key={star} 
+                            className={`h-4 w-4 ${
+                              star <= Math.floor(doctor.avg_rating) 
+                                ? 'text-amber-500 fill-amber-500' 
+                                : 'text-muted-foreground'
+                            }`} 
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {doctor.total_reviews} {t('doctorProfile.reviews')}
+                      </p>
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      {ratingDistribution.map((item) => (
+                        <div key={item.stars} className="flex items-center gap-2">
+                          <span className="text-xs w-3">{item.stars}</span>
+                          <Progress value={item.percentage} className="h-2 flex-1" />
+                          <span className="text-xs text-muted-foreground w-10 text-right">{item.percentage}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {mockReviews.map((review) => (
+                <Card key={review.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
+                        <AvatarImage src={review.avatar} alt={review.customer_name} />
+                        <AvatarFallback>{review.customer_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">{review.customer_name}</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <div className="flex gap-0.5">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star 
+                                    key={star} 
+                                    className={`h-3 w-3 ${
+                                      star <= review.rating 
+                                        ? 'text-amber-500 fill-amber-500' 
+                                        : 'text-muted-foreground'
+                                    }`} 
+                                  />
+                                ))}
+                              </div>
+                              {review.verified && (
+                                <Badge variant="outline" className="text-xs h-5">
+                                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                                  {t('doctorProfile.verifiedPatient')}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">{review.date}</span>
+                        </div>
+                        
+                        <p className="text-sm mt-2 leading-relaxed">{review.comment}</p>
+                        
+                        {(review.quality_rating || review.professionalism_rating || review.punctuality_rating) && (
+                          <div className="flex gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
+                            {review.quality_rating && (
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-current" />
+                                <span>{t('doctorProfile.quality')}: {review.quality_rating}/5</span>
+                              </div>
+                            )}
+                            {review.professionalism_rating && (
+                              <div className="flex items-center gap-1">
+                                <BadgeCheck className="h-3 w-3" />
+                                <span>{t('doctorProfile.professionalism')}: {review.professionalism_rating}/5</span>
+                              </div>
+                            )}
+                            {review.punctuality_rating && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                <span>{t('doctorProfile.punctuality')}: {review.punctuality_rating}/5</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {review.provider_response && (
+                          <div className="mt-3 p-3 bg-muted/50 rounded-lg">
+                            <p className="text-xs font-medium text-primary mb-1 flex items-center gap-1">
+                              <MessageCircle className="h-3 w-3" />
+                              {t('doctorProfile.doctorResponse')}
+                            </p>
+                            <p className="text-sm text-muted-foreground">{review.provider_response}</p>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-4 mt-3">
+                          <Button variant="ghost" size="sm" className="h-8 text-xs">
+                            <ThumbsUp className="h-3 w-3 mr-1" />
+                            {t('doctorProfile.helpful')} ({review.helpful_count})
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <UploadTestimonialDialog
+          open={isTestimonialDialogOpen}
+          onOpenChange={setIsTestimonialDialogOpen}
+          providerId={doctor.id}
+          providerName={`Dr. ${doctor.business_name}`}
+        />
+      </AppLayout>
+    </>
+  );
+}

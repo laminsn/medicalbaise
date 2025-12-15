@@ -4,7 +4,7 @@ import Payments from "./pages/Payments";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CallProvider } from "@/contexts/CallContext";
@@ -21,6 +21,7 @@ import ProfileEdit from "./pages/ProfileEdit";
 import Messages from "./pages/Messages";
 import Referral from "./pages/Referral";
 import ProviderProfile from "./pages/ProviderProfile";
+import DoctorProfile from "./pages/DoctorProfile";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import JobsMarketplace from "./pages/JobsMarketplace";
@@ -44,6 +45,12 @@ import Integrations from "./pages/Integrations";
 import Payouts from "./pages/Payouts";
 import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
+
+// Redirect component for old provider URLs
+const ProviderRedirect = () => {
+  const { id } = useParams();
+  return <Navigate to={`/doctor/${id}`} replace />;
+};
 
 const queryClient = new QueryClient();
 
@@ -75,7 +82,8 @@ const App = () => (
                   <Route path="/payments" element={<Payments />} />
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/referral" element={<Referral />} />
-                  <Route path="/provider/:id" element={<ProviderProfile />} />
+                  <Route path="/doctor/:id" element={<DoctorProfile />} />
+                  <Route path="/provider/:id" element={<ProviderRedirect />} />
                   <Route path="/provider-dashboard" element={<ProviderDashboard />} />
                   <Route path="/customer-dashboard" element={<CustomerDashboard />} />
                   <Route path="/jobs" element={<JobsMarketplace />} />
