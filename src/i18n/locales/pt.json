@@ -62,6 +62,7 @@
     "edit": "Editar",
     "delete": "Excluir",
     "search": "Buscar",
+    "searching": "Buscando...",
     "filter": "Filtrar",
     "filters": "Filtros",
     "viewAll": "Ver Todos",
@@ -137,10 +138,18 @@
     "providerDashboard": "Painel do Prestador"
   },
   "hero": {
-    "title": "Encontre os melhores profissionais para seu projeto",
-    "subtitle": "Conecte-se com prestadores de serviço verificados e qualificados",
-    "searchPlaceholder": "Qual serviço você precisa?",
-    "cta": "Publicar Trabalho"
+    "title": "Encontre Médicos e Profissionais de Saúde Confiáveis",
+    "subtitle": "Conecte-se com médicos, especialistas e profissionais de saúde verificados. Agende consultas, teleconsultas e atendimentos.",
+    "searchPlaceholder": "Busque por especialidade, condição ou nome do médico...",
+    "searchDoctors": "Buscar médicos",
+    "findDoctors": "Encontrar profissionais de saúde",
+    "enterSearchTerm": "Digite um termo de busca",
+    "searchTooShort": "A busca deve ter pelo menos 2 caracteres",
+    "searchTooLong": "A busca deve ter menos de 100 caracteres",
+    "licensedDoctors": "Profissionais Licenciados",
+    "verifiedReviews": "Avaliações Verificadas",
+    "secureBooking": "Agendamento Seguro",
+    "cta": "Agendar Consulta"
   },
   "categories": {
     "title": "Categorias Populares",

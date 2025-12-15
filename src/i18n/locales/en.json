@@ -62,6 +62,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "search": "Search",
+    "searching": "Searching...",
     "filter": "Filter",
     "filters": "Filters",
     "viewAll": "View All",
@@ -137,9 +138,17 @@
     "providerDashboard": "Doctor Dashboard"
   },
   "hero": {
-    "title": "Find trusted doctors and medical professionals",
-    "subtitle": "Connect with verified healthcare providers for consultations and appointments",
-    "searchPlaceholder": "Search by specialty or doctor name...",
+    "title": "Find Trusted Doctors & Healthcare Professionals",
+    "subtitle": "Connect with verified doctors, specialists, and healthcare providers. Book consultations, teleconsultations, and appointments.",
+    "searchPlaceholder": "Search by specialty, condition, or doctor name...",
+    "searchDoctors": "Search for doctors",
+    "findDoctors": "Find healthcare professionals",
+    "enterSearchTerm": "Please enter a search term",
+    "searchTooShort": "Search must be at least 2 characters",
+    "searchTooLong": "Search must be less than 100 characters",
+    "licensedDoctors": "Licensed Professionals",
+    "verifiedReviews": "Verified Reviews",
+    "secureBooking": "Secure Booking",
     "cta": "Book Appointment"
   },
   "categories": {
