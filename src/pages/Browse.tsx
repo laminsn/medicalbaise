@@ -407,15 +407,32 @@ export default function Browse() {
                           </SelectItem>
                         ))}
                       </SelectContent>
-                    </Select>
+                  </Select>
                   </div>
 
-                  {/* Location */}
+                  {/* Location - CEP Only */}
                   <div>
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {t('browse.location')}
                     </Label>
+                    <Input
+                      placeholder={t('browse.cepPlaceholder')}
+                      value={cityQuery}
+                      onChange={(e) => {
+                        // Only allow numbers and format as CEP
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                        const formattedCEP = value.length > 5 
+                          ? `${value.slice(0, 5)}-${value.slice(5)}` 
+                          : value;
+                        setCityQuery(formattedCEP);
+                      }}
+                      className="mt-2"
+                      maxLength={9}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t('browse.cepHint')}
+                    </p>
                     <Select 
                       value={selectedState || "all"} 
                       onValueChange={(v) => setSelectedState(v === "all" ? "" : v)}
@@ -430,12 +447,6 @@ export default function Browse() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Input
-                      placeholder={t('browse.cityPlaceholder')}
-                      value={cityQuery}
-                      onChange={(e) => setCityQuery(e.target.value)}
-                      className="mt-2"
-                    />
                   </div>
 
                   {/* Consultation Fee Range */}

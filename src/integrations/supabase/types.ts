@@ -1417,6 +1417,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_cep: string | null
+          address_complement: string | null
+          address_lat: number | null
+          address_lng: number | null
+          address_neighborhood: string | null
+          address_number: string | null
+          address_street: string | null
           avatar_url: string | null
           bio: string | null
           city: string | null
@@ -1436,6 +1443,13 @@ export type Database = {
           user_type: Database["public"]["Enums"]["user_type"]
         }
         Insert: {
+          address_cep?: string | null
+          address_complement?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_street?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
@@ -1455,6 +1469,13 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"]
         }
         Update: {
+          address_cep?: string | null
+          address_complement?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_neighborhood?: string | null
+          address_number?: string | null
+          address_street?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null

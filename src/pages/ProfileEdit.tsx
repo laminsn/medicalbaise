@@ -39,6 +39,12 @@ export default function ProfileEdit() {
     status: (profile as any)?.status || '',
     bio: (profile as any)?.bio || '',
     avatar_url: profile?.avatar_url || '',
+    // Address fields
+    address_cep: (profile as any)?.address_cep || '',
+    address_street: (profile as any)?.address_street || '',
+    address_number: (profile as any)?.address_number || '',
+    address_complement: (profile as any)?.address_complement || '',
+    address_neighborhood: (profile as any)?.address_neighborhood || '',
   });
 
   if (!user) {
@@ -131,6 +137,12 @@ export default function ProfileEdit() {
           bio: formData.bio.trim() || null,
           avatar_url: formData.avatar_url || null,
           languages: selectedLanguages,
+          // Address fields
+          address_cep: formData.address_cep.trim() || null,
+          address_street: formData.address_street.trim() || null,
+          address_number: formData.address_number.trim() || null,
+          address_complement: formData.address_complement.trim() || null,
+          address_neighborhood: formData.address_neighborhood.trim() || null,
         })
         .eq('user_id', user.id);
 
@@ -306,6 +318,76 @@ export default function ProfileEdit() {
                       onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Address Section */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">{t('profile.address', 'Address')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  {t('profile.addressDescription', 'Your address will be used for in-person consultations and home visits.')}
+                </p>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="address_cep">{t('profile.cep', 'CEP (Postal Code)')}</Label>
+                  <Input
+                    id="address_cep"
+                    placeholder="00000-000"
+                    value={formData.address_cep}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                      const formattedCEP = value.length > 5 
+                        ? `${value.slice(0, 5)}-${value.slice(5)}` 
+                        : value;
+                      setFormData(prev => ({ ...prev, address_cep: formattedCEP }));
+                    }}
+                    maxLength={9}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address_street">{t('profile.street', 'Street')}</Label>
+                  <Input
+                    id="address_street"
+                    placeholder={t('profile.streetPlaceholder', 'Rua, Avenida, etc.')}
+                    value={formData.address_street}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address_street: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="address_number">{t('profile.number', 'Number')}</Label>
+                    <Input
+                      id="address_number"
+                      placeholder="123"
+                      value={formData.address_number}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address_number: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address_complement">{t('profile.complement', 'Complement')}</Label>
+                    <Input
+                      id="address_complement"
+                      placeholder={t('profile.complementPlaceholder', 'Apt, Suite, etc.')}
+                      value={formData.address_complement}
+                      onChange={(e) => setFormData(prev => ({ ...prev, address_complement: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address_neighborhood">{t('profile.neighborhood', 'Neighborhood')}</Label>
+                  <Input
+                    id="address_neighborhood"
+                    placeholder={t('profile.neighborhoodPlaceholder', 'Bairro')}
+                    value={formData.address_neighborhood}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address_neighborhood: e.target.value }))}
+                  />
                 </div>
               </CardContent>
             </Card>
