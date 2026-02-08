@@ -1,36 +1,34 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { 
-  ArrowLeft, Crown, Check, Zap, Star, Shield, 
-  MessageSquare, BarChart3, Users, Video, Loader2 
+import { useSubscription } from '@/hooks/useSubscription';
+import { SUBSCRIPTION_PLANS, type SubscriptionTier } from '@/lib/constants/subscriptionPlans';
+import {
+  ArrowLeft, Crown, Check, Zap, Star, Shield,
+  Users, Loader2, ExternalLink, Settings,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface PlanFeature {
-  text: string;
-  included: boolean;
-}
-
-interface Plan {
-  id: string;
+interface PlanConfig {
+  id: SubscriptionTier;
   name: string;
   price: number;
   description: string;
-  features: PlanFeature[];
+  features: string[];
   popular?: boolean;
   icon: React.ElementType;
   color: string;
+  priceId?: string;
 }
 
-const PLANS: Plan[] = [
+const PLANS: PlanConfig[] = [
   {
     id: 'free',
     name: 'Basic',
@@ -39,132 +37,133 @@ const PLANS: Plan[] = [
     icon: Users,
     color: 'text-muted-foreground',
     features: [
-      { text: 'Create professional profile', included: true },
-      { text: 'Receive direct bookings', included: true },
-      { text: '1 service listing', included: true },
-      { text: 'View job postings', included: true },
-      { text: 'Bid on jobs', included: false },
-      { text: 'Video meetings', included: false },
-      { text: 'Custom messaging', included: false },
-      { text: 'Analytics dashboard', included: false },
+      'Create professional profile',
+      'Receive direct bookings',
+      '1 service listing',
+      'View job postings',
     ],
   },
   {
     id: 'pro',
     name: 'Pro',
-    price: 149,
+    price: SUBSCRIPTION_PLANS.pro.price,
     description: 'For growing professionals',
     icon: Star,
     color: 'text-blue-500',
     popular: true,
+    priceId: SUBSCRIPTION_PLANS.pro.price_id,
     features: [
-      { text: 'All Free features', included: true },
-      { text: 'Up to 5 service listings', included: true },
-      { text: '20 bids per month', included: true },
-      { text: 'Bid on jobs up to R$5,000', included: true },
-      { text: 'Schedule video meetings', included: true },
-      { text: 'Add-on services', included: true },
-      { text: 'Custom messaging', included: false },
-      { text: 'Analytics dashboard', included: false },
+      'All Free features',
+      'Up to 5 service listings',
+      '20 bids per month',
+      'Bid on jobs up to R$5,000',
+      'Schedule video meetings',
+      'Add-on services',
     ],
   },
   {
     id: 'elite',
     name: 'Elite',
-    price: 299,
+    price: SUBSCRIPTION_PLANS.elite.price,
     description: 'For established businesses',
     icon: Crown,
     color: 'text-amber-500',
+    priceId: SUBSCRIPTION_PLANS.elite.price_id,
     features: [
-      { text: 'All Pro features', included: true },
-      { text: 'Up to 10 service listings', included: true },
-      { text: 'Unlimited bids', included: true },
-      { text: 'No job size limit', included: true },
-      { text: 'Featured bid placement', included: true },
-      { text: 'Auto-reply messages', included: true },
-      { text: 'Custom message templates', included: true },
-      { text: 'Email campaigns to followers (R$0.05/email)', included: true },
-      { text: 'Basic analytics', included: true },
+      'All Pro features',
+      'Up to 10 service listings',
+      'Unlimited bids',
+      'No job size limit',
+      'Featured bid placement',
+      'Auto-reply messages',
+      'Custom message templates',
+      'Email campaigns (R$0.05/email)',
+      'Basic analytics',
     ],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 549,
+    price: SUBSCRIPTION_PLANS.enterprise.price,
     description: 'For large organizations',
     icon: Zap,
     color: 'text-purple-500',
+    priceId: SUBSCRIPTION_PLANS.enterprise.price_id,
     features: [
-      { text: 'All Elite features', included: true },
-      { text: 'Unlimited service listings', included: true },
-      { text: 'Meta Pixel tracking', included: true },
-      { text: 'Google Analytics integration', included: true },
-      { text: 'Conversion analytics dashboard', included: true },
-      { text: 'Scheduled email reports', included: true },
-      { text: 'Priority support', included: true },
-      { text: 'Custom integrations', included: true },
+      'All Elite features',
+      'Unlimited service listings',
+      'Meta Pixel tracking',
+      'Google Analytics integration',
+      'Conversion analytics dashboard',
+      'Scheduled email reports',
+      'Priority support',
+      'Custom integrations',
     ],
   },
 ];
 
 export default function Subscription() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentTier, setCurrentTier] = useState<string>('free');
-  const [isProvider, setIsProvider] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  const {
+    subscribed, tier: currentTier, subscriptionEnd,
+    loading: subLoading, startCheckout, openCustomerPortal, checkSubscription,
+  } = useSubscription();
+
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState('');
+  const [isManaging, setIsManaging] = useState(false);
+
+  // Handle Stripe redirect
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      toast.success('Subscription activated! Refreshing status...');
+      checkSubscription();
+    } else if (searchParams.get('canceled') === 'true') {
+      toast.info('Checkout canceled.');
+    }
+  }, [searchParams]);
+
+  // Auto-apply promo from URL
+  useEffect(() => {
+    const urlPromo = searchParams.get('promo');
+    if (urlPromo) setPromoCode(urlPromo);
+  }, [searchParams]);
 
   useEffect(() => {
-    if (user) {
-      fetchSubscription();
-    } else {
-      navigate('/auth');
-    }
-  }, [user]);
+    if (!user && !subLoading) navigate('/auth');
+  }, [user, subLoading]);
 
-  const fetchSubscription = async () => {
-    if (!user) return;
-    
-    setIsLoading(true);
+  const handleSelectPlan = async (plan: PlanConfig) => {
+    if (plan.id === currentTier || !plan.priceId) return;
+
+    setIsUpgrading(plan.id);
     try {
-      const { data } = await supabase
-        .from('providers')
-        .select('subscription_tier')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (data) {
-        setIsProvider(true);
-        setCurrentTier(data.subscription_tier || 'free');
-      }
-    } catch (error) {
-      console.error('Error fetching subscription:', error);
+      await startCheckout(plan.priceId, promoCode || undefined);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to start checkout';
+      toast.error(message);
     } finally {
-      setIsLoading(false);
+      setIsUpgrading(null);
     }
   };
 
-  const handleSelectPlan = async (planId: string) => {
-    if (planId === currentTier) return;
-    
-    if (!isProvider) {
-      toast.error(t('subscription.providerRequired', 'You need to be a provider to subscribe'));
-      return;
+  const handleManageSubscription = async () => {
+    setIsManaging(true);
+    try {
+      await openCustomerPortal();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to open portal';
+      toast.error(message);
+    } finally {
+      setIsManaging(false);
     }
-
-    setIsUpgrading(planId);
-    
-    // Simulate upgrade process - in production, this would integrate with payment
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success(t('subscription.planSelected', 'Plan selected! Payment integration coming soon.'));
-    setIsUpgrading(null);
   };
 
-  if (isLoading) {
+  if (subLoading) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -194,7 +193,7 @@ export default function Subscription() {
             </div>
           </div>
 
-          {/* Current Plan */}
+          {/* Current Plan Summary */}
           <Card className="mb-6 border-primary">
             <CardContent className="pt-4">
               <div className="flex items-center justify-between">
@@ -205,14 +204,60 @@ export default function Subscription() {
                   <div>
                     <p className="font-medium">{t('subscription.currentPlan', 'Current Plan')}</p>
                     <p className="text-sm text-muted-foreground capitalize">{currentTier}</p>
+                    {subscriptionEnd && (
+                      <p className="text-xs text-muted-foreground">
+                        Renews {new Date(subscriptionEnd).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
                 </div>
-                {isProvider && currentTier !== 'free' && (
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
-                    {t('subscription.active', 'Active')}
+                <div className="flex items-center gap-2">
+                  {subscribed && (
+                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                      Active
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              {subscribed && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 gap-1.5 w-full"
+                  onClick={handleManageSubscription}
+                  disabled={isManaging}
+                >
+                  {isManaging ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Settings className="h-4 w-4" />
+                  )}
+                  Manage Subscription
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Promo Code */}
+          <Card className="mb-6">
+            <CardContent className="pt-4">
+              <label className="text-sm font-medium">Promo Code</label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. SUMMER2026"
+                  className="flex-1"
+                />
+                {promoCode && (
+                  <Badge variant="secondary" className="self-center whitespace-nowrap">
+                    Applied ✓
                   </Badge>
                 )}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Enter a code before selecting a plan. You can also enter it at checkout.
+              </p>
             </CardContent>
           </Card>
 
@@ -221,9 +266,9 @@ export default function Subscription() {
             {PLANS.map((plan) => {
               const Icon = plan.icon;
               const isCurrentPlan = plan.id === currentTier;
-              
+
               return (
-                <Card 
+                <Card
                   key={plan.id}
                   className={`relative ${plan.popular ? 'border-primary' : ''} ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}
                 >
@@ -234,7 +279,7 @@ export default function Subscription() {
                       </Badge>
                     </div>
                   )}
-                  
+
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -242,42 +287,50 @@ export default function Subscription() {
                         <CardTitle className="text-lg">{plan.name}</CardTitle>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-bold">R${plan.price}</span>
+                        <span className="text-2xl font-bold">
+                          {plan.price === 0 ? 'Free' : `R$${plan.price}`}
+                        </span>
                         {plan.price > 0 && (
-                          <span className="text-sm text-muted-foreground">/{t('subscription.month', 'mo')}</span>
+                          <span className="text-sm text-muted-foreground">/mo</span>
                         )}
                       </div>
                     </div>
                     <CardDescription>{plan.description}</CardDescription>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4">
                     <ul className="space-y-2">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
-                          <Check className={`h-4 w-4 ${feature.included ? 'text-primary' : 'text-muted-foreground/30'}`} />
-                          <span className={feature.included ? '' : 'text-muted-foreground/50'}>
-                            {feature.text}
-                          </span>
+                          <Check className="h-4 w-4 text-primary" />
+                          <span>{feature}</span>
                         </li>
                       ))}
                     </ul>
 
-                    <Button 
-                      className="w-full"
+                    <Button
+                      className="w-full gap-1.5"
                       variant={isCurrentPlan ? 'secondary' : plan.popular ? 'default' : 'outline'}
-                      disabled={isCurrentPlan || isUpgrading !== null}
-                      onClick={() => handleSelectPlan(plan.id)}
+                      disabled={isCurrentPlan || !plan.priceId || isUpgrading !== null}
+                      onClick={() => handleSelectPlan(plan)}
                     >
                       {isUpgrading === plan.id ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Opening checkout...
+                        </>
                       ) : isCurrentPlan ? (
                         <>
-                          <Check className="h-4 w-4 mr-2" />
-                          {t('subscription.currentPlan', 'Current Plan')}
+                          <Check className="h-4 w-4" />
+                          Current Plan
+                        </>
+                      ) : plan.priceId ? (
+                        <>
+                          <ExternalLink className="h-4 w-4" />
+                          Subscribe
                         </>
                       ) : (
-                        t('subscription.selectPlan', 'Select Plan')
+                        'Free'
                       )}
                     </Button>
                   </CardContent>
@@ -286,7 +339,6 @@ export default function Subscription() {
             })}
           </div>
 
-          {/* Footer Note */}
           <p className="text-center text-xs text-muted-foreground mt-6">
             {t('subscription.cancelAnytime', 'Cancel anytime. No hidden fees.')}
           </p>
