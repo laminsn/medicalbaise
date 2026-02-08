@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.send-weekly-campaign]
 verify_jwt = false
+
+[functions.send-provider-campaign]
+verify_jwt = false

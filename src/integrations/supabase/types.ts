@@ -1806,6 +1806,72 @@ export type Database = {
           },
         ]
       }
+      provider_email_campaigns: {
+        Row: {
+          cost_per_email: number
+          created_at: string
+          emails_failed: number
+          emails_sent: number
+          html_content: string
+          id: string
+          provider_id: string
+          recipient_type: string
+          sent_at: string | null
+          status: string
+          subject: string
+          total_cost: number
+          total_recipients: number
+          updated_at: string
+        }
+        Insert: {
+          cost_per_email?: number
+          created_at?: string
+          emails_failed?: number
+          emails_sent?: number
+          html_content: string
+          id?: string
+          provider_id: string
+          recipient_type?: string
+          sent_at?: string | null
+          status?: string
+          subject: string
+          total_cost?: number
+          total_recipients?: number
+          updated_at?: string
+        }
+        Update: {
+          cost_per_email?: number
+          created_at?: string
+          emails_failed?: number
+          emails_sent?: number
+          html_content?: string
+          id?: string
+          provider_id?: string
+          recipient_type?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          total_cost?: number
+          total_recipients?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_email_campaigns_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_email_campaigns_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_faqs: {
         Row: {
           answer: string

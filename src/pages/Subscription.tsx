@@ -83,6 +83,7 @@ const PLANS: Plan[] = [
       { text: 'Featured bid placement', included: true },
       { text: 'Auto-reply messages', included: true },
       { text: 'Custom message templates', included: true },
+      { text: 'Email campaigns to followers (R$0.05/email)', included: true },
       { text: 'Basic analytics', included: true },
     ],
   },
