@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Radio, Users, Stethoscope, MapPin, Video } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Users, Stethoscope, MapPin, Video } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { LiveStreamViewer } from './LiveStreamViewer';
@@ -14,68 +14,71 @@ interface LiveStreamsSectionProps {
   locationFilter?: string | null;
 }
 
-// Mock live streams for demo purposes - medical themed
-const MOCK_LIVE_STREAMS: LiveStream[] = [
-  {
-    id: '1',
-    providerId: 'provider-1',
-    providerName: 'Dr. Maria Silva',
-    title: 'Cardiologia: Prevenção de Doenças',
-    description: 'Discussão ao vivo sobre saúde cardiovascular',
-    viewerCount: 234,
-    startedAt: new Date(),
-    isLive: true,
-    specialty: 'Cardiologia',
-    location: 'SP'
-  },
-  {
-    id: '2',
-    providerId: 'provider-2',
-    providerName: 'Dr. Carlos Santos',
-    title: 'Dermatologia: Cuidados com a Pele',
-    description: 'Rotina diária recomendada para pele saudável',
-    viewerCount: 156,
-    startedAt: new Date(),
-    isLive: true,
-    specialty: 'Dermatologia',
-    location: 'RJ'
-  },
-  {
-    id: '3',
-    providerId: 'provider-3',
-    providerName: 'Dra. Ana Costa',
-    title: 'Pediatria: Nutrição Infantil',
-    description: 'Dicas de alimentação saudável para crianças',
-    viewerCount: 89,
-    startedAt: new Date(),
-    isLive: true,
-    specialty: 'Pediatria',
-    location: 'MG'
-  },
-  {
-    id: '4',
-    providerId: 'provider-4',
-    providerName: 'Dr. Roberto Lima',
-    title: 'Ortopedia: Postura no Trabalho',
-    description: 'Como evitar lesões no home office',
-    viewerCount: 145,
-    startedAt: new Date(),
-    isLive: true,
-    specialty: 'Ortopedia',
-    location: 'SP'
-  }
-];
-
 export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStreamsSectionProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
-  const [liveStreams, setLiveStreams] = useState<LiveStream[]>(MOCK_LIVE_STREAMS);
+  const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchLiveStreams = async () => {
+    const { data, error } = await supabase
+      .from('live_streams')
+      .select(`
+        *,
+        provider:providers(id, business_name, user_id, specialty_id, address)
+      `)
+      .eq('is_live', true)
+      .order('started_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching live streams:', error);
+      return;
+    }
+
+    const mapped: LiveStream[] = (data || []).map((stream: any) => ({
+      id: stream.id,
+      providerId: stream.provider_id,
+      providerName: stream.provider?.business_name || 'Provider',
+      title: stream.title,
+      description: stream.description,
+      viewerCount: stream.viewer_count || 0,
+      startedAt: new Date(stream.started_at),
+      isLive: stream.is_live,
+      specialty: stream.specialty || stream.provider?.specialty_id,
+      location: stream.location || stream.provider?.address,
+      categoryId: stream.provider?.specialty_id,
+    }));
+
+    setLiveStreams(mapped);
+    setLoading(false);
+  };
+
+  // Fetch live streams and subscribe to realtime updates
+  useEffect(() => {
+    fetchLiveStreams();
+
+    const channel = supabase
+      .channel('live-streams-feed')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'live_streams' },
+        () => fetchLiveStreams()
+      )
+      .subscribe();
+
+    // Fallback polling every 15 seconds
+    const pollInterval = setInterval(fetchLiveStreams, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(pollInterval);
+    };
+  }, []);
 
   // Filter streams based on specialty and location
   const filteredStreams = liveStreams.filter((stream) => {
     if (specialtyFilter && stream.specialty !== specialtyFilter) {
-      // For demo, we use specialty name matching
       return false;
     }
     if (locationFilter && stream.location !== locationFilter) {
@@ -84,13 +87,7 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
     return true;
   });
 
-  // In production, fetch real live streams
-  useEffect(() => {
-    // For now, use mock data
-    // In production, subscribe to realtime channel to get active streams
-  }, []);
-
-  if (filteredStreams.length === 0) {
+  if (loading || filteredStreams.length === 0) {
     return null;
   }
 
@@ -100,8 +97,8 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
         <div className="flex items-center justify-between px-4 mb-3">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Video className="h-5 w-5 text-red-500" />
-              <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+              <Video className="h-5 w-5 text-destructive" />
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full animate-pulse" />
             </div>
             <h2 className="font-bold text-lg">{t('liveStream.liveNow', 'Transmissões Ao Vivo')}</h2>
             <Badge variant="destructive" className="text-xs animate-pulse">
@@ -120,7 +117,7 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
               >
                 {/* Avatar with live ring */}
                 <div className="relative mx-auto mb-2">
-                  <div className="w-20 h-20 rounded-full p-[3px] bg-gradient-to-r from-red-500 via-pink-500 to-red-500 animate-pulse">
+                  <div className="w-20 h-20 rounded-full p-[3px] bg-gradient-to-r from-destructive via-destructive/80 to-destructive animate-pulse">
                     <div className="w-full h-full rounded-full bg-card p-[2px]">
                       <Avatar className="w-full h-full">
                         <AvatarFallback className="text-lg bg-primary/10 text-primary">

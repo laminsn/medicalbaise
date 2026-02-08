@@ -871,6 +871,66 @@ export type Database = {
           },
         ]
       }
+      live_streams: {
+        Row: {
+          channel_name: string
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          id: string
+          is_live: boolean
+          location: string | null
+          provider_id: string
+          specialty: string | null
+          started_at: string
+          title: string
+          viewer_count: number | null
+        }
+        Insert: {
+          channel_name: string
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          is_live?: boolean
+          location?: string | null
+          provider_id: string
+          specialty?: string | null
+          started_at?: string
+          title: string
+          viewer_count?: number | null
+        }
+        Update: {
+          channel_name?: string
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          is_live?: boolean
+          location?: string | null
+          provider_id?: string
+          specialty?: string | null
+          started_at?: string
+          title?: string
+          viewer_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_streams_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "live_streams_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medical_records: {
         Row: {
           created_at: string
