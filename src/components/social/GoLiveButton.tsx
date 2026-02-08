@@ -69,9 +69,10 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
     }, 100);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = async () => {
     if (isRecording) {
-      stopRecording();
+      await handleStopRecording();
+      return;
     }
     stopPreview();
     setCameraReady(false);
@@ -86,6 +87,24 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
 
     try {
       await startRecording();
+
+      // Register live stream in database so others can discover it
+      if (providerId) {
+        const channelName = `live-${providerId}-${Date.now()}`;
+        const { error: streamError } = await supabase
+          .from('live_streams')
+          .insert({
+            provider_id: providerId,
+            title: title.trim(),
+            description: description.trim() || null,
+            channel_name: channelName,
+            is_live: true,
+          });
+        if (streamError) {
+          console.error('Error registering live stream:', streamError);
+        }
+      }
+
       toast.success(t('socialFeed.liveStarted', 'Recording started!'));
     } catch (err) {
       console.error('Recording error:', err);
@@ -93,10 +112,20 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
     }
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
     stopRecording();
     stopPreview();
     setCameraReady(false);
+
+    // Mark stream as ended in database
+    if (providerId) {
+      await supabase
+        .from('live_streams')
+        .update({ is_live: false, ended_at: new Date().toISOString() })
+        .eq('provider_id', providerId)
+        .eq('is_live', true);
+    }
+
     toast.success(t('socialFeed.liveEnded', 'Recording ended'));
     setShowDialog(false);
     
