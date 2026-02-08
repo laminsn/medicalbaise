@@ -94,31 +94,31 @@ export default function SocialFeed() {
     };
   }, [user]);
 
+  const fetchPosts = async () => {
+    setLoading(true);
+    
+    const { data, error } = await supabase
+      .from('social_posts')
+      .select(`
+        *,
+        provider:providers(id, business_name, user_id, specialty_id, address)
+      `)
+      .order('is_promoted', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('Error fetching posts:', error);
+      toast.error(t('socialFeed.errorLoading'));
+    } else {
+      setPosts(data || []);
+    }
+    
+    setLoading(false);
+  };
+
   // Fetch posts
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      
-      const { data, error } = await supabase
-        .from('social_posts')
-        .select(`
-          *,
-          provider:providers(id, business_name, user_id, specialty_id, address)
-        `)
-        .order('is_promoted', { ascending: false })
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error('Error fetching posts:', error);
-        toast.error(t('socialFeed.errorLoading'));
-      } else {
-        setPosts(data || []);
-      }
-      
-      setLoading(false);
-    };
-
     fetchPosts();
 
     // Subscribe to realtime updates
@@ -158,6 +158,7 @@ export default function SocialFeed() {
   const handlePostCreated = () => {
     setShowCreatePost(false);
     toast.success(t('socialFeed.postCreated'));
+    fetchPosts();
   };
 
   if (showAuthPrompt && !user) {
