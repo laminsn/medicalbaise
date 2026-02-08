@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Briefcase, FileText, DollarSign } from 'lucide-react';
@@ -11,6 +12,7 @@ interface Stats {
 }
 
 export function AdminOverview() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     totalProviders: 0,
@@ -41,10 +43,10 @@ export function AdminOverview() {
   }, []);
 
   const cards = [
-    { title: 'Total Users', value: stats.totalUsers, icon: Users, color: 'text-blue-500' },
-    { title: 'Providers', value: stats.totalProviders, icon: Briefcase, color: 'text-green-500' },
-    { title: 'Jobs Posted', value: stats.totalJobs, icon: FileText, color: 'text-amber-500' },
-    { title: 'Referrals', value: stats.totalReferrals, icon: DollarSign, color: 'text-purple-500' },
+    { title: t('admin.totalUsers'), value: stats.totalUsers, icon: Users, color: 'text-blue-500' },
+    { title: t('admin.providers'), value: stats.totalProviders, icon: Briefcase, color: 'text-green-500' },
+    { title: t('admin.jobsPosted'), value: stats.totalJobs, icon: FileText, color: 'text-amber-500' },
+    { title: t('admin.referrals'), value: stats.totalReferrals, icon: DollarSign, color: 'text-purple-500' },
   ];
 
   return (
@@ -72,13 +74,13 @@ export function AdminOverview() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Quick Actions</CardTitle>
+          <CardTitle className="text-base">{t('admin.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="text-sm space-y-2 text-muted-foreground">
-            <li>• Use the <strong>Users</strong> tab to search, view, and edit any user account</li>
-            <li>• Use the <strong>Credits</strong> tab to adjust user credit balances</li>
-            <li>• Use the <strong>Promos</strong> tab to create referral bonuses and partner perks</li>
+            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsUsers')}` }} />
+            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsCredits')}` }} />
+            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsPromos')}` }} />
           </ul>
         </CardContent>
       </Card>

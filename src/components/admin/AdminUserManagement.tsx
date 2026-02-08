@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ interface UserProfile {
 }
 
 export function AdminUserManagement() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,7 +46,6 @@ export function AdminUserManagement() {
     if (!searchQuery.trim()) return;
     setLoading(true);
 
-    // Search by email, name, or handle
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -52,7 +53,7 @@ export function AdminUserManagement() {
       .limit(20);
 
     if (error) {
-      toast.error('Error searching users');
+      toast.error(t('admin.errorSearching'));
     } else {
       setUsers(data || []);
     }
@@ -68,7 +69,7 @@ export function AdminUserManagement() {
       .limit(50);
 
     if (error) {
-      toast.error('Error loading users');
+      toast.error(t('admin.errorLoading'));
     } else {
       setUsers(data || []);
     }
@@ -114,11 +115,10 @@ export function AdminUserManagement() {
       .eq('user_id', selectedUser.user_id);
 
     if (error) {
-      toast.error('Error saving: ' + error.message);
+      toast.error(t('admin.errorSaving') + ': ' + error.message);
     } else {
-      toast.success('User updated successfully');
+      toast.success(t('admin.userUpdated'));
       setSelectedUser(null);
-      // Refresh list
       if (searchQuery) {
         searchUsers();
       } else {
@@ -135,17 +135,17 @@ export function AdminUserManagement() {
         <CardContent className="pt-6">
           <div className="flex gap-2">
             <Input
-              placeholder="Search by name, email, or handle..."
+              placeholder={t('admin.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && searchUsers()}
             />
             <Button onClick={searchUsers} disabled={loading}>
               <Search className="h-4 w-4 mr-2" />
-              Search
+              {t('admin.search')}
             </Button>
             <Button variant="outline" onClick={loadAllUsers} disabled={loading}>
-              All
+              {t('admin.all')}
             </Button>
           </div>
         </CardContent>
@@ -155,7 +155,7 @@ export function AdminUserManagement() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Users ({users.length})
+            {t('admin.usersCount', { count: users.length })}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -164,7 +164,7 @@ export function AdminUserManagement() {
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : users.length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No users found</p>
+            <p className="text-center py-8 text-muted-foreground">{t('admin.noUsersFound')}</p>
           ) : (
             <div className="space-y-2">
               {users.map((user) => (
@@ -208,24 +208,24 @@ export function AdminUserManagement() {
       <Dialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>{t('admin.editUser')}</DialogTitle>
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-4">
               <div className="text-sm text-muted-foreground">
-                Email: <strong>{selectedUser.email}</strong>
+                {t('admin.email')}: <strong>{selectedUser.email}</strong>
               </div>
               
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label>First Name</Label>
+                  <Label>{t('profile.firstName')}</Label>
                   <Input
                     value={editData.first_name || ''}
                     onChange={(e) => setEditData(prev => ({ ...prev, first_name: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>Last Name</Label>
+                  <Label>{t('profile.lastName')}</Label>
                   <Input
                     value={editData.last_name || ''}
                     onChange={(e) => setEditData(prev => ({ ...prev, last_name: e.target.value }))}
@@ -234,7 +234,7 @@ export function AdminUserManagement() {
               </div>
 
               <div className="space-y-1">
-                <Label>Handle</Label>
+                <Label>{t('admin.handle')}</Label>
                 <Input
                   value={editData.handle || ''}
                   onChange={(e) => setEditData(prev => ({
@@ -245,7 +245,7 @@ export function AdminUserManagement() {
               </div>
 
               <div className="space-y-1">
-                <Label>Phone</Label>
+                <Label>{t('profile.phone')}</Label>
                 <Input
                   value={editData.phone || ''}
                   onChange={(e) => setEditData(prev => ({ ...prev, phone: e.target.value }))}
@@ -254,14 +254,14 @@ export function AdminUserManagement() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label>City</Label>
+                  <Label>{t('profile.city')}</Label>
                   <Input
                     value={editData.city || ''}
                     onChange={(e) => setEditData(prev => ({ ...prev, city: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>State</Label>
+                  <Label>{t('profile.state')}</Label>
                   <Input
                     value={editData.state || ''}
                     onChange={(e) => setEditData(prev => ({ ...prev, state: e.target.value }))}
@@ -270,7 +270,7 @@ export function AdminUserManagement() {
               </div>
 
               <div className="space-y-1">
-                <Label>Credits Balance (R$)</Label>
+                <Label>{t('admin.creditsBalanceLabel')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -284,26 +284,26 @@ export function AdminUserManagement() {
               </div>
 
               <div className="space-y-1">
-                <Label>Status</Label>
+                <Label>{t('profile.status')}</Label>
                 <Select
                   value={editData.status || ''}
                   onValueChange={(value) => setEditData(prev => ({ ...prev, status: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder={t('admin.selectStatus')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Available">Available</SelectItem>
-                    <SelectItem value="Busy">Busy</SelectItem>
-                    <SelectItem value="On Vacation">On Vacation</SelectItem>
-                    <SelectItem value="Suspended">Suspended</SelectItem>
+                    <SelectItem value="Available">{t('admin.available')}</SelectItem>
+                    <SelectItem value="Busy">{t('admin.busy')}</SelectItem>
+                    <SelectItem value="On Vacation">{t('admin.onVacation')}</SelectItem>
+                    <SelectItem value="Suspended">{t('admin.suspended')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setSelectedUser(null)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button onClick={handleSave} disabled={saving}>
                   {saving ? (
@@ -311,7 +311,7 @@ export function AdminUserManagement() {
                   ) : (
                     <Save className="h-4 w-4 mr-2" />
                   )}
-                  Save Changes
+                  {t('admin.saveChanges')}
                 </Button>
               </div>
             </div>

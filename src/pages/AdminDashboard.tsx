@@ -33,8 +33,8 @@ export default function AdminDashboard() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
           <Shield className="h-16 w-16 text-destructive mb-4" />
-          <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-          <p className="text-muted-foreground">You do not have admin permissions.</p>
+          <h2 className="text-xl font-bold mb-2">{t('admin.accessDenied')}</h2>
+          <p className="text-muted-foreground">{t('admin.noPermission')}</p>
         </div>
       </AppLayout>
     );
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
   return (
     <>
       <Helmet>
-        <title>Admin Dashboard | MD Baise</title>
+        <title>{t('admin.title')} | MDBaise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-4xl mx-auto">
@@ -52,17 +52,17 @@ export default function AdminDashboard() {
               <Shield className="h-6 w-6 text-destructive" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Manage users, credits, and promotions</p>
+              <h1 className="text-2xl font-bold">{t('admin.title')}</h1>
+              <p className="text-sm text-muted-foreground">{t('admin.subtitle')}</p>
             </div>
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="credits">Credits</TabsTrigger>
-              <TabsTrigger value="promos">Promos</TabsTrigger>
+              <TabsTrigger value="overview">{t('admin.overview')}</TabsTrigger>
+              <TabsTrigger value="users">{t('admin.users')}</TabsTrigger>
+              <TabsTrigger value="credits">{t('admin.credits')}</TabsTrigger>
+              <TabsTrigger value="promos">{t('admin.promos')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
