@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
@@ -46,20 +46,26 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
       });
 
-      if (error) {
+      if (result.error) {
         toast({
           title: t('auth.errorSigningIn'),
-          description: error.message,
+          description: result.error.message,
           variant: 'destructive',
         });
+      } else if (!result.redirected) {
+        toast({ title: t('auth.welcomeBack') + '!' });
+        navigate('/');
       }
+    } catch (err) {
+      toast({
+        title: t('auth.errorSigningIn'),
+        description: err instanceof Error ? err.message : 'Unknown error',
+        variant: 'destructive',
+      });
     } finally {
       setGoogleLoading(false);
     }
