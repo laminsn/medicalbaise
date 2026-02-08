@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { QuoteRequestForm } from '@/components/quote/QuoteRequestForm';
 import { ProviderPixelTracker, trackConversion } from '@/components/tracking/ProviderPixelTracker';
 import { supabase } from '@/integrations/supabase/client';
+import { useFollowerStats } from '@/hooks/useFollowerStats';
 import {
   Star,
   MapPin,
@@ -162,6 +163,7 @@ export default function ProviderProfile() {
   const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [pixelData, setPixelData] = useState<{ meta_pixel_id?: string; google_analytics_id?: string } | null>(null);
   const provider = mockProvider;
+  const { followersCount, followingCount } = useFollowerStats(id);
 
   // Track profile view when component mounts
   useTrackProfileView(id, 'profile_page');
@@ -319,7 +321,15 @@ export default function ProviderProfile() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-4 gap-2 mt-4">
+            <div className="grid grid-cols-5 gap-2 mt-4">
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <p className="font-bold">{followersCount}</p>
+                <p className="text-xs text-muted-foreground">{t('providerProfile.followers', 'Followers')}</p>
+              </div>
+              <div className="bg-background/80 rounded-lg p-2 text-center">
+                <p className="font-bold">{followingCount}</p>
+                <p className="text-xs text-muted-foreground">{t('providerProfile.following', 'Following')}</p>
+              </div>
               <div className="bg-background/80 rounded-lg p-2 text-center">
                 <div className="flex items-center justify-center gap-1">
                   <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
@@ -330,10 +340,6 @@ export default function ProviderProfile() {
               <div className="bg-background/80 rounded-lg p-2 text-center">
                 <p className="font-bold">{provider.total_jobs}</p>
                 <p className="text-xs text-muted-foreground">{t('providerProfile.jobs')}</p>
-              </div>
-              <div className="bg-background/80 rounded-lg p-2 text-center">
-                <p className="font-bold">{provider.years_experience}</p>
-                <p className="text-xs text-muted-foreground">{t('providerProfile.yearsExp')}</p>
               </div>
               <div className="bg-background/80 rounded-lg p-2 text-center">
                 <div className="flex items-center justify-center gap-1">

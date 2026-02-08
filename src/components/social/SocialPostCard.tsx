@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, MessageCircle, Share2, MoreHorizontal, TrendingUp, UserPlus, UserMinus, Calendar } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, TrendingUp, UserPlus, UserMinus, Calendar, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +44,7 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes_count);
   const [following, setFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
   const [loadingLike, setLoadingLike] = useState(false);
   const [loadingFollow, setLoadingFollow] = useState(false);
 
@@ -67,10 +68,19 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
     checkLiked();
   }, [post.id, currentUserId]);
 
-  // Check if user follows this provider
+  // Check if user follows this provider + get follower count
   useEffect(() => {
     const checkFollowing = async () => {
-      if (!currentUserId || !post.provider_id) return;
+      if (!post.provider_id) return;
+
+      // Get follower count
+      const { count } = await supabase
+        .from('follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_provider_id', post.provider_id);
+      setFollowersCount(count || 0);
+
+      if (!currentUserId) return;
 
       const { data } = await supabase
         .from('follows')
@@ -135,6 +145,7 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
 
       if (!error) {
         setFollowing(false);
+        setFollowersCount(prev => Math.max(0, prev - 1));
         toast.success(t('socialFeed.unfollowed'));
       }
     } else {
@@ -144,6 +155,7 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
 
       if (!error) {
         setFollowing(true);
+        setFollowersCount(prev => prev + 1);
         toast.success(t('socialFeed.followed'));
       }
     }
@@ -196,9 +208,16 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+              </p>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+                <Users className="h-3 w-3" />
+                {followersCount}
+              </span>
+            </div>
           </div>
         </div>
 
