@@ -251,7 +251,7 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
                 autoPlay
                 playsInline
                 muted
-                className="w-full h-full object-cover scale-x-[-1]"
+                className="w-full h-full object-contain scale-x-[-1]"
               />
               
               {/* Loading State */}

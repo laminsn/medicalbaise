@@ -11,6 +11,7 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
   const [error, setError] = useState<string | null>(null);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -19,17 +20,22 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
   const durationIntervalRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
-  const startPreview = useCallback(async (videoElement: HTMLVideoElement) => {
+  const startPreview = useCallback(async (videoElement: HTMLVideoElement, facing?: 'user' | 'environment') => {
     try {
       setError(null);
+
+      // Stop any existing stream first
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
       
-      // Request camera and microphone access
+      const mode = facing || facingMode;
+      
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'user',
-          width: { ideal: 1080 },
-          height: { ideal: 1920 },
-          aspectRatio: { ideal: 9/16 }
+          facingMode: mode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
         },
         audio: true
       });
@@ -37,7 +43,7 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       streamRef.current = stream;
       videoRef.current = videoElement;
       videoElement.srcObject = stream;
-      videoElement.muted = true; // Mute to prevent feedback
+      videoElement.muted = true;
       await videoElement.play();
       
       setIsPreviewing(true);
@@ -47,7 +53,7 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       setError(err instanceof Error ? err.message : 'Failed to access camera');
       throw err;
     }
-  }, []);
+  }, [facingMode]);
 
   const stopPreview = useCallback(() => {
     if (streamRef.current) {
@@ -61,6 +67,14 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
     console.log('Camera preview stopped');
   }, []);
 
+  const flipCamera = useCallback(async () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newMode);
+    if (isPreviewing && videoRef.current) {
+      await startPreview(videoRef.current, newMode);
+    }
+  }, [facingMode, isPreviewing, startPreview]);
+
   const startRecording = useCallback(async () => {
     if (!streamRef.current) {
       throw new Error('No stream available. Start preview first.');
@@ -70,7 +84,6 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       setError(null);
       chunksRef.current = [];
 
-      // Determine supported MIME type
       const mimeTypes = [
         'video/webm;codecs=vp9,opus',
         'video/webm;codecs=vp8,opus',
@@ -116,9 +129,8 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       };
 
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(1000); // Collect data every second
+      mediaRecorder.start(1000);
       
-      // Start duration counter
       startTimeRef.current = Date.now();
       durationIntervalRef.current = window.setInterval(() => {
         setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
@@ -183,10 +195,12 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
     error,
     recordedBlob,
     recordedUrl,
+    facingMode,
     startPreview,
     stopPreview,
     startRecording,
     stopRecording,
+    flipCamera,
     cleanup
   };
 }
