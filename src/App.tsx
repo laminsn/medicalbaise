@@ -45,6 +45,8 @@ import Integrations from "./pages/Integrations";
 import Payouts from "./pages/Payouts";
 import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/AdminDashboard";
+import HandleRedirect from "./pages/HandleRedirect";
 
 // Redirect component for old provider URLs
 const ProviderRedirect = () => {
@@ -107,6 +109,8 @@ const App = () => (
                   <Route path="/payouts" element={<Payouts />} />
                   <Route path="/post-job" element={<PostJob />} />
                   <Route path="/help" element={<Learn />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/@:handle" element={<HandleRedirect />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <NotificationPermissionBanner />
