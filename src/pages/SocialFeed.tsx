@@ -13,6 +13,7 @@ import { AdManagerDialog } from '@/components/social/AdManagerDialog';
 import { GoLiveButton } from '@/components/social/GoLiveButton';
 import { LiveStreamsSection } from '@/components/social/LiveStreamsSection';
 import { FeedFilters } from '@/components/social/FeedFilters';
+import { StoriesBar } from '@/components/stories/StoriesBar';
 import { toast } from 'sonner';
 
 interface SocialPost {
@@ -231,6 +232,9 @@ export default function SocialFeed() {
             </div>
           </div>
         </div>
+
+        {/* Stories Bar */}
+        <StoriesBar />
 
         {/* Feed Filters */}
         <FeedFilters

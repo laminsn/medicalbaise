@@ -2741,6 +2741,80 @@ export type Database = {
           },
         ]
       }
+      stories: {
+        Row: {
+          background_gradient: string | null
+          created_at: string
+          duration_seconds: number
+          expires_at: string
+          filter: string | null
+          id: string
+          media_type: string
+          media_url: string
+          overlays: Json | null
+          thumbnail_url: string | null
+          user_id: string
+          view_count: number
+        }
+        Insert: {
+          background_gradient?: string | null
+          created_at?: string
+          duration_seconds?: number
+          expires_at?: string
+          filter?: string | null
+          id?: string
+          media_type?: string
+          media_url: string
+          overlays?: Json | null
+          thumbnail_url?: string | null
+          user_id: string
+          view_count?: number
+        }
+        Update: {
+          background_gradient?: string | null
+          created_at?: string
+          duration_seconds?: number
+          expires_at?: string
+          filter?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          overlays?: Json | null
+          thumbnail_url?: string | null
+          user_id?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
+      story_views: {
+        Row: {
+          id: string
+          story_id: string
+          viewed_at: string
+          viewer_id: string
+        }
+        Insert: {
+          id?: string
+          story_id: string
+          viewed_at?: string
+          viewer_id: string
+        }
+        Update: {
+          id?: string
+          story_id?: string
+          viewed_at?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_views_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
