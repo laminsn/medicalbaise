@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { Plus, TrendingUp, MessageSquare, Bell, Radio, Stethoscope } from 'lucide-react';
+import { Plus, TrendingUp, MessageSquare, Bell, Stethoscope } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SocialPostCard } from '@/components/social/SocialPostCard';
 import { CreatePostDialog } from '@/components/social/CreatePostDialog';
 import { AdManagerDialog } from '@/components/social/AdManagerDialog';
-import { LiveBroadcastDialog } from '@/components/social/LiveBroadcastDialog';
+import { GoLiveButton } from '@/components/social/GoLiveButton';
 import { LiveStreamsSection } from '@/components/social/LiveStreamsSection';
 import { FeedFilters } from '@/components/social/FeedFilters';
 import { toast } from 'sonner';
@@ -45,8 +45,7 @@ export default function SocialFeed() {
   const [providerId, setProviderId] = useState<string | null>(null);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showAdManager, setShowAdManager] = useState(false);
-  const [showLiveBroadcast, setShowLiveBroadcast] = useState(false);
-  const [providerName, setProviderName] = useState('');
+  
   const [viewStartTime] = useState(Date.now());
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,7 +71,7 @@ export default function SocialFeed() {
       if (data) {
         setIsProvider(true);
         setProviderId(data.id);
-        setProviderName(data.business_name);
+        
       }
     };
 
@@ -198,14 +197,7 @@ export default function SocialFeed() {
             <div className="flex items-center gap-1">
               {isProvider && (
                 <>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => setShowLiveBroadcast(true)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                  >
-                    <Radio className="h-5 w-5" />
-                  </Button>
+                  <GoLiveButton providerId={providerId} />
                   <Button 
                     variant="ghost" 
                     size="icon"
@@ -312,14 +304,6 @@ export default function SocialFeed() {
         providerId={providerId}
       />
 
-      {providerId && (
-        <LiveBroadcastDialog
-          open={showLiveBroadcast}
-          onOpenChange={setShowLiveBroadcast}
-          providerId={providerId}
-          providerName={providerName}
-        />
-      )}
     </AppLayout>
   );
 }

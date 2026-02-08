@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Video, Radio, Square, Eye, Camera, CameraOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { LiveStreamReview } from './LiveStreamReview';
 import { useCameraRecorder } from '@/hooks/useCameraRecorder';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GoLiveButtonProps {
   providerId: string | null;
@@ -23,6 +25,7 @@ interface GoLiveButtonProps {
 
 export function GoLiveButton({ providerId }: GoLiveButtonProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [showDialog, setShowDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [title, setTitle] = useState('');
@@ -37,6 +40,7 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
     isPreviewing,
     duration,
     error: cameraError,
+    recordedBlob,
     recordedUrl,
     startPreview,
     stopPreview,
@@ -109,8 +113,51 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
     trimStart: number;
     trimEnd: number;
   }) => {
-    console.log('Posting recording with data:', data);
-    resetState();
+    if (!providerId || !recordedBlob) {
+      toast.error(t('socialFeed.noRecording', 'No recording available to post'));
+      return;
+    }
+
+    try {
+      // Upload video to storage
+      const fileExt = 'webm';
+      const fileName = `${providerId}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('testimonials')
+        .upload(fileName, recordedBlob, {
+          contentType: 'video/webm',
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('testimonials')
+        .getPublicUrl(fileName);
+
+      // Create social post
+      const { error: postError } = await supabase
+        .from('social_posts')
+        .insert({
+          provider_id: providerId,
+          content: data.description || data.title,
+          media_url: publicUrl,
+          media_type: 'video',
+          show_book_now: data.showBookNow,
+        });
+
+      if (postError) throw postError;
+
+      toast.success(t('socialFeed.recordingPosted', 'Recording posted to your feed!'));
+      resetState();
+      // Navigate to feed to see the post
+      navigate('/feed');
+    } catch (error) {
+      console.error('Error posting recording:', error);
+      toast.error(t('socialFeed.postFailed', 'Failed to post recording'));
+      throw error;
+    }
   };
 
   const handleDiscardRecording = () => {
