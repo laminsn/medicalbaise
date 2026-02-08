@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 
 // Production domain used for share links, QR codes, and handle URLs
-export const SITE_DOMAIN = 'https://medicalbaise.lovable.app';
+export const SITE_DOMAIN = 'https://medicalbaise.com';
 import {
   Heart,
   Baby,

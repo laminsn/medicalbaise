@@ -110,7 +110,7 @@ const App = () => (
                   <Route path="/post-job" element={<PostJob />} />
                   <Route path="/help" element={<Learn />} />
                   <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/@:handle" element={<HandleRedirect />} />
+                  <Route path="/u/:handle" element={<HandleRedirect />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <NotificationPermissionBanner />
