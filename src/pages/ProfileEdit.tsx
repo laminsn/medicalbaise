@@ -247,7 +247,7 @@ export default function ProfileEdit() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {t('profile.handleDescription', 'Your unique shareable link:')} medicalbaise.lovable.app/@{formData.handle || '...'}
+                    {t('profile.handleDescription', 'Your unique shareable link:')} medicalbaise.com/u/{formData.handle || '...'}
                   </p>
                 </div>
 

@@ -17,7 +17,7 @@ export function ProfileShareSection({ handle, referralCode }: ProfileShareSectio
   const [showQR, setShowQR] = useState(false);
 
   const profileShareUrl = handle
-    ? `${SITE_DOMAIN}/@${handle}`
+    ? `${SITE_DOMAIN}/u/${handle}`
     : `${SITE_DOMAIN}/browse`;
 
   const shareUrl = referralCode
