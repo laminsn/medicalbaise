@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 import { DollarSign, Plus, Minus, Search, Loader2 } from 'lucide-react';
 
 export function AdminCreditManager() {
+  const { t } = useTranslation();
   const [searchEmail, setSearchEmail] = useState('');
   const [foundUser, setFoundUser] = useState<any>(null);
   const [searching, setSearching] = useState(false);
@@ -31,7 +33,7 @@ export function AdminCreditManager() {
       .maybeSingle();
 
     if (error || !data) {
-      toast.error('User not found');
+      toast.error(t('admin.userNotFound'));
     } else {
       setFoundUser(data);
     }
@@ -44,7 +46,7 @@ export function AdminCreditManager() {
 
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount < 0) {
-      toast.error('Invalid amount');
+      toast.error(t('admin.invalidAmount'));
       setApplying(false);
       return;
     }
@@ -70,9 +72,9 @@ export function AdminCreditManager() {
       .eq('user_id', foundUser.user_id);
 
     if (error) {
-      toast.error('Error updating credits: ' + error.message);
+      toast.error(t('admin.errorSaving') + ': ' + error.message);
     } else {
-      toast.success(`Credits updated: R$${currentBalance} → R$${newBalance}`);
+      toast.success(t('admin.creditsUpdated', { from: currentBalance, to: newBalance }));
       setFoundUser({ ...foundUser, credits_balance: newBalance });
       setAmount('');
       setReason('');
@@ -82,16 +84,15 @@ export function AdminCreditManager() {
 
   return (
     <div className="space-y-4">
-      {/* Search User */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Adjust User Credits</CardTitle>
-          <CardDescription>Search for a user by email or handle to manage their credit balance</CardDescription>
+          <CardTitle className="text-base">{t('admin.adjustCredits')}</CardTitle>
+          <CardDescription>{t('admin.adjustCreditsDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Email or @handle..."
+              placeholder={t('admin.emailOrHandle')}
               value={searchEmail}
               onChange={(e) => setSearchEmail(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && searchUser()}
@@ -112,7 +113,7 @@ export function AdminCreditManager() {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Current Balance</p>
+                  <p className="text-sm text-muted-foreground">{t('admin.currentBalance')}</p>
                   <p className="text-2xl font-bold text-primary">
                     R${foundUser.credits_balance || 0}
                   </p>
@@ -121,7 +122,7 @@ export function AdminCreditManager() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <Label>Operation</Label>
+                  <Label>{t('admin.operation')}</Label>
                   <Select value={operation} onValueChange={(v: any) => setOperation(v)}>
                     <SelectTrigger>
                       <SelectValue />
@@ -129,24 +130,24 @@ export function AdminCreditManager() {
                     <SelectContent>
                       <SelectItem value="add">
                         <div className="flex items-center gap-1">
-                          <Plus className="h-3 w-3" /> Add
+                          <Plus className="h-3 w-3" /> {t('admin.add')}
                         </div>
                       </SelectItem>
                       <SelectItem value="subtract">
                         <div className="flex items-center gap-1">
-                          <Minus className="h-3 w-3" /> Subtract
+                          <Minus className="h-3 w-3" /> {t('admin.subtract')}
                         </div>
                       </SelectItem>
                       <SelectItem value="set">
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" /> Set
+                          <DollarSign className="h-3 w-3" /> {t('admin.set')}
                         </div>
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="col-span-2 space-y-1">
-                  <Label>Amount (R$)</Label>
+                  <Label>{t('admin.amount')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -159,11 +160,11 @@ export function AdminCreditManager() {
               </div>
 
               <div className="space-y-1">
-                <Label>Reason (optional)</Label>
+                <Label>{t('admin.reason')}</Label>
                 <Textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="e.g. Promotional bonus, partner credit, refund..."
+                  placeholder={t('admin.reasonPlaceholder')}
                   rows={2}
                   maxLength={500}
                 />
@@ -175,7 +176,7 @@ export function AdminCreditManager() {
                 ) : (
                   <DollarSign className="h-4 w-4 mr-2" />
                 )}
-                Apply Credit Change
+                {t('admin.applyCreditChange')}
               </Button>
             </div>
           )}

@@ -87,7 +87,7 @@ export default function Profile() {
       items: [
         { icon: Gift, label: t('profile.referFriends'), path: '/referral', badge: t('profile.earnReward') },
         { icon: HelpCircle, label: t('profile.help'), path: '/help' },
-        ...(isAdmin ? [{ icon: Shield, label: 'Admin Dashboard', path: '/admin', badge: 'Admin' }] : []),
+        ...(isAdmin ? [{ icon: Shield, label: t('admin.adminDashboard'), path: '/admin', badge: 'Admin' }] : []),
       ],
     },
   ];
