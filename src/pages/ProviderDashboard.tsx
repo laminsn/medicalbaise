@@ -16,6 +16,7 @@ import { MessageTemplatesPanel } from '@/components/dashboard/MessageTemplatesPa
 import { PixelTrackingSettings } from '@/components/dashboard/PixelTrackingSettings';
 import { ConversionAnalyticsDashboard } from '@/components/dashboard/ConversionAnalyticsDashboard';
 import { FollowerMarketingPanel } from '@/components/marketing/FollowerMarketingPanel';
+import { ProviderEmailCampaigns } from '@/components/marketing/ProviderEmailCampaigns';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -147,7 +148,7 @@ export default function ProviderDashboard() {
 
         {/* Main Tabs */}
         <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 h-auto">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 h-auto">
             <TabsTrigger value="jobs" className="gap-2 py-3">
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.jobs', 'Jobs')}</span>
@@ -159,6 +160,11 @@ export default function ProviderDashboard() {
             <TabsTrigger value="marketing" className="gap-2 py-3">
               <Megaphone className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.marketing', 'Marketing')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="emailCampaigns" className="gap-2 py-3" disabled={!isEliteOrAbove}>
+              <Mail className="h-4 w-4" />
+              <span className="hidden sm:inline">Email Campaigns</span>
+              {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="gap-2 py-3">
               <Calendar className="h-4 w-4" />
@@ -191,6 +197,17 @@ export default function ProviderDashboard() {
 
           <TabsContent value="marketing" className="space-y-6">
             <FollowerMarketingPanel />
+          </TabsContent>
+
+          <TabsContent value="emailCampaigns" className="space-y-6">
+            {isEliteOrAbove ? (
+              <ProviderEmailCampaigns />
+            ) : (
+              <UpgradePrompt 
+                feature="Email Campaigns" 
+                requiredTier="Elite"
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="scheduled" className="space-y-6">
