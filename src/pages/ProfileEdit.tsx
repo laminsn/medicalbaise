@@ -39,6 +39,7 @@ export default function ProfileEdit() {
     status: (profile as any)?.status || '',
     bio: (profile as any)?.bio || '',
     avatar_url: profile?.avatar_url || '',
+    handle: (profile as any)?.handle || '',
     // Address fields
     address_cep: (profile as any)?.address_cep || '',
     address_street: (profile as any)?.address_street || '',
@@ -137,6 +138,7 @@ export default function ProfileEdit() {
           bio: formData.bio.trim() || null,
           avatar_url: formData.avatar_url || null,
           languages: selectedLanguages,
+          handle: formData.handle.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '') || null,
           // Address fields
           address_cep: formData.address_cep.trim() || null,
           address_street: formData.address_street.trim() || null,
@@ -229,6 +231,26 @@ export default function ProfileEdit() {
                 <CardTitle className="text-base">{t('profile.aboutYou', 'About You')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="handle">{t('profile.handle', 'Username / Handle')}</Label>
+                  <div className="flex items-center">
+                    <span className="text-sm text-muted-foreground mr-1">@</span>
+                    <Input
+                      id="handle"
+                      placeholder={t('profile.handlePlaceholder', 'yourname')}
+                      value={formData.handle}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        handle: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+                      }))}
+                      maxLength={30}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t('profile.handleDescription', 'Your unique shareable link:')} {window.location.origin}/@{formData.handle || '...'}
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="status">{t('profile.status', 'Status')}</Label>
                   <Select 

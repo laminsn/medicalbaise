@@ -1431,6 +1431,7 @@ export type Database = {
           credits_balance: number | null
           email: string | null
           first_name: string | null
+          handle: string | null
           id: string
           languages: string[] | null
           last_name: string | null
@@ -1457,6 +1458,7 @@ export type Database = {
           credits_balance?: number | null
           email?: string | null
           first_name?: string | null
+          handle?: string | null
           id?: string
           languages?: string[] | null
           last_name?: string | null
@@ -1483,6 +1485,7 @@ export type Database = {
           credits_balance?: number | null
           email?: string | null
           first_name?: string | null
+          handle?: string | null
           id?: string
           languages?: string[] | null
           last_name?: string | null
