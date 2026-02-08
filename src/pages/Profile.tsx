@@ -5,7 +5,7 @@ import {
   User, Settings, Heart, Clock, MessageSquare, Star, 
   CreditCard, Gift, HelpCircle, LogOut, ChevronRight, ChevronLeft,
   Briefcase, FileText, Share2, Copy, Check, Crown,
-  Users, Plug, Wallet
+  Users, Plug, Wallet, AtSign
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,11 @@ export default function Profile() {
 
   const isEnterprise = providerTier === 'enterprise';
 
+  const handle = (profile as any)?.handle;
   const referralCode = profile?.referral_code;
+  const profileShareUrl = handle 
+    ? `${window.location.origin}/@${handle}` 
+    : `${window.location.origin}/profile`;
   const shareUrl = referralCode 
     ? `${window.location.origin}/auth?ref=${referralCode}` 
     : window.location.origin;
@@ -185,10 +189,11 @@ export default function Profile() {
                 {profile?.first_name} {profile?.last_name}
               </h1>
               <p className="text-sm text-muted-foreground">{profile?.email}</p>
-              {(profile as any)?.status && (
-                <p className="text-sm text-primary mt-1">
-                  {(profile as any).status}
-                </p>
+              {handle && (
+                <div className="flex items-center gap-1 mt-0.5">
+                  <AtSign className="w-3 h-3 text-primary" />
+                  <span className="text-sm font-medium text-primary">{handle}</span>
+                </div>
               )}
               {profile?.credits_balance > 0 && (
                 <Badge variant="secondary" className="mt-1 bg-primary/10 text-primary">
@@ -305,8 +310,14 @@ export default function Profile() {
           </div>
           
           {profile?.referral_code && (
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-muted-foreground mb-2">
               {t('profile.yourReferralCode')}: <span className="font-mono font-semibold text-primary">{profile.referral_code}</span>
+            </p>
+          )}
+          
+          {handle && (
+            <p className="text-xs text-muted-foreground mb-3">
+              {t('profile.yourProfileLink', 'Your profile link')}: <span className="font-mono font-semibold text-primary">{profileShareUrl}</span>
             </p>
           )}
           

@@ -18,6 +18,7 @@ interface Profile {
   status: string | null;
   bio: string | null;
   languages: string[] | null;
+  handle: string | null;
 }
 
 interface AuthContextType {
