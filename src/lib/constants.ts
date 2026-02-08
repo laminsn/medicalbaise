@@ -21,6 +21,7 @@ import {
   Video,
   Clock,
   Shield,
+  Apple,
 } from 'lucide-react';
 
 export interface MedicalCategory {
@@ -168,6 +169,24 @@ export const MEDICAL_CATEGORIES: MedicalCategory[] = [
     color: '#DC2626',
     description_en: 'Cancer diagnosis and treatment',
     description_pt: 'Diagnóstico e tratamento de câncer',
+  },
+  {
+    id: 'therapy',
+    name_en: 'Therapy',
+    name_pt: 'Terapia',
+    icon: Brain,
+    color: '#8B5CF6',
+    description_en: 'Mental health therapy and counseling',
+    description_pt: 'Terapia e aconselhamento de saúde mental',
+  },
+  {
+    id: 'dietitian',
+    name_en: 'Dietitian',
+    name_pt: 'Nutricionista',
+    icon: Apple,
+    color: '#22C55E',
+    description_en: 'Nutrition and dietary planning',
+    description_pt: 'Nutrição e planejamento alimentar',
   },
 ];
 
