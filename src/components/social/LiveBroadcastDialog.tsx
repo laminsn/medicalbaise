@@ -19,6 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useLiveStream, StreamMessage } from '@/hooks/useLiveStream';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LiveBroadcastDialogProps {
   open: boolean;
@@ -79,6 +80,40 @@ export function LiveBroadcastDialog({
     setCameraReady(false);
   }, []);
 
+  // Notify all followers when going live
+  const notifyFollowers = useCallback(async (streamId: string, pId: string, pName: string, streamTitle: string) => {
+    try {
+      const { data: followers, error: followError } = await supabase
+        .from('follows')
+        .select('follower_id')
+        .eq('following_provider_id', pId);
+
+      if (followError || !followers?.length) return;
+
+      const notifications = followers.map(f => ({
+        user_id: f.follower_id,
+        title: `${pName} is live!`,
+        message: streamTitle || `${pName} started a live stream`,
+        type: 'live_stream',
+        priority: 'high',
+        action_url: '/feed',
+        metadata: { stream_id: streamId, provider_id: pId } as Record<string, string>,
+      }));
+
+      const { error: insertError } = await supabase
+        .from('notifications')
+        .insert(notifications);
+
+      if (insertError) {
+        console.error('Failed to notify followers:', insertError);
+      } else {
+        console.log(`Notified ${followers.length} followers about live stream`);
+      }
+    } catch (err) {
+      console.error('Error notifying followers:', err);
+    }
+  }, []);
+
   // Start live stream
   const handleStartStream = async () => {
     if (!title.trim()) {
@@ -90,6 +125,10 @@ export function LiveBroadcastDialog({
     
     try {
       await startBroadcast(providerId, providerName, title, description, videoRef.current);
+      
+      // Notify followers about the live stream
+      notifyFollowers(providerId, providerId, providerName, title);
+      
       toast.success('You are now live!');
     } catch (err) {
       toast.error('Failed to start stream');
@@ -189,7 +228,7 @@ export function LiveBroadcastDialog({
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-full object-cover scale-x-[-1]"
+                  className="w-full h-full object-contain scale-x-[-1]"
                 />
                 
                 {/* Loading State */}
