@@ -298,4 +298,19 @@
   .shadow-red {
     box-shadow: var(--shadow-red);
   }
+
+  /* Float up animation for stream reactions */
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-250px) scale(0.4);
+      opacity: 0;
+    }
+  }
 }
