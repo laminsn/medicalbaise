@@ -271,7 +271,7 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
         {(post.show_book_now !== false) && (
           <button
             onClick={() => navigate(`/provider/${post.provider_id}`)}
-            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent py-4 px-4 flex items-center justify-between opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+            className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-[hsl(190,80%,40%)] via-[hsl(200,85%,45%)] to-[hsl(210,90%,35%)] py-3 px-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-2 text-white">
               <Calendar className="h-4 w-4" />
@@ -279,7 +279,7 @@ export function SocialPostCard({ post, currentUserId, isProvider, onBoostClick }
                 {t('socialFeed.bookNow', 'Book Now')}
               </span>
             </div>
-            <span className="text-white/80 text-xs">
+            <span className="text-white/90 text-xs font-medium">
               {t('socialFeed.viewProfile', 'View Profile')} →
             </span>
           </button>
