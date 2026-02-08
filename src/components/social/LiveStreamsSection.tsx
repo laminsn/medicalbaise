@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Radio, Users, ChevronRight, Stethoscope, MapPin, Video } from 'lucide-react';
+import { Radio, Users, Stethoscope, MapPin, Video } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -108,9 +108,6 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
               {filteredStreams.length} {t('liveStream.live', 'AO VIVO')}
             </Badge>
           </div>
-          <button className="text-primary text-sm font-medium flex items-center gap-1 hover:underline">
-            {t('common.seeAll', 'Ver Todas')} <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
 
         <ScrollArea className="w-full">
