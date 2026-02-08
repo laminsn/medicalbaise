@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,9 +20,21 @@ import {
   ExternalLink,
   Check,
   QrCode,
-  Download
+  Download,
+  Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface ReferralItem {
+  id: string;
+  referral_code: string;
+  status: string;
+  credit_amount: number;
+  created_at: string;
+  referred_email: string | null;
+  referred_user_id: string | null;
+}
 
 const REFERRAL_TIERS = [
   { count: 5, bonus: 50, totalEarned: 150, badgeKey: null },
@@ -38,28 +50,44 @@ const PROVIDER_TIERS = [
   { count: 20, bonus: 2000, subscriptionKey: 'freeMonths6Enterprise' },
 ];
 
-// Mock data - replace with real data from Supabase
-const mockReferrals = [
-  { id: '1', name: 'Maria S.', status: 'credited', date: '2024-12-01', amount: 20 },
-  { id: '2', name: 'João P.', status: 'active', date: '2024-12-03', amount: 20 },
-  { id: '3', name: 'Ana L.', status: 'pending', date: '2024-12-04', amount: 20 },
-];
-
 export function ReferralDashboard() {
   const { t } = useTranslation();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const qrCodeRef = useRef<HTMLDivElement>(null);
+  const [referrals, setReferrals] = useState<ReferralItem[]>([]);
+  const [loadingReferrals, setLoadingReferrals] = useState(true);
+
+  useEffect(() => {
+    const fetchReferrals = async () => {
+      if (!user) return;
+      setLoadingReferrals(true);
+
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('*')
+        .eq('referrer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setReferrals(data);
+      }
+      setLoadingReferrals(false);
+    };
+
+    fetchReferrals();
+  }, [user]);
 
   const referralCode = profile?.referral_code || 'LOADING';
-  const referralLink = `brasilbase.com/ref/${referralCode}`;
+  const referralLink = `${window.location.origin}/auth?ref=${referralCode}`;
   
-  const totalReferrals = mockReferrals.length;
-  const creditedReferrals = mockReferrals.filter(r => r.status === 'credited').length;
-  const pendingReferrals = mockReferrals.filter(r => r.status === 'pending').length;
-  const totalEarned = creditedReferrals * 20;
-  const pendingEarnings = pendingReferrals * 20;
+  const totalReferrals = referrals.length;
+  const creditedReferrals = referrals.filter(r => r.status === 'credited');
+  const pendingReferrals = referrals.filter(r => r.status === 'pending');
+  const activeReferrals = referrals.filter(r => r.status === 'active');
+  const totalEarned = creditedReferrals.reduce((sum, r) => sum + (r.credit_amount || 0), 0);
+  const pendingEarnings = pendingReferrals.reduce((sum, r) => sum + (r.credit_amount || 0), 0);
 
   const currentTier = REFERRAL_TIERS.findIndex(t => totalReferrals < t.count);
   const nextTier = REFERRAL_TIERS[currentTier] || REFERRAL_TIERS[REFERRAL_TIERS.length - 1];
@@ -321,7 +349,11 @@ export function ReferralDashboard() {
             </TabsList>
             
             <TabsContent value="all" className="space-y-3">
-              {mockReferrals.map((referral) => (
+              {loadingReferrals ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+              ) : referrals.length === 0 ? (
+                <p className="text-center py-6 text-muted-foreground text-sm">{t('referral.noReferralsYet', 'No referrals yet. Share your code to start earning!')}</p>
+              ) : referrals.map((referral) => (
                 <div 
                   key={referral.id}
                   className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
@@ -329,12 +361,12 @@ export function ReferralDashboard() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="font-medium text-primary">
-                        {referral.name.charAt(0)}
+                        {(referral.referred_email || 'U').charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium">{referral.name}</p>
-                      <p className="text-xs text-muted-foreground">{referral.date}</p>
+                      <p className="font-medium">{referral.referred_email || t('referral.pendingUser', 'Pending signup')}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(referral.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -346,14 +378,16 @@ export function ReferralDashboard() {
                     >
                       {getStatusLabel(referral.status)}
                     </Badge>
-                    <p className="text-sm font-medium mt-1">R${referral.amount}</p>
+                    <p className="text-sm font-medium mt-1">R${referral.credit_amount}</p>
                   </div>
                 </div>
               ))}
             </TabsContent>
             
-            <TabsContent value="pending">
-              {mockReferrals.filter(r => r.status === 'pending').map((referral) => (
+            <TabsContent value="pending" className="space-y-3">
+              {pendingReferrals.length === 0 ? (
+                <p className="text-center py-6 text-muted-foreground text-sm">{t('referral.noPendingReferrals', 'No pending referrals')}</p>
+              ) : pendingReferrals.map((referral) => (
                 <div 
                   key={referral.id}
                   className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
@@ -361,12 +395,12 @@ export function ReferralDashboard() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
                       <span className="font-medium text-amber-600">
-                        {referral.name.charAt(0)}
+                        {(referral.referred_email || 'U').charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium">{referral.name}</p>
-                      <p className="text-xs text-muted-foreground">{referral.date}</p>
+                      <p className="font-medium">{referral.referred_email || t('referral.pendingUser', 'Pending signup')}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(referral.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <Badge variant="outline">{t('referral.pendingStatus')}</Badge>
@@ -374,8 +408,10 @@ export function ReferralDashboard() {
               ))}
             </TabsContent>
             
-            <TabsContent value="credited">
-              {mockReferrals.filter(r => r.status === 'credited').map((referral) => (
+            <TabsContent value="credited" className="space-y-3">
+              {creditedReferrals.length === 0 ? (
+                <p className="text-center py-6 text-muted-foreground text-sm">{t('referral.noCreditedReferrals', 'No credited referrals yet')}</p>
+              ) : creditedReferrals.map((referral) => (
                 <div 
                   key={referral.id}
                   className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
@@ -383,17 +419,17 @@ export function ReferralDashboard() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="font-medium text-primary">
-                        {referral.name.charAt(0)}
+                        {(referral.referred_email || 'U').charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium">{referral.name}</p>
-                      <p className="text-xs text-muted-foreground">{referral.date}</p>
+                      <p className="font-medium">{referral.referred_email || t('referral.pendingUser', 'Pending signup')}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(referral.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <Badge>{t('referral.creditedStatus')}</Badge>
-                    <p className="text-sm font-medium mt-1 text-primary">+R${referral.amount}</p>
+                    <p className="text-sm font-medium mt-1 text-primary">+R${referral.credit_amount}</p>
                   </div>
                 </div>
               ))}

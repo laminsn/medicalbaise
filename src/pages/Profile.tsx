@@ -5,7 +5,7 @@ import {
   User, Settings, Heart, Clock, MessageSquare, Star, 
   CreditCard, Gift, HelpCircle, LogOut, ChevronRight, ChevronLeft,
   Briefcase, FileText, Share2, Copy, Check, Crown,
-  Users, Plug, Wallet, AtSign
+  Users, Plug, Wallet, AtSign, Shield
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,11 @@ import { useTranslation } from 'react-i18next';
 import { BecomeProviderForm } from '@/components/provider/BecomeProviderForm';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { useAdmin } from '@/hooks/useAdmin';
 
 export default function Profile() {
   const { user, profile, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
@@ -117,6 +119,7 @@ export default function Profile() {
       items: [
         { icon: Gift, label: t('profile.referFriends'), path: '/referral', badge: t('profile.earnReward') },
         { icon: HelpCircle, label: t('profile.help'), path: '/help' },
+        ...(isAdmin ? [{ icon: Shield, label: 'Admin Dashboard', path: '/admin', badge: 'Admin' }] : []),
       ],
     },
   ];
