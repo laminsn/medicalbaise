@@ -15,6 +15,7 @@ import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServi
 import { MessageTemplatesPanel } from '@/components/dashboard/MessageTemplatesPanel';
 import { PixelTrackingSettings } from '@/components/dashboard/PixelTrackingSettings';
 import { ConversionAnalyticsDashboard } from '@/components/dashboard/ConversionAnalyticsDashboard';
+import { FollowerMarketingPanel } from '@/components/marketing/FollowerMarketingPanel';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -27,7 +28,8 @@ import {
   Loader2,
   Briefcase,
   Wallet,
-  Target
+  Target,
+  Megaphone,
 } from 'lucide-react';
 
 type SubscriptionTier = 'free' | 'pro' | 'elite' | 'enterprise';
@@ -145,7 +147,7 @@ export default function ProviderDashboard() {
 
         {/* Main Tabs */}
         <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 h-auto">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 h-auto">
             <TabsTrigger value="jobs" className="gap-2 py-3">
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.jobs', 'Jobs')}</span>
@@ -153,6 +155,10 @@ export default function ProviderDashboard() {
             <TabsTrigger value="analytics" className="gap-2 py-3">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.analytics')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="marketing" className="gap-2 py-3">
+              <Megaphone className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('dashboard.tabs.marketing', 'Marketing')}</span>
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="gap-2 py-3">
               <Calendar className="h-4 w-4" />
@@ -181,6 +187,10 @@ export default function ProviderDashboard() {
 
           <TabsContent value="analytics" className="space-y-6">
             <ProviderAnalytics />
+          </TabsContent>
+
+          <TabsContent value="marketing" className="space-y-6">
+            <FollowerMarketingPanel />
           </TabsContent>
 
           <TabsContent value="scheduled" className="space-y-6">
