@@ -10,6 +10,8 @@ import { AdminUserManagement } from '@/components/admin/AdminUserManagement';
 import { AdminCreditManager } from '@/components/admin/AdminCreditManager';
 import { AdminPromoManager } from '@/components/admin/AdminPromoManager';
 import { AdminOverview } from '@/components/admin/AdminOverview';
+import { AdminAllUsers } from '@/components/admin/AdminAllUsers';
+import { AdminEmailCampaigns } from '@/components/admin/AdminEmailCampaigns';
 import { Shield, Loader2 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -58,15 +60,21 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">{t('admin.overview')}</TabsTrigger>
-              <TabsTrigger value="users">{t('admin.users')}</TabsTrigger>
-              <TabsTrigger value="credits">{t('admin.credits')}</TabsTrigger>
-              <TabsTrigger value="promos">{t('admin.promos')}</TabsTrigger>
+            <TabsList className="w-full overflow-x-auto flex">
+              <TabsTrigger value="overview" className="flex-1">{t('admin.overview')}</TabsTrigger>
+              <TabsTrigger value="all-users" className="flex-1">All Users</TabsTrigger>
+              <TabsTrigger value="users" className="flex-1">{t('admin.users')}</TabsTrigger>
+              <TabsTrigger value="credits" className="flex-1">{t('admin.credits')}</TabsTrigger>
+              <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>
+              <TabsTrigger value="campaigns" className="flex-1">Campaigns</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
               <AdminOverview />
+            </TabsContent>
+
+            <TabsContent value="all-users">
+              <AdminAllUsers />
             </TabsContent>
 
             <TabsContent value="users">
@@ -79,6 +87,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="promos">
               <AdminPromoManager />
+            </TabsContent>
+
+            <TabsContent value="campaigns">
+              <AdminEmailCampaigns />
             </TabsContent>
           </Tabs>
         </div>

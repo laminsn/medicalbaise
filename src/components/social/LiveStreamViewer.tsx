@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useLiveStream, LiveStream, StreamMessage } from '@/hooks/useLiveStream';
+import { StreamReactions } from './StreamReactions';
 
 interface LiveStreamViewerProps {
   open: boolean;
@@ -40,6 +41,8 @@ export function LiveStreamViewer({
   const [isMuted, setIsMuted] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   
+  const [incomingReactions, setIncomingReactions] = useState<{ emoji: string; id: string }[]>([]);
+
   const {
     isWatching,
     viewerCount,
@@ -80,6 +83,12 @@ export function LiveStreamViewer({
       videoRef.current.muted = !videoRef.current.muted;
       setIsMuted(!isMuted);
     }
+  };
+
+  // Handle emoji reaction
+  const handleReaction = (emoji: string) => {
+    // Send reaction via chat channel as a special message
+    sendMessage(userId, userName, `[reaction:${emoji}]`);
   };
 
   // Like animation
@@ -187,12 +196,11 @@ export function LiveStreamViewer({
               </div>
             </div>
 
-            {/* Floating Hearts Animation */}
-            {isLiked && (
-              <div className="absolute bottom-20 right-10 animate-fade-in">
-                <Heart className="h-8 w-8 text-red-500 fill-red-500 animate-bounce" />
-              </div>
-            )}
+            {/* Stream Reactions */}
+            <StreamReactions
+              onReact={handleReaction}
+              incomingReactions={incomingReactions}
+            />
           </div>
 
           {/* Chat Section */}

@@ -20,6 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useLiveStream, StreamMessage } from '@/hooks/useLiveStream';
 import { supabase } from '@/integrations/supabase/client';
+import { StreamReactions } from './StreamReactions';
+
 
 interface LiveBroadcastDialogProps {
   open: boolean;
@@ -278,6 +280,13 @@ export function LiveBroadcastDialog({
                   </div>
                 )}
               </div>
+
+              {/* Reactions overlay for broadcaster */}
+              {isStreaming && (
+                <div className="flex justify-center mb-2">
+                  <StreamReactions onReact={(emoji) => sendMessage(providerId, providerName, `[reaction:${emoji}]`)} />
+                </div>
+              )}
 
               {/* Stream Controls */}
               {!isStreaming ? (
