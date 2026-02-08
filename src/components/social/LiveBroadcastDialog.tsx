@@ -163,8 +163,8 @@ export function LiveBroadcastDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden p-0">
-        <div className="flex flex-col h-full">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+        <div className="flex flex-col">
           {/* Header */}
           <DialogHeader className="p-4 border-b border-border">
             <DialogTitle className="flex items-center gap-2">
