@@ -22,6 +22,7 @@ import {
   Clock,
   Shield,
   Apple,
+  MessageCircle,
 } from 'lucide-react';
 
 export interface MedicalCategory {
@@ -187,6 +188,15 @@ export const MEDICAL_CATEGORIES: MedicalCategory[] = [
     color: '#22C55E',
     description_en: 'Nutrition and dietary planning',
     description_pt: 'Nutrição e planejamento alimentar',
+  },
+  {
+    id: 'speech-pathology',
+    name_en: 'Speech & Language Pathology',
+    name_pt: 'Fonoaudiologia',
+    icon: MessageCircle,
+    color: '#F472B6',
+    description_en: 'Speech, language, and swallowing disorders',
+    description_pt: 'Distúrbios de fala, linguagem e deglutição',
   },
 ];
 
