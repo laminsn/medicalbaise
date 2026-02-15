@@ -1,6 +1,14 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+/** Validate tracking IDs to prevent script injection via pixel/measurement IDs */
+function isValidPixelId(id: string): boolean {
+  return /^\d{10,20}$/.test(id);
+}
+function isValidGAId(id: string): boolean {
+  return /^G-[A-Z0-9]{6,12}$/.test(id);
+}
+
 interface ProviderPixelTrackerProps {
   metaPixelId?: string | null;
   googleAnalyticsId?: string | null;
@@ -55,13 +63,13 @@ export function ProviderPixelTracker({
 }: ProviderPixelTrackerProps) {
   
   useEffect(() => {
-    // Initialize Meta Pixel
-    if (metaPixelId) {
+    // Initialize Meta Pixel — only if ID passes validation
+    if (metaPixelId && isValidPixelId(metaPixelId)) {
       initMetaPixel(metaPixelId);
     }
 
-    // Initialize Google Analytics
-    if (googleAnalyticsId) {
+    // Initialize Google Analytics — only if ID passes validation
+    if (googleAnalyticsId && isValidGAId(googleAnalyticsId)) {
       initGoogleAnalytics(googleAnalyticsId);
     }
 

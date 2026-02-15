@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
@@ -217,7 +218,7 @@ export function AdminPromoManager() {
                 <li>• 20 referrals → R$2,000 + 6 free months Enterprise</li>
               </ul>
             </div>
-            <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('admin.partnerNote') }} />
+            <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t('admin.partnerNote')) }} />
           </div>
         </CardContent>
       </Card>
