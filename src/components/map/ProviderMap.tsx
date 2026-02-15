@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { escapeHtml } from '@/lib/sanitize';
 
 interface ProviderMapProps {
   onProviderClick?: (providerId: string) => void;
@@ -168,8 +169,8 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
       const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
         .setHTML(`
           <div class="p-3 min-w-[200px] bg-card text-card-foreground rounded-lg">
-            <h3 class="font-semibold text-sm mb-1">${provider.business_name}</h3>
-            ${provider.tagline ? `<p class="text-xs text-muted-foreground mb-2">${provider.tagline}</p>` : ''}
+            <h3 class="font-semibold text-sm mb-1">${escapeHtml(provider.business_name || '')}</h3>
+            ${provider.tagline ? `<p class="text-xs text-muted-foreground mb-2">${escapeHtml(provider.tagline)}</p>` : ''}
             <div class="flex items-center gap-2 text-xs">
               <span class="text-yellow-500">★ ${provider.avg_rating?.toFixed(1) || '—'}</span>
               <span class="text-muted-foreground">(${provider.total_reviews || 0} reviews)</span>

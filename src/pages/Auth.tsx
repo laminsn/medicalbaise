@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,11 +11,22 @@ import { z } from 'zod';
 import { lovable } from '@/integrations/lovable/index';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
+import { FaceAuthVerify } from '@/components/auth/FaceAuthVerify';
+import {
+  validatePasswordStrength,
+  isAccountLocked,
+  recordFailedAttempt,
+  clearLoginAttempts,
+  getRemainingAttempts,
+  formatLockoutTime,
+} from '@/lib/security';
 
 export default function Auth() {
   const { t } = useTranslation();
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showFaceAuth, setShowFaceAuth] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['portuguese']);
@@ -33,7 +44,11 @@ export default function Auth() {
 
   const signUpSchema = z.object({
     email: z.string().email(t('auth.invalidEmail')),
-    password: z.string().min(6, t('auth.passwordMinLength')),
+    password: z.string()
+      .min(12, t('security.passwordMinLength12'))
+      .refine((val) => validatePasswordStrength(val).isValid, {
+        message: t('security.passwordRequirements'),
+      }),
     firstName: z.string().min(2, t('auth.firstNameTooShort')).optional(),
     lastName: z.string().min(2, t('auth.lastNameTooShort')).optional(),
   });
@@ -69,6 +84,11 @@ export default function Auth() {
     } finally {
       setGoogleLoading(false);
     }
+  };
+
+  const handleFaceAuthSuccess = () => {
+    toast({ title: t('auth.welcomeBack') + '!' });
+    navigate('/');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,15 +150,34 @@ export default function Auth() {
           return;
         }
 
+        // Check account lockout before attempting sign-in
+        const lockout = isAccountLocked(formData.email);
+        if (lockout.locked) {
+          toast({
+            title: t('security.accountLocked'),
+            description: t('security.accountLockedDescription', {
+              time: formatLockoutTime(lockout.remainingMs),
+            }),
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+
         const { error } = await signIn(formData.email, formData.password);
 
         if (error) {
+          recordFailedAttempt(formData.email);
+          const remaining = getRemainingAttempts(formData.email);
           toast({
             title: t('auth.errorSigningIn'),
-            description: t('auth.incorrectCredentials'),
+            description: remaining > 0
+              ? t('security.attemptsRemaining', { count: remaining })
+              : t('security.accountLocked'),
             variant: 'destructive',
           });
         } else {
+          clearLoginAttempts(formData.email);
           toast({
             title: t('auth.welcomeBack') + '!',
           });
@@ -149,6 +188,35 @@ export default function Auth() {
       setLoading(false);
     }
   };
+
+  // Face auth login view
+  if (showFaceAuth) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="p-4 safe-top flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowFaceAuth(false)}
+            className="text-muted-foreground"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <LanguageSelector />
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
+          <FaceAuthVerify onSuccess={handleFaceAuthSuccess} />
+          <Button
+            variant="link"
+            className="mt-4 text-muted-foreground"
+            onClick={() => setShowFaceAuth(false)}
+          >
+            {t('security.usePasswordInstead')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -179,6 +247,19 @@ export default function Auth() {
             {isSignUp ? t('auth.joinUs') : t('auth.welcomeBack')}
           </p>
         </div>
+
+        {/* Face Auth Login Button (sign-in only) */}
+        {!isSignUp && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full h-12 mb-3 font-medium border-primary/30 hover:border-primary"
+            onClick={() => setShowFaceAuth(true)}
+          >
+            <Camera className="w-5 h-5 mr-2" />
+            {t('security.signInWithFace')}
+          </Button>
+        )}
 
         {/* Google Sign In */}
         <Button
@@ -232,6 +313,7 @@ export default function Auth() {
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     className="pl-10"
+                    autoComplete="given-name"
                   />
                 </div>
                 {errors.firstName && (
@@ -245,6 +327,7 @@ export default function Auth() {
                   placeholder={t('auth.lastName')}
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  autoComplete="family-name"
                 />
                 {errors.lastName && (
                   <p className="text-xs text-destructive">{errors.lastName}</p>
@@ -275,6 +358,7 @@ export default function Auth() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="pl-10"
+                autoComplete="email"
               />
             </div>
             {errors.email && (
@@ -289,10 +373,11 @@ export default function Auth() {
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••"
+                placeholder="••••••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="pl-10 pr-10"
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
               />
               <Button
                 type="button"
@@ -311,12 +396,25 @@ export default function Auth() {
             {errors.password && (
               <p className="text-xs text-destructive">{errors.password}</p>
             )}
+            {isSignUp && <PasswordStrengthIndicator password={formData.password} />}
           </div>
+
+          {/* Lockout warning */}
+          {!isSignUp && formData.email && isAccountLocked(formData.email).locked && (
+            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+              <ShieldAlert className="w-4 h-4 text-destructive flex-shrink-0" />
+              <p className="text-xs text-destructive">
+                {t('security.accountLockedDescription', {
+                  time: formatLockoutTime(isAccountLocked(formData.email).remainingMs),
+                })}
+              </p>
+            </div>
+          )}
 
           <Button
             type="submit"
             className="w-full h-12 bg-primary hover:bg-primary/90 font-semibold"
-            disabled={loading}
+            disabled={loading || (!isSignUp && formData.email ? isAccountLocked(formData.email).locked : false)}
           >
             {loading ? t('common.loading') : isSignUp ? t('auth.createAccount') : t('auth.signIn')}
           </Button>

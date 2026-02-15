@@ -1,31 +1,31 @@
 project_id = "hnmkchpbfcijkupqitzc"
 
 [functions.ai-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-mapbox-token]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-analytics-report]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-notification-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.live-stream-signal]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-weekly-campaign]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-provider-campaign]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-checkout]
-verify_jwt = false
+verify_jwt = true
 
 [functions.check-subscription]
-verify_jwt = false
+verify_jwt = true
 
 [functions.customer-portal]
-verify_jwt = false
+verify_jwt = true

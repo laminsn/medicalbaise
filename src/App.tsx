@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CallProvider } from "@/contexts/CallContext";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Browse from "./pages/Browse";
@@ -56,9 +57,10 @@ const ProviderRedirect = () => {
 
 const queryClient = new QueryClient();
 
-// Component to initialize message notifications
+// Component to initialize message notifications and session security
 const MessageNotificationProvider = ({ children }: { children: React.ReactNode }) => {
   useMessageNotifications();
+  useSessionTimeout();
   return <>{children}</>;
 };
 

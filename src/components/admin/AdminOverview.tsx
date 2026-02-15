@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Briefcase, FileText, DollarSign } from 'lucide-react';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface Stats {
   totalUsers: number;
@@ -78,9 +79,9 @@ export function AdminOverview() {
         </CardHeader>
         <CardContent>
           <ul className="text-sm space-y-2 text-muted-foreground">
-            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsUsers')}` }} />
-            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsCredits')}` }} />
-            <li dangerouslySetInnerHTML={{ __html: `• ${t('admin.quickActionsPromos')}` }} />
+            <li dangerouslySetInnerHTML={{ __html: sanitizeHtml(`• ${t('admin.quickActionsUsers')}`) }} />
+            <li dangerouslySetInnerHTML={{ __html: sanitizeHtml(`• ${t('admin.quickActionsCredits')}`) }} />
+            <li dangerouslySetInnerHTML={{ __html: sanitizeHtml(`• ${t('admin.quickActionsPromos')}`) }} />
           </ul>
         </CardContent>
       </Card>

@@ -22,6 +22,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 interface Campaign {
   id: string;
@@ -325,7 +326,7 @@ export function ProviderEmailCampaigns() {
               </div>
               <div
                 className="prose prose-sm max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: htmlContent || '<p>(No content)</p>' }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(htmlContent || '<p>(No content)</p>') }}
               />
             </div>
           )}

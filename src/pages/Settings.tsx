@@ -10,9 +10,12 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Bell, Moon, Globe, Lock, Trash2, Check, Package, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Bell, Moon, Globe, Lock, Trash2, Check, Package, ChevronRight, ScanFace, ShieldCheck } from 'lucide-react';
 import { ProviderAddonsSettings } from '@/components/settings/ProviderAddonsSettings';
 import { supabase } from '@/integrations/supabase/client';
+import { FaceAuthEnroll } from '@/components/auth/FaceAuthEnroll';
+import { useFaceAuth } from '@/hooks/useFaceAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -24,11 +27,16 @@ export default function Settings() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
-  
+  const { toast } = useToast();
+  const { checkEnrollment, removeFaceEnrollment } = useFaceAuth();
+
   const [notifications, setNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [providerId, setProviderId] = useState<string | null>(null);
   const [isPro, setIsPro] = useState(false);
+  const [faceEnrolled, setFaceEnrolled] = useState(false);
+  const [showFaceEnroll, setShowFaceEnroll] = useState(false);
+  const [faceLoading, setFaceLoading] = useState(true);
 
   // Check if user is a provider with Pro+ tier
   useEffect(() => {
@@ -50,12 +58,50 @@ export default function Settings() {
     checkProvider();
   }, [user]);
 
+  // Check face enrollment status
+  useEffect(() => {
+    const check = async () => {
+      if (!user) return;
+      setFaceLoading(true);
+      const enrolled = await checkEnrollment();
+      setFaceEnrolled(enrolled);
+      setFaceLoading(false);
+    };
+    check();
+  }, [user, checkEnrollment]);
+
   if (!user) {
     navigate('/auth');
     return null;
   }
 
   const isDarkMode = theme === 'dark';
+
+  const handleRemoveFace = async () => {
+    const success = await removeFaceEnrollment();
+    if (success) {
+      setFaceEnrolled(false);
+      toast({
+        title: t('security.faceRemoved'),
+        description: t('security.faceRemovedDescription'),
+      });
+    } else {
+      toast({
+        title: t('common.error'),
+        description: t('security.faceRemoveFailed'),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleFaceEnrollSuccess = () => {
+    setFaceEnrolled(true);
+    setShowFaceEnroll(false);
+    toast({
+      title: t('security.faceEnrolled'),
+      description: t('security.faceEnrolledDescription'),
+    });
+  };
 
   return (
     <>
@@ -93,6 +139,69 @@ export default function Settings() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Face Authentication */}
+            <Card className="border-primary/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ScanFace className="h-4 w-4 text-primary" />
+                  {t('security.faceAuthentication')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {showFaceEnroll ? (
+                  <FaceAuthEnroll
+                    onSuccess={handleFaceEnrollSuccess}
+                    onCancel={() => setShowFaceEnroll(false)}
+                  />
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{t('security.faceLoginEnabled')}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {faceEnrolled
+                            ? t('security.faceEnrolledStatus')
+                            : t('security.faceNotEnrolledStatus')}
+                        </p>
+                      </div>
+                      {!faceLoading && (
+                        faceEnrolled ? (
+                          <ShieldCheck className="h-5 w-5 text-green-500" />
+                        ) : null
+                      )}
+                    </div>
+
+                    {faceEnrolled ? (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => setShowFaceEnroll(true)}
+                        >
+                          {t('security.reEnrollFace')}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleRemoveFace}
+                        >
+                          {t('security.removeFace')}
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => setShowFaceEnroll(true)}
+                        className="w-full"
+                      >
+                        <ScanFace className="w-4 h-4 mr-2" />
+                        {t('security.setupFaceLogin')}
+                      </Button>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Notifications */}
             <Card>
