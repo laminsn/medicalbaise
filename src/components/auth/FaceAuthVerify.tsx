@@ -22,8 +22,9 @@ export function FaceAuthVerify({ onSuccess }: FaceAuthVerifyProps) {
     stopCamera,
     verifyFace,
   } = useFaceAuth();
-  const [step, setStep] = useState<'init' | 'camera' | 'verifying' | 'done' | 'error'>('init');
+  const [step, setStep] = useState<'init' | 'camera' | 'verifying' | 'otp-sent' | 'done' | 'error'>('init');
   const [matchError, setMatchError] = useState<string | null>(null);
+  const [otpEmail, setOtpEmail] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -55,15 +56,9 @@ export function FaceAuthVerify({ onSuccess }: FaceAuthVerifyProps) {
     const result = await verifyFace();
 
     if (result.matched && result.email) {
-      // Sign in with a special face-auth token approach
-      // Since we verified the face matches the stored descriptor,
-      // we authenticate the user via Supabase's admin signInWithPassword
-      // using a one-time face-auth session token stored server-side.
-      // For the client-side implementation, we use the magic link flow
-      // or direct session recovery.
-
-      // The face verification confirms identity — sign the user in
-      // via Supabase OTP (passwordless) for the matched email
+      // Face matched — send OTP for second-factor verification.
+      // The user MUST confirm via the email link before being authenticated.
+      // This prevents client-side face-matching bypass attacks.
       const { error: signInError } = await supabaseSignInWithOtp(result.email);
 
       if (signInError) {
@@ -72,9 +67,12 @@ export function FaceAuthVerify({ onSuccess }: FaceAuthVerifyProps) {
         return;
       }
 
-      setStep('done');
+      // Do NOT call onSuccess() here — the user must click the OTP link first.
+      // Supabase auth state listener in useAuth will detect the session once
+      // the OTP link is confirmed, triggering navigation automatically.
+      setOtpEmail(result.email);
+      setStep('otp-sent');
       stopCamera();
-      onSuccess();
     } else {
       setMatchError(error || t('security.faceNotRecognized'));
       setStep('error');
@@ -121,13 +119,18 @@ export function FaceAuthVerify({ onSuccess }: FaceAuthVerifyProps) {
             </div>
           </div>
         )}
-        {step === 'done' && (
+        {(step === 'done' || step === 'otp-sent') && (
           <div className="absolute inset-0 flex items-center justify-center bg-green-500/20">
-            <div className="text-center">
+            <div className="text-center px-4">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-2" />
               <p className="text-lg font-semibold text-green-700 dark:text-green-300">
                 {t('security.faceVerified')}
               </p>
+              {step === 'otp-sent' && otpEmail && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {t('security.otpSentCheckEmail', { email: otpEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3') })}
+                </p>
+              )}
             </div>
           </div>
         )}

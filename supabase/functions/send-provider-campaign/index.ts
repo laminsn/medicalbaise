@@ -13,16 +13,44 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8080",
 ];
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGINS[0],
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
   console.log(`[PROVIDER-CAMPAIGN] ${step}${detailsStr}`);
 };
+
+/** Escape HTML entities to prevent XSS */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Strip dangerous tags from provider HTML content (basic server-side sanitization) */
+function sanitizeEmailHtml(html: string): string {
+  // Remove script tags and event handlers
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^>]*>.*?<\/iframe>/gi, '')
+    .replace(/<object\b[^>]*>.*?<\/object>/gi, '')
+    .replace(/<embed\b[^>]*>/gi, '')
+    .replace(/<form\b[^>]*>.*?<\/form>/gi, '')
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/\bon\w+\s*=\s*[^\s>]*/gi, '')
+    .replace(/javascript\s*:/gi, '');
+}
 
 const wrapEmailHtml = (subject: string, htmlContent: string, providerName: string) => `
 <!DOCTYPE html>
@@ -33,14 +61,14 @@ const wrapEmailHtml = (subject: string, htmlContent: string, providerName: strin
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a; line-height: 1.6;">
   <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #047857;">
-    <h1 style="margin: 0; color: #047857; font-size: 20px;">${providerName}</h1>
+    <h1 style="margin: 0; color: #047857; font-size: 20px;">${escapeHtml(providerName)}</h1>
   </div>
   <div style="margin-top: 24px;">
-    ${htmlContent}
+    ${sanitizeEmailHtml(htmlContent)}
   </div>
   <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
     <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-      You're receiving this because you follow ${providerName} on MDBaise.
+      You're receiving this because you follow ${escapeHtml(providerName)} on MDBaise.
     </p>
   </div>
 </body>
@@ -48,6 +76,8 @@ const wrapEmailHtml = (subject: string, htmlContent: string, providerName: strin
 `;
 
 const handler = async (req: Request): Promise<Response> => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

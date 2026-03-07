@@ -96,10 +96,16 @@ function initMetaPixel(pixelId: string) {
   // Check if already initialized
   if (document.getElementById('meta-pixel-script')) return;
 
+  // Double-check validation before injecting into script context
+  if (!isValidPixelId(pixelId)) return;
+
+  // Use textContent-safe approach: encode the ID to prevent any injection
+  const safePixelId = encodeURIComponent(pixelId);
+
   // Create and inject the Meta Pixel script
   const script = document.createElement('script');
   script.id = 'meta-pixel-script';
-  script.innerHTML = `
+  script.textContent = `
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -108,15 +114,20 @@ function initMetaPixel(pixelId: string) {
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '${pixelId}');
+    fbq('init', '${safePixelId}');
     fbq('track', 'PageView');
   `;
   document.head.appendChild(script);
 
-  // Add noscript fallback
+  // Add noscript fallback using safe DOM API
   const noscript = document.createElement('noscript');
   noscript.id = 'meta-pixel-noscript';
-  noscript.innerHTML = `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1"/>`;
+  const img = document.createElement('img');
+  img.height = 1;
+  img.width = 1;
+  img.style.display = 'none';
+  img.src = `https://www.facebook.com/tr?id=${safePixelId}&ev=PageView&noscript=1`;
+  noscript.appendChild(img);
   document.body.appendChild(noscript);
 
   console.log('[ProviderPixelTracker] Meta Pixel initialized:', pixelId);
@@ -126,21 +137,26 @@ function initGoogleAnalytics(measurementId: string) {
   // Check if already initialized
   if (document.getElementById('ga-script')) return;
 
+  // Double-check validation before injecting into script context
+  if (!isValidGAId(measurementId)) return;
+
+  const safeMeasurementId = encodeURIComponent(measurementId);
+
   // Create gtag.js script
   const script = document.createElement('script');
   script.id = 'ga-script';
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${safeMeasurementId}`;
   document.head.appendChild(script);
 
   // Initialize gtag
   const configScript = document.createElement('script');
   configScript.id = 'ga-config-script';
-  configScript.innerHTML = `
+  configScript.textContent = `
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '${measurementId}');
+    gtag('config', '${safeMeasurementId}');
   `;
   document.head.appendChild(configScript);
 

@@ -11,10 +11,44 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8080",
 ];
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGINS[0],
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
+
+/** Escape HTML entities to prevent XSS in email templates */
+function escapeHtml(str: string | undefined | null): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Validate that a URL is safe for use in email links (https only) */
+function sanitizeUrl(url: string | undefined): string {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return '';
+    // Only allow our own domains
+    const allowedHosts = ['medicalbaise.lovable.app', 'mdbaise.com'];
+    if (!allowedHosts.some(h => parsed.hostname === h || parsed.hostname.endsWith('.' + h))) {
+      return '';
+    }
+    return parsed.href;
+  } catch {
+    return '';
+  }
+}
+
+const VALID_EMAIL_TYPES = ["work_submitted", "work_approved", "work_rejected", "job_status_changed"];
 
 interface NotificationEmailRequest {
   type: "work_submitted" | "work_approved" | "work_rejected" | "job_status_changed";
@@ -29,8 +63,16 @@ interface NotificationEmailRequest {
 }
 
 const getEmailContent = (request: NotificationEmailRequest) => {
-  const { type, recipientName, jobTitle, providerName, customerName, newStatus, feedback, actionUrl } = request;
-  
+  // Escape ALL user-provided values to prevent XSS in email HTML
+  const recipientName = escapeHtml(request.recipientName);
+  const jobTitle = escapeHtml(request.jobTitle);
+  const providerName = escapeHtml(request.providerName);
+  const customerName = escapeHtml(request.customerName);
+  const feedback = escapeHtml(request.feedback);
+  const actionUrl = sanitizeUrl(request.actionUrl);
+  const newStatus = escapeHtml(request.newStatus);
+  const type = request.type;
+
   switch (type) {
     case "work_submitted":
       return {
@@ -46,7 +88,7 @@ const getEmailContent = (request: NotificationEmailRequest) => {
           </div>
         `,
       };
-    
+
     case "work_approved":
       return {
         subject: `Work Approved - ${jobTitle}`,
@@ -60,7 +102,7 @@ const getEmailContent = (request: NotificationEmailRequest) => {
           </div>
         `,
       };
-    
+
     case "work_rejected":
       return {
         subject: `Work Needs Revision - ${jobTitle}`,
@@ -76,15 +118,16 @@ const getEmailContent = (request: NotificationEmailRequest) => {
           </div>
         `,
       };
-    
-    case "job_status_changed":
+
+    case "job_status_changed": {
       const statusColors: Record<string, string> = {
         'in_progress': '#047857',
         'completed': '#059669',
         'cancelled': '#dc2626',
       };
-      const statusColor = statusColors[newStatus || ''] || '#047857';
-      
+      const rawStatus = request.newStatus || '';
+      const statusColor = statusColors[rawStatus] || '#047857';
+
       return {
         subject: `Job Status Updated - ${jobTitle}`,
         html: `
@@ -97,7 +140,8 @@ const getEmailContent = (request: NotificationEmailRequest) => {
           </div>
         `,
       };
-    
+    }
+
     default:
       return {
         subject: `Notification - ${jobTitle}`,
@@ -107,6 +151,8 @@ const getEmailContent = (request: NotificationEmailRequest) => {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -115,7 +161,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Verify the user is authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      console.error("No authorization header provided");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -126,23 +171,42 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      console.error("Authentication failed:", authError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("User authenticated:", user.id);
-
     const request: NotificationEmailRequest = await req.json();
-    
+
+    // Validate required fields and type
+    if (!request.type || !VALID_EMAIL_TYPES.includes(request.type)) {
+      return new Response(JSON.stringify({ error: "Invalid notification type" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    if (!request.recipientEmail || !request.recipientName || !request.jobTitle) {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(request.recipientEmail)) {
+      return new Response(JSON.stringify({ error: "Invalid email format" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
     console.log("Sending notification email:", {
       type: request.type,
-      recipient: request.recipientEmail,
       job: request.jobTitle,
       requestedBy: user.id,
     });
@@ -174,10 +238,10 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error sending notification email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Failed to send notification" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

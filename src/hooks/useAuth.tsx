@@ -117,16 +117,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  // Whitelist: only these fields may be updated from the client.
+  // Fields like credits_balance, status, user_type, referral_code, email, id, user_id
+  // must NEVER be modifiable from the client side.
+  const ALLOWED_PROFILE_FIELDS: (keyof Profile)[] = [
+    'first_name', 'last_name', 'phone', 'avatar_url',
+    'city', 'state', 'bio', 'languages', 'handle',
+  ];
+
   const updateProfile = async (data: Partial<Profile>) => {
     if (!user) return { error: new Error('Not authenticated') };
 
+    const sanitizedData: Record<string, unknown> = {};
+    for (const key of ALLOWED_PROFILE_FIELDS) {
+      if (key in data) {
+        sanitizedData[key] = data[key];
+      }
+    }
+
+    if (Object.keys(sanitizedData).length === 0) {
+      return { error: new Error('No valid fields to update') };
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update(data)
+      .update(sanitizedData)
       .eq('user_id', user.id);
 
     if (!error) {
-      setProfile(prev => prev ? { ...prev, ...data } : null);
+      setProfile(prev => prev ? { ...prev, ...sanitizedData } as Profile : null);
     }
 
     return { error };

@@ -1,3 +1,11 @@
+# Environment variables — NEVER commit secrets
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+
 # Logs
 logs
 *.log
@@ -22,3 +30,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Sensitive files
+*.pem
+*.key
+*.cert
+credentials.json
+service-account.json
