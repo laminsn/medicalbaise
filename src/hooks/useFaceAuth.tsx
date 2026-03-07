@@ -174,10 +174,10 @@ export function useFaceAuth() {
     }
 
     // Fetch all users who have enrolled face auth
-    const { data: profiles, error } = await supabase
+    const { data: profiles, error } = await (supabase
       .from('profiles')
       .select('user_id, email, first_name, face_descriptor')
-      .not('face_descriptor', 'is', null);
+      .not('face_descriptor', 'is', null) as unknown as Promise<{ data: { user_id: string; email: string | null; first_name: string | null; face_descriptor: string | null }[] | null; error: unknown }>);
 
     if (error || !profiles || profiles.length === 0) {
       setState((s) => ({
@@ -194,7 +194,7 @@ export function useFaceAuth() {
     for (const profile of profiles) {
       try {
         const storedDescriptor = new Float32Array(
-          JSON.parse((profile as Record<string, unknown>).face_descriptor as string)
+          JSON.parse(profile.face_descriptor as string)
         );
         const distance = faceapi.euclideanDistance(descriptor, storedDescriptor);
 
@@ -228,10 +228,10 @@ export function useFaceAuth() {
   const removeFaceEnrollment = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
 
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('profiles')
-      .update({ face_descriptor: null } as Record<string, unknown>)
-      .eq('user_id', user.id);
+      .update({ face_descriptor: null } as any)
+      .eq('user_id', user.id) as unknown as Promise<{ error: unknown }>);
 
     return !error;
   }, [user]);
@@ -240,13 +240,13 @@ export function useFaceAuth() {
   const checkEnrollment = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
 
-    const { data } = await supabase
+    const { data } = await (supabase
       .from('profiles')
       .select('face_descriptor')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .maybeSingle() as unknown as Promise<{ data: { face_descriptor: string | null } | null }>);
 
-    return !!(data as Record<string, unknown>)?.face_descriptor;
+    return !!data?.face_descriptor;
   }, [user]);
 
   return {
