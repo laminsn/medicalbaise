@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Loader2, Save } from 'lucide-react';
+import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
 
 interface ServiceCategory {
   id: string;
@@ -84,8 +85,11 @@ export function ProviderServicesEditor() {
   };
 
   const getServiceName = (category: ServiceCategory) => {
-    const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-    return isPt ? category.name_pt : category.name_en;
+    if (isPortuguese(i18n)) return category.name_pt;
+    if (isSpanish(i18n)) {
+      return t(`medicalCategories.${category.id}.name`, category.name_en);
+    }
+    return category.name_en;
   };
 
   const hasChanges = () => {

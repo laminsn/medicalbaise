@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
+import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
 
 interface Category {
   id: string;
@@ -70,7 +71,11 @@ export function FeedFilters({
   }, []);
 
   const getCategoryName = (category: Category) => {
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    if (isPortuguese(i18n)) return category.name_pt;
+    if (isSpanish(i18n)) {
+      return t(`medicalCategories.${category.id}.name`, category.name_en);
+    }
+    return category.name_en;
   };
 
   const getSelectedSpecialtyName = () => {

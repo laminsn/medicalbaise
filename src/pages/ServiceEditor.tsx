@@ -16,6 +16,7 @@ import {
   ArrowLeft, Loader2, Plus, Trash2, DollarSign, Package, Shield, Award
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 interface ServiceAddon {
   id?: string;
@@ -323,7 +324,7 @@ export default function ServiceEditor() {
   };
 
   const getCategoryName = (category: { name_en: string; name_pt: string }) => {
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    return getLocalizedCategoryName(category, i18n, t);
   };
 
   const activeAddons = addons.filter(a => !a.isDeleted);

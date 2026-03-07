@@ -36,23 +36,24 @@ export default function Payouts() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user } = useAuth();
   const [isAddingMethod, setIsAddingMethod] = useState(false);
   const [payoutType, setPayoutType] = useState<string>('');
   
   // Mock data - in real implementation, fetch from database
   const [payoutMethods] = useState<PayoutMethod[]>([
-    { id: '1', type: 'pix', name: isPt ? 'Chave PIX' : 'PIX Key', details: '***@email.com', isDefault: true },
+    { id: '1', type: 'pix', name: isPt ? 'Chave PIX' : isEs ? 'Clave PIX' : 'PIX Key', details: '***@email.com', isDefault: true },
   ]);
 
   const [payoutHistory] = useState<PayoutHistory[]>([
     { id: '1', date: '2024-12-01', amount: 1500, status: 'completed', method: 'PIX', receiptUrl: '#' },
     { id: '2', date: '2024-11-15', amount: 2300, status: 'completed', method: 'PIX', receiptUrl: '#' },
-    { id: '3', date: '2024-11-01', amount: 890, status: 'completed', method: isPt ? 'Transferência bancária' : 'Bank Transfer', receiptUrl: '#' },
+    { id: '3', date: '2024-11-01', amount: 890, status: 'completed', method: isPt ? 'Transferência bancária' : isEs ? 'Transferencia bancaria' : 'Bank Transfer', receiptUrl: '#' },
   ]);
 
   const handleAddMethod = () => {
-    toast.success(isPt ? 'Método de recebimento adicionado com sucesso' : 'Payout method added successfully');
+    toast.success(isPt ? 'Método de recebimento adicionado com sucesso' : isEs ? 'Método de cobro agregado correctamente' : 'Payout method added successfully');
     setIsAddingMethod(false);
     setPayoutType('');
   };
@@ -60,11 +61,11 @@ export default function Payouts() {
   const getStatusBadge = (status: PayoutHistory['status']) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{isPt ? 'Concluído' : 'Completed'}</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{isPt ? 'Concluído' : isEs ? 'Completado' : 'Completed'}</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">{isPt ? 'Pendente' : 'Pending'}</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">{isPt ? 'Pendente' : isEs ? 'Pendiente' : 'Pending'}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{isPt ? 'Falhou' : 'Failed'}</Badge>;
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{isPt ? 'Falhou' : isEs ? 'Falló' : 'Failed'}</Badge>;
     }
   };
 
@@ -87,7 +88,7 @@ export default function Payouts() {
   return (
     <>
       <Helmet>
-        <title>{isPt ? 'Pagamentos - Brasil Base' : 'Payouts - Brasil Base'}</title>
+        <title>{isPt ? 'Pagamentos - Brasil Base' : isEs ? 'Cobros - Brasil Base' : 'Payouts - Brasil Base'}</title>
       </Helmet>
       <AppLayout>
         <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -217,7 +218,7 @@ export default function Payouts() {
                         {method.isDefault && (
                           <Badge variant="secondary" className="bg-primary/10 text-primary">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
-                            {isPt ? 'Padrão' : 'Default'}
+                            {isPt ? 'Padrão' : isEs ? 'Predeterminado' : 'Default'}
                           </Badge>
                         )}
                         <Button variant="ghost" size="sm">

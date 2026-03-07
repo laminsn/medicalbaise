@@ -3,11 +3,11 @@ import { Clock, MapPin, Banknote, AlertCircle, Calendar, Users } from 'lucide-re
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MEDICAL_CATEGORIES } from '@/lib/constants';
+import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 interface Appointment {
   id: string;
@@ -23,8 +23,7 @@ interface Appointment {
 
 export function RecentAppointments() {
   const { t, i18n } = useTranslation();
-  const isPortuguese = i18n.language === 'pt';
-  const dateLocale = isPortuguese ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   const { data: appointments, isLoading, error } = useQuery({
     queryKey: ['recent-appointments'],
@@ -153,8 +152,8 @@ export function RecentAppointments() {
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {appointments.map((appointment) => {
             const category = MEDICAL_CATEGORIES.find(c => c.id === appointment.category_id);
-            const categoryName = category 
-              ? (isPortuguese ? category.name_pt : category.name_en)
+            const categoryName = category
+              ? getLocalizedCategoryName(category, i18n, t)
               : appointment.category_id;
 
             return (

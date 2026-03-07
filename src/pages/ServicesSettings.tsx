@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProviderAddonsSettings } from '@/components/settings/ProviderAddonsSettings';
+import { getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 interface ServiceCategory {
   id: string;
@@ -161,7 +162,7 @@ export default function ServicesSettings() {
 
   const getCategoryName = (category: ServiceCategory | undefined) => {
     if (!category) return '';
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    return getLocalizedCategoryName(category, i18n, t);
   };
 
   if (isLoading) {

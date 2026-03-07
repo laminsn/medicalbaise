@@ -3,14 +3,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 const AVAILABLE_LANGUAGES = [
-  { code: 'portuguese', labelEn: 'Portuguese', labelPt: 'Português' },
-  { code: 'english', labelEn: 'English', labelPt: 'Inglês' },
-  { code: 'spanish', labelEn: 'Spanish', labelPt: 'Espanhol' },
-  { code: 'french', labelEn: 'French', labelPt: 'Francês' },
-  { code: 'german', labelEn: 'German', labelPt: 'Alemão' },
-  { code: 'italian', labelEn: 'Italian', labelPt: 'Italiano' },
-  { code: 'japanese', labelEn: 'Japanese', labelPt: 'Japonês' },
-  { code: 'chinese', labelEn: 'Chinese', labelPt: 'Chinês' },
+  { code: 'portuguese', labelEn: 'Portuguese', labelPt: 'Português', labelEs: 'Portugués' },
+  { code: 'english', labelEn: 'English', labelPt: 'Inglês', labelEs: 'Inglés' },
+  { code: 'spanish', labelEn: 'Spanish', labelPt: 'Espanhol', labelEs: 'Español' },
+  { code: 'french', labelEn: 'French', labelPt: 'Francês', labelEs: 'Francés' },
+  { code: 'german', labelEn: 'German', labelPt: 'Alemão', labelEs: 'Alemán' },
+  { code: 'italian', labelEn: 'Italian', labelPt: 'Italiano', labelEs: 'Italiano' },
+  { code: 'japanese', labelEn: 'Japanese', labelPt: 'Japonês', labelEs: 'Japonés' },
+  { code: 'chinese', labelEn: 'Chinese', labelPt: 'Chinês', labelEs: 'Chino' },
 ];
 
 interface LanguageFluencySelectorProps {
@@ -38,7 +38,10 @@ export function LanguageFluencySelector({
 
   const getLanguageLabel = (lang: typeof AVAILABLE_LANGUAGES[0]) => {
     const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-    return isPt ? lang.labelPt : lang.labelEn;
+    const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+    if (isPt) return lang.labelPt;
+    if (isEs) return lang.labelEs;
+    return lang.labelEn;
   };
 
   return (

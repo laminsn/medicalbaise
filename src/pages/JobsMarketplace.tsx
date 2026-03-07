@@ -26,7 +26,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 interface Job {
   id: string;
@@ -57,7 +57,7 @@ export default function JobsMarketplace() {
   const [sortBy, setSortBy] = useState('newest');
   const [provider, setProvider] = useState<any>(null);
   
-  const dateLocale = i18n.language === 'pt' ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -129,7 +129,7 @@ export default function JobsMarketplace() {
   const getCategoryName = (categoryId: string | null) => {
     if (!categoryId) return '';
     const cat = SERVICE_CATEGORIES.find(c => c.id === categoryId);
-    return i18n.language === 'pt' ? cat?.name_pt : cat?.name_en || categoryId;
+    return cat ? getLocalizedCategoryName(cat, i18n, t) : categoryId;
   };
 
   const formatBudget = (min: number | null, max: number | null, disclosed: boolean | null) => {
@@ -267,7 +267,7 @@ export default function JobsMarketplace() {
                   <SelectItem value="all">{t('categories.allCategories')}</SelectItem>
                   {SERVICE_CATEGORIES.map(cat => (
                     <SelectItem key={cat.id} value={cat.id}>
-                      {i18n.language === 'pt' ? cat.name_pt : cat.name_en}
+                      {getLocalizedCategoryName(cat, i18n, t)}
                     </SelectItem>
                   ))}
                 </SelectContent>

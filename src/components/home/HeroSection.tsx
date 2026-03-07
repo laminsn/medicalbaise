@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MEDICAL_CATEGORIES, POPULAR_SPECIALTIES } from '@/lib/constants';
+import { getLocalizedCategoryName } from '@/lib/i18n-utils';
 import { toast } from 'sonner';
 
 export function HeroSection() {
@@ -122,7 +123,7 @@ export function HeroSection() {
                 onClick={() => handleSpecialtyClick(specialty.id)}
                 disabled={isSearching}
               >
-                {i18n.language === 'pt' ? specialty.name_pt : specialty.name_en}
+                {getLocalizedCategoryName(specialty, i18n, t)}
               </Button>
             );
           })}

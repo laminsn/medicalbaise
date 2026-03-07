@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import * as faceapi from 'face-api.js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import i18n from '@/i18n';
 
 const FACE_MATCH_THRESHOLD = 0.35; // Lowered for stricter matching — reduces false positives
 const MAX_FACE_VERIFY_ATTEMPTS = 5;
@@ -16,6 +17,13 @@ interface FaceAuthState {
   error: string | null;
   modelsLoaded: boolean;
 }
+
+const localizeError = (en: string, pt: string, es: string) => {
+  const lang = (i18n.resolvedLanguage || i18n.language || 'en').toLowerCase();
+  if (lang.startsWith('pt')) return pt;
+  if (lang.startsWith('es')) return es;
+  return en;
+};
 
 /**
  * Hook for face authentication using face-api.js.
@@ -48,7 +56,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'Failed to load face recognition models. Please check your connection.',
+        error: localizeError(
+          'Failed to load face recognition models. Please check your connection.',
+          'Falha ao carregar os modelos de reconhecimento facial. Verifique sua conexão.',
+          'No se pudieron cargar los modelos de reconocimiento facial. Verifica tu conexión.',
+        ),
       }));
       return false;
     }
@@ -69,7 +81,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'Camera access denied. Please allow camera permissions to use face authentication.',
+        error: localizeError(
+          'Camera access denied. Please allow camera permissions to use face authentication.',
+          'Acesso à câmera negado. Permita o acesso para usar autenticação facial.',
+          'Acceso a la cámara denegado. Permite el acceso para usar autenticación facial.',
+        ),
       }));
       return false;
     }
@@ -98,7 +114,15 @@ export function useFaceAuth() {
       .withFaceDescriptor();
 
     if (!detection) {
-      setState((s) => ({ ...s, status: 'ready', error: 'No face detected. Please look at the camera.' }));
+      setState((s) => ({
+        ...s,
+        status: 'ready',
+        error: localizeError(
+          'No face detected. Please look at the camera.',
+          'Nenhum rosto detectado. Olhe para a câmera.',
+          'No se detectó ningún rostro. Mira hacia la cámara.',
+        ),
+      }));
       return null;
     }
 
@@ -108,7 +132,14 @@ export function useFaceAuth() {
   /** Enroll a face — store the descriptor for the current user */
   const enrollFace = useCallback(async (): Promise<boolean> => {
     if (!user) {
-      setState((s) => ({ ...s, error: 'Must be logged in to enroll face.' }));
+      setState((s) => ({
+        ...s,
+        error: localizeError(
+          'Must be logged in to enroll face.',
+          'Você precisa estar logado para cadastrar o rosto.',
+          'Debes iniciar sesión para registrar el rostro.',
+        ),
+      }));
       return false;
     }
 
@@ -129,7 +160,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'Could not capture enough face data. Please try again with better lighting.',
+        error: localizeError(
+          'Could not capture enough face data. Please try again with better lighting.',
+          'Não foi possível capturar dados faciais suficientes. Tente novamente com melhor iluminação.',
+          'No se pudieron capturar suficientes datos faciales. Inténtalo de nuevo con mejor iluminación.',
+        ),
       }));
       return false;
     }
@@ -158,7 +193,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'Failed to save face data. Please try again.',
+        error: localizeError(
+          'Failed to save face data. Please try again.',
+          'Falha ao salvar dados faciais. Tente novamente.',
+          'No se pudieron guardar los datos faciales. Inténtalo de nuevo.',
+        ),
       }));
       return false;
     }
@@ -201,7 +240,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'Too many face verification attempts. Please try again later or use password login.',
+        error: localizeError(
+          'Too many face verification attempts. Please try again later or use password login.',
+          'Muitas tentativas de verificação facial. Tente novamente mais tarde ou faça login com senha.',
+          'Demasiados intentos de verificación facial. Inténtalo más tarde o inicia sesión con contraseña.',
+        ),
       }));
       return { matched: false };
     }
@@ -225,7 +268,11 @@ export function useFaceAuth() {
       setState((s) => ({
         ...s,
         status: 'error',
-        error: 'No enrolled faces found. Please sign in with password first and enroll your face.',
+        error: localizeError(
+          'No enrolled faces found. Please sign in with password first and enroll your face.',
+          'Nenhum rosto cadastrado encontrado. Entre com senha primeiro e cadastre seu rosto.',
+          'No se encontraron rostros registrados. Inicia sesión con contraseña y luego registra tu rostro.',
+        ),
       }));
       return { matched: false };
     }
@@ -262,7 +309,11 @@ export function useFaceAuth() {
     setState((s) => ({
       ...s,
       status: 'error',
-      error: 'Face not recognized. Please try again or use password login.',
+      error: localizeError(
+        'Face not recognized. Please try again or use password login.',
+        'Rosto não reconhecido. Tente novamente ou entre com senha.',
+        'Rostro no reconocido. Inténtalo de nuevo o inicia sesión con contraseña.',
+      ),
     }));
     return { matched: false };
   }, [detectFace, checkFaceVerifyRateLimit, recordFaceVerifyAttempt]);

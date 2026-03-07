@@ -16,7 +16,9 @@ interface Message {
 }
 
 const AIChatBot: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user, session } = useAuth();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -76,10 +78,19 @@ const AIChatBot: React.FC = () => {
 
     if (!resp.ok) {
       const error = await resp.json();
-      throw new Error(error.error || 'Failed to get response');
+      throw new Error(
+        error.error
+          || (isPt
+            ? 'Falha ao obter resposta'
+            : isEs
+              ? 'No se pudo obtener respuesta'
+              : 'Failed to get response'),
+      );
     }
 
-    if (!resp.body) throw new Error('No response body');
+    if (!resp.body) {
+      throw new Error(isPt ? 'Sem corpo de resposta' : isEs ? 'Sin cuerpo de respuesta' : 'No response body');
+    }
 
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();

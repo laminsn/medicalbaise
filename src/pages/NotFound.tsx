@@ -6,6 +6,7 @@ const NotFound = () => {
   const location = useLocation();
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith("pt") || i18n.language.startsWith("pt");
+  const isEs = i18n.resolvedLanguage?.startsWith("es") || i18n.language.startsWith("es");
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
@@ -16,10 +17,10 @@ const NotFound = () => {
       <div className="text-center">
         <h1 className="mb-4 text-4xl font-bold">404</h1>
         <p className="mb-4 text-xl text-muted-foreground">
-          {isPt ? "Ops! Página não encontrada" : "Oops! Page not found"}
+          {isPt ? "Ops! Página não encontrada" : isEs ? "Vaya, página no encontrada" : "Oops! Page not found"}
         </p>
         <a href="/" className="text-primary underline hover:text-primary/90">
-          {isPt ? "Voltar para a página inicial" : "Return to Home"}
+          {isPt ? "Voltar para a página inicial" : isEs ? "Volver al inicio" : "Return to Home"}
         </a>
       </div>
     </div>

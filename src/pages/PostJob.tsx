@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SERVICE_CATEGORIES, BUDGET_RANGES } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { getLocalizedCategoryName } from '@/lib/i18n-utils';
 import {
   Select,
   SelectContent,
@@ -176,7 +177,7 @@ export default function PostJob() {
             <SelectContent>
               {SERVICE_CATEGORIES.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id}>
-                  {i18n.language === 'pt' ? cat.name_pt : cat.name_en}
+                  {getLocalizedCategoryName(cat, i18n, t)}
                 </SelectItem>
               ))}
             </SelectContent>

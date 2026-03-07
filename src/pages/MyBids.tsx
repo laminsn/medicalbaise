@@ -21,7 +21,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { getDateFnsLocale } from '@/lib/i18n-utils';
 
 // Mock data
 const mockBids = [
@@ -63,7 +63,7 @@ export default function MyBids() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('active');
-  const dateLocale = i18n.language === 'pt' ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   if (!user) {
     return (

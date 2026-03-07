@@ -37,8 +37,9 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const reviewsLabel = isPt ? 'avaliações' : 'reviews';
-  const verifiedLabel = t('providers.verified', isPt ? 'Verificado' : 'Verified');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const reviewsLabel = isPt ? 'avaliações' : isEs ? 'reseñas' : 'reviews';
+  const verifiedLabel = t('providers.verified', isPt ? 'Verificado' : isEs ? 'Verificado' : 'Verified');
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -98,7 +99,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
     mapboxgl.accessToken = mapboxToken;
 
     if (!mapboxgl.accessToken) {
-      setMapError(isPt ? 'Token do mapa não configurado' : 'Mapbox token not configured');
+      setMapError(isPt ? 'Token do mapa não configurado' : isEs ? 'Token de mapa no configurado' : 'Mapbox token not configured');
       return;
     }
 
@@ -136,7 +137,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [mapboxToken, isPt]);
+  }, [mapboxToken, isPt, isEs]);
 
   // Handle center changes from external location search
   useEffect(() => {
@@ -234,7 +235,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {mapError || (isPt ? 'Erro na configuração do mapa. Tente novamente mais tarde.' : 'Map configuration error. Please try again later.')}
+            {mapError || (isPt ? 'Erro na configuração do mapa. Tente novamente mais tarde.' : isEs ? 'Error de configuración del mapa. Inténtalo de nuevo más tarde.' : 'Map configuration error. Please try again later.')}
           </AlertDescription>
         </Alert>
       </div>

@@ -1835,5 +1835,323 @@
     "typeSomething": "Digite algo...",
     "typeText": "Digitar texto",
     "yourStory": "Seu story"
+  },
+  "medicalCategories": {
+    "general-practice": {
+      "name": "Clínica Geral",
+      "description": "Atendimento primário e consulta médica geral"
+    },
+    "cardiology": {
+      "name": "Cardiologia",
+      "description": "Cuidados cardíacos e cardiovasculares"
+    },
+    "dermatology": {
+      "name": "Dermatologia",
+      "description": "Cuidados com pele, cabelo e unhas"
+    },
+    "pediatrics": {
+      "name": "Pediatria",
+      "description": "Cuidados infantis e adolescentes"
+    },
+    "dentistry": {
+      "name": "Odontologia",
+      "description": "Saúde dental e bucal"
+    },
+    "orthopedics": {
+      "name": "Ortopedia",
+      "description": "Cuidados com ossos, articulações e músculos"
+    },
+    "gynecology": {
+      "name": "Ginecologia e Obstetrícia",
+      "description": "Saúde mental e cuidados comportamentais"
+    },
+    "ophthalmology": {
+      "name": "Oftalmologia",
+      "description": "Cuidados com os olhos e visão"
+    },
+    "neurology": {
+      "name": "Neurologia",
+      "description": "Cérebro e sistema nervoso"
+    },
+    "ent": {
+      "name": "Otorrinolaringologia",
+      "description": "Cuidados com ouvido, nariz e garganta"
+    },
+    "endocrinology": {
+      "name": "Endocrinologia",
+      "description": "Distúrbios hormonais e metabólicos"
+    },
+    "gastroenterology": {
+      "name": "Gastroenterologia",
+      "description": "Cuidados do sistema digestivo"
+    },
+    "urology": {
+      "name": "Urologia",
+      "description": "Saúde do trato urinário e reprodutivo masculino"
+    },
+    "oncology": {
+      "name": "Oncologia",
+      "description": "Diagnóstico e tratamento de câncer"
+    },
+    "therapy": {
+      "name": "Terapia / Psicologia",
+      "description": "Terapia e aconselhamento de saúde mental"
+    },
+    "dietitian": {
+      "name": "Nutricionista",
+      "description": "Nutrição e planejamento alimentar"
+    },
+    "speech-pathology": {
+      "name": "Fonoaudiologia",
+      "description": "Distúrbios de fala, linguagem e deglutição"
+    },
+    "doula": {
+      "name": "Doula",
+      "description": "Apoio ao parto, cuidados pré e pós-natal"
+    },
+    "general-surgery": {
+      "name": "Cirurgia Geral",
+      "description": "Procedimentos cirúrgicos e cuidados operatórios"
+    },
+    "neurosurgery": {
+      "name": "Neurocirurgia",
+      "description": "Cirurgia do cérebro e medula espinhal"
+    },
+    "cardiac-surgery": {
+      "name": "Cirurgia Cardíaca",
+      "description": "Cirurgia cardíaca e cardiovascular"
+    },
+    "plastic-surgery": {
+      "name": "Cirurgia Plástica e Reconstrutiva",
+      "description": "Procedimentos cirúrgicos cosméticos e reconstrutivos"
+    },
+    "vascular-surgery": {
+      "name": "Cirurgia Vascular",
+      "description": "Cirurgia de vasos sanguíneos e sistema circulatório"
+    },
+    "thoracic-surgery": {
+      "name": "Cirurgia Torácica",
+      "description": "Cirurgia de tórax, pulmão e esôfago"
+    },
+    "colorectal-surgery": {
+      "name": "Cirurgia Colorretal",
+      "description": "Cirurgia de cólon, reto e anal"
+    },
+    "emergency-medicine": {
+      "name": "Medicina de Emergência",
+      "description": "Cuidados de emergência e trauma agudo"
+    },
+    "intensivist": {
+      "name": "Intensivista (UTI)",
+      "description": "Cuidados intensivos em UTI"
+    },
+    "hospitalist": {
+      "name": "Hospitalista",
+      "description": "Medicina hospitalar para pacientes internados"
+    },
+    "trauma-surgery": {
+      "name": "Cirurgia de Trauma",
+      "description": "Cuidados cirúrgicos de emergência para lesões traumáticas"
+    },
+    "neonatology": {
+      "name": "Neonatologia",
+      "description": "Cuidados intensivos e críticos neonatais"
+    },
+    "pulmonology": {
+      "name": "Pneumologia",
+      "description": "Cuidados pulmonares e do sistema respiratório"
+    },
+    "nephrology": {
+      "name": "Nefrologia",
+      "description": "Doenças renais e cuidados nefróticos"
+    },
+    "rheumatology": {
+      "name": "Reumatologia",
+      "description": "Distúrbios autoimunes e musculoesqueléticos"
+    },
+    "hematology": {
+      "name": "Hematologia",
+      "description": "Distúrbios do sangue e medicina transfusional"
+    },
+    "infectious-disease": {
+      "name": "Infectologia",
+      "description": "Infecções bacterianas, virais e parasitárias"
+    },
+    "allergy-immunology": {
+      "name": "Alergia e Imunologia",
+      "description": "Alergias, asma e distúrbios do sistema imunológico"
+    },
+    "geriatrics": {
+      "name": "Geriatria",
+      "description": "Cuidados com idosos e população em envelhecimento"
+    },
+    "radiology": {
+      "name": "Radiologia",
+      "description": "Imagem médica e radiologia diagnóstica"
+    },
+    "pathology": {
+      "name": "Patologia",
+      "description": "Diagnósticos laboratoriais e análise de tecidos"
+    },
+    "nuclear-medicine": {
+      "name": "Medicina Nuclear",
+      "description": "Diagnósticos e terapia radioativos"
+    },
+    "genetics": {
+      "name": "Genética Médica",
+      "description": "Testes genéticos, aconselhamento e condições hereditárias"
+    },
+    "anesthesiology": {
+      "name": "Anestesiologia",
+      "description": "Anestesia para cuidados cirúrgicos e procedimentais"
+    },
+    "pain-management": {
+      "name": "Medicina da Dor",
+      "description": "Tratamento de dor crônica e aguda"
+    },
+    "physical-therapy": {
+      "name": "Fisioterapia",
+      "description": "Reabilitação de movimentos e recuperação física"
+    },
+    "occupational-therapy": {
+      "name": "Terapia Ocupacional",
+      "description": "Habilidades para vida diária e reabilitação funcional"
+    },
+    "physiatry": {
+      "name": "Fisiatria",
+      "description": "Reabilitação musculoesquelética e neurológica não cirúrgica"
+    },
+    "respiratory-therapy": {
+      "name": "Terapia Respiratória",
+      "description": "Cuidados respiratórios e gerenciamento de ventiladores"
+    },
+    "sports-medicine": {
+      "name": "Medicina Esportiva",
+      "description": "Lesões esportivas e medicina de desempenho"
+    },
+    "palliative-care": {
+      "name": "Cuidados Paliativos",
+      "description": "Cuidados de fim de vida e conforto"
+    },
+    "sleep-medicine": {
+      "name": "Medicina do Sono",
+      "description": "Diagnóstico e tratamento de distúrbios do sono"
+    },
+    "wound-care": {
+      "name": "Tratamento de Feridas",
+      "description": "Gestão e cicatrização de feridas crônicas"
+    },
+    "toxicology": {
+      "name": "Toxicologia",
+      "description": "Tratamento de envenenamento, overdose e exposição tóxica"
+    },
+    "addiction-medicine": {
+      "name": "Medicina de Dependência",
+      "description": "Distúrbios por uso de substâncias e recuperação"
+    },
+    "orthodontics": {
+      "name": "Ortodontia",
+      "description": "Alinhamento dentário e correção de mordida"
+    },
+    "oral-surgery": {
+      "name": "Cirurgia Bucomaxilofacial",
+      "description": "Procedimentos cirúrgicos de boca, mandíbula e face"
+    },
+    "periodontics": {
+      "name": "Periodontia",
+      "description": "Tratamento de doenças gengivais e implantes dentários"
+    },
+    "endodontics": {
+      "name": "Endodontia",
+      "description": "Tratamento de canal radicular e polpa dentária"
+    },
+    "nurse-practitioner": {
+      "name": "Enfermeiro(a) Especialista",
+      "description": "Enfermagem de prática avançada e atenção primária"
+    },
+    "registered-nurse": {
+      "name": "Enfermeiro(a) Registrado(a)",
+      "description": "Cuidados profissionais de enfermagem e gerenciamento de pacientes"
+    },
+    "certified-nursing-assistant": {
+      "name": "Auxiliar de Enfermagem",
+      "description": "Cuidados básicos com pacientes e suporte de enfermagem"
+    },
+    "midwifery": {
+      "name": "Obstetrícia / Parteira",
+      "description": "Cuidados de obstetrícia na gravidez, parto e pós-parto"
+    },
+    "medical-lab-tech": {
+      "name": "Técnico(a) de Laboratório",
+      "description": "Testes e análises laboratoriais clínicas"
+    },
+    "phlebotomy": {
+      "name": "Flebotomia",
+      "description": "Coleta de sangue e serviços de punção venosa"
+    },
+    "radiologic-tech": {
+      "name": "Técnico(a) em Radiologia",
+      "description": "Serviços de imagem por raio-X, tomografia e ressonância"
+    },
+    "chiropractic": {
+      "name": "Quiropraxia",
+      "description": "Alinhamento espinhal e manipulação musculoesquelética"
+    },
+    "acupuncture": {
+      "name": "Acupuntura",
+      "description": "Terapia de acupuntura tradicional e médica"
+    },
+    "naturopathy": {
+      "name": "Naturopatia",
+      "description": "Abordagens de saúde natural e holística"
+    },
+    "optometry": {
+      "name": "Optometria",
+      "description": "Teste de visão, óculos e adaptação de lentes de contato"
+    },
+    "audiology": {
+      "name": "Audiologia",
+      "description": "Avaliação auditiva e adaptação de aparelhos auditivos"
+    },
+    "home-health": {
+      "name": "Atendimento Domiciliar",
+      "description": "Cuidados médicos domiciliares e monitoramento de saúde"
+    },
+    "telehealth": {
+      "name": "Telemedicina",
+      "description": "Consultas médicas virtuais remotas"
+    },
+    "paramedic": {
+      "name": "Paramédico / Socorrista",
+      "description": "Cuidados médicos de emergência pré-hospitalares"
+    },
+    "pharmacy": {
+      "name": "Farmácia / Farmacêutico Clínico",
+      "description": "Gerenciamento de medicamentos e cuidados farmacêuticos"
+    },
+    "medical-social-work": {
+      "name": "Serviço Social Médico",
+      "description": "Advocacia do paciente, planejamento de alta e suporte"
+    },
+    "patient-advocacy": {
+      "name": "Navegador de Pacientes",
+      "description": "Coordenação de cuidados e defesa dos direitos do paciente"
+    },
+    "health-informatics": {
+      "name": "Informática em Saúde",
+      "description": "Gestão de dados de saúde e sistemas clínicos"
+    },
+    "medical-coding": {
+      "name": "Codificação e Faturamento Médico",
+      "description": "Codificação de prontuários e faturamento de seguros"
+    },
+    "psychiatry": {
+      "name": "Psiquiatria",
+      "description": "Especialistas em saúde mental"
+    },
+    "otolaryngology": {
+      "name": "Otorrinolaringologia",
+      "description": "Especialistas em ouvido, nariz e garganta"
+    }
   }
 }

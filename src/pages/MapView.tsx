@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Filter, Search, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMapboxToken } from '@/hooks/useMapboxToken';
+import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
 
 interface ServiceCategory {
   id: string;
@@ -46,7 +47,11 @@ const MapView = () => {
   };
 
   const getCategoryName = (category: ServiceCategory) => {
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    if (isPortuguese(i18n)) return category.name_pt;
+    if (isSpanish(i18n)) {
+      return t(`medicalCategories.${category.id}.name`, category.name_en || category.name_pt || category.id);
+    }
+    return category.name_en;
   };
 
   const handleLocationSearch = async () => {

@@ -58,7 +58,9 @@ const PLANS = [
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { tier: currentTier, startCheckout } = useSubscription();
   const [upgrading, setUpgrading] = useState<string | null>(null);
 
@@ -78,7 +80,15 @@ export default function Pricing() {
     try {
       await startCheckout(plan.priceId);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start checkout');
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : isPt
+            ? 'Falha ao iniciar checkout'
+            : isEs
+              ? 'Error al iniciar el pago'
+              : 'Failed to start checkout',
+      );
     } finally {
       setUpgrading(null);
     }
@@ -121,7 +131,7 @@ export default function Pricing() {
                   )}
                   {isCurrentPlan && (
                     <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
-                      Your Plan
+                      {isPt ? 'Seu plano' : isEs ? 'Tu plan' : 'Your Plan'}
                     </Badge>
                   )}
                   <CardHeader className="pb-2">
@@ -163,7 +173,7 @@ export default function Pricing() {
                       {upgrading === plan.id ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Opening checkout...
+                          {isPt ? 'Abrindo checkout...' : isEs ? 'Abriendo pago...' : 'Opening checkout...'}
                         </>
                       ) : isCurrentPlan ? (
                         t('pricing.currentPlan')
