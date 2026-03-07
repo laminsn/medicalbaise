@@ -160,7 +160,7 @@ export function RecentAppointments() {
             return (
               <Link
                 key={appointment.id}
-                to={`/jobs/${appointment.id}`}
+                to={`/job/${appointment.id}`}
                 className="block bg-card rounded-xl border border-border hover:border-primary/50 p-4 transition-all hover:shadow-lg"
               >
                 <div className="flex items-start justify-between mb-2">

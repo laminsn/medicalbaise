@@ -122,6 +122,7 @@
     "errorCreatingAccount": "Erro ao criar conta",
     "accountCreatedSuccess": "Conta criada com sucesso!",
     "welcomeToBrasilBase": "Bem-vindo ao MD Baise.",
+    "welcomeToMedicalBase": "Bem-vindo ao MD Baise.",
     "errorSigningIn": "Erro ao entrar",
     "incorrectCredentials": "Email ou senha incorretos.",
     "invalidEmail": "Email inválido",

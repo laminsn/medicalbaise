@@ -122,6 +122,7 @@
     "errorCreatingAccount": "Error creating account",
     "accountCreatedSuccess": "Account created successfully!",
     "welcomeToMedicalBase": "Welcome to MD Baise.",
+    "welcomeToBrasilBase": "Welcome to MD Baise.",
     "errorSigningIn": "Error signing in",
     "incorrectCredentials": "Incorrect email or password.",
     "invalidEmail": "Invalid email",
@@ -1308,6 +1309,7 @@
     "eliteFeature": "Elite Feature",
     "upgradeDescription": "Upgrade to Elite to unlock custom messaging via Email, SMS, and WhatsApp.",
     "sent": "Message sent via {{channel}}",
+    "send": "Send Message",
     "sending": "Sending..."
   },
   "customerDashboard": {

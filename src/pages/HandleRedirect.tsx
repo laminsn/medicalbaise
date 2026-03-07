@@ -61,7 +61,7 @@ export default function HandleRedirect() {
   }
 
   if (providerId) {
-    return <Navigate to={`/doctor/${providerId}`} replace />;
+    return <Navigate to={`/provider/${providerId}`} replace />;
   }
 
   if (notFound) {
