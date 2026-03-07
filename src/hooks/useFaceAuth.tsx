@@ -228,10 +228,10 @@ export function useFaceAuth() {
   const removeFaceEnrollment = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
 
-    const { error } = await supabase
+    const { error } = await (supabase
       .from('profiles')
-      .update({ face_descriptor: null } as Record<string, unknown>)
-      .eq('user_id', user.id);
+      .update({ face_descriptor: null } as any)
+      .eq('user_id', user.id) as unknown as Promise<{ error: unknown }>);
 
     return !error;
   }, [user]);
