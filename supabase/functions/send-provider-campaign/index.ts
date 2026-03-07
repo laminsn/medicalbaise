@@ -10,7 +10,7 @@ const COST_PER_EMAIL = 0.05; // R$0.05 per email
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (userError || !userData.user) throw new Error("Authentication failed");
 
     const userId = userData.user.id;
-    logStep("User authenticated", { userId });
+    logStep("User authenticated");
 
     // Get provider info and check subscription tier
     const { data: provider, error: provError } = await supabase
@@ -202,23 +202,31 @@ const handler = async (req: Request): Promise<Response> => {
           } else {
             errors++;
             const errText = await res.text();
-            console.error(`Failed to send to ${recipient.email}:`, errText);
+            console.error(`Failed to send email to recipient:`, errText);
           }
         } catch (err) {
           errors++;
-          console.error(`Error sending to ${recipient.email}:`, err);
+          console.error(`Error sending email to recipient:`, err);
         }
       });
 
       await Promise.all(promises);
     }
 
-    // Deduct credits
+    // Deduct credits atomically — use conditional update to prevent race conditions.
+    // Only deduct if balance is still sufficient (another request may have consumed credits).
     const actualCost = sent * COST_PER_EMAIL;
-    await supabase
+    const { data: deductResult, error: deductError } = await supabase
       .from("profiles")
       .update({ credits_balance: creditsBalance - actualCost })
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .gte("credits_balance", actualCost)
+      .select("credits_balance")
+      .single();
+
+    if (deductError || !deductResult) {
+      logStep("WARNING: Credit deduction failed — possible race condition", { actualCost });
+    }
 
     // Update campaign record
     await supabase
