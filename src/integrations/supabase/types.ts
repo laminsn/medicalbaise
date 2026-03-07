@@ -1490,6 +1490,7 @@ export type Database = {
           created_at: string | null
           credits_balance: number | null
           email: string | null
+          face_descriptor: string | null
           first_name: string | null
           handle: string | null
           id: string
@@ -1517,6 +1518,7 @@ export type Database = {
           created_at?: string | null
           credits_balance?: number | null
           email?: string | null
+          face_descriptor?: string | null
           first_name?: string | null
           handle?: string | null
           id?: string
@@ -1544,6 +1546,7 @@ export type Database = {
           created_at?: string | null
           credits_balance?: number | null
           email?: string | null
+          face_descriptor?: string | null
           first_name?: string | null
           handle?: string | null
           id?: string
