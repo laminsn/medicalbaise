@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SERVICE_CATEGORIES } from '@/lib/constants';
+import { MEDICAL_CATEGORIES } from '@/lib/constants';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChevronRight } from 'lucide-react';
 
@@ -15,14 +15,20 @@ export default function Categories() {
             {t('categories.allCategories', 'All Service Categories')}
           </h1>
           <p className="text-muted-foreground">
-            {t('categories.allCategoriesDescription', 'Browse all available service categories and find the right professional for your needs.')}
+            {t(
+              'categories.allCategoriesDescription',
+              i18n.language === 'pt'
+                ? 'Explore todas as especialidades disponíveis e encontre o profissional ideal para você.'
+                : 'Browse all available specialties and find the right professional for your needs.',
+            )}
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SERVICE_CATEGORIES.map((category) => {
+          {MEDICAL_CATEGORIES.map((category) => {
             const Icon = category.icon;
             const name = i18n.language === 'pt' ? category.name_pt : category.name_en;
+            const description = i18n.language === 'pt' ? category.description_pt : category.description_en;
             return (
               <Link
                 key={category.id}
@@ -41,7 +47,7 @@ export default function Categories() {
                     {name}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {t(`categories.${category.id}.shortDesc`, 'Find trusted professionals')}
+                    {description}
                   </p>
                 </div>
                 <ChevronRight className="relative w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
