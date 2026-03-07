@@ -162,6 +162,8 @@ function printSection(title, values, max = 30) {
 }
 
 function main() {
+  const showAll = process.argv.includes('--full');
+  const sectionMax = showAll ? Number.MAX_SAFE_INTEGER : 30;
   const localeData = LOCALES.map(readLocale);
   const [en, pt] = localeData;
   const { requiredKeys, optionalKeys } = extractUsedTranslationKeys();
@@ -182,14 +184,14 @@ function main() {
   console.log(`  • required: ${requiredKeys.size}`);
   console.log(`  • optional (fallback/default provided): ${optionalKeys.size}`);
 
-  printSection('Top-level duplicate keys in en.json', en.duplicateTopLevelKeys);
-  printSection('Top-level duplicate keys in pt.json', pt.duplicateTopLevelKeys);
-  printSection('Keys present in en but missing in pt', missingInPt);
-  printSection('Keys present in pt but missing in en', missingInEn);
-  printSection('Required used keys missing in en', requiredMissingInEn);
-  printSection('Required used keys missing in pt', requiredMissingInPt);
-  printSection('Optional used keys missing in en', optionalMissingInEn);
-  printSection('Optional used keys missing in pt', optionalMissingInPt);
+  printSection('Top-level duplicate keys in en.json', en.duplicateTopLevelKeys, sectionMax);
+  printSection('Top-level duplicate keys in pt.json', pt.duplicateTopLevelKeys, sectionMax);
+  printSection('Keys present in en but missing in pt', missingInPt, sectionMax);
+  printSection('Keys present in pt but missing in en', missingInEn, sectionMax);
+  printSection('Required used keys missing in en', requiredMissingInEn, sectionMax);
+  printSection('Required used keys missing in pt', requiredMissingInPt, sectionMax);
+  printSection('Optional used keys missing in en', optionalMissingInEn, sectionMax);
+  printSection('Optional used keys missing in pt', optionalMissingInPt, sectionMax);
 
   const hasFailures =
     missingInPt.length > 0 ||

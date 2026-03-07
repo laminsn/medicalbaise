@@ -308,7 +308,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log("Email sent successfully:", emailResponse);
 
         // Calculate next send date
-        let nextSendAt = new Date();
+        const nextSendAt = new Date();
         if (schedule.frequency === "weekly") {
           nextSendAt.setDate(nextSendAt.getDate() + 7);
         } else {
