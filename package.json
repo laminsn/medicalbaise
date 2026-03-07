@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:i18n": "node scripts/validate-i18n.mjs"
+    "test:i18n": "node scripts/validate-i18n.mjs",
+    "generate:es-locale": "node scripts/generate-es-locale.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.4",
