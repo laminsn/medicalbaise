@@ -49,6 +49,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTrackProfileView } from '@/hooks/useProfileViews';
 import { toast } from 'sonner';
 import { MEDICAL_CATEGORIES } from '@/lib/constants/medical';
+import { isPortuguese } from '@/lib/i18n-utils';
 
 // Mock data for development
 const mockDoctor = {
@@ -56,8 +57,11 @@ const mockDoctor = {
   business_name: 'Maria Silva',
   specialty_id: 'cardiology',
   specialty_name: 'Cardiologia',
+  specialty_name_en: 'Cardiology',
   tagline: 'Especialista em Cardiologia Clínica e Preventiva',
+  tagline_en: 'Specialist in Clinical and Preventive Cardiology',
   bio: 'Médica cardiologista com mais de 15 anos de experiência no diagnóstico e tratamento de doenças cardiovasculares. Graduada pela USP, com residência no InCor e fellowship em cardiologia intervencionista. Atendimento humanizado com foco na prevenção e no bem-estar dos pacientes.',
+  bio_en: 'Cardiologist with more than 15 years of experience in diagnosing and treating cardiovascular conditions. Graduated from USP, with residency at InCor and fellowship in interventional cardiology. Patient-centered care focused on prevention and long-term well-being.',
   avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400',
   years_experience: 15,
   total_patients: 2847,
@@ -73,8 +77,11 @@ const mockDoctor = {
   state: 'SP',
   crm_number: 'CRM/SP 123456',
   medical_school: 'Faculdade de Medicina da USP',
+  medical_school_en: 'USP School of Medicine',
   residency: 'InCor - Instituto do Coração',
+  residency_en: 'InCor - Heart Institute',
   fellowship: 'Cardiologia Intervencionista - Hospital Sírio-Libanês',
+  fellowship_en: 'Interventional Cardiology - Hospital Sírio-Libanês',
   languages: ['Português', 'English', 'Español'],
   consultation_types: ['in-person', 'teleconsultation'],
   consultation_fee: 350,
@@ -233,6 +240,8 @@ export default function DoctorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const isPt = isPortuguese(i18n);
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user } = useAuth();
   const { startConversation } = useStartConversation();
   const { isFavorited, toggleFavorite } = useFavorites();
@@ -241,6 +250,12 @@ export default function DoctorProfile() {
   const [isStartingConversation, setIsStartingConversation] = useState(false);
 
   const doctor = mockDoctor;
+  const specialtyName = isPt ? doctor.specialty_name : doctor.specialty_name_en || doctor.specialty_name;
+  const tagline = isPt ? doctor.tagline : doctor.tagline_en || doctor.tagline;
+  const bio = isPt ? doctor.bio : doctor.bio_en || doctor.bio;
+  const medicalSchool = isPt ? doctor.medical_school : doctor.medical_school_en || doctor.medical_school;
+  const residency = isPt ? doctor.residency : doctor.residency_en || doctor.residency;
+  const fellowship = isPt ? doctor.fellowship : doctor.fellowship_en || doctor.fellowship;
 
   useTrackProfileView(id, 'doctor_profile');
 
@@ -329,8 +344,8 @@ export default function DoctorProfile() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Dr. ${doctor.business_name} - ${doctor.specialty_name}`,
-          text: doctor.tagline,
+          title: `Dr. ${doctor.business_name} - ${specialtyName}`,
+          text: tagline,
           url: url,
         });
         toast.success(t('common.shared'));
@@ -393,11 +408,32 @@ export default function DoctorProfile() {
     );
   }
 
+  if (isEs) {
+    return (
+      <AppLayout>
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <Card className="border-dashed">
+            <CardContent className="py-10 text-center space-y-3">
+              <h2 className="text-xl font-semibold">Perfil en traducción</h2>
+              <p className="text-muted-foreground">
+                Esta página de perfil médico aún se está adaptando completamente al español.
+                Puedes ver la versión completa en inglés mientras finalizamos la traducción.
+              </p>
+              <Button onClick={() => i18n.changeLanguage('en')}>
+                Ver versión completa en inglés
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <>
       <Helmet>
-        <title>Dr. {doctor.business_name} - {doctor.specialty_name} | MDBaise</title>
-        <meta name="description" content={doctor.tagline} />
+        <title>Dr. {doctor.business_name} - {specialtyName} | MDBaise</title>
+        <meta name="description" content={tagline} />
       </Helmet>
       
       <AppLayout>
@@ -426,12 +462,12 @@ export default function DoctorProfile() {
                     <BadgeCheck className="h-5 w-5 text-primary flex-shrink-0" aria-label={t('doctorProfile.verified')} />
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{doctor.tagline}</p>
+                <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{tagline}</p>
                 <div className="flex items-center gap-2 flex-wrap">
                   {getTierBadge(doctor.subscription_tier)}
                   <Badge variant="outline" className="text-xs">
                     <Stethoscope className="h-3 w-3 mr-1" />
-                    {doctor.specialty_name}
+                    {specialtyName}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
                     <MapPin className="h-3 w-3 mr-1" />
@@ -555,7 +591,7 @@ export default function DoctorProfile() {
                   <CardTitle className="text-base">{t('doctorProfile.aboutDoctor')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{doctor.bio}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{bio}</p>
                   
                   <Separator className="my-4" />
                   
@@ -564,7 +600,7 @@ export default function DoctorProfile() {
                       <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-muted-foreground">{t('doctorProfile.medicalSchool')}</p>
-                        <p className="text-sm font-medium">{doctor.medical_school}</p>
+                        <p className="text-sm font-medium">{medicalSchool}</p>
                       </div>
                     </div>
 
@@ -572,16 +608,16 @@ export default function DoctorProfile() {
                       <Hospital className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-muted-foreground">{t('doctorProfile.residency')}</p>
-                        <p className="text-sm font-medium">{doctor.residency}</p>
+                        <p className="text-sm font-medium">{residency}</p>
                       </div>
                     </div>
 
-                    {doctor.fellowship && (
+                    {fellowship && (
                       <div className="flex items-start gap-3">
                         <Award className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">{t('doctorProfile.fellowship')}</p>
-                          <p className="text-sm font-medium">{doctor.fellowship}</p>
+                          <p className="text-sm font-medium">{fellowship}</p>
                         </div>
                       </div>
                     )}
@@ -714,10 +750,10 @@ export default function DoctorProfile() {
                   {mockFAQs.map((faq, index) => (
                     <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
                       <p className="font-medium text-sm">
-                        {i18n.language === 'pt' ? faq.question : faq.question_en}
+                        {isPt ? faq.question : faq.question_en}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {i18n.language === 'pt' ? faq.answer : faq.answer_en}
+                        {isPt ? faq.answer : faq.answer_en}
                       </p>
                     </div>
                   ))}
@@ -733,10 +769,10 @@ export default function DoctorProfile() {
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-base">
-                          {i18n.language === 'pt' ? procedure.name : procedure.name_en}
+                          {isPt ? procedure.name : procedure.name_en}
                         </h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {i18n.language === 'pt' ? procedure.description : procedure.description_en}
+                          {isPt ? procedure.description : procedure.description_en}
                         </p>
                         <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
                           <div className="flex items-center gap-1">
@@ -784,7 +820,7 @@ export default function DoctorProfile() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm">
-                          {i18n.language === 'pt' ? cred.title : cred.title_en}
+                          {isPt ? cred.title : cred.title_en}
                         </h4>
                         <p className="text-sm text-muted-foreground">{cred.institution}</p>
                         <p className="text-xs text-muted-foreground mt-1">{cred.year}</p>

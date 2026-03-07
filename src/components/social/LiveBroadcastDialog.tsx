@@ -36,7 +36,10 @@ export function LiveBroadcastDialog({
   providerId,
   providerName
 }: LiveBroadcastDialogProps) {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const tx = (en: string, pt: string, es: string) => (isPt ? pt : isEs ? es : en);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -68,9 +71,9 @@ export function LiveBroadcastDialog({
       setCameraReady(true);
     } catch (err) {
       console.error('Camera init error:', err);
-      toast.error('Failed to access camera. Please check permissions.');
+      toast.error(tx('Failed to access camera. Please check permissions.', 'Falha ao acessar a câmera. Verifique as permissões.', 'No se pudo acceder a la cámara. Revisa los permisos.'));
     }
-  }, []);
+  }, [isPt, isEs]);
 
   // Stop camera preview
   const stopCamera = useCallback(() => {
@@ -94,8 +97,8 @@ export function LiveBroadcastDialog({
 
       const notifications = followers.map(f => ({
         user_id: f.follower_id,
-        title: `${pName} is live!`,
-        message: streamTitle || `${pName} started a live stream`,
+        title: isPt ? `${pName} está ao vivo!` : isEs ? `¡${pName} está en vivo!` : `${pName} is live!`,
+        message: streamTitle || (isPt ? `${pName} iniciou uma transmissão ao vivo` : isEs ? `${pName} inició una transmisión en vivo` : `${pName} started a live stream`),
         type: 'live_stream',
         priority: 'high',
         action_url: '/feed',
@@ -114,12 +117,12 @@ export function LiveBroadcastDialog({
     } catch (err) {
       console.error('Error notifying followers:', err);
     }
-  }, []);
+  }, [isPt, isEs]);
 
   // Start live stream
   const handleStartStream = async () => {
     if (!title.trim()) {
-      toast.error('Please enter a title for your stream');
+      toast.error(tx('Please enter a title for your stream', 'Informe um título para sua transmissão', 'Ingresa un título para tu transmisión'));
       return;
     }
     
@@ -131,9 +134,9 @@ export function LiveBroadcastDialog({
       // Notify followers about the live stream
       notifyFollowers(providerId, providerId, providerName, title);
       
-      toast.success('You are now live!');
+      toast.success(tx('You are now live!', 'Você está ao vivo!', '¡Ya estás en vivo!'));
     } catch (err) {
-      toast.error('Failed to start stream');
+      toast.error(tx('Failed to start stream', 'Falha ao iniciar transmissão', 'No se pudo iniciar la transmisión'));
     }
   };
 
@@ -141,7 +144,7 @@ export function LiveBroadcastDialog({
   const handleEndStream = async () => {
     await stopBroadcast();
     stopCamera();
-    toast.success('Stream ended');
+    toast.success(tx('Stream ended', 'Transmissão encerrada', 'Transmisión finalizada'));
     onOpenChange(false);
   };
 
@@ -210,12 +213,12 @@ export function LiveBroadcastDialog({
           <DialogHeader className="p-4 border-b border-border">
             <DialogTitle className="flex items-center gap-2">
               <Radio className={`h-5 w-5 ${isStreaming ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`} />
-              {isStreaming ? 'Live Now' : 'Go Live'}
+              {isStreaming ? tx('Live Now', 'Ao vivo agora', 'En vivo ahora') : tx('Go Live', 'Entrar ao vivo', 'Transmitir en vivo')}
             </DialogTitle>
             <DialogDescription>
               {isStreaming 
-                ? 'Broadcasting to your audience' 
-                : 'Start a live video stream for your followers'
+                ? tx('Broadcasting to your audience', 'Transmitindo para sua audiência', 'Transmitiendo para tu audiencia')
+                : tx('Start a live video stream for your followers', 'Inicie uma transmissão ao vivo para seus seguidores', 'Inicia una transmisión en vivo para tus seguidores')
               }
             </DialogDescription>
           </DialogHeader>
@@ -238,7 +241,7 @@ export function LiveBroadcastDialog({
                   <div className="absolute inset-0 flex items-center justify-center bg-muted">
                     <div className="text-center">
                       <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-2 animate-pulse" />
-                      <p className="text-sm text-muted-foreground">Starting camera...</p>
+                      <p className="text-sm text-muted-foreground">{tx('Starting camera...', 'Iniciando câmera...', 'Iniciando cámara...')}</p>
                     </div>
                   </div>
                 )}
@@ -248,10 +251,10 @@ export function LiveBroadcastDialog({
                   <div className="absolute inset-0 flex items-center justify-center bg-muted">
                     <div className="text-center p-4">
                       <CameraOff className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground mb-2">Camera access denied</p>
+                      <p className="text-sm text-muted-foreground mb-2">{tx('Camera access denied', 'Acesso à câmera negado', 'Acceso a cámara denegado')}</p>
                       <Button variant="outline" size="sm" onClick={initializeCamera}>
                         <Camera className="h-4 w-4 mr-2" />
-                        Retry
+                        {tx('Retry', 'Tentar novamente', 'Reintentar')}
                       </Button>
                     </div>
                   </div>
@@ -262,7 +265,7 @@ export function LiveBroadcastDialog({
                   <div className="absolute top-3 left-3 flex items-center gap-2">
                     <Badge variant="destructive" className="animate-pulse">
                       <div className="h-2 w-2 rounded-full bg-white mr-1.5" />
-                      LIVE
+                      {tx('LIVE', 'AO VIVO', 'EN VIVO')}
                     </Badge>
                     <Badge variant="secondary">
                       {formatDuration(duration)}
@@ -295,16 +298,16 @@ export function LiveBroadcastDialog({
                     <Label htmlFor="stream-title">Stream Title</Label>
                     <Input
                       id="stream-title"
-                      placeholder="What are you streaming about?"
+                      placeholder={tx('What are you streaming about?', 'Sobre o que você vai transmitir?', '¿Sobre qué vas a transmitir?')}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="stream-description">Description (optional)</Label>
+                    <Label htmlFor="stream-description">{tx('Description (optional)', 'Descrição (opcional)', 'Descripción (opcional)')}</Label>
                     <Textarea
                       id="stream-description"
-                      placeholder="Tell viewers what to expect..."
+                      placeholder={tx('Tell viewers what to expect...', 'Diga aos espectadores o que esperar...', 'Cuéntales a los espectadores qué esperar...')}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={2}
@@ -316,7 +319,7 @@ export function LiveBroadcastDialog({
                     className="w-full bg-red-500 hover:bg-red-600"
                   >
                     <Radio className="h-4 w-4 mr-2" />
-                    Go Live
+                    {tx('Go Live', 'Entrar ao vivo', 'Transmitir en vivo')}
                   </Button>
                 </div>
               ) : (
@@ -326,7 +329,7 @@ export function LiveBroadcastDialog({
                   className="w-full"
                 >
                   <Square className="h-4 w-4 mr-2" />
-                  End Stream
+                  {tx('End Stream', 'Encerrar transmissão', 'Finalizar transmisión')}
                 </Button>
               )}
             </div>
@@ -337,7 +340,7 @@ export function LiveBroadcastDialog({
                 <div className="p-3 border-b border-border">
                   <h3 className="font-medium flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    Live Chat
+                    {tx('Live Chat', 'Chat ao vivo', 'Chat en vivo')}
                   </h3>
                 </div>
                 
@@ -345,7 +348,7 @@ export function LiveBroadcastDialog({
                   <div className="space-y-3">
                     {messages.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-4">
-                        No messages yet
+                        {tx('No messages yet', 'Sem mensagens ainda', 'Aún no hay mensajes')}
                       </p>
                     ) : (
                       messages.map((msg) => (
@@ -363,7 +366,7 @@ export function LiveBroadcastDialog({
                 <div className="p-3 border-t border-border">
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Say something..."
+                      placeholder={tx('Say something...', 'Diga algo...', 'Escribe algo...')}
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}

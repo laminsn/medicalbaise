@@ -31,7 +31,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
-import { enUS, ptBR } from 'date-fns/locale';
+import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useTranslation } from 'react-i18next';
@@ -53,21 +53,22 @@ interface CreateReminderDialogProps {
 export function CreateReminderDialog({ open, onOpenChange }: CreateReminderDialogProps) {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const dateLocale = isPt ? ptBR : enUS;
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const dateLocale = isPt ? ptBR : isEs ? esLocale : enUS;
   const { createReminder } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const reminderSchema = useMemo(
     () =>
       z.object({
-        title: z.string().min(1, isPt ? 'Título é obrigatório' : 'Title is required'),
-        message: z.string().min(1, isPt ? 'Mensagem é obrigatória' : 'Message is required'),
+        title: z.string().min(1, isPt ? 'Título é obrigatório' : isEs ? 'El título es obligatorio' : 'Title is required'),
+        message: z.string().min(1, isPt ? 'Mensagem é obrigatória' : isEs ? 'El mensaje es obligatorio' : 'Message is required'),
         reminder_type: z.string(),
         scheduled_date: z.date(),
         scheduled_time: z.string(),
         repeat_interval: z.string().optional(),
       }),
-    [isPt],
+    [isPt, isEs],
   );
 
   const form = useForm<ReminderFormValues>({

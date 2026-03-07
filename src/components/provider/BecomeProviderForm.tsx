@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -35,6 +35,7 @@ import {
 import { Loader2, Upload, X, FileText, Image } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
+import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
 
 interface ServiceCategory {
   id: string;
@@ -42,13 +43,16 @@ interface ServiceCategory {
   name_pt: string;
 }
 
-const formSchema = z.object({
-  business_name: z.string().min(2, 'Business name must be at least 2 characters'),
+const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
+  business_name: z.string().min(2, isPt ? 'Nome comercial deve ter pelo menos 2 caracteres' : isEs ? 'El nombre comercial debe tener al menos 2 caracteres' : 'Business name must be at least 2 characters'),
   business_type: z.enum(['individual', 'company']),
-  tagline: z.string().max(100, 'Tagline must be 100 characters or less').optional(),
-  bio: z.string().min(20, 'Bio must be at least 20 characters').max(500, 'Bio must be 500 characters or less'),
+  tagline: z.string().max(100, isPt ? 'Slogan deve ter no máximo 100 caracteres' : isEs ? 'El eslogan debe tener 100 caracteres o menos' : 'Tagline must be 100 characters or less').optional(),
+  bio: z
+    .string()
+    .min(20, isPt ? 'Bio deve ter pelo menos 20 caracteres' : isEs ? 'La biografía debe tener al menos 20 caracteres' : 'Bio must be at least 20 characters')
+    .max(500, isPt ? 'Bio deve ter no máximo 500 caracteres' : isEs ? 'La biografía debe tener 500 caracteres o menos' : 'Bio must be 500 characters or less'),
   years_experience: z.coerce.number().min(0).max(50),
-  address: z.string().min(5, 'Please enter a valid address'),
+  address: z.string().min(5, isPt ? 'Informe um endereço válido' : isEs ? 'Ingresa una dirección válida' : 'Please enter a valid address'),
   service_radius_km: z.coerce.number().min(1).max(100),
   // Identity verification
   id_type: z.enum(['cpf_cnpj', 'alternative']),
@@ -62,7 +66,7 @@ const formSchema = z.object({
   }
   return true;
 }, {
-  message: 'CPF/CNPJ is required',
+  message: isPt ? 'CPF/CNPJ é obrigatório' : isEs ? 'El CPF/CNPJ es obligatorio' : 'CPF/CNPJ is required',
   path: ['cpf_cnpj'],
 }).refine((data) => {
   if (data.id_type === 'alternative') {
@@ -70,7 +74,7 @@ const formSchema = z.object({
   }
   return true;
 }, {
-  message: 'Passport number is required',
+  message: isPt ? 'Número do passaporte é obrigatório' : isEs ? 'El número de pasaporte es obligatorio' : 'Passport number is required',
   path: ['passport_number'],
 }).refine((data) => {
   if (data.id_type === 'alternative') {
@@ -78,7 +82,7 @@ const formSchema = z.object({
   }
   return true;
 }, {
-  message: 'Phone number is required',
+  message: isPt ? 'Telefone é obrigatório' : isEs ? 'El teléfono es obligatorio' : 'Phone number is required',
   path: ['contact_phone'],
 }).refine((data) => {
   if (data.id_type === 'alternative') {
@@ -86,11 +90,11 @@ const formSchema = z.object({
   }
   return true;
 }, {
-  message: 'Email is required',
+  message: isPt ? 'E-mail é obrigatório' : isEs ? 'El correo electrónico es obligatorio' : 'Email is required',
   path: ['contact_email'],
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof createFormSchema>>;
 
 interface UploadedFile {
   file: File;
@@ -106,6 +110,8 @@ interface BecomeProviderFormProps {
 
 export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProviderFormProps) {
   const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user, updateProfile } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [certifications, setCertifications] = useState<UploadedFile[]>([]);
@@ -113,6 +119,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
   const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['portuguese']);
+  const formSchema = useMemo(() => createFormSchema(isPt, isEs), [isPt, isEs]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -161,7 +168,11 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
   };
 
   const getServiceName = (category: ServiceCategory) => {
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    if (isPortuguese(i18n)) return category.name_pt;
+    if (isSpanish(i18n)) {
+      return t(`medicalCategories.${category.id}.name`, category.name_en);
+    }
+    return category.name_en;
   };
 
   const handleCertificationUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,7 +288,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
           await supabase.from('provider_credentials').insert({
             provider_id: providerData.id,
             credential_type: 'certification',
-            title: 'Uploaded Certification',
+            title: isPt ? 'Certificação enviada' : isEs ? 'Certificación subida' : 'Uploaded Certification',
             document_url: url,
           });
         }

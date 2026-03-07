@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNotifications, Notification, ScheduledReminder } from '@/hooks/useNotifications';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, format } from 'date-fns';
-import { enUS, ptBR } from 'date-fns/locale';
+import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { CreateReminderDialog } from '@/components/notifications/CreateReminderDialog';
 
@@ -40,6 +40,7 @@ export default function Notifications() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [showCreateReminder, setShowCreateReminder] = useState(false);
   const {
     notifications,
@@ -139,6 +140,7 @@ export default function Notifications() {
                     onDelete={() => deleteNotification(notification.id)}
                     onNavigate={(url) => navigate(url)}
                     isPt={isPt}
+                    isEs={isEs}
                   />
                 ))}
               </div>
@@ -171,6 +173,7 @@ export default function Notifications() {
                     onToggle={(active) => updateReminder(reminder.id, { is_active: active })}
                     onDelete={() => deleteReminder(reminder.id)}
                     isPt={isPt}
+                    isEs={isEs}
                   />
                 ))}
               </div>
@@ -252,23 +255,26 @@ function NotificationCard({
   onDelete,
   onNavigate,
   isPt,
+  isEs,
 }: { 
   notification: Notification;
   onMarkAsRead: () => void;
   onDelete: () => void;
   onNavigate: (url: string) => void;
   isPt: boolean;
+  isEs: boolean;
 }) {
   const { i18n } = useTranslation();
   const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const dateLocale = isPortuguese ? ptBR : enUS;
+  const isSpanishLang = isEs || i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const dateLocale = isPortuguese ? ptBR : isSpanishLang ? esLocale : enUS;
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return <Badge variant="destructive">{isPortuguese ? 'Urgente' : 'Urgent'}</Badge>;
+        return <Badge variant="destructive">{isPortuguese ? 'Urgente' : isSpanishLang ? 'Urgente' : 'Urgent'}</Badge>;
       case 'high':
-        return <Badge className="bg-orange-500">{isPortuguese ? 'Alta' : 'High'}</Badge>;
+        return <Badge className="bg-orange-500">{isPortuguese ? 'Alta' : isSpanishLang ? 'Alta' : 'High'}</Badge>;
       default:
         return null;
     }
@@ -310,7 +316,7 @@ function NotificationCard({
               </span>
               {notification.action_url && (
                 <Button variant="link" size="sm" className="h-auto p-0" onClick={() => onNavigate(notification.action_url!)}>
-                  {isPortuguese ? 'Ver detalhes' : 'View Details'} →
+                  {isPortuguese ? 'Ver detalhes' : isSpanishLang ? 'Ver detalles' : 'View Details'} →
                 </Button>
               )}
             </div>
@@ -326,26 +332,29 @@ function ReminderCard({
   onToggle,
   onDelete,
   isPt,
+  isEs,
 }: {
   reminder: ScheduledReminder;
   onToggle: (active: boolean) => void;
   onDelete: () => void;
   isPt: boolean;
+  isEs: boolean;
 }) {
   const { i18n } = useTranslation();
   const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const dateLocale = isPortuguese ? ptBR : enUS;
+  const isSpanishLang = isEs || i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const dateLocale = isPortuguese ? ptBR : isSpanishLang ? esLocale : enUS;
 
   const getReminderTypeBadge = (type: string) => {
     switch (type) {
       case 'appointment':
-        return <Badge variant="secondary">{isPortuguese ? 'Consulta' : 'Appointment'}</Badge>;
+        return <Badge variant="secondary">{isPortuguese ? 'Consulta' : isSpanishLang ? 'Cita' : 'Appointment'}</Badge>;
       case 'maintenance':
-        return <Badge className="bg-blue-500 text-white">{isPortuguese ? 'Manutenção' : 'Maintenance'}</Badge>;
+        return <Badge className="bg-blue-500 text-white">{isPortuguese ? 'Manutenção' : isSpanishLang ? 'Mantenimiento' : 'Maintenance'}</Badge>;
       case 'follow_up':
-        return <Badge className="bg-purple-500 text-white">{isPortuguese ? 'Retorno' : 'Follow-up'}</Badge>;
+        return <Badge className="bg-purple-500 text-white">{isPortuguese ? 'Retorno' : isSpanishLang ? 'Seguimiento' : 'Follow-up'}</Badge>;
       default:
-        return <Badge variant="outline">{isPortuguese ? 'Personalizado' : 'Custom'}</Badge>;
+        return <Badge variant="outline">{isPortuguese ? 'Personalizado' : isSpanishLang ? 'Personalizado' : 'Custom'}</Badge>;
     }
   };
 
@@ -362,9 +371,21 @@ function ReminderCard({
                 ? 'anualmente'
                 : interval
       )
-      : interval;
+      : isSpanishLang
+        ? (
+          interval === 'daily'
+            ? 'diariamente'
+            : interval === 'weekly'
+              ? 'semanalmente'
+              : interval === 'monthly'
+                ? 'mensualmente'
+                : interval === 'yearly'
+                  ? 'anualmente'
+                  : interval
+        )
+        : interval;
 
-    return `${isPortuguese ? 'Repete' : 'Repeats'} ${intervalLabel}`;
+    return `${isPortuguese ? 'Repete' : isSpanishLang ? 'Se repite' : 'Repeats'} ${intervalLabel}`;
   };
 
   const isPast = new Date(reminder.scheduled_for) < new Date();

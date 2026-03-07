@@ -1835,5 +1835,323 @@
     "typeSomething": "Type something...",
     "typeText": "Type text",
     "yourStory": "Your story"
+  },
+  "medicalCategories": {
+    "general-practice": {
+      "name": "General Practice",
+      "description": "Primary care and general medical consultation"
+    },
+    "cardiology": {
+      "name": "Cardiology",
+      "description": "Heart and cardiovascular care"
+    },
+    "dermatology": {
+      "name": "Dermatology",
+      "description": "Skin, hair, and nail care"
+    },
+    "pediatrics": {
+      "name": "Pediatrics",
+      "description": "Children and adolescent care"
+    },
+    "dentistry": {
+      "name": "Dentistry",
+      "description": "Dental and oral health"
+    },
+    "orthopedics": {
+      "name": "Orthopedics",
+      "description": "Bone, joint, and muscle care"
+    },
+    "gynecology": {
+      "name": "Gynecology & Obstetrics",
+      "description": "Mental health and behavioral care"
+    },
+    "ophthalmology": {
+      "name": "Ophthalmology",
+      "description": "Eye care and vision"
+    },
+    "neurology": {
+      "name": "Neurology",
+      "description": "Brain and nervous system"
+    },
+    "ent": {
+      "name": "ENT (Ear, Nose, Throat)",
+      "description": "Ear, nose, and throat care"
+    },
+    "endocrinology": {
+      "name": "Endocrinology",
+      "description": "Hormone and metabolic disorders"
+    },
+    "gastroenterology": {
+      "name": "Gastroenterology",
+      "description": "Digestive system care"
+    },
+    "urology": {
+      "name": "Urology",
+      "description": "Urinary tract and male reproductive health"
+    },
+    "oncology": {
+      "name": "Oncology",
+      "description": "Cancer diagnosis and treatment"
+    },
+    "therapy": {
+      "name": "Therapy / Psychology",
+      "description": "Mental health therapy and counseling"
+    },
+    "dietitian": {
+      "name": "Dietitian / Nutritionist",
+      "description": "Nutrition and dietary planning"
+    },
+    "speech-pathology": {
+      "name": "Speech & Language Pathology",
+      "description": "Speech, language, and swallowing disorders"
+    },
+    "doula": {
+      "name": "Doula",
+      "description": "Birth support, prenatal and postpartum care"
+    },
+    "general-surgery": {
+      "name": "General Surgery",
+      "description": "Surgical procedures and operative care"
+    },
+    "neurosurgery": {
+      "name": "Neurosurgery",
+      "description": "Brain and spinal cord surgery"
+    },
+    "cardiac-surgery": {
+      "name": "Cardiac Surgery",
+      "description": "Heart and cardiovascular surgery"
+    },
+    "plastic-surgery": {
+      "name": "Plastic & Reconstructive Surgery",
+      "description": "Cosmetic and reconstructive surgical procedures"
+    },
+    "vascular-surgery": {
+      "name": "Vascular Surgery",
+      "description": "Blood vessel and circulatory system surgery"
+    },
+    "thoracic-surgery": {
+      "name": "Thoracic Surgery",
+      "description": "Chest, lung, and esophageal surgery"
+    },
+    "colorectal-surgery": {
+      "name": "Colorectal Surgery",
+      "description": "Colon, rectum, and anal surgery"
+    },
+    "emergency-medicine": {
+      "name": "Emergency Medicine",
+      "description": "Acute emergency and trauma care"
+    },
+    "intensivist": {
+      "name": "Intensivist (ICU)",
+      "description": "Intensive care unit critical care"
+    },
+    "hospitalist": {
+      "name": "Hospitalist",
+      "description": "Inpatient hospital-based medicine"
+    },
+    "trauma-surgery": {
+      "name": "Trauma Surgery",
+      "description": "Emergency surgical care for traumatic injuries"
+    },
+    "neonatology": {
+      "name": "Neonatology",
+      "description": "Newborn intensive and critical care"
+    },
+    "pulmonology": {
+      "name": "Pulmonology",
+      "description": "Lung and respiratory system care"
+    },
+    "nephrology": {
+      "name": "Nephrology",
+      "description": "Kidney disease and renal care"
+    },
+    "rheumatology": {
+      "name": "Rheumatology",
+      "description": "Autoimmune and musculoskeletal disorders"
+    },
+    "hematology": {
+      "name": "Hematology",
+      "description": "Blood disorders and transfusion medicine"
+    },
+    "infectious-disease": {
+      "name": "Infectious Disease",
+      "description": "Bacterial, viral, and parasitic infections"
+    },
+    "allergy-immunology": {
+      "name": "Allergy & Immunology",
+      "description": "Allergies, asthma, and immune system disorders"
+    },
+    "geriatrics": {
+      "name": "Geriatrics",
+      "description": "Elderly and aging population care"
+    },
+    "radiology": {
+      "name": "Radiology",
+      "description": "Medical imaging and diagnostic radiology"
+    },
+    "pathology": {
+      "name": "Pathology",
+      "description": "Laboratory diagnostics and tissue analysis"
+    },
+    "nuclear-medicine": {
+      "name": "Nuclear Medicine",
+      "description": "Radioactive diagnostics and therapy"
+    },
+    "genetics": {
+      "name": "Medical Genetics",
+      "description": "Genetic testing, counseling, and hereditary conditions"
+    },
+    "anesthesiology": {
+      "name": "Anesthesiology",
+      "description": "Anesthesia for surgical and procedural care"
+    },
+    "pain-management": {
+      "name": "Pain Management",
+      "description": "Chronic and acute pain treatment"
+    },
+    "physical-therapy": {
+      "name": "Physical Therapy / Physiotherapy",
+      "description": "Movement rehabilitation and physical recovery"
+    },
+    "occupational-therapy": {
+      "name": "Occupational Therapy",
+      "description": "Daily living skills and functional rehabilitation"
+    },
+    "physiatry": {
+      "name": "Physical Medicine & Rehabilitation",
+      "description": "Non-surgical musculoskeletal and neurological rehab"
+    },
+    "respiratory-therapy": {
+      "name": "Respiratory Therapy",
+      "description": "Respiratory care and ventilator management"
+    },
+    "sports-medicine": {
+      "name": "Sports Medicine",
+      "description": "Athletic injuries and performance medicine"
+    },
+    "palliative-care": {
+      "name": "Palliative Care & Hospice",
+      "description": "End-of-life and comfort-focused care"
+    },
+    "sleep-medicine": {
+      "name": "Sleep Medicine",
+      "description": "Sleep disorders diagnosis and treatment"
+    },
+    "wound-care": {
+      "name": "Wound Care",
+      "description": "Chronic wound management and healing"
+    },
+    "toxicology": {
+      "name": "Toxicology",
+      "description": "Poisoning, overdose, and toxic exposure treatment"
+    },
+    "addiction-medicine": {
+      "name": "Addiction Medicine",
+      "description": "Substance use disorders and recovery"
+    },
+    "orthodontics": {
+      "name": "Orthodontics",
+      "description": "Teeth alignment and bite correction"
+    },
+    "oral-surgery": {
+      "name": "Oral & Maxillofacial Surgery",
+      "description": "Surgical procedures of mouth, jaw, and face"
+    },
+    "periodontics": {
+      "name": "Periodontics",
+      "description": "Gum disease treatment and dental implants"
+    },
+    "endodontics": {
+      "name": "Endodontics",
+      "description": "Root canal therapy and dental pulp treatment"
+    },
+    "nurse-practitioner": {
+      "name": "Nurse Practitioner (NP)",
+      "description": "Advanced practice nursing and primary care"
+    },
+    "registered-nurse": {
+      "name": "Registered Nurse (RN)",
+      "description": "Professional nursing care and patient management"
+    },
+    "certified-nursing-assistant": {
+      "name": "Certified Nursing Assistant (CNA)",
+      "description": "Basic patient care and nursing support"
+    },
+    "midwifery": {
+      "name": "Midwifery",
+      "description": "Pregnancy, labor, and postpartum midwifery care"
+    },
+    "medical-lab-tech": {
+      "name": "Medical Lab Technologist",
+      "description": "Clinical laboratory testing and analysis"
+    },
+    "phlebotomy": {
+      "name": "Phlebotomy",
+      "description": "Blood collection and venipuncture services"
+    },
+    "radiologic-tech": {
+      "name": "Radiologic Technologist",
+      "description": "X-ray, CT, and MRI imaging services"
+    },
+    "chiropractic": {
+      "name": "Chiropractic",
+      "description": "Spinal alignment and musculoskeletal manipulation"
+    },
+    "acupuncture": {
+      "name": "Acupuncture",
+      "description": "Traditional and medical acupuncture therapy"
+    },
+    "naturopathy": {
+      "name": "Naturopathic Medicine",
+      "description": "Natural and holistic health approaches"
+    },
+    "optometry": {
+      "name": "Optometry",
+      "description": "Vision testing, eyeglasses, and contact lens fitting"
+    },
+    "audiology": {
+      "name": "Audiology",
+      "description": "Hearing evaluation and hearing aid fitting"
+    },
+    "home-health": {
+      "name": "Home Health Services",
+      "description": "In-home medical care and health monitoring"
+    },
+    "telehealth": {
+      "name": "Telehealth / Telemedicine",
+      "description": "Remote virtual medical consultations"
+    },
+    "paramedic": {
+      "name": "Paramedic / EMT",
+      "description": "Pre-hospital emergency medical care"
+    },
+    "pharmacy": {
+      "name": "Pharmacy / Clinical Pharmacist",
+      "description": "Medication management and pharmaceutical care"
+    },
+    "medical-social-work": {
+      "name": "Medical Social Work",
+      "description": "Patient advocacy, discharge planning, and support"
+    },
+    "patient-advocacy": {
+      "name": "Patient Advocate / Navigator",
+      "description": "Care coordination and patient rights advocacy"
+    },
+    "health-informatics": {
+      "name": "Health Informatics",
+      "description": "Health data management and clinical systems"
+    },
+    "medical-coding": {
+      "name": "Medical Coding & Billing",
+      "description": "Medical records coding and insurance billing"
+    },
+    "psychiatry": {
+      "name": "Psychiatry",
+      "description": "Mental health specialists"
+    },
+    "otolaryngology": {
+      "name": "ENT (Otolaryngology)",
+      "description": "Ear, nose, and throat specialists"
+    }
   }
 }

@@ -14,6 +14,7 @@ import {
   Search, Filter, Star, MapPin, Clock, Shield, 
   ChevronLeft, Users, Briefcase, Award
 } from 'lucide-react';
+import { getLocalizedCategoryDescription, getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 // Mock providers for demo
 const MOCK_PROVIDERS = [
@@ -28,6 +29,8 @@ const MOCK_PROVIDERS = [
 export default function CategoryDetail() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState([0, 200]);
@@ -53,10 +56,10 @@ export default function CategoryDetail() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">
-            {t('categories.notFound', i18n.language === 'pt' ? 'Categoria não encontrada' : 'Category not found')}
+            {t('categories.notFound', 'Category not found')}
           </h1>
           <Link to="/categories" className="text-primary hover:underline">
-            {t('categories.backToCategories', i18n.language === 'pt' ? 'Voltar para categorias' : 'Back to categories')}
+            {t('categories.backToCategories', 'Back to categories')}
           </Link>
         </div>
       </AppLayout>
@@ -64,8 +67,8 @@ export default function CategoryDetail() {
   }
 
   const Icon = category.icon;
-  const categoryName = i18n.language === 'pt' ? category.name_pt : category.name_en;
-  const description = i18n.language === 'pt' ? category.description_pt : category.description_en;
+  const categoryName = getLocalizedCategoryName(category, i18n, t);
+  const description = getLocalizedCategoryDescription(category, i18n, t);
 
   return (
     <AppLayout>
@@ -98,7 +101,7 @@ export default function CategoryDetail() {
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>{MOCK_PROVIDERS.length} {t('providers.title', i18n.language === 'pt' ? 'Profissionais' : 'Providers')}</span>
+                <span>{MOCK_PROVIDERS.length} {t('providers.title', 'Providers')}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Briefcase className="w-4 h-4" />
@@ -134,7 +137,7 @@ export default function CategoryDetail() {
                 {/* Price Range */}
                 <div>
                   <Label className="mb-3 block">
-                    {t('filters.priceRange', i18n.language === 'pt' ? 'Faixa de preço' : 'Price range')}: R${priceRange[0]} - R${priceRange[1]}
+                    {t('filters.priceRange', 'Price range')}: R${priceRange[0]} - R${priceRange[1]}
                   </Label>
                   <Slider
                     value={priceRange}
@@ -175,7 +178,7 @@ export default function CategoryDetail() {
                   <div>
                     <Label>{t('providers.verifiedOnly')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === 'pt' ? 'Mostrar apenas profissionais verificados' : 'Show only verified professionals'}
+                      {t('providers.verifiedProviders', 'Show only verified professionals')}
                     </p>
                   </div>
                   <Switch checked={verifiedOnly} onCheckedChange={setVerifiedOnly} />
@@ -184,9 +187,9 @@ export default function CategoryDetail() {
                 {/* Background Checked */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>{t('provider.backgroundCheckRequired', i18n.language === 'pt' ? 'Antecedentes verificados' : 'Background checked')}</Label>
+                    <Label>{t('provider.backgroundCheckRequired', 'Background checked')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {i18n.language === 'pt' ? 'Profissionais com credenciais verificadas' : 'Professionals with verified credentials'}
+                      {t('providers.verifiedProviders', 'Professionals with verified credentials')}
                     </p>
                   </div>
                   <Switch checked={backgroundCheckedOnly} onCheckedChange={setBackgroundCheckedOnly} />
@@ -203,7 +206,7 @@ export default function CategoryDetail() {
                     setBackgroundCheckedOnly(false);
                   }}
                 >
-                  {t('common.clearFilters', i18n.language === 'pt' ? 'Limpar filtros' : 'Clear filters')}
+                  {t('common.clearFilters', 'Clear filters')}
                 </Button>
               </div>
             </SheetContent>
@@ -240,7 +243,7 @@ export default function CategoryDetail() {
                   {provider.backgroundChecked && (
                     <Badge variant="outline" className="text-xs">
                       <Shield className="w-3 h-3 mr-1" />
-                      {i18n.language === 'pt' ? 'Credenciais verificadas' : 'Credentials verified'}
+                      {t('providers.verified', 'Verified')}
                     </Badge>
                   )}
                 </div>
@@ -251,7 +254,7 @@ export default function CategoryDetail() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    {i18n.language === 'pt' ? 'Responde em' : 'Responds in'} {provider.responseTime}h
+                    {isPt ? 'Responde em' : isEs ? 'Responde en' : 'Responds in'} {provider.responseTime}h
                   </span>
                 </div>
               </div>
@@ -266,9 +269,7 @@ export default function CategoryDetail() {
         {filteredProviders.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              {i18n.language === 'pt'
-                ? 'Nenhum profissional encontrado com os filtros selecionados'
-                : 'No providers found matching your criteria'}
+              {isPt ? 'Nenhum profissional encontrado com os filtros selecionados' : isEs ? 'No se encontraron profesionales con tus filtros' : 'No providers found matching your criteria'}
             </p>
             <Button 
               variant="link" 
@@ -280,7 +281,7 @@ export default function CategoryDetail() {
                 setBackgroundCheckedOnly(false);
               }}
             >
-              {t('common.clearFilters', i18n.language === 'pt' ? 'Limpar filtros' : 'Clear filters')}
+              {t('common.clearFilters', 'Clear filters')}
             </Button>
           </div>
         )}

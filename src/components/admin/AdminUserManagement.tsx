@@ -35,12 +35,29 @@ interface UserProfile {
 }
 
 export function AdminUserManagement() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [editData, setEditData] = useState<Partial<UserProfile>>({});
+
+  const getUserTypeLabel = (userType: string) => {
+    if (isPt) {
+      if (userType === 'provider') return 'profissional';
+      if (userType === 'customer') return 'cliente';
+      if (userType === 'admin') return 'administrador';
+      return userType;
+    }
+    if (isEs) {
+      if (userType === 'provider') return 'profesional';
+      if (userType === 'customer') return 'cliente';
+      if (userType === 'admin') return 'administrador';
+    }
+    return userType;
+  };
   const [saving, setSaving] = useState(false);
 
   const searchUsers = async () => {
@@ -184,7 +201,7 @@ export function AdminUserManagement() {
                       <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Badge variant="secondary" className="text-xs">
-                          {user.user_type}
+                          {getUserTypeLabel(user.user_type)}
                         </Badge>
                         {user.handle && (
                           <span className="text-xs text-primary">@{user.handle}</span>

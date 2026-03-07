@@ -38,6 +38,7 @@ type SubscriptionTier = 'free' | 'pro' | 'elite' | 'enterprise';
 export default function ProviderDashboard() {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user } = useAuth();
   const navigate = useNavigate();
   const [providerTier, setProviderTier] = useState<SubscriptionTier>('free');
@@ -73,11 +74,11 @@ export default function ProviderDashboard() {
   const isProOrAbove = isEliteOrAbove || providerTier === 'pro';
   const isEnterprise = providerTier === 'enterprise';
   const tierLabel = (tier: SubscriptionTier) => {
-    if (!isPt) return tier;
-    if (tier === 'free') return 'gratuito';
+    if (!isPt && !isEs) return tier;
+    if (tier === 'free') return isEs ? 'gratis' : 'gratuito';
     if (tier === 'pro') return 'pro';
     if (tier === 'elite') return 'elite';
-    return 'enterprise';
+    return isEs ? 'empresarial' : 'enterprise';
   };
 
   const getTierBadgeColor = (tier: SubscriptionTier) => {
@@ -171,7 +172,7 @@ export default function ProviderDashboard() {
             </TabsTrigger>
             <TabsTrigger value="emailCampaigns" className="gap-2 py-3" disabled={!isEliteOrAbove}>
               <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">{isPt ? 'Campanhas de email' : 'Email Campaigns'}</span>
+              <span className="hidden sm:inline">{isPt ? 'Campanhas de email' : isEs ? 'Campañas de correo' : 'Email Campaigns'}</span>
               {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="gap-2 py-3">
@@ -208,13 +209,13 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="emailCampaigns" className="space-y-6">
-            {isPt ? (
-              <TranslationPendingCard />
+            {isPt || isEs ? (
+              <TranslationPendingCard isEs={isEs} />
             ) : isEliteOrAbove ? (
               <ProviderEmailCampaigns />
             ) : (
               <UpgradePrompt 
-                feature={isPt ? 'Campanhas de email' : 'Email Campaigns'}
+                feature={isPt ? 'Campanhas de email' : isEs ? 'Campañas de correo' : 'Email Campaigns'}
                 requiredTier="Elite"
               />
             )}
@@ -247,8 +248,8 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="tracking" className="space-y-6">
-            {isPt ? (
-              <TranslationPendingCard />
+            {isPt || isEs ? (
+              <TranslationPendingCard isEs={isEs} />
             ) : isEnterprise ? (
               <div className="space-y-6">
                 <PixelTrackingSettings />
@@ -267,11 +268,13 @@ export default function ProviderDashboard() {
   );
 }
 
-function TranslationPendingCard() {
+function TranslationPendingCard({ isEs = false }: { isEs?: boolean }) {
   return (
     <Card className="border-dashed">
       <CardContent className="py-10 text-center text-muted-foreground">
-        Conteúdo desta seção em tradução para português.
+        {isEs
+          ? 'Contenido de esta sección en traducción al español.'
+          : 'Conteúdo desta seção em tradução para português.'}
       </CardContent>
     </Card>
   );

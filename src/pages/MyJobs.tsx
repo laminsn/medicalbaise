@@ -22,7 +22,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { getDateFnsLocale } from '@/lib/i18n-utils';
 
 interface Job {
   id: string;
@@ -44,7 +44,7 @@ export default function MyJobs() {
   const [activeTab, setActiveTab] = useState('active');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const dateLocale = i18n.language === 'pt' ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
     const fetchJobs = async () => {

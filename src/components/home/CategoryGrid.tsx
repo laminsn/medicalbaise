@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MEDICAL_CATEGORIES, POPULAR_SPECIALTIES } from '@/lib/constants';
 import { Stethoscope } from 'lucide-react';
+import { getLocalizedCategoryDescription, getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 export function CategoryGrid() {
   const { t, i18n } = useTranslation();
@@ -47,8 +48,8 @@ export function CategoryGrid() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {popularCategories.map((category) => {
             const Icon = category.icon;
-            const name = i18n.language === 'pt' ? category.name_pt : category.name_en;
-            const description = i18n.language === 'pt' ? category.description_pt : category.description_en;
+            const name = getLocalizedCategoryName(category, i18n, t);
+            const description = getLocalizedCategoryDescription(category, i18n, t);
             
             return (
               <Link

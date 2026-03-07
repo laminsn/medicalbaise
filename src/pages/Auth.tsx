@@ -23,7 +23,9 @@ import {
 } from '@/lib/security';
 
 export default function Auth() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showFaceAuth, setShowFaceAuth] = useState(false);
@@ -78,7 +80,7 @@ export default function Auth() {
     } catch (err) {
       toast({
         title: t('auth.errorSigningIn'),
-        description: err instanceof Error ? err.message : 'Unknown error',
+        description: err instanceof Error ? err.message : isPt ? 'Erro desconhecido' : isEs ? 'Error desconocido' : 'Unknown error',
         variant: 'destructive',
       });
     } finally {
@@ -354,7 +356,7 @@ export default function Auth() {
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder={isPt ? 'seu@email.com' : isEs ? 'tu@email.com' : 'your@email.com'}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="pl-10"

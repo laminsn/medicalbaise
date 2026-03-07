@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getLocalizedCategoryName, isPortuguese, isSpanish } from '@/lib/i18n-utils';
 
 const BRAZILIAN_STATES = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
@@ -80,6 +81,8 @@ interface Doctor {
 export default function Browse() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
+  const isPt = isPortuguese(i18n);
+  const isEs = isSpanish(i18n);
 
   // Initialize state from URL params
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -403,7 +406,7 @@ export default function Browse() {
                         <SelectItem value="all">{t('common.all')}</SelectItem>
                         {MEDICAL_CATEGORIES.map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {i18n.language === 'pt' ? cat.name_pt : cat.name_en}
+                            {getLocalizedCategoryName(cat, i18n, t)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -568,7 +571,19 @@ export default function Browse() {
                               htmlFor={`consult-${type.id}`}
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                             >
-                              {i18n.language === 'pt' ? type.label_pt : type.label_en}
+                              {isPt
+                                ? type.label_pt
+                                : isEs
+                                  ? (
+                                    type.id === 'in-person'
+                                      ? 'Presencial'
+                                      : type.id === 'teleconsultation'
+                                        ? 'Consulta por video'
+                                        : type.id === 'phone'
+                                          ? 'Consulta telefónica'
+                                          : 'Visita a domicilio'
+                                  )
+                                  : type.label_en}
                             </label>
                           </div>
                         </div>
@@ -583,18 +598,26 @@ export default function Browse() {
                       {t('browse.languagesSpoken')}
                     </Label>
                     <div className="space-y-2 mt-3">
-                      {['Portuguese', 'English', 'Spanish', 'Italian', 'German', 'French', 'Mandarin'].map((lang) => (
-                        <div key={lang} className="flex items-center space-x-2">
+                      {[
+                        { value: 'Portuguese', label: isPt ? 'Português' : isEs ? 'Portugués' : 'Portuguese' },
+                        { value: 'English', label: isPt ? 'Inglês' : isEs ? 'Inglés' : 'English' },
+                        { value: 'Spanish', label: isPt ? 'Espanhol' : isEs ? 'Español' : 'Spanish' },
+                        { value: 'Italian', label: isPt ? 'Italiano' : isEs ? 'Italiano' : 'Italian' },
+                        { value: 'German', label: isPt ? 'Alemão' : isEs ? 'Alemán' : 'German' },
+                        { value: 'French', label: isPt ? 'Francês' : isEs ? 'Francés' : 'French' },
+                        { value: 'Mandarin', label: isPt ? 'Mandarim' : isEs ? 'Mandarín' : 'Mandarin' },
+                      ].map((lang) => (
+                        <div key={lang.value} className="flex items-center space-x-2">
                           <Checkbox
-                            id={`lang-${lang}`}
-                            checked={selectedLanguages.includes(lang)}
-                            onCheckedChange={() => toggleLanguage(lang)}
+                            id={`lang-${lang.value}`}
+                            checked={selectedLanguages.includes(lang.value)}
+                            onCheckedChange={() => toggleLanguage(lang.value)}
                           />
                           <label
-                            htmlFor={`lang-${lang}`}
+                            htmlFor={`lang-${lang.value}`}
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                           >
-                            {lang}
+                            {lang.label}
                           </label>
                         </div>
                       ))}
@@ -743,7 +766,7 @@ export default function Browse() {
                 updateURLParams();
               }}
             >
-              {i18n.language === 'pt' ? cat.name_pt : cat.name_en}
+              {getLocalizedCategoryName(cat, i18n, t)}
             </Button>
           ))}
         </div>
@@ -774,7 +797,7 @@ export default function Browse() {
           {filteredDoctors.map((doctor) => {
             const category = MEDICAL_CATEGORIES.find(c => c.id === doctor.category_id);
             const categoryName = category 
-              ? (i18n.language === 'pt' ? category.name_pt : category.name_en)
+              ? getLocalizedCategoryName(category, i18n, t)
               : doctor.category_id || '';
 
             return (

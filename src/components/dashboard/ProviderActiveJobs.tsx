@@ -20,7 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJobStatusUpdate } from '@/hooks/useJobStatusUpdate';
 import { format } from 'date-fns';
-import { enUS, ptBR } from 'date-fns/locale';
+import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,7 +56,8 @@ interface ActiveJob {
 export function ProviderActiveJobs() {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const dateLocale = isPt ? ptBR : enUS;
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const dateLocale = isPt ? ptBR : isEs ? esLocale : enUS;
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { startJob, completeJob, cancelJob, isUpdating } = useJobStatusUpdate();
@@ -140,10 +141,10 @@ export function ProviderActiveJobs() {
       cancelled: { color: 'bg-red-500/20 text-red-500', icon: <AlertCircle className="h-3 w-3" /> },
     };
     const statusLabels: Record<string, string> = {
-      pending_start: isPt ? 'aguardando início' : 'pending start',
-      in_progress: isPt ? 'em andamento' : 'in progress',
-      completed: isPt ? 'concluído' : 'completed',
-      cancelled: isPt ? 'cancelado' : 'cancelled',
+      pending_start: isPt ? 'aguardando início' : isEs ? 'pendiente de inicio' : 'pending start',
+      in_progress: isPt ? 'em andamento' : isEs ? 'en curso' : 'in progress',
+      completed: isPt ? 'concluído' : isEs ? 'completado' : 'completed',
+      cancelled: isPt ? 'cancelado' : isEs ? 'cancelado' : 'cancelled',
     };
     const config = statusConfig[status] || statusConfig.pending_start;
     return (
@@ -219,7 +220,7 @@ export function ProviderActiveJobs() {
                           className="gap-1"
                         >
                           {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3" />}
-                          {isPt ? 'Iniciar trabalho' : 'Start Job'}
+                          {isPt ? 'Iniciar trabalho' : isEs ? 'Iniciar trabajo' : 'Start Job'}
                         </Button>
                       )}
                       
@@ -228,22 +229,24 @@ export function ProviderActiveJobs() {
                           <AlertDialogTrigger asChild>
                             <Button size="sm" variant="default" className="gap-1" disabled={isUpdating}>
                               <Check className="h-3 w-3" />
-                              {isPt ? 'Marcar como concluído' : 'Mark Complete'}
+                              {isPt ? 'Marcar como concluído' : isEs ? 'Marcar como completado' : 'Mark Complete'}
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>{isPt ? 'Concluir este trabalho?' : 'Complete this job?'}</AlertDialogTitle>
+                              <AlertDialogTitle>{isPt ? 'Concluir este trabalho?' : isEs ? '¿Completar este trabajo?' : 'Complete this job?'}</AlertDialogTitle>
                               <AlertDialogDescription>
                                 {isPt
                                   ? 'Isso marcará o trabalho como concluído e notificará o cliente.'
-                                  : 'This will mark the job as completed and notify the customer.'}
+                                  : isEs
+                                    ? 'Esto marcará el trabajo como completado y notificará al cliente.'
+                                    : 'This will mark the job as completed and notify the customer.'}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>{isPt ? 'Cancelar' : 'Cancel'}</AlertDialogCancel>
+                              <AlertDialogCancel>{isPt ? 'Cancelar' : isEs ? 'Cancelar' : 'Cancel'}</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleStatusUpdate(job.id, 'complete')}>
-                                {isPt ? 'Concluir' : 'Complete'}
+                                {isPt ? 'Concluir' : isEs ? 'Completar' : 'Complete'}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -254,25 +257,27 @@ export function ProviderActiveJobs() {
                         <AlertDialogTrigger asChild>
                           <Button size="sm" variant="outline" className="gap-1 text-destructive" disabled={isUpdating}>
                             <X className="h-3 w-3" />
-                            {isPt ? 'Cancelar' : 'Cancel'}
+                            {isPt ? 'Cancelar' : isEs ? 'Cancelar' : 'Cancel'}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>{isPt ? 'Cancelar este trabalho?' : 'Cancel this job?'}</AlertDialogTitle>
+                            <AlertDialogTitle>{isPt ? 'Cancelar este trabalho?' : isEs ? '¿Cancelar este trabajo?' : 'Cancel this job?'}</AlertDialogTitle>
                             <AlertDialogDescription>
                               {isPt
                                 ? 'Esta ação não pode ser desfeita. O cliente será notificado sobre o cancelamento.'
-                                : 'This action cannot be undone. The customer will be notified about the cancellation.'}
+                                : isEs
+                                  ? 'Esta acción no se puede deshacer. El cliente será notificado de la cancelación.'
+                                  : 'This action cannot be undone. The customer will be notified about the cancellation.'}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>{isPt ? 'Voltar' : 'Go Back'}</AlertDialogCancel>
+                            <AlertDialogCancel>{isPt ? 'Voltar' : isEs ? 'Volver' : 'Go Back'}</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleStatusUpdate(job.id, 'cancel')}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              {isPt ? 'Cancelar trabalho' : 'Cancel Job'}
+                              {isPt ? 'Cancelar trabalho' : isEs ? 'Cancelar trabajo' : 'Cancel Job'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Star, ArrowLeft, MessageSquare, ThumbsUp } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { getDateFnsLocale } from '@/lib/i18n-utils';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -38,7 +38,7 @@ export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('received');
-  const dateLocale = i18n.language === 'pt' ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
     if (!user) {

@@ -24,6 +24,7 @@ export default function ProfileEdit() {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,8 +66,8 @@ export default function ProfileEdit() {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: isPt ? 'Tipo de arquivo inválido' : 'Invalid file type',
-        description: isPt ? 'Selecione um arquivo de imagem' : 'Please select an image file',
+        title: isPt ? 'Tipo de arquivo inválido' : isEs ? 'Tipo de archivo no válido' : 'Invalid file type',
+        description: isPt ? 'Selecione um arquivo de imagem' : isEs ? 'Selecciona un archivo de imagen' : 'Please select an image file',
         variant: 'destructive',
       });
       return;
@@ -75,8 +76,8 @@ export default function ProfileEdit() {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: isPt ? 'Arquivo muito grande' : 'File too large',
-        description: isPt ? 'Selecione uma imagem com menos de 5MB' : 'Please select an image under 5MB',
+        title: isPt ? 'Arquivo muito grande' : isEs ? 'Archivo demasiado grande' : 'File too large',
+        description: isPt ? 'Selecione uma imagem com menos de 5MB' : isEs ? 'Selecciona una imagen de menos de 5MB' : 'Please select an image under 5MB',
         variant: 'destructive',
       });
       return;
@@ -111,14 +112,14 @@ export default function ProfileEdit() {
       setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
       
       toast({
-        title: isPt ? 'Imagem enviada' : 'Image uploaded',
-        description: isPt ? 'Sua foto de perfil foi atualizada' : 'Your profile picture has been updated',
+        title: isPt ? 'Imagem enviada' : isEs ? 'Imagen subida' : 'Image uploaded',
+        description: isPt ? 'Sua foto de perfil foi atualizada' : isEs ? 'Tu foto de perfil fue actualizada' : 'Your profile picture has been updated',
       });
     } catch (error: any) {
       console.error('Error uploading image:', error);
       toast({
-        title: isPt ? 'Falha no envio' : 'Upload failed',
-        description: error.message || (isPt ? 'Falha ao enviar imagem' : 'Failed to upload image'),
+        title: isPt ? 'Falha no envio' : isEs ? 'Error al subir' : 'Upload failed',
+        description: error.message || (isPt ? 'Falha ao enviar imagem' : isEs ? 'No se pudo subir la imagen' : 'Failed to upload image'),
         variant: 'destructive',
       });
     } finally {
@@ -158,16 +159,16 @@ export default function ProfileEdit() {
       await refreshProfile();
       
       toast({
-        title: isPt ? 'Perfil atualizado' : 'Profile updated',
-        description: isPt ? 'Seu perfil foi salvo com sucesso' : 'Your profile has been saved successfully',
+        title: isPt ? 'Perfil atualizado' : isEs ? 'Perfil actualizado' : 'Profile updated',
+        description: isPt ? 'Seu perfil foi salvo com sucesso' : isEs ? 'Tu perfil se guardó correctamente' : 'Your profile has been saved successfully',
       });
       
       navigate('/profile');
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
-        title: isPt ? 'Falha na atualização' : 'Update failed',
-        description: error.message || (isPt ? 'Falha ao atualizar perfil' : 'Failed to update profile'),
+        title: isPt ? 'Falha na atualização' : isEs ? 'Error al actualizar' : 'Update failed',
+        description: error.message || (isPt ? 'Falha ao atualizar perfil' : isEs ? 'No se pudo actualizar el perfil' : 'Failed to update profile'),
         variant: 'destructive',
       });
     } finally {

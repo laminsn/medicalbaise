@@ -30,7 +30,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
 
 interface JobDetails {
   id: string;
@@ -82,7 +82,7 @@ export default function JobDetails() {
   const [provider, setProvider] = useState<any>(null);
   const [customerProfile, setCustomerProfile] = useState<any>(null);
   
-  const dateLocale = i18n.language === 'pt' ? ptBR : enUS;
+  const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -175,7 +175,7 @@ export default function JobDetails() {
   const getCategoryName = (categoryId: string | null) => {
     if (!categoryId) return '';
     const cat = SERVICE_CATEGORIES.find(c => c.id === categoryId);
-    return i18n.language === 'pt' ? cat?.name_pt : cat?.name_en || categoryId;
+    return cat ? getLocalizedCategoryName(cat, i18n, t) : categoryId;
   };
 
   const formatBudget = (min: number | null, max: number | null, disclosed: boolean | null) => {

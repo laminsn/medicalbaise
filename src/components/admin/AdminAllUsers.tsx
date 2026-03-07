@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { Search, Loader2, Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { enUS, ptBR } from 'date-fns/locale';
+import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 interface UserWithLogin {
@@ -36,7 +36,8 @@ interface UserWithLogin {
 export function AdminAllUsers() {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const dateLocale = isPt ? ptBR : enUS;
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const dateLocale = isPt ? ptBR : isEs ? esLocale : enUS;
   const [users, setUsers] = useState<UserWithLogin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,19 +91,45 @@ export function AdminAllUsers() {
 
   const totalPages = Math.ceil(totalCount / pageSize);
   const getUserTypeLabel = (userType: string) => {
-    if (!isPt) return userType;
-    if (userType === 'provider') return 'profissional';
-    if (userType === 'customer') return 'cliente';
-    if (userType === 'admin') return 'administrador';
+    if (isPt) {
+      if (userType === 'provider') return 'profissional';
+      if (userType === 'customer') return 'cliente';
+      if (userType === 'admin') return 'administrador';
+      return userType;
+    }
+    if (isEs) {
+      if (userType === 'provider') return 'profesional';
+      if (userType === 'customer') return 'cliente';
+      if (userType === 'admin') return 'administrador';
+    }
     return userType;
   };
 
   const getStatusLabel = (status: string | null) => {
     const current = status || 'Active';
-    if (!isPt) return current;
-    if (current === 'Active' || current === 'Available') return 'Ativo';
-    if (current === 'Suspended') return 'Suspenso';
-    if (current === 'Busy') return 'Ocupado';
+    if (isPt) {
+      if (current === 'Active' || current === 'Available') return 'Ativo';
+      if (current === 'Suspended') return 'Suspenso';
+      if (current === 'Busy') return 'Ocupado';
+      if (current === 'On Vacation') return 'De férias';
+      if (current === 'Open to Work') return 'Disponível para trabalho';
+      if (current === 'Hiring') return 'Contratando';
+      if (current === 'Learning') return 'Aprendendo';
+      if (current === 'Building') return 'Construindo';
+      if (current === 'Invested!') return 'Investido!';
+      return current;
+    }
+    if (isEs) {
+      if (current === 'Active' || current === 'Available') return 'Activo';
+      if (current === 'Suspended') return 'Suspendido';
+      if (current === 'Busy') return 'Ocupado';
+      if (current === 'On Vacation') return 'De vacaciones';
+      if (current === 'Open to Work') return 'Abierto a trabajo';
+      if (current === 'Hiring') return 'Contratando';
+      if (current === 'Learning') return 'Aprendiendo';
+      if (current === 'Building') return 'Construyendo';
+      if (current === 'Invested!') return '¡Invertido!';
+    }
     return current;
   };
 
@@ -113,14 +140,14 @@ export function AdminAllUsers() {
         <CardContent className="pt-6">
           <div className="flex gap-2">
             <Input
-              placeholder={isPt ? 'Buscar por nome, email ou @usuário...' : 'Search by name, email, or handle...'}
+              placeholder={isPt ? 'Buscar por nome, email ou @usuário...' : isEs ? 'Buscar por nombre, email o @usuario...' : 'Search by name, email, or handle...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <Button onClick={handleSearch} disabled={loading}>
               <Search className="h-4 w-4 mr-2" />
-              {isPt ? 'Buscar' : 'Search'}
+              {isPt ? 'Buscar' : isEs ? 'Buscar' : 'Search'}
             </Button>
             <Button variant="outline" onClick={() => { setSearchQuery(''); setPage(0); fetchUsers('', 0); }} disabled={loading}>
               <RefreshCw className="h-4 w-4" />
@@ -134,7 +161,7 @@ export function AdminAllUsers() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {isPt ? 'Todos os usuários' : 'All Users'} ({totalCount})
+            {isPt ? 'Todos os usuários' : isEs ? 'Todos los usuarios' : 'All Users'} ({totalCount})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -148,20 +175,20 @@ export function AdminAllUsers() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{isPt ? 'Usuário' : 'User'}</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>{isPt ? 'Tipo' : 'Type'}</TableHead>
-                      <TableHead>{isPt ? 'Localização' : 'Location'}</TableHead>
-                      <TableHead>{isPt ? 'Créditos' : 'Credits'}</TableHead>
-                      <TableHead>{isPt ? 'Status' : 'Status'}</TableHead>
-                      <TableHead>{isPt ? 'Cadastro' : 'Joined'}</TableHead>
+                      <TableHead>{isPt ? 'Usuário' : isEs ? 'Usuario' : 'User'}</TableHead>
+                      <TableHead>{isPt ? 'E-mail' : isEs ? 'Correo' : 'Email'}</TableHead>
+                      <TableHead>{isPt ? 'Tipo' : isEs ? 'Tipo' : 'Type'}</TableHead>
+                      <TableHead>{isPt ? 'Localização' : isEs ? 'Ubicación' : 'Location'}</TableHead>
+                      <TableHead>{isPt ? 'Créditos' : isEs ? 'Créditos' : 'Credits'}</TableHead>
+                      <TableHead>{isPt ? 'Status' : isEs ? 'Estado' : 'Status'}</TableHead>
+                      <TableHead>{isPt ? 'Cadastro' : isEs ? 'Registro' : 'Joined'}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                          {isPt ? 'Nenhum usuário encontrado' : 'No users found'}
+                          {isPt ? 'Nenhum usuário encontrado' : isEs ? 'No se encontraron usuarios' : 'No users found'}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -214,7 +241,7 @@ export function AdminAllUsers() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-between mt-4">
                   <p className="text-sm text-muted-foreground">
-                    {isPt ? 'Mostrando' : 'Showing'} {page * pageSize + 1}–{Math.min((page + 1) * pageSize, totalCount)} {isPt ? 'de' : 'of'} {totalCount}
+                    {isPt ? 'Mostrando' : isEs ? 'Mostrando' : 'Showing'} {page * pageSize + 1}–{Math.min((page + 1) * pageSize, totalCount)} {isPt ? 'de' : isEs ? 'de' : 'of'} {totalCount}
                   </p>
                   <div className="flex items-center gap-2">
                     <Button
@@ -226,7 +253,7 @@ export function AdminAllUsers() {
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm">
-                      {isPt ? 'Página' : 'Page'} {page + 1} {isPt ? 'de' : 'of'} {totalPages}
+                      {isPt ? 'Página' : isEs ? 'Página' : 'Page'} {page + 1} {isPt ? 'de' : isEs ? 'de' : 'of'} {totalPages}
                     </span>
                     <Button
                       variant="outline"

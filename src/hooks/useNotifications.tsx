@@ -55,6 +55,7 @@ export function useNotifications() {
   const { toast } = useToast();
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<ScheduledReminder[]>([]);
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
@@ -221,8 +222,8 @@ export function useNotifications() {
     if (error) {
       console.error('Error creating reminder:', error);
       toast({
-        title: isPt ? 'Erro' : 'Error',
-        description: isPt ? 'Falha ao criar lembrete' : 'Failed to create reminder',
+        title: isPt ? 'Erro' : isEs ? 'Error' : 'Error',
+        description: isPt ? 'Falha ao criar lembrete' : isEs ? 'No se pudo crear el recordatorio' : 'Failed to create reminder',
         variant: 'destructive',
       });
       return null;
@@ -230,8 +231,8 @@ export function useNotifications() {
 
     setReminders(prev => [...prev, data as ScheduledReminder]);
     toast({
-      title: isPt ? 'Lembrete criado' : 'Reminder Created',
-      description: isPt ? 'Seu lembrete foi agendado' : 'Your reminder has been scheduled',
+      title: isPt ? 'Lembrete criado' : isEs ? 'Recordatorio creado' : 'Reminder Created',
+      description: isPt ? 'Seu lembrete foi agendado' : isEs ? 'Tu recordatorio fue programado' : 'Your reminder has been scheduled',
     });
     return data;
   };

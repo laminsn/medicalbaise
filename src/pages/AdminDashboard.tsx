@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
 
   if (loading) {
     return (
@@ -63,11 +64,11 @@ export default function AdminDashboard() {
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="w-full overflow-x-auto flex">
               <TabsTrigger value="overview" className="flex-1">{t('admin.overview')}</TabsTrigger>
-              <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : 'All Users'}</TabsTrigger>
+              <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : isEs ? 'Todos los usuarios' : 'All Users'}</TabsTrigger>
               <TabsTrigger value="users" className="flex-1">{t('admin.users')}</TabsTrigger>
               <TabsTrigger value="credits" className="flex-1">{t('admin.credits')}</TabsTrigger>
               <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>
-              <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : 'Campaigns'}</TabsTrigger>
+              <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : isEs ? 'Campañas' : 'Campaigns'}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -91,9 +92,11 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <TabsContent value="campaigns">
-              {isPt ? (
+              {isPt || isEs ? (
                 <div className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
-                  Conteúdo de campanhas em tradução para português.
+                  {isPt
+                    ? 'Conteúdo de campanhas em tradução para português.'
+                    : 'Contenido de campañas en traducción al español.'}
                 </div>
               ) : (
                 <AdminEmailCampaigns />
