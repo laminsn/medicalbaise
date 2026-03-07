@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { Search, Loader2, Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -46,8 +47,9 @@ export function AdminAllUsers() {
         .select('*', { count: 'exact' });
 
       if (search && search.trim()) {
+        const safe = sanitizePostgrestValue(search);
         query = query.or(
-          `email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%,handle.ilike.%${search}%`
+          `email.ilike.%${safe}%,first_name.ilike.%${safe}%,last_name.ilike.%${safe}%,handle.ilike.%${safe}%`
         );
       }
 

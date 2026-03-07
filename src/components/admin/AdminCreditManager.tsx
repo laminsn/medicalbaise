@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { DollarSign, Plus, Minus, Search, Loader2 } from 'lucide-react';
 
@@ -28,7 +29,7 @@ export function AdminCreditManager() {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .or(`email.ilike.%${searchEmail}%,handle.ilike.%${searchEmail}%`)
+      .or(`email.ilike.%${sanitizePostgrestValue(searchEmail)}%,handle.ilike.%${sanitizePostgrestValue(searchEmail)}%`)
       .limit(1)
       .maybeSingle();
 
@@ -51,8 +52,21 @@ export function AdminCreditManager() {
       return;
     }
 
+    // Re-fetch current balance to avoid stale read-then-write race condition
+    const { data: freshUser, error: fetchErr } = await supabase
+      .from('profiles')
+      .select('credits_balance')
+      .eq('user_id', foundUser.user_id)
+      .single();
+
+    if (fetchErr || !freshUser) {
+      toast.error(t('admin.userNotFound'));
+      setApplying(false);
+      return;
+    }
+
+    const currentBalance = freshUser.credits_balance || 0;
     let newBalance: number;
-    const currentBalance = foundUser.credits_balance || 0;
 
     switch (operation) {
       case 'add':
@@ -66,13 +80,21 @@ export function AdminCreditManager() {
         break;
     }
 
-    const { error } = await supabase
+    // Optimistic lock: only update if balance hasn't changed since we read it
+    const { data: updated, error } = await supabase
       .from('profiles')
       .update({ credits_balance: newBalance })
-      .eq('user_id', foundUser.user_id);
+      .eq('user_id', foundUser.user_id)
+      .eq('credits_balance', currentBalance)
+      .select('credits_balance')
+      .maybeSingle();
 
     if (error) {
       toast.error(t('admin.errorSaving') + ': ' + error.message);
+    } else if (!updated) {
+      toast.error('Balance was modified concurrently. Please try again.');
+      // Refresh displayed balance
+      setFoundUser({ ...foundUser, credits_balance: currentBalance });
     } else {
       toast.success(t('admin.creditsUpdated', { from: currentBalance, to: newBalance }));
       setFoundUser({ ...foundUser, credits_balance: newBalance });

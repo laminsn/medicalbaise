@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChevronLeft, Plus, Wallet, CreditCard, Building2, FileText, Download, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface PayoutMethod {
   id: string;
@@ -34,6 +35,7 @@ interface PayoutHistory {
 export default function Payouts() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [isAddingMethod, setIsAddingMethod] = useState(false);
   const [payoutType, setPayoutType] = useState<string>('');
   
@@ -64,6 +66,11 @@ export default function Payouts() {
         return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Failed</Badge>;
     }
   };
+
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
 
   const getMethodIcon = (type: PayoutMethod['type']) => {
     switch (type) {
