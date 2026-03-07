@@ -198,6 +198,15 @@ export const MEDICAL_CATEGORIES: MedicalCategory[] = [
     description_en: 'Speech, language, and swallowing disorders',
     description_pt: 'Distúrbios de fala, linguagem e deglutição',
   },
+  {
+    id: 'doula',
+    name_en: 'Doula',
+    name_pt: 'Doula',
+    icon: Heart,
+    color: '#E879A8',
+    description_en: 'Birth support, prenatal and postpartum care',
+    description_pt: 'Apoio ao parto, cuidados pré e pós-natal',
+  },
 ];
 
 // Popular specialties shown in hero
