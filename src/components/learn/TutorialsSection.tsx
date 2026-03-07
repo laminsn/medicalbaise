@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 import { 
   BookOpen, Clock, ChevronRight, CheckCircle2, Circle, 
   User, Calendar, Search, MessageSquare, Star, Video, 
@@ -260,9 +261,30 @@ const tutorials = [
 ];
 
 export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
+  const { i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTutorial, setSelectedTutorial] = useState<typeof tutorials[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
+
+  const tutorialCategoryLabels: Record<string, { en: string; pt: string }> = {
+    all: { en: 'All Tutorials', pt: 'Todos os tutoriais' },
+    patients: { en: 'For Patients', pt: 'Para pacientes' },
+    providers: { en: 'For Providers', pt: 'Para profissionais' },
+    advanced: { en: 'Advanced', pt: 'Avançado' },
+  };
+
+  const audienceLabels: Record<string, { en: string; pt: string }> = {
+    patients: { en: 'patients', pt: 'pacientes' },
+    providers: { en: 'providers', pt: 'profissionais' },
+    advanced: { en: 'advanced', pt: 'avançado' },
+  };
+
+  const difficultyLabels: Record<string, { en: string; pt: string }> = {
+    Beginner: { en: 'Beginner', pt: 'Iniciante' },
+    Intermediate: { en: 'Intermediate', pt: 'Intermediário' },
+    Advanced: { en: 'Advanced', pt: 'Avançado' },
+  };
 
   const filteredTutorials = tutorials.filter((tutorial) => {
     const matchesSearch =
@@ -288,7 +310,7 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                 : 'border-border/50 hover:border-cyan-500/30 hover:text-cyan-400'
             }
           >
-            {cat.label}
+            {isPt ? (tutorialCategoryLabels[cat.id]?.pt ?? cat.label) : (tutorialCategoryLabels[cat.id]?.en ?? cat.label)}
           </Button>
         ))}
       </div>
@@ -312,10 +334,14 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
-                      {tutorial.difficulty}
+                      {isPt
+                        ? (difficultyLabels[tutorial.difficulty]?.pt ?? tutorial.difficulty)
+                        : (difficultyLabels[tutorial.difficulty]?.en ?? tutorial.difficulty)}
                     </Badge>
                     <Badge variant="outline" className="text-xs capitalize">
-                      {tutorial.category}
+                      {isPt
+                        ? (audienceLabels[tutorial.category]?.pt ?? tutorial.category)
+                        : (audienceLabels[tutorial.category]?.en ?? tutorial.category)}
                     </Badge>
                   </div>
                   <h3 className="font-semibold text-foreground mb-1 group-hover:text-cyan-400 transition-colors line-clamp-2">
@@ -330,7 +356,7 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                         <Clock className="w-3 h-3" />
                         {tutorial.duration}
                       </span>
-                      <span>{tutorial.steps.length} steps</span>
+                      <span>{tutorial.steps.length} {isPt ? 'etapas' : 'steps'}</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
@@ -344,7 +370,7 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
       {filteredTutorials.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No tutorials found matching your search</p>
+          <p className="text-muted-foreground">{isPt ? 'Nenhum tutorial encontrado para sua busca' : 'No tutorials found matching your search'}</p>
         </div>
       )}
 
@@ -356,10 +382,14 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
               <DialogHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
-                    {selectedTutorial.difficulty}
+                    {isPt
+                      ? (difficultyLabels[selectedTutorial.difficulty]?.pt ?? selectedTutorial.difficulty)
+                      : (difficultyLabels[selectedTutorial.difficulty]?.en ?? selectedTutorial.difficulty)}
                   </Badge>
                   <Badge variant="outline" className="text-xs capitalize">
-                    {selectedTutorial.category}
+                    {isPt
+                      ? (audienceLabels[selectedTutorial.category]?.pt ?? selectedTutorial.category)
+                      : (audienceLabels[selectedTutorial.category]?.en ?? selectedTutorial.category)}
                   </Badge>
                 </div>
                 <DialogTitle className="text-xl">{selectedTutorial.title}</DialogTitle>
@@ -399,8 +429,8 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                   <div className="bg-muted/30 border border-border/50 rounded-xl aspect-video flex items-center justify-center">
                     <div className="text-center">
                       <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Screenshot placeholder</p>
-                      <p className="text-xs text-muted-foreground">Auto-generated with platform updates</p>
+                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : 'Screenshot placeholder'}</p>
+                      <p className="text-xs text-muted-foreground">{isPt ? 'Gerado automaticamente com atualizações da plataforma' : 'Auto-generated with platform updates'}</p>
                     </div>
                   </div>
 
@@ -412,24 +442,24 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                       onClick={() => setCurrentStep(currentStep - 1)}
                       className="border-border/50"
                     >
-                      Previous
+                      {isPt ? 'Anterior' : 'Previous'}
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Step {currentStep + 1} of {selectedTutorial.steps.length}
+                      {isPt ? 'Etapa' : 'Step'} {currentStep + 1} {isPt ? 'de' : 'of'} {selectedTutorial.steps.length}
                     </span>
                     <Button
                       disabled={currentStep === selectedTutorial.steps.length - 1}
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="bg-cyan-500 hover:bg-cyan-600 text-white"
                     >
-                      Next
+                      {isPt ? 'Próxima' : 'Next'}
                     </Button>
                   </div>
                 </div>
 
                 {/* Step List */}
                 <div className="mt-8 pt-6 border-t border-border/50">
-                  <h4 className="font-medium mb-4">All Steps</h4>
+                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : 'All Steps'}</h4>
                   <div className="space-y-2">
                     {selectedTutorial.steps.map((step, index) => (
                       <button

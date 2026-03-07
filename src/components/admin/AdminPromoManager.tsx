@@ -12,7 +12,8 @@ import { toast } from 'sonner';
 import { Gift, Users, Percent, Loader2, Send } from 'lucide-react';
 
 export function AdminPromoManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [targetEmail, setTargetEmail] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -60,7 +61,7 @@ export function AdminPromoManager() {
     if (error) {
       toast.error(t('admin.errorApplyingBonus'));
     } else if (!updated) {
-      toast.error('Balance was modified concurrently. Please try again.');
+      toast.error(isPt ? 'O saldo foi alterado simultaneamente. Tente novamente.' : 'Balance was modified concurrently. Please try again.');
     } else {
       toast.success(t('admin.bonusApplied', {
         amount: bonus,
@@ -134,7 +135,7 @@ export function AdminPromoManager() {
             <Input
               value={targetEmail}
               onChange={(e) => setTargetEmail(e.target.value)}
-              placeholder="user@email.com or @handle"
+              placeholder={isPt ? 'usuario@email.com ou @usuario' : 'user@email.com or @handle'}
             />
           </div>
 
@@ -215,20 +216,20 @@ export function AdminPromoManager() {
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="font-medium">{t('admin.customerReferralTiers')}</p>
               <ul className="text-muted-foreground mt-1 space-y-0.5">
-                <li>• R$20 per referral</li>
-                <li>• 5 referrals → R$50 bonus</li>
-                <li>• 10 referrals → R$150 bonus + Featured Badge</li>
-                <li>• 20 referrals → R$400 bonus + VIP 6 months</li>
-                <li>• 50 referrals → R$1,500 bonus + Lifetime VIP</li>
+                <li>{isPt ? '• R$20 por indicação' : '• R$20 per referral'}</li>
+                <li>{isPt ? '• 5 indicações → bônus de R$50' : '• 5 referrals → R$50 bonus'}</li>
+                <li>{isPt ? '• 10 indicações → bônus de R$150 + selo em destaque' : '• 10 referrals → R$150 bonus + Featured Badge'}</li>
+                <li>{isPt ? '• 20 indicações → bônus de R$400 + VIP por 6 meses' : '• 20 referrals → R$400 bonus + VIP 6 months'}</li>
+                <li>{isPt ? '• 50 indicações → bônus de R$1.500 + VIP vitalício' : '• 50 referrals → R$1,500 bonus + Lifetime VIP'}</li>
               </ul>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="font-medium">{t('admin.providerReferralTiers')}</p>
               <ul className="text-muted-foreground mt-1 space-y-0.5">
-                <li>• 3 referrals → R$100 + 1 free month</li>
-                <li>• 5 referrals → R$300 + 2 free months</li>
-                <li>• 10 referrals → R$800 + 3 free months Elite</li>
-                <li>• 20 referrals → R$2,000 + 6 free months Enterprise</li>
+                <li>{isPt ? '• 3 indicações → R$100 + 1 mês grátis' : '• 3 referrals → R$100 + 1 free month'}</li>
+                <li>{isPt ? '• 5 indicações → R$300 + 2 meses grátis' : '• 5 referrals → R$300 + 2 free months'}</li>
+                <li>{isPt ? '• 10 indicações → R$800 + 3 meses grátis no Elite' : '• 10 referrals → R$800 + 3 free months Elite'}</li>
+                <li>{isPt ? '• 20 indicações → R$2.000 + 6 meses grátis no Enterprise' : '• 20 referrals → R$2,000 + 6 free months Enterprise'}</li>
               </ul>
             </div>
             <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t('admin.partnerNote')) }} />

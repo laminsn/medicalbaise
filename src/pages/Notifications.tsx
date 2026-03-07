@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNotifications, Notification, ScheduledReminder } from '@/hooks/useNotifications';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, format } from 'date-fns';
+import { enUS, ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { CreateReminderDialog } from '@/components/notifications/CreateReminderDialog';
 
@@ -34,34 +35,11 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
-const getPriorityBadge = (priority: string) => {
-  switch (priority) {
-    case 'urgent':
-      return <Badge variant="destructive">Urgent</Badge>;
-    case 'high':
-      return <Badge className="bg-orange-500">High</Badge>;
-    default:
-      return null;
-  }
-};
-
-const getReminderTypeBadge = (type: string) => {
-  switch (type) {
-    case 'appointment':
-      return <Badge variant="secondary">Appointment</Badge>;
-    case 'maintenance':
-      return <Badge className="bg-blue-500 text-white">Maintenance</Badge>;
-    case 'follow_up':
-      return <Badge className="bg-purple-500 text-white">Follow-up</Badge>;
-    default:
-      return <Badge variant="outline">Custom</Badge>;
-  }
-};
-
 export default function Notifications() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [showCreateReminder, setShowCreateReminder] = useState(false);
   const {
     notifications,
@@ -160,6 +138,7 @@ export default function Notifications() {
                     onMarkAsRead={() => markAsRead(notification.id)}
                     onDelete={() => deleteNotification(notification.id)}
                     onNavigate={(url) => navigate(url)}
+                    isPt={isPt}
                   />
                 ))}
               </div>
@@ -191,6 +170,7 @@ export default function Notifications() {
                     reminder={reminder}
                     onToggle={(active) => updateReminder(reminder.id, { is_active: active })}
                     onDelete={() => deleteReminder(reminder.id)}
+                    isPt={isPt}
                   />
                 ))}
               </div>
@@ -270,13 +250,30 @@ function NotificationCard({
   notification, 
   onMarkAsRead, 
   onDelete,
-  onNavigate 
+  onNavigate,
+  isPt,
 }: { 
   notification: Notification;
   onMarkAsRead: () => void;
   onDelete: () => void;
   onNavigate: (url: string) => void;
+  isPt: boolean;
 }) {
+  const { i18n } = useTranslation();
+  const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const dateLocale = isPortuguese ? ptBR : enUS;
+
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case 'urgent':
+        return <Badge variant="destructive">{isPortuguese ? 'Urgente' : 'Urgent'}</Badge>;
+      case 'high':
+        return <Badge className="bg-orange-500">{isPortuguese ? 'Alta' : 'High'}</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className={cn(!notification.is_read && "border-primary/50 bg-primary/5")}>
       <CardContent className="p-4">
@@ -309,11 +306,11 @@ function NotificationCard({
             <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: dateLocale })}
               </span>
               {notification.action_url && (
                 <Button variant="link" size="sm" className="h-auto p-0" onClick={() => onNavigate(notification.action_url!)}>
-                  View Details →
+                  {isPortuguese ? 'Ver detalhes' : 'View Details'} →
                 </Button>
               )}
             </div>
@@ -328,11 +325,48 @@ function ReminderCard({
   reminder,
   onToggle,
   onDelete,
+  isPt,
 }: {
   reminder: ScheduledReminder;
   onToggle: (active: boolean) => void;
   onDelete: () => void;
+  isPt: boolean;
 }) {
+  const { i18n } = useTranslation();
+  const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const dateLocale = isPortuguese ? ptBR : enUS;
+
+  const getReminderTypeBadge = (type: string) => {
+    switch (type) {
+      case 'appointment':
+        return <Badge variant="secondary">{isPortuguese ? 'Consulta' : 'Appointment'}</Badge>;
+      case 'maintenance':
+        return <Badge className="bg-blue-500 text-white">{isPortuguese ? 'Manutenção' : 'Maintenance'}</Badge>;
+      case 'follow_up':
+        return <Badge className="bg-purple-500 text-white">{isPortuguese ? 'Retorno' : 'Follow-up'}</Badge>;
+      default:
+        return <Badge variant="outline">{isPortuguese ? 'Personalizado' : 'Custom'}</Badge>;
+    }
+  };
+
+  const repeatLabel = (interval: string) => {
+    const intervalLabel = isPortuguese
+      ? (
+        interval === 'daily'
+          ? 'diariamente'
+          : interval === 'weekly'
+            ? 'semanalmente'
+            : interval === 'monthly'
+              ? 'mensalmente'
+              : interval === 'yearly'
+                ? 'anualmente'
+                : interval
+      )
+      : interval;
+
+    return `${isPortuguese ? 'Repete' : 'Repeats'} ${intervalLabel}`;
+  };
+
   const isPast = new Date(reminder.scheduled_for) < new Date();
 
   return (
@@ -363,11 +397,11 @@ function ReminderCard({
             </div>
             <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
               <span className={cn(isPast && !reminder.repeat_interval && "text-destructive")}>
-                {format(new Date(reminder.scheduled_for), 'PPp')}
+                {format(new Date(reminder.scheduled_for), 'PPp', { locale: dateLocale })}
               </span>
               {reminder.repeat_interval && (
                 <Badge variant="outline" className="text-xs">
-                  Repeats {reminder.repeat_interval}
+                  {repeatLabel(reminder.repeat_interval)}
                 </Badge>
               )}
             </div>

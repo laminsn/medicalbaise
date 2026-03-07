@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 import { 
   FileText, Download, Printer, Clock, CheckSquare, AlertTriangle, 
   Users, Calendar, CreditCard, Video, MessageSquare, Shield, Settings,
@@ -386,8 +387,18 @@ const sops = [
 ];
 
 export function SOPSection({ searchQuery }: SOPSectionProps) {
+  const { i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSOP, setSelectedSOP] = useState<typeof sops[0] | null>(null);
+
+  const sopCategoryLabels: Record<string, { en: string; pt: string }> = {
+    all: { en: 'All SOPs', pt: 'Todos os POPs' },
+    patient: { en: 'Patient Procedures', pt: 'Procedimentos para pacientes' },
+    provider: { en: 'Provider Procedures', pt: 'Procedimentos para profissionais' },
+    admin: { en: 'Administrative', pt: 'Administrativo' },
+    emergency: { en: 'Emergency', pt: 'Emergência' },
+  };
 
   const filteredSOPs = sops.filter((sop) => {
     const matchesSearch =
@@ -405,9 +416,11 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-foreground font-medium">Standard Operating Procedures</p>
+            <p className="text-sm text-foreground font-medium">{isPt ? 'Procedimentos Operacionais Padrão' : 'Standard Operating Procedures'}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              These SOPs are automatically updated with each platform release. Always refer to the latest version.
+              {isPt
+                ? 'Esses POPs são atualizados automaticamente a cada release da plataforma. Consulte sempre a versão mais recente.'
+                : 'These SOPs are automatically updated with each platform release. Always refer to the latest version.'}
             </p>
           </div>
         </div>
@@ -427,7 +440,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                 : 'border-border/50 hover:border-cyan-500/30 hover:text-cyan-400'
             }
           >
-            {cat.label}
+            {isPt ? (sopCategoryLabels[cat.id]?.pt ?? cat.label) : (sopCategoryLabels[cat.id]?.en ?? cat.label)}
           </Button>
         ))}
       </div>
@@ -451,7 +464,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                       {sop.code}
                     </Badge>
                     <Badge variant="outline" className="text-xs capitalize">
-                      {sop.category}
+                      {isPt ? (sopCategoryLabels[sop.category]?.pt ?? sop.category) : (sopCategoryLabels[sop.category]?.en ?? sop.category)}
                     </Badge>
                     <span className="text-xs text-muted-foreground">v{sop.version}</span>
                   </div>
@@ -460,9 +473,9 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      Updated {sop.lastUpdated}
+                      {isPt ? 'Atualizado' : 'Updated'} {sop.lastUpdated}
                     </span>
-                    <span>{sop.steps.length} steps</span>
+                    <span>{sop.steps.length} {isPt ? 'etapas' : 'steps'}</span>
                     <span>{sop.department}</span>
                   </div>
                 </div>
@@ -476,7 +489,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
       {filteredSOPs.length === 0 && (
         <div className="text-center py-12">
           <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No SOPs found matching your search</p>
+          <p className="text-muted-foreground">{isPt ? 'Nenhum POP encontrado para sua busca' : 'No SOPs found matching your search'}</p>
         </div>
       )}
 
@@ -491,12 +504,16 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                     {selectedSOP.code}
                   </Badge>
                   <Badge variant="outline" className="text-xs">v{selectedSOP.version}</Badge>
-                  <Badge variant="outline" className="text-xs capitalize">{selectedSOP.category}</Badge>
+                  <Badge variant="outline" className="text-xs capitalize">
+                    {isPt
+                      ? (sopCategoryLabels[selectedSOP.category]?.pt ?? selectedSOP.category)
+                      : (sopCategoryLabels[selectedSOP.category]?.en ?? selectedSOP.category)}
+                  </Badge>
                 </div>
                 <DialogTitle className="text-xl">{selectedSOP.title}</DialogTitle>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Department: {selectedSOP.department}</span>
-                  <span>Last Updated: {selectedSOP.lastUpdated}</span>
+                  <span>{isPt ? 'Departamento' : 'Department'}: {selectedSOP.department}</span>
+                  <span>{isPt ? 'Última atualização' : 'Last Updated'}: {selectedSOP.lastUpdated}</span>
                 </div>
               </DialogHeader>
 
@@ -505,29 +522,29 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="border-border/50">
                     <Download className="w-4 h-4 mr-2" />
-                    Download PDF
+                    {isPt ? 'Baixar PDF' : 'Download PDF'}
                   </Button>
                   <Button variant="outline" size="sm" className="border-border/50">
                     <Printer className="w-4 h-4 mr-2" />
-                    Print
+                    {isPt ? 'Imprimir' : 'Print'}
                   </Button>
                 </div>
 
                 {/* Overview */}
                 <div>
-                  <h4 className="font-semibold mb-2">Overview</h4>
+                  <h4 className="font-semibold mb-2">{isPt ? 'Visão geral' : 'Overview'}</h4>
                   <p className="text-muted-foreground">{selectedSOP.overview}</p>
                 </div>
 
                 {/* Scope */}
                 <div>
-                  <h4 className="font-semibold mb-2">Scope</h4>
+                  <h4 className="font-semibold mb-2">{isPt ? 'Escopo' : 'Scope'}</h4>
                   <p className="text-muted-foreground">{selectedSOP.scope}</p>
                 </div>
 
                 {/* Responsibilities */}
                 <div>
-                  <h4 className="font-semibold mb-2">Responsibilities</h4>
+                  <h4 className="font-semibold mb-2">{isPt ? 'Responsabilidades' : 'Responsibilities'}</h4>
                   <ul className="space-y-2">
                     {selectedSOP.responsibilities.map((resp, index) => (
                       <li key={index} className="flex items-start gap-2 text-muted-foreground">
@@ -540,7 +557,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
 
                 {/* Procedure Steps */}
                 <div>
-                  <h4 className="font-semibold mb-4">Procedure</h4>
+                  <h4 className="font-semibold mb-4">{isPt ? 'Procedimento' : 'Procedure'}</h4>
                   <Accordion type="single" collapsible className="space-y-2">
                     {selectedSOP.steps.map((step) => (
                       <AccordionItem
@@ -561,7 +578,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
                             <p className="text-muted-foreground">{step.description}</p>
                             {step.notes && (
                               <div className="bg-muted/30 rounded-lg p-3 text-sm">
-                                <span className="text-cyan-400 font-medium">Note: </span>
+                                <span className="text-cyan-400 font-medium">{isPt ? 'Nota: ' : 'Note: '}</span>
                                 <span className="text-muted-foreground">{step.notes}</span>
                               </div>
                             )}
@@ -574,7 +591,7 @@ export function SOPSection({ searchQuery }: SOPSectionProps) {
 
                 {/* Quality Checks */}
                 <div>
-                  <h4 className="font-semibold mb-2">Quality Checks</h4>
+                  <h4 className="font-semibold mb-2">{isPt ? 'Verificações de qualidade' : 'Quality Checks'}</h4>
                   <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
                     <ul className="space-y-2">
                       {selectedSOP.qualityChecks.map((check, index) => (

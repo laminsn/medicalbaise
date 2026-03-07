@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
+import { useTranslation } from 'react-i18next';
 
 export interface Notification {
   id: string;
@@ -52,6 +53,8 @@ export interface NotificationPreferences {
 export function useNotifications() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<ScheduledReminder[]>([]);
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
@@ -218,8 +221,8 @@ export function useNotifications() {
     if (error) {
       console.error('Error creating reminder:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to create reminder',
+        title: isPt ? 'Erro' : 'Error',
+        description: isPt ? 'Falha ao criar lembrete' : 'Failed to create reminder',
         variant: 'destructive',
       });
       return null;
@@ -227,8 +230,8 @@ export function useNotifications() {
 
     setReminders(prev => [...prev, data as ScheduledReminder]);
     toast({
-      title: 'Reminder Created',
-      description: 'Your reminder has been scheduled',
+      title: isPt ? 'Lembrete criado' : 'Reminder Created',
+      description: isPt ? 'Seu lembrete foi agendado' : 'Your reminder has been scheduled',
     });
     return data;
   };

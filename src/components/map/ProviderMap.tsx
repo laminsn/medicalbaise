@@ -35,7 +35,10 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
   center,
   className = ''
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const reviewsLabel = isPt ? 'avaliações' : 'reviews';
+  const verifiedLabel = t('providers.verified', isPt ? 'Verificado' : 'Verified');
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -95,7 +98,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
     mapboxgl.accessToken = mapboxToken;
 
     if (!mapboxgl.accessToken) {
-      setMapError('Mapbox token not configured');
+      setMapError(isPt ? 'Token do mapa não configurado' : 'Mapbox token not configured');
       return;
     }
 
@@ -133,7 +136,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, isPt]);
 
   // Handle center changes from external location search
   useEffect(() => {
@@ -179,9 +182,9 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
             ${provider.tagline ? `<p class="text-xs text-muted-foreground mb-2">${escapeHtml(provider.tagline)}</p>` : ''}
             <div class="flex items-center gap-2 text-xs">
               <span class="text-yellow-500">★ ${provider.avg_rating?.toFixed(1) || '—'}</span>
-              <span class="text-muted-foreground">(${provider.total_reviews || 0} reviews)</span>
+              <span class="text-muted-foreground">(${provider.total_reviews || 0} ${escapeHtml(reviewsLabel)})</span>
             </div>
-            ${provider.is_verified ? '<span class="inline-block mt-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">Verified</span>' : ''}
+            ${provider.is_verified ? `<span class="inline-block mt-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">${escapeHtml(verifiedLabel)}</span>` : ''}
           </div>
         `);
 
@@ -215,7 +218,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
         });
       }
     }
-  }, [providers, mapLoaded, onProviderClick]);
+  }, [providers, mapLoaded, onProviderClick, reviewsLabel, verifiedLabel]);
 
   if (isLoading || tokenLoading) {
     return (
@@ -231,7 +234,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
         <Alert variant="destructive" className="max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {mapError || 'Map configuration error. Please try again later.'}
+            {mapError || (isPt ? 'Erro na configuração do mapa. Tente novamente mais tarde.' : 'Map configuration error. Please try again later.')}
           </AlertDescription>
         </Alert>
       </div>

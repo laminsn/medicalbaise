@@ -84,7 +84,8 @@ export function ProviderServicesEditor() {
   };
 
   const getServiceName = (category: ServiceCategory) => {
-    return i18n.language === 'pt' ? category.name_pt : category.name_en;
+    const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+    return isPt ? category.name_pt : category.name_en;
   };
 
   const hasChanges = () => {

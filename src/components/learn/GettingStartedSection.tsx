@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 import { 
   UserPlus, Search, Calendar, MessageSquare, Star, CreditCard, 
   Video, Shield, ArrowRight, Clock, CheckCircle2, BookOpen
@@ -141,8 +142,31 @@ const gettingStartedGuides = [
 ];
 
 export function GettingStartedSection({ searchQuery }: GettingStartedSectionProps) {
+  const { i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [selectedGuide, setSelectedGuide] = useState<typeof gettingStartedGuides[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
+
+  const categoryLabels: Record<string, { en: string; pt: string }> = {
+    Account: { en: 'Account', pt: 'Conta' },
+    Search: { en: 'Search', pt: 'Busca' },
+    Booking: { en: 'Booking', pt: 'Agendamento' },
+    Communication: { en: 'Communication', pt: 'Comunicação' },
+    Reviews: { en: 'Reviews', pt: 'Avaliações' },
+    Payments: { en: 'Payments', pt: 'Pagamentos' },
+    Teleconsultation: { en: 'Teleconsultation', pt: 'Teleconsulta' },
+    Verification: { en: 'Verification', pt: 'Verificação' },
+    Providers: { en: 'Providers', pt: 'Profissionais' },
+    Settings: { en: 'Settings', pt: 'Configurações' },
+    Security: { en: 'Security', pt: 'Segurança' },
+    Compliance: { en: 'Compliance', pt: 'Conformidade' },
+  };
+
+  const difficultyLabels: Record<string, { en: string; pt: string }> = {
+    Beginner: { en: 'Beginner', pt: 'Iniciante' },
+    Intermediate: { en: 'Intermediate', pt: 'Intermediário' },
+    Advanced: { en: 'Advanced', pt: 'Avançado' },
+  };
 
   const filteredGuides = gettingStartedGuides.filter(
     (guide) =>
@@ -159,18 +183,22 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
             <CheckCircle2 className="w-8 h-8 text-cyan-400" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to MDBaise!</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              {isPt ? 'Bem-vindo ao MDBaise!' : 'Welcome to MDBaise!'}
+            </h2>
             <p className="text-muted-foreground mb-4">
-              Follow these quick guides to get the most out of the platform. Whether you're a patient looking for care or a provider building your practice, we've got you covered.
+              {isPt
+                ? 'Siga estes guias rápidos para aproveitar ao máximo a plataforma. Seja você um paciente em busca de atendimento ou um profissional desenvolvendo sua prática, estamos com você.'
+                : "Follow these quick guides to get the most out of the platform. Whether you're a patient looking for care or a provider building your practice, we've got you covered."}
             </p>
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2 text-cyan-400">
                 <Clock className="w-4 h-4" />
-                <span>~25 min total</span>
+                <span>{isPt ? '~25 min no total' : '~25 min total'}</span>
               </div>
               <div className="flex items-center gap-2 text-cyan-400">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>8 quick guides</span>
+                <span>{isPt ? '8 guias rápidos' : '8 quick guides'}</span>
               </div>
             </div>
           </div>
@@ -195,9 +223,9 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-muted-foreground">Step {index + 1}</span>
+                    <span className="text-xs text-muted-foreground">{isPt ? 'Etapa' : 'Step'} {index + 1}</span>
                     <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
-                      {guide.category}
+                      {isPt ? (categoryLabels[guide.category]?.pt ?? guide.category) : (categoryLabels[guide.category]?.en ?? guide.category)}
                     </Badge>
                   </div>
                   <h3 className="font-semibold text-foreground mb-1 group-hover:text-cyan-400 transition-colors">
@@ -212,7 +240,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                         <Clock className="w-3 h-3" />
                         {guide.duration}
                       </span>
-                      <span>{guide.steps.length} steps</span>
+                      <span>{guide.steps.length} {isPt ? 'etapas' : 'steps'}</span>
                     </div>
                     <ArrowRight className="w-4 h-4 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
@@ -225,7 +253,11 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
 
       {filteredGuides.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No guides found matching "{searchQuery}"</p>
+          <p className="text-muted-foreground">
+            {isPt
+              ? `Nenhum guia encontrado para "${searchQuery}"`
+              : `No guides found matching "${searchQuery}"`}
+          </p>
         </div>
       )}
 
@@ -237,10 +269,12 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
               <DialogHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
-                    {selectedGuide.difficulty}
+                    {isPt
+                      ? (difficultyLabels[selectedGuide.difficulty]?.pt ?? selectedGuide.difficulty)
+                      : (difficultyLabels[selectedGuide.difficulty]?.en ?? selectedGuide.difficulty)}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    {selectedGuide.category}
+                    {isPt ? (categoryLabels[selectedGuide.category]?.pt ?? selectedGuide.category) : (categoryLabels[selectedGuide.category]?.en ?? selectedGuide.category)}
                   </Badge>
                 </div>
                 <DialogTitle className="text-xl">{selectedGuide.title}</DialogTitle>
@@ -280,8 +314,8 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                   <div className="bg-muted/30 border border-border/50 rounded-xl aspect-video flex items-center justify-center">
                     <div className="text-center">
                       <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Screenshot placeholder</p>
-                      <p className="text-xs text-muted-foreground">Visual guide coming soon</p>
+                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : 'Screenshot placeholder'}</p>
+                      <p className="text-xs text-muted-foreground">{isPt ? 'Guia visual em breve' : 'Visual guide coming soon'}</p>
                     </div>
                   </div>
 
@@ -293,24 +327,24 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                       onClick={() => setCurrentStep(currentStep - 1)}
                       className="border-border/50"
                     >
-                      Previous
+                      {isPt ? 'Anterior' : 'Previous'}
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      Step {currentStep + 1} of {selectedGuide.steps.length}
+                      {isPt ? 'Etapa' : 'Step'} {currentStep + 1} {isPt ? 'de' : 'of'} {selectedGuide.steps.length}
                     </span>
                     <Button
                       disabled={currentStep === selectedGuide.steps.length - 1}
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="bg-cyan-500 hover:bg-cyan-600 text-white"
                     >
-                      Next
+                      {isPt ? 'Próxima' : 'Next'}
                     </Button>
                   </div>
                 </div>
 
                 {/* Step List */}
                 <div className="mt-8 pt-6 border-t border-border/50">
-                  <h4 className="font-medium mb-4">All Steps</h4>
+                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : 'All Steps'}</h4>
                   <div className="space-y-2">
                     {selectedGuide.steps.map((step, index) => (
                       <button

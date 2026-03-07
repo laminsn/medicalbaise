@@ -20,6 +20,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useJobStatusUpdate } from '@/hooks/useJobStatusUpdate';
 import { format } from 'date-fns';
+import { enUS, ptBR } from 'date-fns/locale';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,7 +54,9 @@ interface ActiveJob {
 }
 
 export function ProviderActiveJobs() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const dateLocale = isPt ? ptBR : enUS;
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { startJob, completeJob, cancelJob, isUpdating } = useJobStatusUpdate();
@@ -136,11 +139,17 @@ export function ProviderActiveJobs() {
       completed: { color: 'bg-green-500/20 text-green-500', icon: <CheckCircle className="h-3 w-3" /> },
       cancelled: { color: 'bg-red-500/20 text-red-500', icon: <AlertCircle className="h-3 w-3" /> },
     };
+    const statusLabels: Record<string, string> = {
+      pending_start: isPt ? 'aguardando início' : 'pending start',
+      in_progress: isPt ? 'em andamento' : 'in progress',
+      completed: isPt ? 'concluído' : 'completed',
+      cancelled: isPt ? 'cancelado' : 'cancelled',
+    };
     const config = statusConfig[status] || statusConfig.pending_start;
     return (
       <Badge className={`${config.color} gap-1`}>
         {config.icon}
-        {status.replace('_', ' ')}
+        {statusLabels[status] || status.replace('_', ' ')}
       </Badge>
     );
   };
@@ -188,7 +197,7 @@ export function ProviderActiveJobs() {
                       {job.expected_completion_date && (
                         <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar className="h-4 w-4" />
-                          <span>{format(new Date(job.expected_completion_date), 'MMM dd')}</span>
+                          <span>{format(new Date(job.expected_completion_date), 'MMM dd', { locale: dateLocale })}</span>
                         </div>
                       )}
                     </div>
@@ -210,7 +219,7 @@ export function ProviderActiveJobs() {
                           className="gap-1"
                         >
                           {isUpdating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3" />}
-                          Start Job
+                          {isPt ? 'Iniciar trabalho' : 'Start Job'}
                         </Button>
                       )}
                       
@@ -219,20 +228,22 @@ export function ProviderActiveJobs() {
                           <AlertDialogTrigger asChild>
                             <Button size="sm" variant="default" className="gap-1" disabled={isUpdating}>
                               <Check className="h-3 w-3" />
-                              Mark Complete
+                              {isPt ? 'Marcar como concluído' : 'Mark Complete'}
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Complete this job?</AlertDialogTitle>
+                              <AlertDialogTitle>{isPt ? 'Concluir este trabalho?' : 'Complete this job?'}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will mark the job as completed and notify the customer.
+                                {isPt
+                                  ? 'Isso marcará o trabalho como concluído e notificará o cliente.'
+                                  : 'This will mark the job as completed and notify the customer.'}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>{isPt ? 'Cancelar' : 'Cancel'}</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleStatusUpdate(job.id, 'complete')}>
-                                Complete
+                                {isPt ? 'Concluir' : 'Complete'}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -243,23 +254,25 @@ export function ProviderActiveJobs() {
                         <AlertDialogTrigger asChild>
                           <Button size="sm" variant="outline" className="gap-1 text-destructive" disabled={isUpdating}>
                             <X className="h-3 w-3" />
-                            Cancel
+                            {isPt ? 'Cancelar' : 'Cancel'}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel this job?</AlertDialogTitle>
+                            <AlertDialogTitle>{isPt ? 'Cancelar este trabalho?' : 'Cancel this job?'}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. The customer will be notified about the cancellation.
+                              {isPt
+                                ? 'Esta ação não pode ser desfeita. O cliente será notificado sobre o cancelamento.'
+                                : 'This action cannot be undone. The customer will be notified about the cancellation.'}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Go Back</AlertDialogCancel>
+                            <AlertDialogCancel>{isPt ? 'Voltar' : 'Go Back'}</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleStatusUpdate(job.id, 'cancel')}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Cancel Job
+                              {isPt ? 'Cancelar trabalho' : 'Cancel Job'}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

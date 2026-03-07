@@ -12,7 +12,8 @@ import { toast } from 'sonner';
 import { DollarSign, Plus, Minus, Search, Loader2 } from 'lucide-react';
 
 export function AdminCreditManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [searchEmail, setSearchEmail] = useState('');
   const [foundUser, setFoundUser] = useState<any>(null);
   const [searching, setSearching] = useState(false);
@@ -92,7 +93,7 @@ export function AdminCreditManager() {
     if (error) {
       toast.error(t('admin.errorSaving') + ': ' + error.message);
     } else if (!updated) {
-      toast.error('Balance was modified concurrently. Please try again.');
+      toast.error(isPt ? 'O saldo foi alterado simultaneamente. Tente novamente.' : 'Balance was modified concurrently. Please try again.');
       // Refresh displayed balance
       setFoundUser({ ...foundUser, credits_balance: currentBalance });
     } else {

@@ -18,7 +18,8 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
 
   if (loading) {
     return (
@@ -62,11 +63,11 @@ export default function AdminDashboard() {
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="w-full overflow-x-auto flex">
               <TabsTrigger value="overview" className="flex-1">{t('admin.overview')}</TabsTrigger>
-              <TabsTrigger value="all-users" className="flex-1">All Users</TabsTrigger>
+              <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : 'All Users'}</TabsTrigger>
               <TabsTrigger value="users" className="flex-1">{t('admin.users')}</TabsTrigger>
               <TabsTrigger value="credits" className="flex-1">{t('admin.credits')}</TabsTrigger>
               <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>
-              <TabsTrigger value="campaigns" className="flex-1">Campaigns</TabsTrigger>
+              <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : 'Campaigns'}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -90,7 +91,13 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <TabsContent value="campaigns">
-              <AdminEmailCampaigns />
+              {isPt ? (
+                <div className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
+                  Conteúdo de campanhas em tradução para português.
+                </div>
+              ) : (
+                <AdminEmailCampaigns />
+              )}
             </TabsContent>
           </Tabs>
         </div>
