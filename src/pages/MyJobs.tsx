@@ -77,7 +77,7 @@ export default function MyJobs() {
         const acceptedBids = bidsData?.filter(b => b.status === 'accepted') || [];
         const providerIds = acceptedBids.map(b => b.provider_id);
         
-        let providersMap: Record<string, string> = {};
+        const providersMap: Record<string, string> = {};
         if (providerIds.length > 0) {
           const { data: providersData } = await supabase
             .from('providers')

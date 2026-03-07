@@ -12,6 +12,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { MapPin, Filter, Search, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMapboxToken } from '@/hooks/useMapboxToken';
+
+interface ServiceCategory {
+  id: string;
+  name_en: string | null;
+  name_pt: string | null;
+}
 
 const MapView = () => {
   const { t, i18n } = useTranslation();
@@ -20,6 +27,7 @@ const MapView = () => {
   const [locationSearch, setLocationSearch] = useState('');
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const { data: mapboxToken } = useMapboxToken();
 
   const { data: categories } = useQuery({
     queryKey: ['service-categories'],
@@ -29,7 +37,7 @@ const MapView = () => {
         .select('*')
         .order('order_index');
       if (error) throw error;
-      return data;
+      return (data as ServiceCategory[] | null) ?? [];
     },
   });
 
@@ -37,17 +45,21 @@ const MapView = () => {
     navigate(`/provider/${providerId}`);
   };
 
-  const getCategoryName = (category: any) => {
+  const getCategoryName = (category: ServiceCategory) => {
     return i18n.language === 'pt' ? category.name_pt : category.name_en;
   };
 
   const handleLocationSearch = async () => {
     if (!locationSearch.trim()) return;
+    if (!mapboxToken) {
+      toast.error(t('map.locationError'));
+      return;
+    }
     
     try {
       // Use Mapbox Geocoding API
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationSearch)}.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN || ''}&country=BR&limit=1`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationSearch)}.json?access_token=${mapboxToken}&country=BR&limit=1`
       );
       const data = await response.json();
       

@@ -7,12 +7,26 @@ import { Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { escapeHtml } from '@/lib/sanitize';
+import { useMapboxToken } from '@/hooks/useMapboxToken';
 
 interface ProviderMapProps {
   onProviderClick?: (providerId: string) => void;
   selectedCategory?: string;
   center?: [number, number] | null;
   className?: string;
+}
+
+interface ProviderWithServices {
+  id: string;
+  business_name: string | null;
+  tagline: string | null;
+  avg_rating: number | null;
+  total_reviews: number | null;
+  location_lat: number | null;
+  location_lng: number | null;
+  is_verified: boolean | null;
+  subscription_tier: string | null;
+  provider_services: { category_id: string }[] | null;
 }
 
 const ProviderMap: React.FC<ProviderMapProps> = ({ 
@@ -28,21 +42,12 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // Fetch Mapbox token from edge function
-  const { data: tokenData, isLoading: tokenLoading } = useQuery({
-    queryKey: ['mapbox-token'],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-      if (error) throw error;
-      return data;
-    },
-    staleTime: Infinity,
-  });
+  const { data: mapboxToken, isLoading: tokenLoading } = useMapboxToken();
 
   const { data: providers, isLoading } = useQuery({
     queryKey: ['providers-with-location', selectedCategory],
     queryFn: async () => {
-      let query = supabase
+      const query = supabase
         .from('providers')
         .select(`
           id,
@@ -69,24 +74,25 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
 
       const { data, error } = await query;
       if (error) throw error;
+      const providerData = (data as ProviderWithServices[] | null) ?? [];
       
       // Filter by category if selected
-      if (selectedCategory && data) {
-        return data.filter(provider => 
+      if (selectedCategory) {
+        return providerData.filter(provider => 
           provider.provider_services?.some(
-            (service: any) => service.category_id === selectedCategory
+            (service) => service.category_id === selectedCategory
           )
         );
       }
       
-      return data;
+      return providerData;
     },
   });
 
   useEffect(() => {
-    if (!mapContainer.current || map.current || !tokenData?.token) return;
+    if (!mapContainer.current || map.current || !mapboxToken) return;
 
-    mapboxgl.accessToken = tokenData.token;
+    mapboxgl.accessToken = mapboxToken;
 
     if (!mapboxgl.accessToken) {
       setMapError('Mapbox token not configured');
@@ -127,7 +133,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
       map.current?.remove();
       map.current = null;
     };
-  }, [tokenData?.token]);
+  }, [mapboxToken]);
 
   // Handle center changes from external location search
   useEffect(() => {
@@ -219,7 +225,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
     );
   }
 
-  if (mapError || !tokenData?.token) {
+  if (mapError || !mapboxToken) {
     return (
       <div className={`flex items-center justify-center bg-card rounded-lg p-6 ${className}`}>
         <Alert variant="destructive" className="max-w-md">

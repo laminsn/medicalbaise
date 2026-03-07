@@ -22,8 +22,8 @@ import Profile from "./pages/Profile";
 import ProfileEdit from "./pages/ProfileEdit";
 import Messages from "./pages/Messages";
 import Referral from "./pages/Referral";
-import ProviderProfile from "./pages/ProviderProfile";
 import DoctorProfile from "./pages/DoctorProfile";
+import ProviderProfileRouter from "./pages/ProviderProfileRouter";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import JobsMarketplace from "./pages/JobsMarketplace";
@@ -49,11 +49,13 @@ import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import HandleRedirect from "./pages/HandleRedirect";
+import BookAppointment from "./pages/BookAppointment";
 
-// Redirect component for old provider URLs
-const ProviderRedirect = () => {
+// Redirect component for legacy plural jobs route.
+const JobsRedirect = () => {
   const { id } = useParams();
-  return <Navigate to={`/doctor/${id}`} replace />;
+  if (!id) return <Navigate to="/jobs" replace />;
+  return <Navigate to={`/job/${id}`} replace />;
 };
 
 const queryClient = new QueryClient();
@@ -88,12 +90,14 @@ const App = () => (
                   <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                   <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
                   <Route path="/doctor/:id" element={<DoctorProfile />} />
-                  <Route path="/provider/:id" element={<ProviderRedirect />} />
+                  <Route path="/provider/:id" element={<ProviderProfileRouter />} />
                   <Route path="/provider-dashboard" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />
                   <Route path="/customer-dashboard" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
                   <Route path="/jobs" element={<JobsMarketplace />} />
+                  <Route path="/jobs/:id" element={<JobsRedirect />} />
                   <Route path="/job/:id" element={<JobDetails />} />
                   <Route path="/job/:id/bid" element={<ProtectedRoute><SubmitBid /></ProtectedRoute>} />
+                  <Route path="/book-appointment/:id" element={<ProtectedRoute><BookAppointment /></ProtectedRoute>} />
                   <Route path="/my-jobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
                   <Route path="/my-bids" element={<ProtectedRoute><MyBids /></ProtectedRoute>} />
                   <Route path="/my-quotes" element={<ProtectedRoute><MyQuotes /></ProtectedRoute>} />

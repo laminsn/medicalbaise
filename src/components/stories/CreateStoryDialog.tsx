@@ -176,7 +176,9 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
     isLongPress.current = false;
     longPressTimer.current = window.setTimeout(async () => {
       isLongPress.current = true;
-      try { await startRecording(); } catch {}
+      try { await startRecording(); } catch {
+        // Recording start errors are handled by recorder state/toasts.
+      }
     }, 300);
   }, [isPreviewing, startRecording]);
 
