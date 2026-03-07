@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -139,11 +139,10 @@ serve(async (req) => {
         });
     }
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error in live-stream-signal:', error);
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: errorMessage
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'An internal error occurred'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

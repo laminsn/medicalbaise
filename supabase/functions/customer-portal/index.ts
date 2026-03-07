@@ -5,7 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -41,10 +41,10 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
+    // Use anon key — this function only needs to verify the user's JWT, not bypass RLS
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
     const authHeader = req.headers.get("Authorization");
@@ -56,7 +56,7 @@ serve(async (req) => {
 
     const user = userData.user;
     if (!user.email) throw new Error("User email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 

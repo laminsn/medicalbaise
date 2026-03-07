@@ -9,7 +9,7 @@ const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -155,14 +155,14 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    console.log("User authenticated:", user.id);
+    console.log("User authenticated");
 
     // Use service role client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { providerId, manual } = await req.json().catch(() => ({}));
-    
-    console.log("Starting analytics report send", { providerId, manual, requestedBy: user.id });
+
+    console.log("Starting analytics report send", { providerId, manual });
 
     // If providerId is specified, verify the user owns that provider
     if (providerId) {
@@ -224,14 +224,14 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (userSchedules.length === 0) {
-      console.log("No schedules to process for user", user.id);
+      console.log("No schedules to process");
       return new Response(JSON.stringify({ message: "No schedules to process" }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log(`Processing ${userSchedules.length} schedules for user ${user.id}`);
+    console.log(`Processing ${userSchedules.length} schedules`);
 
     const results = [];
 
@@ -337,8 +337,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: unknown) {
     console.error("Error in send-analytics-report:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: "Analytics report failed" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

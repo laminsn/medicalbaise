@@ -5,7 +5,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -52,11 +52,16 @@ serve(async (req) => {
 
     const user = userData.user;
     if (!user.email) throw new Error("User email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated");
 
     const { priceId, promoCode } = await req.json();
     if (!priceId) throw new Error("Price ID required");
-    logStep("Request parsed", { priceId, promoCode });
+
+    // Validate priceId format — must match Stripe price ID pattern
+    if (typeof priceId !== "string" || !/^price_[A-Za-z0-9]{8,}$/.test(priceId)) {
+      throw new Error("Invalid price ID format");
+    }
+    logStep("Request parsed");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -115,7 +120,7 @@ serve(async (req) => {
     const message = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message });
     // Return generic error to client, log details server-side only
-    const safeErrors = ["No authorization header", "Authentication failed", "Price ID required", "User email not available"];
+    const safeErrors = ["No authorization header", "Authentication failed", "Price ID required", "User email not available", "Invalid price ID format"];
     const clientMessage = safeErrors.includes(message) ? message : "Checkout creation failed";
     return new Response(JSON.stringify({ error: clientMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -8,7 +8,7 @@ const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ALLOWED_ORIGINS = [
   "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
-  "http://localhost:8080",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -356,7 +356,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    console.log("Admin user verified:", userData.user.id);
+    console.log("Admin user verified");
 
     // Determine which week's campaign to send (rotating)
     const startDate = new Date("2026-01-01");
@@ -430,11 +430,11 @@ const handler = async (req: Request): Promise<Response> => {
           } else {
             errors++;
             const errText = await res.text();
-            console.error(`Failed to send to ${profile.email}:`, errText);
+            console.error(`Failed to send campaign email:`, errText);
           }
         } catch (err) {
           errors++;
-          console.error(`Error sending to ${profile.email}:`, err);
+          console.error(`Error sending campaign email:`, err);
         }
       });
 
