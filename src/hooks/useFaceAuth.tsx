@@ -194,7 +194,7 @@ export function useFaceAuth() {
     for (const profile of profiles) {
       try {
         const storedDescriptor = new Float32Array(
-          JSON.parse((profile as Record<string, unknown>).face_descriptor as string)
+          JSON.parse(profile.face_descriptor as string)
         );
         const distance = faceapi.euclideanDistance(descriptor, storedDescriptor);
 
