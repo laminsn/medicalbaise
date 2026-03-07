@@ -174,10 +174,10 @@ export function useFaceAuth() {
     }
 
     // Fetch all users who have enrolled face auth
-    const { data: profiles, error } = await supabase
+    const { data: profiles, error } = await (supabase
       .from('profiles')
       .select('user_id, email, first_name, face_descriptor')
-      .not('face_descriptor', 'is', null);
+      .not('face_descriptor', 'is', null) as unknown as Promise<{ data: { user_id: string; email: string | null; first_name: string | null; face_descriptor: string | null }[] | null; error: unknown }>);
 
     if (error || !profiles || profiles.length === 0) {
       setState((s) => ({
