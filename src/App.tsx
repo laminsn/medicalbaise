@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CallProvider } from "@/contexts/CallContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
@@ -80,38 +81,38 @@ const App = () => (
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/categories" element={<Categories />} />
                   <Route path="/categories/:categoryId" element={<CategoryDetail />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/profile/edit" element={<ProfileEdit />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/payments" element={<Payments />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/referral" element={<Referral />} />
+                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/profile/edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                  <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+                  <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+                  <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
                   <Route path="/doctor/:id" element={<DoctorProfile />} />
                   <Route path="/provider/:id" element={<ProviderRedirect />} />
-                  <Route path="/provider-dashboard" element={<ProviderDashboard />} />
-                  <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+                  <Route path="/provider-dashboard" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />
+                  <Route path="/customer-dashboard" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
                   <Route path="/jobs" element={<JobsMarketplace />} />
                   <Route path="/job/:id" element={<JobDetails />} />
-                  <Route path="/job/:id/bid" element={<SubmitBid />} />
-                  <Route path="/my-jobs" element={<MyJobs />} />
-                  <Route path="/my-bids" element={<MyBids />} />
-                  <Route path="/my-quotes" element={<MyQuotes />} />
-                  <Route path="/favorites" element={<Favorites />} />
-                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/job/:id/bid" element={<ProtectedRoute><SubmitBid /></ProtectedRoute>} />
+                  <Route path="/my-jobs" element={<ProtectedRoute><MyJobs /></ProtectedRoute>} />
+                  <Route path="/my-bids" element={<ProtectedRoute><MyBids /></ProtectedRoute>} />
+                  <Route path="/my-quotes" element={<ProtectedRoute><MyQuotes /></ProtectedRoute>} />
+                  <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+                  <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                   <Route path="/map" element={<MapView />} />
-                  <Route path="/chat/:id" element={<Chat />} />
-                  <Route path="/feed" element={<SocialFeed />} />
+                  <Route path="/chat/:id" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+                  <Route path="/feed" element={<ProtectedRoute><SocialFeed /></ProtectedRoute>} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/reviews" element={<Reviews />} />
-                  <Route path="/services" element={<ServicesSettings />} />
-                  <Route path="/services/:serviceId" element={<ServiceEditor />} />
-                  <Route path="/subscription" element={<Subscription />} />
-                  <Route path="/team" element={<Team />} />
-                  <Route path="/integrations" element={<Integrations />} />
-                  <Route path="/payouts" element={<Payouts />} />
-                  <Route path="/post-job" element={<PostJob />} />
+                  <Route path="/services" element={<ProtectedRoute><ServicesSettings /></ProtectedRoute>} />
+                  <Route path="/services/:serviceId" element={<ProtectedRoute><ServiceEditor /></ProtectedRoute>} />
+                  <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+                  <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+                  <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+                  <Route path="/payouts" element={<ProtectedRoute><Payouts /></ProtectedRoute>} />
+                  <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
                   <Route path="/help" element={<Learn />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/u/:handle" element={<HandleRedirect />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

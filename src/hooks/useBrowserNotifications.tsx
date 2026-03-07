@@ -40,7 +40,11 @@ export const useBrowserNotifications = () => {
         window.focus();
         notification.close();
         if (options?.data?.url) {
-          window.location.href = options.data.url;
+          // Prevent open redirect — only allow same-origin relative paths
+          const url = options.data.url;
+          if (typeof url === 'string' && url.startsWith('/') && !url.startsWith('//')) {
+            window.location.href = url;
+          }
         }
       };
 

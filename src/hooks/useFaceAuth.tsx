@@ -3,7 +3,10 @@ import * as faceapi from 'face-api.js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-const FACE_MATCH_THRESHOLD = 0.45; // Lower = stricter matching
+const FACE_MATCH_THRESHOLD = 0.35; // Lowered for stricter matching — reduces false positives
+const MAX_FACE_VERIFY_ATTEMPTS = 5;
+const FACE_VERIFY_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+const FACE_VERIFY_ATTEMPTS_KEY = 'face_verify_attempts';
 const MODEL_URL = '/models'; // Models served from public/models/
 
 type FaceAuthStatus = 'idle' | 'loading-models' | 'ready' | 'detecting' | 'enrolling' | 'verifying' | 'success' | 'error';
@@ -164,8 +167,46 @@ export function useFaceAuth() {
     return true;
   }, [user, detectFace]);
 
-  /** Verify a face against all stored descriptors (for login) */
+  /** Check rate limiting for face verification attempts */
+  const checkFaceVerifyRateLimit = useCallback((): boolean => {
+    try {
+      const stored = localStorage.getItem(FACE_VERIFY_ATTEMPTS_KEY);
+      if (!stored) return true;
+      const attempts: number[] = JSON.parse(stored);
+      const cutoff = Date.now() - FACE_VERIFY_WINDOW_MS;
+      const recent = attempts.filter((t: number) => t > cutoff);
+      return recent.length < MAX_FACE_VERIFY_ATTEMPTS;
+    } catch {
+      return true;
+    }
+  }, []);
+
+  const recordFaceVerifyAttempt = useCallback(() => {
+    try {
+      const stored = localStorage.getItem(FACE_VERIFY_ATTEMPTS_KEY);
+      const attempts: number[] = stored ? JSON.parse(stored) : [];
+      const cutoff = Date.now() - FACE_VERIFY_WINDOW_MS;
+      const recent = attempts.filter((t: number) => t > cutoff);
+      recent.push(Date.now());
+      localStorage.setItem(FACE_VERIFY_ATTEMPTS_KEY, JSON.stringify(recent));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  /** Verify a face against stored descriptors (for login) */
   const verifyFace = useCallback(async (): Promise<{ matched: boolean; userId?: string; email?: string }> => {
+    // Rate limit face verification attempts
+    if (!checkFaceVerifyRateLimit()) {
+      setState((s) => ({
+        ...s,
+        status: 'error',
+        error: 'Too many face verification attempts. Please try again later or use password login.',
+      }));
+      return { matched: false };
+    }
+
+    recordFaceVerifyAttempt();
     setState((s) => ({ ...s, status: 'verifying', error: null }));
 
     const descriptor = await detectFace();
@@ -173,11 +214,12 @@ export function useFaceAuth() {
       return { matched: false };
     }
 
-    // Fetch all users who have enrolled face auth
+    // Fetch face descriptors — only email and face_descriptor (no user_id exposed)
+    // RLS should restrict this query; we only select the minimum needed fields.
     const { data: profiles, error } = await (supabase
       .from('profiles')
-      .select('user_id, email, first_name, face_descriptor')
-      .not('face_descriptor', 'is', null) as unknown as Promise<{ data: { user_id: string; email: string | null; first_name: string | null; face_descriptor: string | null }[] | null; error: unknown }>);
+      .select('email, face_descriptor')
+      .not('face_descriptor', 'is', null) as unknown as Promise<{ data: { email: string | null; face_descriptor: string | null }[] | null; error: unknown }>);
 
     if (error || !profiles || profiles.length === 0) {
       setState((s) => ({
@@ -189,31 +231,32 @@ export function useFaceAuth() {
     }
 
     // Compare against each stored descriptor
-    let bestMatch: { userId: string; email: string | null; distance: number } | null = null;
+    let bestMatch: { email: string | null; distance: number } | null = null;
 
     for (const profile of profiles) {
       try {
-        const storedDescriptor = new Float32Array(
-          JSON.parse(profile.face_descriptor as string)
-        );
+        const parsed = JSON.parse(profile.face_descriptor as string);
+        // Validate descriptor shape to prevent injection
+        if (!Array.isArray(parsed) || parsed.length !== 128 || !parsed.every((v: unknown) => typeof v === 'number' && isFinite(v as number))) {
+          continue;
+        }
+        const storedDescriptor = new Float32Array(parsed);
         const distance = faceapi.euclideanDistance(descriptor, storedDescriptor);
 
         if (distance < FACE_MATCH_THRESHOLD && (!bestMatch || distance < bestMatch.distance)) {
           bestMatch = {
-            userId: profile.user_id,
             email: profile.email,
             distance,
           };
         }
       } catch {
-        // Skip malformed descriptors
         continue;
       }
     }
 
     if (bestMatch && bestMatch.email) {
       setState((s) => ({ ...s, status: 'success', error: null }));
-      return { matched: true, userId: bestMatch.userId, email: bestMatch.email };
+      return { matched: true, email: bestMatch.email };
     }
 
     setState((s) => ({
@@ -222,7 +265,7 @@ export function useFaceAuth() {
       error: 'Face not recognized. Please try again or use password login.',
     }));
     return { matched: false };
-  }, [detectFace]);
+  }, [detectFace, checkFaceVerifyRateLimit, recordFaceVerifyAttempt]);
 
   /** Remove face enrollment for current user */
   const removeFaceEnrollment = useCallback(async (): Promise<boolean> => {
