@@ -240,13 +240,13 @@ export function useFaceAuth() {
   const checkEnrollment = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
 
-    const { data } = await supabase
+    const { data } = await (supabase
       .from('profiles')
       .select('face_descriptor')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .maybeSingle() as unknown as Promise<{ data: { face_descriptor: string | null } | null }>);
 
-    return !!(data as Record<string, unknown>)?.face_descriptor;
+    return !!data?.face_descriptor;
   }, [user]);
 
   return {
