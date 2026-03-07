@@ -127,12 +127,14 @@ export function useNotifications() {
     }
   };
 
-  // Mark notification as read
+  // Mark notification as read — scoped to current user
   const markAsRead = async (notificationId: string) => {
+    if (!user) return;
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true, read_at: new Date().toISOString() })
-      .eq('id', notificationId);
+      .eq('id', notificationId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error marking notification as read:', error);
@@ -164,12 +166,14 @@ export function useNotifications() {
     setUnreadCount(0);
   };
 
-  // Delete notification
+  // Delete notification — scoped to current user
   const deleteNotification = async (notificationId: string) => {
+    if (!user) return;
     const { error } = await supabase
       .from('notifications')
       .delete()
-      .eq('id', notificationId);
+      .eq('id', notificationId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error deleting notification:', error);
@@ -229,12 +233,14 @@ export function useNotifications() {
     return data;
   };
 
-  // Update reminder
+  // Update reminder — scoped to current user
   const updateReminder = async (reminderId: string, updates: { is_active?: boolean }) => {
+    if (!user) return false;
     const { error } = await supabase
       .from('scheduled_reminders')
       .update(updates)
-      .eq('id', reminderId);
+      .eq('id', reminderId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error updating reminder:', error);
@@ -247,12 +253,14 @@ export function useNotifications() {
     return true;
   };
 
-  // Delete reminder
+  // Delete reminder — scoped to current user
   const deleteReminder = async (reminderId: string) => {
+    if (!user) return false;
     const { error } = await supabase
       .from('scheduled_reminders')
       .delete()
-      .eq('id', reminderId);
+      .eq('id', reminderId)
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error deleting reminder:', error);

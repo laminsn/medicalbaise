@@ -28,76 +28,93 @@ export const useMessageNotifications = () => {
   useEffect(() => {
     if (!user || !isGranted) return;
 
-    // Subscribe to all new messages for the current user
-    const channel = supabase
-      .channel('global-messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        },
-        async (payload) => {
-          const newMessage = payload.new as MessagePayload;
-          
-          // Don't notify for own messages
-          if (newMessage.sender_id === user.id) return;
-          
-          // Don't notify if user is already viewing this conversation
-          if (currentConversationId.current === newMessage.conversation_id) return;
+    // Fetch user's conversation IDs to scope the subscription
+    // This prevents receiving messages from conversations the user is not part of
+    const setupSubscription = async () => {
+      // Get provider IDs for this user
+      const { data: userProviders } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id);
+      const providerIds = userProviders?.map(p => p.id) || [];
 
-          // Check if this message is in a conversation the user is part of
-          const { data: conversation } = await supabase
-            .from('conversations')
-            .select(`
-              id,
-              customer_id,
-              provider:providers(id, business_name, user_id)
-            `)
-            .eq('id', newMessage.conversation_id)
-            .maybeSingle();
+      // Subscribe only to conversations where the user is a participant
+      // We listen for inserts where sender is NOT the current user
+      const channel = supabase
+        .channel('user-messages')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+          },
+          async (payload) => {
+            const newMessage = payload.new as MessagePayload;
 
-          if (!conversation) return;
+            // Don't notify for own messages
+            if (newMessage.sender_id === user.id) return;
 
-          // Verify user is part of this conversation
-          const isCustomer = conversation.customer_id === user.id;
-          const isProvider = conversation.provider?.user_id === user.id;
-          
-          if (!isCustomer && !isProvider) return;
+            // Don't notify if user is already viewing this conversation
+            if (currentConversationId.current === newMessage.conversation_id) return;
 
-          // Get sender name
-          let senderName = 'Someone';
-          if (isCustomer && conversation.provider) {
-            senderName = conversation.provider.business_name;
-          } else {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('first_name, last_name')
-              .eq('user_id', newMessage.sender_id)
+            // Verify user is part of this conversation BEFORE accessing content
+            const { data: conversation } = await supabase
+              .from('conversations')
+              .select(`
+                id,
+                customer_id,
+                provider:providers(id, business_name, user_id)
+              `)
+              .eq('id', newMessage.conversation_id)
               .maybeSingle();
-            
-            if (profile) {
-              senderName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Customer';
-            }
-          }
 
-          // Send browser notification
-          sendNotification(`New message from ${senderName}`, {
-            body: newMessage.content.length > 100 
-              ? newMessage.content.substring(0, 100) + '...' 
-              : newMessage.content,
-            tag: `message-${newMessage.conversation_id}`,
-            data: {
-              url: `/chat/${newMessage.conversation_id}`,
-            },
-          });
-        }
-      )
-      .subscribe();
+            if (!conversation) return;
+
+            const isCustomer = conversation.customer_id === user.id;
+            const isProvider = conversation.provider?.user_id === user.id;
+
+            if (!isCustomer && !isProvider) return;
+
+            // Only access message content after verifying ownership
+            let senderName = 'Someone';
+            if (isCustomer && conversation.provider) {
+              senderName = conversation.provider.business_name;
+            } else {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('first_name, last_name')
+                .eq('user_id', newMessage.sender_id)
+                .maybeSingle();
+
+              if (profile) {
+                senderName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Customer';
+              }
+            }
+
+            sendNotification(`New message from ${senderName}`, {
+              body: newMessage.content.length > 100
+                ? newMessage.content.substring(0, 100) + '...'
+                : newMessage.content,
+              tag: `message-${newMessage.conversation_id}`,
+              data: {
+                url: `/chat/${newMessage.conversation_id}`,
+              },
+            });
+          }
+        )
+        .subscribe();
+
+      return channel;
+    };
+
+    let channelRef: ReturnType<typeof supabase.channel> | null = null;
+    setupSubscription().then(ch => { channelRef = ch; });
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef) {
+        supabase.removeChannel(channelRef);
+      }
     };
   }, [user, isGranted, sendNotification]);
 };

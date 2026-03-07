@@ -92,9 +92,20 @@ export function useWorkApproval(activeJobId?: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Validate file type and size
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/quicktime', 'video/webm'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Invalid file type. Allowed: JPEG, PNG, WebP, MP4, MOV, WebM');
+      }
+      const maxSize = file.type.startsWith('video/') ? 100 * 1024 * 1024 : 10 * 1024 * 1024; // 100MB video, 10MB image
+      if (file.size > maxSize) {
+        throw new Error(`File too large. Maximum: ${file.type.startsWith('video/') ? '100MB' : '10MB'}`);
+      }
+
       const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
-      
-      const fileExt = file.name.split('.').pop();
+
+      // Sanitize file extension
+      const fileExt = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
       const fileName = `${user.id}/${activeJobId}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
@@ -154,8 +165,22 @@ export function useWorkApproval(activeJobId?: string) {
 
   const approveMedia = async (mediaId: string, feedback?: string) => {
     if (!activeJobId) return false;
-    
+
     try {
+      // Verify the current user is the customer for this job
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: activeJob } = await supabase
+        .from('active_jobs')
+        .select('customer_id')
+        .eq('id', activeJobId)
+        .single();
+
+      if (!activeJob || activeJob.customer_id !== user.id) {
+        throw new Error('Not authorized to approve work for this job');
+      }
+
       const { error } = await supabase
         .from('work_approval_media')
         .update({
@@ -163,7 +188,8 @@ export function useWorkApproval(activeJobId?: string) {
           customer_feedback: feedback,
           approved_at: new Date().toISOString(),
         })
-        .eq('id', mediaId);
+        .eq('id', mediaId)
+        .eq('active_job_id', activeJobId);
 
       if (error) throw error;
 
@@ -198,8 +224,22 @@ export function useWorkApproval(activeJobId?: string) {
 
   const rejectMedia = async (mediaId: string, feedback: string) => {
     if (!activeJobId) return false;
-    
+
     try {
+      // Verify the current user is the customer for this job
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: activeJob } = await supabase
+        .from('active_jobs')
+        .select('customer_id')
+        .eq('id', activeJobId)
+        .single();
+
+      if (!activeJob || activeJob.customer_id !== user.id) {
+        throw new Error('Not authorized to reject work for this job');
+      }
+
       const { error } = await supabase
         .from('work_approval_media')
         .update({
@@ -207,7 +247,8 @@ export function useWorkApproval(activeJobId?: string) {
           customer_feedback: feedback,
           rejected_at: new Date().toISOString(),
         })
-        .eq('id', mediaId);
+        .eq('id', mediaId)
+        .eq('active_job_id', activeJobId);
 
       if (error) throw error;
 
@@ -243,10 +284,15 @@ export function useWorkApproval(activeJobId?: string) {
 
   const deleteMedia = async (mediaId: string) => {
     try {
+      // Only allow the uploader to delete their own media
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('work_approval_media')
         .delete()
-        .eq('id', mediaId);
+        .eq('id', mediaId)
+        .eq('uploaded_by', user.id);
 
       if (error) throw error;
 

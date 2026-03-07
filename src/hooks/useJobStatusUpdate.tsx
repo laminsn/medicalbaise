@@ -49,6 +49,33 @@ export function useJobStatusUpdate() {
   ) => {
     setIsUpdating(true);
     try {
+      // Verify the user is a participant (customer or provider) before allowing status update
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: jobCheck } = await supabase
+        .from('active_jobs')
+        .select('customer_id, provider_id')
+        .eq('id', activeJobId)
+        .single();
+
+      if (!jobCheck) throw new Error('Job not found');
+
+      // Check if user is the customer or provider for this job
+      const { data: userProvider } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('id', jobCheck.provider_id)
+        .maybeSingle();
+
+      const isCustomer = jobCheck.customer_id === user.id;
+      const isProvider = !!userProvider;
+
+      if (!isCustomer && !isProvider) {
+        throw new Error('Not authorized to update this job');
+      }
+
       const updateData: Record<string, any> = {
         job_status: newStatus,
       };
