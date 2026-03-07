@@ -4,7 +4,15 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const LOCALES_DIR = path.join(ROOT, 'src', 'i18n', 'locales');
 const SOURCE_DIR = path.join(ROOT, 'src');
-const LOCALES = ['en', 'pt'];
+
+function getLocales() {
+  const files = fs.readdirSync(LOCALES_DIR).filter((file) => file.endsWith('.json'));
+  const locales = files.map((file) => path.basename(file, '.json')).sort();
+  if (!locales.includes('en')) {
+    throw new Error('Expected src/i18n/locales/en.json to exist');
+  }
+  return ['en', ...locales.filter((locale) => locale !== 'en')];
+}
 
 function flattenKeys(value, prefix = '', out = new Set()) {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -164,40 +172,86 @@ function printSection(title, values, max = 30) {
 function main() {
   const showAll = process.argv.includes('--full');
   const sectionMax = showAll ? Number.MAX_SAFE_INTEGER : 30;
-  const localeData = LOCALES.map(readLocale);
-  const [en, pt] = localeData;
+  const locales = getLocales();
+  const localeData = locales.map(readLocale);
+  const base = localeData.find((locale) => locale.locale === 'en');
+  if (!base) {
+    throw new Error('Base locale en is required');
+  }
+
   const { requiredKeys, optionalKeys } = extractUsedTranslationKeys();
   const allUsedKeysCount = new Set([...requiredKeys, ...optionalKeys]).size;
 
-  const missingInPt = diffMissing(en.flattenedKeys, pt.flattenedKeys);
-  const missingInEn = diffMissing(pt.flattenedKeys, en.flattenedKeys);
-  const requiredMissingInEn = diffMissing(requiredKeys, en.flattenedKeys);
-  const requiredMissingInPt = diffMissing(requiredKeys, pt.flattenedKeys);
-  const optionalMissingInEn = diffMissing(optionalKeys, en.flattenedKeys);
-  const optionalMissingInPt = diffMissing(optionalKeys, pt.flattenedKeys);
-
   console.log('i18n validation report');
   console.log('======================');
-  console.log(`- Locale keys (en): ${en.flattenedKeys.size}`);
-  console.log(`- Locale keys (pt): ${pt.flattenedKeys.size}`);
+  for (const locale of localeData) {
+    console.log(`- Locale keys (${locale.locale}): ${locale.flattenedKeys.size}`);
+  }
   console.log(`- Used translation keys in src: ${allUsedKeysCount}`);
   console.log(`  • required: ${requiredKeys.size}`);
   console.log(`  • optional (fallback/default provided): ${optionalKeys.size}`);
 
-  printSection('Top-level duplicate keys in en.json', en.duplicateTopLevelKeys, sectionMax);
-  printSection('Top-level duplicate keys in pt.json', pt.duplicateTopLevelKeys, sectionMax);
-  printSection('Keys present in en but missing in pt', missingInPt, sectionMax);
-  printSection('Keys present in pt but missing in en', missingInEn, sectionMax);
-  printSection('Required used keys missing in en', requiredMissingInEn, sectionMax);
-  printSection('Required used keys missing in pt', requiredMissingInPt, sectionMax);
-  printSection('Optional used keys missing in en', optionalMissingInEn, sectionMax);
-  printSection('Optional used keys missing in pt', optionalMissingInPt, sectionMax);
+  for (const locale of localeData) {
+    printSection(
+      `Top-level duplicate keys in ${locale.locale}.json`,
+      locale.duplicateTopLevelKeys,
+      sectionMax,
+    );
+  }
 
-  const hasFailures =
-    missingInPt.length > 0 ||
-    missingInEn.length > 0 ||
-    requiredMissingInEn.length > 0 ||
-    requiredMissingInPt.length > 0;
+  let hasFailures = false;
+  const requiredMissingInBase = diffMissing(requiredKeys, base.flattenedKeys);
+  if (requiredMissingInBase.length > 0) {
+    hasFailures = true;
+  }
+  printSection(
+    `Required used keys missing in ${base.locale}`,
+    requiredMissingInBase,
+    sectionMax,
+  );
+  printSection(
+    `Optional used keys missing in ${base.locale}`,
+    diffMissing(optionalKeys, base.flattenedKeys),
+    sectionMax,
+  );
+
+  for (const locale of localeData) {
+    if (locale.locale === base.locale) continue;
+
+    const missingInLocale = diffMissing(base.flattenedKeys, locale.flattenedKeys);
+    const missingInBase = diffMissing(locale.flattenedKeys, base.flattenedKeys);
+    const requiredMissingInLocale = diffMissing(requiredKeys, locale.flattenedKeys);
+    const optionalMissingInLocale = diffMissing(optionalKeys, locale.flattenedKeys);
+
+    printSection(
+      `Keys present in ${base.locale} but missing in ${locale.locale}`,
+      missingInLocale,
+      sectionMax,
+    );
+    printSection(
+      `Keys present in ${locale.locale} but missing in ${base.locale}`,
+      missingInBase,
+      sectionMax,
+    );
+    printSection(
+      `Required used keys missing in ${locale.locale}`,
+      requiredMissingInLocale,
+      sectionMax,
+    );
+    printSection(
+      `Optional used keys missing in ${locale.locale}`,
+      optionalMissingInLocale,
+      sectionMax,
+    );
+
+    if (
+      missingInLocale.length > 0 ||
+      missingInBase.length > 0 ||
+      requiredMissingInLocale.length > 0
+    ) {
+      hasFailures = true;
+    }
+  }
 
   if (hasFailures) {
     process.exitCode = 1;

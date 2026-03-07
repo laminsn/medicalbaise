@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
 ];
 
 export default function Settings() {
@@ -76,6 +77,8 @@ export default function Settings() {
   }
 
   const isDarkMode = theme === 'dark';
+  const resolvedLanguage = i18n.resolvedLanguage || i18n.language;
+  const selectedLanguage = languages.find((lang) => resolvedLanguage.startsWith(lang.code))?.code || 'pt';
 
   const handleRemoveFace = async () => {
     const success = await removeFaceEnrollment();
@@ -272,7 +275,7 @@ export default function Settings() {
               </CardHeader>
               <CardContent>
                 <RadioGroup
-                  value={i18n.language}
+                  value={selectedLanguage}
                   onValueChange={(value) => i18n.changeLanguage(value)}
                   className="space-y-3"
                 >
@@ -290,7 +293,7 @@ export default function Settings() {
                         <span className="text-lg">{lang.flag}</span>
                         <span>{lang.name}</span>
                       </Label>
-                      {i18n.language === lang.code && (
+                      {selectedLanguage === lang.code && (
                         <Check className="h-4 w-4 text-primary" />
                       )}
                     </div>
