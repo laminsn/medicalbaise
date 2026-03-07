@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, CreditCard, Plus, History, Wallet, X } from 'lucide-react';
+import { ArrowLeft, CreditCard, Plus, History, Wallet } from 'lucide-react';
 import { CheckoutAddOns, DEFAULT_ADDONS, AddOn } from '@/components/checkout/CheckoutAddOns';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -29,10 +29,6 @@ export default function Payments() {
   const [showAddFunds, setShowAddFunds] = useState(false);
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [fundAmount, setFundAmount] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
-  const [cardName, setCardName] = useState('');
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [subscriptionTier, setSubscriptionTier] = useState<string>('free');
 
@@ -85,35 +81,11 @@ export default function Payments() {
   };
 
   const handleAddPaymentMethod = () => {
-    if (!cardNumber || !cardExpiry || !cardCvc || !cardName) {
-      toast.error(t('payments.fillAllFields', 'Please fill all card details'));
-      return;
-    }
-    toast.success(t('payments.paymentMethodAdded', 'Payment method added successfully!'));
+    // Payment method collection must be handled via Stripe Elements or
+    // a PCI-compliant payment processor. Raw card data must never be
+    // stored in application state or transmitted to our servers.
+    toast.info(t('payments.stripeRedirect', 'You will be redirected to our secure payment processor.'));
     setShowAddPayment(false);
-    setCardNumber('');
-    setCardExpiry('');
-    setCardCvc('');
-    setCardName('');
-  };
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || '';
-    const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    return parts.length ? parts.join(' ') : value;
-  };
-
-  const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4);
-    }
-    return v;
   };
 
   const predefinedAmounts = [50, 100, 200, 500];
@@ -293,47 +265,9 @@ export default function Payments() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="card-name">{t('payments.cardholderName', 'Cardholder Name')}</Label>
-                <Input
-                  id="card-name"
-                  placeholder="John Doe"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="card-number">{t('payments.cardNumber', 'Card Number')}</Label>
-                <Input
-                  id="card-number"
-                  placeholder="1234 5678 9012 3456"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                  maxLength={19}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="card-expiry">{t('payments.expiry', 'Expiry')}</Label>
-                  <Input
-                    id="card-expiry"
-                    placeholder="MM/YY"
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                    maxLength={5}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="card-cvc">{t('payments.cvc', 'CVC')}</Label>
-                  <Input
-                    id="card-cvc"
-                    placeholder="123"
-                    value={cardCvc}
-                    onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    maxLength={4}
-                  />
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                {t('payments.securePaymentNote', 'For your security, card details are collected directly by our PCI-compliant payment processor. You will be securely redirected.')}
+              </p>
               <Button onClick={handleAddPaymentMethod} className="w-full">
                 {t('payments.addCard', 'Add Card')}
               </Button>

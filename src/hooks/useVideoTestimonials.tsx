@@ -85,8 +85,17 @@ export function useVideoTestimonials(providerId?: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Upload video to storage
-      const fileExt = file.name.split('.').pop();
+      // Validate file type and size
+      const allowedVideoTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
+      if (!allowedVideoTypes.includes(file.type)) {
+        throw new Error('Invalid file type. Allowed: MP4, MOV, WebM');
+      }
+      if (file.size > 100 * 1024 * 1024) { // 100MB max
+        throw new Error('File too large. Maximum: 100MB');
+      }
+
+      // Sanitize file extension and upload
+      const fileExt = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4';
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
@@ -136,10 +145,15 @@ export function useVideoTestimonials(providerId?: string) {
 
   const deleteTestimonial = async (testimonialId: string) => {
     try {
+      // Only allow the customer who created the testimonial to delete it
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('video_testimonials')
         .delete()
-        .eq('id', testimonialId);
+        .eq('id', testimonialId)
+        .eq('customer_id', user.id);
 
       if (error) throw error;
 

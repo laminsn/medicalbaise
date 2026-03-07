@@ -199,7 +199,8 @@ export default function ServiceEditor() {
         const { error } = await supabase
           .from('provider_services')
           .update(serviceData)
-          .eq('id', serviceId);
+          .eq('id', serviceId)
+          .eq('provider_id', providerId);
 
         if (error) throw error;
         toast.success(t('services.serviceUpdated', 'Service updated'));
@@ -208,7 +209,7 @@ export default function ServiceEditor() {
       // Save addons
       for (const addon of addons) {
         if (addon.isDeleted && addon.id) {
-          await supabase.from('provider_addons').delete().eq('id', addon.id);
+          await supabase.from('provider_addons').delete().eq('id', addon.id).eq('provider_id', providerId);
         } else if (addon.isNew && !addon.isDeleted) {
           await supabase
             .from('provider_addons')
@@ -227,7 +228,8 @@ export default function ServiceEditor() {
               description: addon.description || null,
               price: addon.price,
             })
-            .eq('id', addon.id);
+            .eq('id', addon.id)
+            .eq('provider_id', providerId);
         }
       }
 
@@ -235,7 +237,7 @@ export default function ServiceEditor() {
       if (currentServiceId) {
         for (const warranty of warranties) {
           if (warranty.isDeleted && warranty.id) {
-            await supabase.from('service_warranties').delete().eq('id', warranty.id);
+            await supabase.from('service_warranties').delete().eq('id', warranty.id).eq('service_id', currentServiceId);
           } else if (warranty.isNew && !warranty.isDeleted) {
             await supabase
               .from('service_warranties')
@@ -255,7 +257,8 @@ export default function ServiceEditor() {
                 warranty_type: warranty.warranty_type,
                 duration_months: warranty.duration_months,
               })
-              .eq('id', warranty.id);
+              .eq('id', warranty.id)
+              .eq('service_id', currentServiceId);
           }
         }
       }

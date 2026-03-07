@@ -215,21 +215,29 @@ export default function JobDetails() {
   };
 
   const handleAcceptBid = async (bidId: string) => {
+    // Verify the current user is the job owner before accepting
+    if (!user || !job || job.customer_id !== user.id) {
+      toast.error(t('jobs.errorAcceptingBid'));
+      return;
+    }
+
     const { error } = await supabase
       .from('bids')
       .update({ status: 'accepted', accepted_at: new Date().toISOString() })
-      .eq('id', bidId);
+      .eq('id', bidId)
+      .eq('job_id', id); // Scope bid to this job
 
     if (error) {
       toast.error(t('jobs.errorAcceptingBid'));
       return;
     }
 
-    // Update job status
+    // Update job status — scoped to the current user's jobs
     await supabase
       .from('jobs_posted')
       .update({ status: 'bid_accepted' })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('customer_id', user.id);
 
     toast.success(t('jobs.bidAcceptedSuccess'));
     

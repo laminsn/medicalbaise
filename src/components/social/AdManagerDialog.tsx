@@ -131,12 +131,14 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
   };
 
   const toggleAdStatus = async (ad: Ad) => {
+    if (!providerId) return;
     const newStatus = ad.status === 'active' ? 'paused' : 'active';
 
     const { error } = await supabase
       .from('promoted_ads')
       .update({ status: newStatus })
-      .eq('id', ad.id);
+      .eq('id', ad.id)
+      .eq('provider_id', providerId);
 
     if (error) {
       toast.error(t('socialFeed.errorUpdatingAd'));
@@ -147,10 +149,12 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
   };
 
   const deleteAd = async (adId: string) => {
+    if (!providerId) return;
     const { error } = await supabase
       .from('promoted_ads')
       .delete()
-      .eq('id', adId);
+      .eq('id', adId)
+      .eq('provider_id', providerId);
 
     if (error) {
       toast.error(t('socialFeed.errorDeletingAd'));

@@ -47,8 +47,16 @@ export const useMessages = () => {
     try {
       setLoading(true);
       
-      // Fetch conversations
-      const { data: convData, error: convError } = await supabase
+      // Fetch conversations — only those the user participates in
+      // First get provider IDs owned by this user (if any)
+      const { data: userProviders } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id);
+
+      const providerIds = userProviders?.map(p => p.id) || [];
+
+      let convQuery = supabase
         .from('conversations')
         .select(`
           *,
@@ -56,6 +64,15 @@ export const useMessages = () => {
           job:jobs_posted(id, title)
         `)
         .order('updated_at', { ascending: false });
+
+      // Filter: user is either the customer or the provider
+      if (providerIds.length > 0) {
+        convQuery = convQuery.or(`customer_id.eq.${user.id},provider_id.in.(${providerIds.join(',')})`);
+      } else {
+        convQuery = convQuery.eq('customer_id', user.id);
+      }
+
+      const { data: convData, error: convError } = await convQuery;
 
       if (convError) throw convError;
 
@@ -159,6 +176,16 @@ export const useConversation = (conversationId: string | undefined) => {
       if (convError) throw convError;
       if (!convData) return;
 
+      // Verify the current user is a participant in this conversation
+      const { data: userProviders } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id);
+      const userProviderIds = userProviders?.map(p => p.id) || [];
+      const isParticipant = convData.customer_id === user.id ||
+        userProviderIds.includes(convData.provider_id);
+      if (!isParticipant) return;
+
       // Get other user's name
       const isCustomer = convData.customer_id === user.id;
       let otherUserName = '';
@@ -217,6 +244,19 @@ export const useConversation = (conversationId: string | undefined) => {
     try {
       setSending(true);
 
+      // Verify the user is a participant before sending
+      if (!conversation) return;
+      const { data: userProviders } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id);
+      const userProviderIds = userProviders?.map(p => p.id) || [];
+      const isParticipant = conversation.customer_id === user.id ||
+        userProviderIds.includes(conversation.provider_id);
+      if (!isParticipant) {
+        throw new Error('Not authorized to send messages in this conversation');
+      }
+
       const { data, error } = await supabase
         .from('messages')
         .insert({
@@ -229,11 +269,12 @@ export const useConversation = (conversationId: string | undefined) => {
 
       if (error) throw error;
 
-      // Update conversation timestamp
+      // Update conversation timestamp — scope to user's conversations
       await supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
-        .eq('id', conversationId);
+        .eq('id', conversationId)
+        .or(`customer_id.eq.${user.id},provider_id.in.(${userProviderIds.join(',') || 'null'})`);
 
       return data;
     } catch (error) {

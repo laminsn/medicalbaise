@@ -110,3 +110,13 @@ export function sanitizeRedirectUrl(url: string): string {
 export function sanitizeInput(input: string, maxLength = 5000): string {
   return sanitizeText(input.slice(0, maxLength));
 }
+
+/**
+ * Sanitize a value for use in PostgREST `.or()` / `.filter()` strings.
+ * Strips characters that could inject additional filter clauses:
+ *   commas (clause separator), parentheses, dots (column.op), and backslashes.
+ * Use this whenever interpolating user input into a PostgREST filter string.
+ */
+export function sanitizePostgrestValue(value: string): string {
+  return value.replace(/[,().\\]/g, '');
+}

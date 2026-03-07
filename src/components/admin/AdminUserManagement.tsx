@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { Search, Edit, Loader2, Save, User } from 'lucide-react';
 
@@ -49,7 +50,7 @@ export function AdminUserManagement() {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .or(`email.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,handle.ilike.%${searchQuery}%`)
+      .or(`email.ilike.%${sanitizePostgrestValue(searchQuery)}%,first_name.ilike.%${sanitizePostgrestValue(searchQuery)}%,last_name.ilike.%${sanitizePostgrestValue(searchQuery)}%,handle.ilike.%${sanitizePostgrestValue(searchQuery)}%`)
       .limit(20);
 
     if (error) {

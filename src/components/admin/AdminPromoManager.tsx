@@ -7,6 +7,7 @@ import { sanitizeHtml } from '@/lib/sanitize';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { Gift, Users, Percent, Loader2, Send } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export function AdminPromoManager() {
     const { data: user, error: findErr } = await supabase
       .from('profiles')
       .select('user_id, first_name, credits_balance')
-      .or(`email.ilike.%${targetEmail}%,handle.ilike.%${targetEmail}%`)
+      .or(`email.ilike.%${sanitizePostgrestValue(targetEmail)}%,handle.ilike.%${sanitizePostgrestValue(targetEmail)}%`)
       .limit(1)
       .maybeSingle();
 
@@ -44,15 +45,22 @@ export function AdminPromoManager() {
       return;
     }
 
-    const newBalance = (user.credits_balance || 0) + bonus;
+    const currentBalance = user.credits_balance || 0;
+    const newBalance = currentBalance + bonus;
 
-    const { error } = await supabase
+    // Optimistic lock: only update if balance hasn't changed since we read it
+    const { data: updated, error } = await supabase
       .from('profiles')
       .update({ credits_balance: newBalance })
-      .eq('user_id', user.user_id);
+      .eq('user_id', user.user_id)
+      .eq('credits_balance', currentBalance)
+      .select('credits_balance')
+      .maybeSingle();
 
     if (error) {
       toast.error(t('admin.errorApplyingBonus'));
+    } else if (!updated) {
+      toast.error('Balance was modified concurrently. Please try again.');
     } else {
       toast.success(t('admin.bonusApplied', {
         amount: bonus,
@@ -89,12 +97,17 @@ export function AdminPromoManager() {
 
     let successCount = 0;
     for (const u of allUsers) {
-      const newBal = (u.credits_balance || 0) + bonus;
-      const { error } = await supabase
+      const currentBal = u.credits_balance || 0;
+      const newBal = currentBal + bonus;
+      // Optimistic lock per user to prevent race conditions
+      const { data: updated, error } = await supabase
         .from('profiles')
         .update({ credits_balance: newBal })
-        .eq('user_id', u.user_id);
-      if (!error) successCount++;
+        .eq('user_id', u.user_id)
+        .eq('credits_balance', currentBal)
+        .select('user_id')
+        .maybeSingle();
+      if (!error && updated) successCount++;
     }
 
     toast.success(t('admin.bulkApplied', { amount: bonus, count: successCount }));

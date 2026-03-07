@@ -74,14 +74,28 @@ export function useScheduledServices() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Get user's provider IDs first to avoid raw sub-select injection
+      const { data: userProviders } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id);
+      const providerIds = userProviders?.map(p => p.id) || [];
+
+      let serviceQuery = supabase
         .from('scheduled_services')
         .select(`
           *,
           provider:providers(business_name)
         `)
-        .or(`customer_id.eq.${user.id},provider_id.in.(select id from providers where user_id = '${user.id}')`)
         .order('next_scheduled_date', { ascending: true });
+
+      if (providerIds.length > 0) {
+        serviceQuery = serviceQuery.or(`customer_id.eq.${user.id},provider_id.in.(${providerIds.join(',')})`);
+      } else {
+        serviceQuery = serviceQuery.eq('customer_id', user.id);
+      }
+
+      const { data, error } = await serviceQuery;
 
       if (error) throw error;
       setServices((data || []) as unknown as ScheduledService[]);
@@ -212,10 +226,15 @@ export function useScheduledServices() {
 
   const updateServiceStatus = async (serviceId: string, status: 'active' | 'paused' | 'cancelled') => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Only allow the customer who created the service to update it
       const { error } = await supabase
         .from('scheduled_services')
         .update({ status })
-        .eq('id', serviceId);
+        .eq('id', serviceId)
+        .eq('customer_id', user.id);
 
       if (error) throw error;
 
