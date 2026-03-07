@@ -36,7 +36,8 @@ import {
 type SubscriptionTier = 'free' | 'pro' | 'elite' | 'enterprise';
 
 export default function ProviderDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const { user } = useAuth();
   const navigate = useNavigate();
   const [providerTier, setProviderTier] = useState<SubscriptionTier>('free');
@@ -71,6 +72,13 @@ export default function ProviderDashboard() {
   const isEliteOrAbove = providerTier === 'elite' || providerTier === 'enterprise';
   const isProOrAbove = isEliteOrAbove || providerTier === 'pro';
   const isEnterprise = providerTier === 'enterprise';
+  const tierLabel = (tier: SubscriptionTier) => {
+    if (!isPt) return tier;
+    if (tier === 'free') return 'gratuito';
+    if (tier === 'pro') return 'pro';
+    if (tier === 'elite') return 'elite';
+    return 'enterprise';
+  };
 
   const getTierBadgeColor = (tier: SubscriptionTier) => {
     switch (tier) {
@@ -131,7 +139,7 @@ export default function ProviderDashboard() {
           <div className="flex items-center gap-3">
             <Badge className={`${getTierBadgeColor(providerTier)} capitalize`}>
               <Crown className="h-3 w-3 mr-1" />
-              {providerTier} {t('common.tier')}
+              {tierLabel(providerTier)} {t('common.tier')}
             </Badge>
             {!isEliteOrAbove && (
               <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate('/subscription')}>
@@ -163,7 +171,7 @@ export default function ProviderDashboard() {
             </TabsTrigger>
             <TabsTrigger value="emailCampaigns" className="gap-2 py-3" disabled={!isEliteOrAbove}>
               <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">Email Campaigns</span>
+              <span className="hidden sm:inline">{isPt ? 'Campanhas de email' : 'Email Campaigns'}</span>
               {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
             </TabsTrigger>
             <TabsTrigger value="scheduled" className="gap-2 py-3">
@@ -200,11 +208,13 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="emailCampaigns" className="space-y-6">
-            {isEliteOrAbove ? (
+            {isPt ? (
+              <TranslationPendingCard />
+            ) : isEliteOrAbove ? (
               <ProviderEmailCampaigns />
             ) : (
               <UpgradePrompt 
-                feature="Email Campaigns" 
+                feature={isPt ? 'Campanhas de email' : 'Email Campaigns'}
                 requiredTier="Elite"
               />
             )}
@@ -237,7 +247,9 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="tracking" className="space-y-6">
-            {isEnterprise ? (
+            {isPt ? (
+              <TranslationPendingCard />
+            ) : isEnterprise ? (
               <div className="space-y-6">
                 <PixelTrackingSettings />
                 <ConversionAnalyticsDashboard />
@@ -252,6 +264,16 @@ export default function ProviderDashboard() {
         </Tabs>
       </div>
     </AppLayout>
+  );
+}
+
+function TranslationPendingCard() {
+  return (
+    <Card className="border-dashed">
+      <CardContent className="py-10 text-center text-muted-foreground">
+        Conteúdo desta seção em tradução para português.
+      </CardContent>
+    </Card>
   );
 }
 

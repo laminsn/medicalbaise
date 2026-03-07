@@ -37,7 +37,8 @@ export function LanguageFluencySelector({
   };
 
   const getLanguageLabel = (lang: typeof AVAILABLE_LANGUAGES[0]) => {
-    return i18n.language === 'pt' ? lang.labelPt : lang.labelEn;
+    const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+    return isPt ? lang.labelPt : lang.labelEn;
   };
 
   return (

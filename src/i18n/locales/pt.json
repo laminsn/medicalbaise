@@ -96,7 +96,10 @@
     "linkCopied": "Link copiado",
     "reload": "Recarregar",
     "shared": "Compartilhado com sucesso",
-    "tryAgain": "Tente novamente"
+    "tryAgain": "Tente novamente",
+    "clearFilters": "Limpar filtros",
+    "discard": "Descartar",
+    "invalidRequest": "Solicitação inválida."
   },
   "nav": {
     "home": "Início",
@@ -179,7 +182,10 @@
     "psychology": "Psicologia",
     "endocrinology": "Endocrinologia",
     "more": "Mais",
-    "allCategories": "Todas Especialidades"
+    "allCategories": "Todas Especialidades",
+    "allCategoriesDescription": "Explore todas as especialidades disponíveis e encontre o profissional ideal para você.",
+    "backToCategories": "Voltar para categorias",
+    "notFound": "Categoria não encontrada"
   },
   "providers": {
     "title": "Profissionais em Destaque",
@@ -720,7 +726,15 @@
     "cameraPreview": "Prévia da Câmera",
     "endLive": "Encerrar Live",
     "liveEnded": "Live encerrada",
-    "reviewAfterLive": "Após encerrar, você pode revisar e editar antes de publicar"
+    "reviewAfterLive": "Após encerrar, você pode revisar e editar antes de publicar",
+    "cameraAccessDenied": "Acesso à câmera negado",
+    "cameraError": "Erro de câmera",
+    "initializingCamera": "Inicializando câmera...",
+    "noPostsFiltered": "Nenhuma publicação encontrada para os filtros selecionados",
+    "noRecording": "Nenhuma gravação disponível",
+    "preview": "Pré-visualizar",
+    "recordingError": "Erro de gravação",
+    "retryCamera": "Tentar câmera novamente"
   },
   "payments": {
     "balance": "Saldo Disponível",
@@ -747,7 +761,9 @@
     "cvc": "CVV",
     "addCard": "Adicionar Cartão",
     "paymentMethodAdded": "Método de pagamento adicionado com sucesso!",
-    "fillAllFields": "Por favor, preencha todos os dados do cartão"
+    "fillAllFields": "Por favor, preencha todos os dados do cartão",
+    "securePaymentNote": "Pagamentos processados com segurança pelo Stripe.",
+    "stripeRedirect": "Você será redirecionado para o checkout do Stripe."
   },
   "messages": {
     "title": "Mensagens",
@@ -881,7 +897,9 @@
     "serviceWarranty": "Garantia de Serviço",
     "satisfactionGuarantee": "Garantia de Satisfação",
     "mockWarranty": "Garantia de 1 ano em todas as instalações. Reparos gratuitos para defeitos de mão de obra.",
-    "mockGuarantee": "100% de satisfação garantida. Se não estiver satisfeito com nosso trabalho, refazemos gratuitamente."
+    "mockGuarantee": "100% de satisfação garantida. Se não estiver satisfeito com nosso trabalho, refazemos gratuitamente.",
+    "followers": "Seguidores",
+    "following": "Seguindo"
   },
   "quote": {
     "requestQuote": "Solicitar Orçamento",
@@ -977,7 +995,10 @@
     "saveFailed": "Falha ao salvar",
     "acceptedFormats": "Formatos aceitos: JPG, PNG, PDF (máx 5MB cada)",
     "createProfile": "Criar perfil",
-    "servicesOfferedDescription": "Selecione todos os serviços que você oferece"
+    "servicesOfferedDescription": "Selecione todos os serviços que você oferece",
+    "servicesSelected": "{{count}} serviços selecionados",
+    "servicesUpdated": "Serviços atualizados com sucesso",
+    "servicesUpdateError": "Falha ao atualizar serviços"
   },
   "referral": {
     "pageTitle": "Programa de Indicação - Brasil Base",
@@ -1022,7 +1043,11 @@
     "qrCodeDescription": "Escaneie este QR code para usar o link de indicação",
     "downloadQrCode": "Baixar QR Code",
     "qrDownloaded": "QR Code Baixado",
-    "qrDownloadedDescription": "O QR code foi salvo no seu dispositivo"
+    "qrDownloadedDescription": "O QR code foi salvo no seu dispositivo",
+    "noCreditedReferrals": "Nenhuma indicação creditada ainda",
+    "noPendingReferrals": "Nenhuma indicação pendente",
+    "noReferralsYet": "Ainda não há indicações",
+    "pendingUser": "Usuário pendente"
   },
   "favorites": {
     "title": "Favoritos",
@@ -1052,14 +1077,14 @@
     "createReminder": "Criar Lembrete",
     "createReminderDesc": "Configure um lembrete para compromissos, manutenção ou tarefas personalizadas.",
     "reminderTitle": "Título",
-    "reminderTitlePlaceholder": "Ex: Fazer follow-up com cliente",
+    "reminderTitlePlaceholder": "Ex: Fazer acompanhamento com cliente",
     "reminderMessage": "Mensagem",
     "reminderMessagePlaceholder": "O que você precisa lembrar?",
     "reminderType": "Tipo",
     "typeCustom": "Personalizado",
     "typeAppointment": "Compromisso",
     "typeMaintenance": "Manutenção",
-    "typeFollowUp": "Follow-up",
+    "typeFollowUp": "Acompanhamento",
     "date": "Data",
     "time": "Hora",
     "pickDate": "Escolha uma data",
@@ -1116,7 +1141,8 @@
     "titleLabel": "Título",
     "titlePlaceholder": "Ex.: Excelente atendimento",
     "uploadTitle": "Enviar depoimento em vídeo",
-    "uploading": "Enviando..."
+    "uploading": "Enviando...",
+    "uploadDescription": "Compartilhe sua experiência com {{provider}}"
   },
   "workApproval": {
     "approve": "Aprovar",
@@ -1314,7 +1340,9 @@
       "scheduled": "Agendados",
       "autoReply": "Resposta Auto",
       "messages": "Mensagens",
-      "tracking": "Rastreamento"
+      "tracking": "Rastreamento",
+      "jobs": "Trabalhos",
+      "marketing": "Marketing"
     },
     "features": {
       "autoReply": "Resposta Automática",
@@ -1522,7 +1550,26 @@
     "noAddons": "Nenhum adicional ainda. Adicione extras opcionais para seu serviço.",
     "addonName": "Nome do Adicional",
     "addonNamePlaceholder": "Ex: Serviço Expresso",
-    "addonDescPlaceholder": "Breve descrição"
+    "addonDescPlaceholder": "Breve descrição",
+    "addOns": "Adicionais",
+    "addOnsDescription": "Extras opcionais que os clientes podem adicionar",
+    "cleanupIncluded": "Limpeza incluída",
+    "editGuarantee": "Editar garantia de satisfação",
+    "editWarranty": "Editar garantia de serviço",
+    "emergencyService": "Atendimento de emergência",
+    "freeConsultation": "Consulta gratuita",
+    "globalWarranty": "Garantia global",
+    "guaranteeInfoDesc": "Explique os detalhes da sua garantia de satisfação",
+    "materialsIncluded": "Materiais incluídos",
+    "noGuaranteeSet": "Nenhuma informação de garantia de satisfação definida",
+    "noWarrantySet": "Nenhuma informação de garantia de serviço definida",
+    "pricing": "Preços",
+    "selectWhatIncluded": "Selecione o que está incluído",
+    "serviceOptions": "Opções de serviço",
+    "servicesAdded": "Serviços adicionados com sucesso",
+    "warranties": "Garantias",
+    "warrantyInfoDesc": "Explique a cobertura da sua garantia",
+    "weekendAvailable": "Disponível aos finais de semana"
   },
   "subscription": {
     "title": "Assinatura",
@@ -1576,7 +1623,19 @@
     "doctorsAvailable": "médicos disponíveis",
     "viewDetails": "Ver detalhes",
     "errorLoading": "Falha ao carregar consultas",
-    "noRecentAppointments": "Nenhuma consulta recente"
+    "noRecentAppointments": "Nenhuma consulta recente",
+    "consultationFee": "Valor da consulta",
+    "fillRequiredFields": "Preencha todos os campos obrigatórios.",
+    "notes": "Observações",
+    "notesPlaceholder": "Descreva sintomas, objetivos ou detalhes importantes.",
+    "preferredDate": "Data preferida",
+    "preferredTime": "Horário preferido",
+    "providerNotFound": "Profissional não encontrado.",
+    "requestAppointment": "Solicitar consulta",
+    "requestFailed": "Não foi possível enviar a solicitação de consulta.",
+    "requestMessageTitle": "Solicitação de consulta",
+    "requestSent": "Solicitação de consulta enviada.",
+    "sendRequest": "Enviar solicitação"
   },
   "doctorProfile": {
     "loading": "Carregando perfil do médico...",
@@ -1673,7 +1732,8 @@
     "faceNotRecognized": "Rosto não reconhecido. Tente novamente ou use login com senha.",
     "faceAuthSignInFailed": "Rosto verificado mas o login falhou. Use login com senha.",
     "startFaceScan": "Iniciar Escaneamento Facial",
-    "verifyMyFace": "Verificar Meu Rosto"
+    "verifyMyFace": "Verificar Meu Rosto",
+    "otpSentCheckEmail": "Código enviado. Verifique seu email."
   },
   "address": {
     "street": "Rua",
@@ -1685,5 +1745,95 @@
     "neighborhood": "Bairro",
     "neighborhoodPlaceholder": "Bairro",
     "cep": "CEP"
+  },
+  "filters": {
+    "priceRange": "Faixa de preço"
+  },
+  "marketing": {
+    "title": "Campanhas de marketing",
+    "sendDesc": "Envie anúncios e promoções para seus seguidores",
+    "totalFollowers": "Total de seguidores",
+    "totalReached": "Total alcançado",
+    "blastsSent": "Campanhas enviadas",
+    "fromProvider": "De {{provider}}",
+    "notificationType": "Tipo de notificação",
+    "typeAnnouncement": "Comunicado",
+    "typePromotion": "Promoção",
+    "typeUpdate": "Atualização",
+    "typeEvent": "Evento",
+    "titlePlaceholder": "Título da campanha",
+    "message": "Mensagem",
+    "messagePlaceholder": "Escreva a mensagem da campanha...",
+    "sendTo": "Enviar para",
+    "sendNotification": "Enviar notificação",
+    "quickTemplates": "Templates rápidos",
+    "templatePromoTitle": "Oferta especial para seguidores",
+    "templatePromoMsg": "Promoção por tempo limitado! Confira nossa oferta mais recente.",
+    "templateUpdateTitle": "Atualização importante",
+    "templateUpdateMsg": "Temos uma atualização importante para nossos seguidores.",
+    "templateEventTitle": "Novo evento",
+    "templateEventMsg": "Participe do nosso próximo evento. Será um prazer ter você.",
+    "preview": "Pré-visualização",
+    "fillAllFields": "Preencha todos os campos",
+    "noFollowers": "Ainda não há seguidores",
+    "noHistory": "Ainda não há histórico de campanhas",
+    "history": "Histórico de campanhas",
+    "reached": "Alcance",
+    "sending": "Enviando...",
+    "blastSent": "Campanha enviada com sucesso",
+    "blastError": "Falha ao enviar campanha",
+    "errorFetchingFollowers": "Falha ao carregar seguidores"
+  },
+  "payouts": {
+    "title": "Pagamentos",
+    "subtitle": "Gerencie métodos de recebimento e histórico",
+    "methods": "Métodos de recebimento",
+    "methodsDescription": "Escolha como deseja receber",
+    "noMethods": "Nenhum método de recebimento adicionado",
+    "addMethod": "Adicionar método",
+    "addMethodDescription": "Adicione um método para receber valores",
+    "addPayoutMethod": "Adicionar método de recebimento",
+    "methodType": "Tipo de método",
+    "selectType": "Selecione o tipo de método",
+    "bankTransfer": "Transferência bancária",
+    "accountHolder": "Titular da conta",
+    "accountHolderPlaceholder": "Nome do titular da conta",
+    "bankName": "Nome do banco",
+    "bankNamePlaceholder": "Nome do banco",
+    "agency": "Agência",
+    "account": "Conta",
+    "pixKey": "Chave PIX",
+    "pixKeyPlaceholder": "Chave PIX",
+    "paypalEmail": "Email do PayPal",
+    "paypalEmailPlaceholder": "nome@exemplo.com",
+    "saveMethod": "Salvar método",
+    "history": "Histórico de recebimentos",
+    "historyDescription": "Acompanhe seus registros de recebimento",
+    "noHistory": "Ainda não há histórico de recebimentos",
+    "date": "Data",
+    "amount": "Valor",
+    "status": "Status",
+    "method": "Método",
+    "receipt": "Comprovante",
+    "download": "Baixar"
+  },
+  "providerDashboard": {
+    "activeJobs": "Trabalhos ativos",
+    "noActiveJobs": "Nenhum trabalho ativo"
+  },
+  "stories": {
+    "addStory": "Adicionar story",
+    "addText": "Adicionar texto",
+    "chooseFromGallery": "Escolher da galeria",
+    "create": "Criar story",
+    "createDesc": "Compartilhe uma foto, vídeo ou atualização em texto",
+    "createText": "Criar story de texto",
+    "gallery": "Galeria",
+    "normal": "Normal",
+    "publishing": "Publicando...",
+    "startingCamera": "Iniciando câmera...",
+    "typeSomething": "Digite algo...",
+    "typeText": "Digitar texto",
+    "yourStory": "Seu story"
   }
 }

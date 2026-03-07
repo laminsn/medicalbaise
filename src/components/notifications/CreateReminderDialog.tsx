@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -31,20 +31,19 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { enUS, ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useTranslation } from 'react-i18next';
 
-const reminderSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  message: z.string().min(1, 'Message is required'),
-  reminder_type: z.string(),
-  scheduled_date: z.date(),
-  scheduled_time: z.string(),
-  repeat_interval: z.string().optional(),
-});
-
-type ReminderFormValues = z.infer<typeof reminderSchema>;
+type ReminderFormValues = {
+  title: string;
+  message: string;
+  reminder_type: string;
+  scheduled_date: Date;
+  scheduled_time: string;
+  repeat_interval?: string;
+};
 
 interface CreateReminderDialogProps {
   open: boolean;
@@ -52,9 +51,24 @@ interface CreateReminderDialogProps {
 }
 
 export function CreateReminderDialog({ open, onOpenChange }: CreateReminderDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const dateLocale = isPt ? ptBR : enUS;
   const { createReminder } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const reminderSchema = useMemo(
+    () =>
+      z.object({
+        title: z.string().min(1, isPt ? 'Título é obrigatório' : 'Title is required'),
+        message: z.string().min(1, isPt ? 'Mensagem é obrigatória' : 'Message is required'),
+        reminder_type: z.string(),
+        scheduled_date: z.date(),
+        scheduled_time: z.string(),
+        repeat_interval: z.string().optional(),
+      }),
+    [isPt],
+  );
 
   const form = useForm<ReminderFormValues>({
     resolver: zodResolver(reminderSchema),
@@ -178,7 +192,7 @@ export function CreateReminderDialog({ open, onOpenChange }: CreateReminderDialo
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: dateLocale })
                             ) : (
                               <span>{t('notifications.pickDate')}</span>
                             )}

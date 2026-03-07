@@ -21,8 +21,9 @@ import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 export default function ProfileEdit() {
   const { user, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -64,8 +65,8 @@ export default function ProfileEdit() {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: 'Invalid file type',
-        description: 'Please select an image file',
+        title: isPt ? 'Tipo de arquivo inválido' : 'Invalid file type',
+        description: isPt ? 'Selecione um arquivo de imagem' : 'Please select an image file',
         variant: 'destructive',
       });
       return;
@@ -74,8 +75,8 @@ export default function ProfileEdit() {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: 'File too large',
-        description: 'Please select an image under 5MB',
+        title: isPt ? 'Arquivo muito grande' : 'File too large',
+        description: isPt ? 'Selecione uma imagem com menos de 5MB' : 'Please select an image under 5MB',
         variant: 'destructive',
       });
       return;
@@ -94,7 +95,11 @@ export default function ProfileEdit() {
       if (uploadError) {
         // If bucket doesn't exist, show a message
         if (uploadError.message.includes('not found')) {
-          throw new Error('Avatar storage not configured. Please contact support.');
+          throw new Error(
+            isPt
+              ? 'Armazenamento de avatar não configurado. Entre em contato com o suporte.'
+              : 'Avatar storage not configured. Please contact support.',
+          );
         }
         throw uploadError;
       }
@@ -106,14 +111,14 @@ export default function ProfileEdit() {
       setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
       
       toast({
-        title: 'Image uploaded',
-        description: 'Your profile picture has been updated',
+        title: isPt ? 'Imagem enviada' : 'Image uploaded',
+        description: isPt ? 'Sua foto de perfil foi atualizada' : 'Your profile picture has been updated',
       });
     } catch (error: any) {
       console.error('Error uploading image:', error);
       toast({
-        title: 'Upload failed',
-        description: error.message || 'Failed to upload image',
+        title: isPt ? 'Falha no envio' : 'Upload failed',
+        description: error.message || (isPt ? 'Falha ao enviar imagem' : 'Failed to upload image'),
         variant: 'destructive',
       });
     } finally {
@@ -153,16 +158,16 @@ export default function ProfileEdit() {
       await refreshProfile();
       
       toast({
-        title: 'Profile updated',
-        description: 'Your profile has been saved successfully',
+        title: isPt ? 'Perfil atualizado' : 'Profile updated',
+        description: isPt ? 'Seu perfil foi salvo com sucesso' : 'Your profile has been saved successfully',
       });
       
       navigate('/profile');
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
-        title: 'Update failed',
-        description: error.message || 'Failed to update profile',
+        title: isPt ? 'Falha na atualização' : 'Update failed',
+        description: error.message || (isPt ? 'Falha ao atualizar perfil' : 'Failed to update profile'),
         variant: 'destructive',
       });
     } finally {

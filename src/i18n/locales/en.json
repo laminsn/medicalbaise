@@ -96,7 +96,10 @@
     "linkCopied": "Link copied",
     "reload": "Reload",
     "shared": "Shared successfully",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "clearFilters": "Clear filters",
+    "discard": "Discard",
+    "invalidRequest": "Invalid request."
   },
   "nav": {
     "home": "Home",
@@ -179,7 +182,10 @@
     "psychology": "Psychology",
     "endocrinology": "Endocrinology",
     "more": "More",
-    "allCategories": "All Specialties"
+    "allCategories": "All Specialties",
+    "allCategoriesDescription": "Browse all available specialties and find the right professional for your needs.",
+    "backToCategories": "Back to categories",
+    "notFound": "Category not found"
   },
   "providers": {
     "title": "Featured Doctors",
@@ -720,7 +726,15 @@
     "cameraPreview": "Camera Preview",
     "endLive": "End Live Stream",
     "liveEnded": "Live stream ended",
-    "reviewAfterLive": "After ending, you can review and edit before posting"
+    "reviewAfterLive": "After ending, you can review and edit before posting",
+    "cameraAccessDenied": "Camera access denied",
+    "cameraError": "Camera error",
+    "initializingCamera": "Initializing camera...",
+    "noPostsFiltered": "No posts found for selected filters",
+    "noRecording": "No recording available",
+    "preview": "Preview",
+    "recordingError": "Recording error",
+    "retryCamera": "Retry camera"
   },
   "payments": {
     "balance": "Available Balance",
@@ -747,7 +761,9 @@
     "cvc": "CVC",
     "addCard": "Add Card",
     "paymentMethodAdded": "Payment method added successfully!",
-    "fillAllFields": "Please fill all card details"
+    "fillAllFields": "Please fill all card details",
+    "securePaymentNote": "Payments are securely processed by Stripe.",
+    "stripeRedirect": "You will be redirected to Stripe checkout."
   },
   "messages": {
     "title": "Messages",
@@ -881,7 +897,9 @@
     "serviceWarranty": "Treatment Guarantee",
     "satisfactionGuarantee": "Patient Satisfaction",
     "mockWarranty": "Follow-up care included. Free consultations for any treatment-related concerns.",
-    "mockGuarantee": "100% patient satisfaction guaranteed. We ensure quality care and address all your concerns."
+    "mockGuarantee": "100% patient satisfaction guaranteed. We ensure quality care and address all your concerns.",
+    "followers": "Followers",
+    "following": "Following"
   },
   "quote": {
     "requestQuote": "Request Appointment",
@@ -977,7 +995,10 @@
     "saveFailed": "Failed to save",
     "acceptedFormats": "Accepted formats: JPG, PNG, PDF (max 5MB each)",
     "createProfile": "Create profile",
-    "servicesOfferedDescription": "Select all services you provide"
+    "servicesOfferedDescription": "Select all services you provide",
+    "servicesSelected": "{{count}} services selected",
+    "servicesUpdated": "Services updated successfully",
+    "servicesUpdateError": "Failed to update services"
   },
   "referral": {
     "pageTitle": "Referral Program - MD Baise",
@@ -1022,7 +1043,11 @@
     "qrCodeDescription": "Scan this QR code to use the referral link",
     "downloadQrCode": "Download QR Code",
     "qrDownloaded": "QR Code Downloaded",
-    "qrDownloadedDescription": "The QR code has been saved to your device"
+    "qrDownloadedDescription": "The QR code has been saved to your device",
+    "noCreditedReferrals": "No credited referrals yet",
+    "noPendingReferrals": "No pending referrals",
+    "noReferralsYet": "No referrals yet",
+    "pendingUser": "Pending user"
   },
   "favorites": {
     "title": "Favorites",
@@ -1116,7 +1141,8 @@
     "titleLabel": "Title",
     "titlePlaceholder": "e.g., Great service",
     "uploadTitle": "Upload video testimonial",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "uploadDescription": "Share your experience with {{provider}}"
   },
   "workApproval": {
     "approve": "Approve",
@@ -1314,7 +1340,9 @@
       "scheduled": "Scheduled",
       "autoReply": "Auto-Reply",
       "messages": "Messages",
-      "tracking": "Tracking"
+      "tracking": "Tracking",
+      "jobs": "Jobs",
+      "marketing": "Marketing"
     },
     "features": {
       "autoReply": "Auto-Reply",
@@ -1522,7 +1550,26 @@
     "noAddons": "No add-ons yet. Add optional extras for your service.",
     "addonName": "Add-on Name",
     "addonNamePlaceholder": "e.g., Express Service",
-    "addonDescPlaceholder": "Brief description"
+    "addonDescPlaceholder": "Brief description",
+    "addOns": "Add-ons",
+    "addOnsDescription": "Optional extras customers can add",
+    "cleanupIncluded": "Cleanup included",
+    "editGuarantee": "Edit guarantee",
+    "editWarranty": "Edit warranty",
+    "emergencyService": "Emergency service",
+    "freeConsultation": "Free consultation",
+    "globalWarranty": "Global warranty",
+    "guaranteeInfoDesc": "Explain your satisfaction guarantee details",
+    "materialsIncluded": "Materials included",
+    "noGuaranteeSet": "No guarantee information set",
+    "noWarrantySet": "No warranty information set",
+    "pricing": "Pricing",
+    "selectWhatIncluded": "Select what is included",
+    "serviceOptions": "Service options",
+    "servicesAdded": "Services added successfully",
+    "warranties": "Warranties",
+    "warrantyInfoDesc": "Explain your warranty coverage",
+    "weekendAvailable": "Weekend availability"
   },
   "subscription": {
     "title": "Subscription",
@@ -1576,7 +1623,19 @@
     "doctorsAvailable": "doctors available",
     "viewDetails": "View details",
     "errorLoading": "Failed to load appointments",
-    "noRecentAppointments": "No recent appointments"
+    "noRecentAppointments": "No recent appointments",
+    "consultationFee": "Consultation fee",
+    "fillRequiredFields": "Please fill in all required fields.",
+    "notes": "Notes",
+    "notesPlaceholder": "Describe symptoms, goals, or important details.",
+    "preferredDate": "Preferred date",
+    "preferredTime": "Preferred time",
+    "providerNotFound": "Provider not found.",
+    "requestAppointment": "Request appointment",
+    "requestFailed": "Could not send appointment request.",
+    "requestMessageTitle": "Appointment request",
+    "requestSent": "Appointment request sent.",
+    "sendRequest": "Send request"
   },
   "doctorProfile": {
     "loading": "Loading doctor profile...",
@@ -1673,7 +1732,8 @@
     "faceNotRecognized": "Face not recognized. Please try again or use password login.",
     "faceAuthSignInFailed": "Face verified but sign-in failed. Please use password login.",
     "startFaceScan": "Start Face Scan",
-    "verifyMyFace": "Verify My Face"
+    "verifyMyFace": "Verify My Face",
+    "otpSentCheckEmail": "Code sent. Check your email."
   },
   "address": {
     "street": "Street",
@@ -1685,5 +1745,95 @@
     "neighborhood": "Neighborhood",
     "neighborhoodPlaceholder": "Neighborhood",
     "cep": "ZIP code (CEP)"
+  },
+  "filters": {
+    "priceRange": "Price range"
+  },
+  "marketing": {
+    "title": "Marketing campaigns",
+    "sendDesc": "Send announcements and promotions to your followers",
+    "totalFollowers": "Total followers",
+    "totalReached": "Total reached",
+    "blastsSent": "Campaigns sent",
+    "fromProvider": "From {{provider}}",
+    "notificationType": "Notification type",
+    "typeAnnouncement": "Announcement",
+    "typePromotion": "Promotion",
+    "typeUpdate": "Update",
+    "typeEvent": "Event",
+    "titlePlaceholder": "Campaign title",
+    "message": "Message",
+    "messagePlaceholder": "Write your campaign message...",
+    "sendTo": "Send to",
+    "sendNotification": "Send notification",
+    "quickTemplates": "Quick templates",
+    "templatePromoTitle": "Special offer for followers",
+    "templatePromoMsg": "Limited-time promotion! Check out our latest offer.",
+    "templateUpdateTitle": "Important update",
+    "templateUpdateMsg": "We have an important update for our followers.",
+    "templateEventTitle": "New event",
+    "templateEventMsg": "Join our upcoming event. We would love to see you there.",
+    "preview": "Preview",
+    "fillAllFields": "Please fill all fields",
+    "noFollowers": "No followers yet",
+    "noHistory": "No campaign history yet",
+    "history": "Campaign history",
+    "reached": "Reached",
+    "sending": "Sending...",
+    "blastSent": "Campaign sent successfully",
+    "blastError": "Failed to send campaign",
+    "errorFetchingFollowers": "Failed to load followers"
+  },
+  "payouts": {
+    "title": "Payouts",
+    "subtitle": "Manage payout methods and history",
+    "methods": "Payout methods",
+    "methodsDescription": "Choose how you receive payouts",
+    "noMethods": "No payout methods added yet",
+    "addMethod": "Add method",
+    "addMethodDescription": "Add a payout method to receive funds",
+    "addPayoutMethod": "Add payout method",
+    "methodType": "Method type",
+    "selectType": "Select method type",
+    "bankTransfer": "Bank transfer",
+    "accountHolder": "Account holder",
+    "accountHolderPlaceholder": "Account holder name",
+    "bankName": "Bank name",
+    "bankNamePlaceholder": "Bank name",
+    "agency": "Branch / Agency",
+    "account": "Account",
+    "pixKey": "PIX key",
+    "pixKeyPlaceholder": "PIX key",
+    "paypalEmail": "PayPal email",
+    "paypalEmailPlaceholder": "name@example.com",
+    "saveMethod": "Save method",
+    "history": "Payout history",
+    "historyDescription": "Track your payout records",
+    "noHistory": "No payout history yet",
+    "date": "Date",
+    "amount": "Amount",
+    "status": "Status",
+    "method": "Method",
+    "receipt": "Receipt",
+    "download": "Download"
+  },
+  "providerDashboard": {
+    "activeJobs": "Active jobs",
+    "noActiveJobs": "No active jobs"
+  },
+  "stories": {
+    "addStory": "Add story",
+    "addText": "Add text",
+    "chooseFromGallery": "Choose from gallery",
+    "create": "Create story",
+    "createDesc": "Share a photo, video, or text update",
+    "createText": "Create text story",
+    "gallery": "Gallery",
+    "normal": "Normal",
+    "publishing": "Publishing...",
+    "startingCamera": "Starting camera...",
+    "typeSomething": "Type something...",
+    "typeText": "Type text",
+    "yourStory": "Your story"
   }
 }
