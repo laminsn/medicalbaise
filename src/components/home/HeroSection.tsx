@@ -1,7 +1,7 @@
 import { Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MEDICAL_CATEGORIES, POPULAR_SPECIALTIES } from '@/lib/constants';
@@ -104,6 +104,14 @@ export function HeroSection() {
             </Button>
           </div>
         </form>
+
+        <div className="flex justify-center mb-4">
+          <Link to="/post-job">
+            <Button variant="outline" size="lg" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8">
+              {t('nav.postJob', 'Post a Job')}
+            </Button>
+          </Link>
+        </div>
 
         {/* Popular Specialties */}
         <div className="flex flex-wrap items-center justify-center gap-2">

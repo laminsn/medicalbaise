@@ -345,7 +345,7 @@ export function useNotifications() {
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   return {
     notifications,
