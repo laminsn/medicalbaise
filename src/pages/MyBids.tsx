@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,44 +21,10 @@ import {
   Send,
   Trophy,
   ArrowLeft,
+  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale } from '@/lib/i18n-utils';
-
-// Mock data
-const mockBids = [
-  {
-    id: '1',
-    job_title: 'Instalação de ar condicionado split',
-    job_location: 'São Paulo, SP - Zona Sul',
-    quoted_price: 750,
-    status: 'submitted',
-    submitted_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    job_budget: 'R$500 - R$1.000',
-    total_bids: 3,
-  },
-  {
-    id: '2',
-    job_title: 'Pintura interna apartamento',
-    job_location: 'São Paulo, SP - Moema',
-    quoted_price: 2800,
-    status: 'accepted',
-    submitted_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    accepted_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    job_budget: 'R$2.000 - R$3.500',
-    total_bids: 5,
-  },
-  {
-    id: '3',
-    job_title: 'Limpeza de caixa d\'água',
-    job_location: 'São Paulo, SP - Jardins',
-    quoted_price: 200,
-    status: 'declined',
-    submitted_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    job_budget: 'R$150 - R$300',
-    total_bids: 4,
-  },
-];
 
 export default function MyBids() {
   const { user } = useAuth();
@@ -104,12 +72,40 @@ export default function MyBids() {
     }
   };
 
-  const activeBids = mockBids.filter(b => ['submitted', 'under_review'].includes(b.status));
-  const historyBids = mockBids.filter(b => ['accepted', 'declined', 'withdrawn', 'expired'].includes(b.status));
+  const { data: bids = [], isLoading: isLoadingBids } = useQuery({
+    queryKey: ['my-bids', user?.id],
+    queryFn: async () => {
+      const { data: provider } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      if (!provider) return [];
+      const { data, error } = await supabase
+        .from('bids')
+        .select('*, jobs_posted!inner(title, location_address, budget_min, budget_max)')
+        .eq('provider_id', provider.id)
+        .order('submitted_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((b: any) => ({
+        ...b,
+        job_title: b.jobs_posted?.title || '',
+        job_location: b.jobs_posted?.location_address || '',
+        job_budget: b.jobs_posted?.budget_min && b.jobs_posted?.budget_max
+          ? `R$${b.jobs_posted.budget_min} - R$${b.jobs_posted.budget_max}`
+          : '',
+        total_bids: 0,
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
+  const activeBids = bids.filter((b: any) => ['submitted', 'under_review'].includes(b.status));
+  const historyBids = bids.filter((b: any) => ['accepted', 'declined', 'withdrawn', 'expired'].includes(b.status));
 
   // Stats
-  const totalBids = mockBids.length;
-  const acceptedBids = mockBids.filter(b => b.status === 'accepted').length;
+  const totalBids = bids.length;
+  const acceptedBids = bids.filter((b: any) => b.status === 'accepted').length;
   const winRate = totalBids > 0 ? Math.round((acceptedBids / totalBids) * 100) : 0;
 
   return (

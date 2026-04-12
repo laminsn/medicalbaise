@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -77,14 +78,14 @@ const mockProvider = {
   repeat_customer_rate: 67,
 };
 
-const mockServices = [
+const providerServices = [
   { id: '1', name: 'Limpeza Residencial', hourly_rate: 80, description: 'Limpeza completa de casas e apartamentos' },
   { id: '2', name: 'Limpeza Comercial', hourly_rate: 100, description: 'Escritórios e espaços comerciais' },
   { id: '3', name: 'Limpeza Pós-Obra', fixed_price: 500, description: 'Limpeza pesada após reformas' },
   { id: '4', name: 'Limpeza de Vidros', hourly_rate: 60, description: 'Janelas e superfícies de vidro' },
 ];
 
-const mockReviews = [
+const providerReviews = [
   {
     id: '1',
     customer_name: 'Maria S.',
@@ -127,7 +128,7 @@ const mockReviews = [
   },
 ];
 
-const mockPortfolio = [
+const providerPortfolio = [
   { id: '1', url: 'https://images.unsplash.com/photo-1527515545081-5db817172677?w=400', caption: 'Sala de estar - Antes e depois' },
   { id: '2', url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400', caption: 'Banheiro renovado' },
   { id: '3', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400', caption: 'Cozinha limpa' },
@@ -136,7 +137,7 @@ const mockPortfolio = [
   { id: '6', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400', caption: 'Casa de luxo' },
 ];
 
-const mockFAQs = [
+const providerFaqs = [
   { question: 'Vocês fornecem os materiais de limpeza?', answer: 'Sim, utilizamos produtos profissionais e ecológicos. Caso prefira, podemos usar os seus materiais.' },
   { question: 'Qual é a política de cancelamento?', answer: 'Cancelamentos com mais de 24h de antecedência são gratuitos. Menos de 24h, cobramos 50% do valor.' },
   { question: 'Atendem aos finais de semana?', answer: 'Sim, atendemos sábados das 9h às 16h. Domingos e feriados sob consulta.' },
@@ -162,8 +163,68 @@ export default function ProviderProfile() {
   const [isSchedulingDialogOpen, setIsSchedulingDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [pixelData, setPixelData] = useState<{ meta_pixel_id?: string; google_analytics_id?: string } | null>(null);
-  const provider = mockProvider;
   const { followersCount, followingCount } = useFollowerStats(id);
+
+  const { data: providerData, isLoading: isLoadingProvider } = useQuery({
+    queryKey: ['provider-profile', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('providers')
+        .select('*, profiles!inner(first_name, last_name, avatar_url)')
+        .eq('id', id!)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: providerServices = [] } = useQuery({
+    queryKey: ['provider-services', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('provider_services').select('*, service_categories(name_pt, name_en)').eq('provider_id', id!);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: providerReviews = [] } = useQuery({
+    queryKey: ['provider-reviews', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('reviews').select('*, profiles!reviews_customer_id_fkey(first_name, last_name, avatar_url)').eq('provider_id', id!).order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: providerPortfolio = [] } = useQuery({
+    queryKey: ['provider-portfolio', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('portfolio_items').select('*').eq('provider_id', id!).order('order_index');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: providerFaqs = [] } = useQuery({
+    queryKey: ['provider-faqs', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('provider_faqs').select('*').eq('provider_id', id!).order('order_index');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const provider = providerData ? {
+    ...providerData,
+    name: providerData.business_name || `${(providerData as any).profiles?.first_name || ''} ${(providerData as any).profiles?.last_name || ''}`.trim(),
+    avatar_url: (providerData as any).profiles?.avatar_url || '',
+  } : null;
 
   // Track profile view when component mounts
   useTrackProfileView(id, 'profile_page');
@@ -172,14 +233,13 @@ export default function ProviderProfile() {
   useEffect(() => {
     const fetchPixelData = async () => {
       if (!id) return;
-      
+
       const { data } = await supabase
         .from('providers')
         .select('meta_pixel_id, google_analytics_id, subscription_tier')
         .eq('id', id)
         .single();
-      
-      // Only set pixel data for enterprise tier providers
+
       if (data?.subscription_tier === 'enterprise') {
         setPixelData({
           meta_pixel_id: data.meta_pixel_id || undefined,
@@ -526,7 +586,7 @@ export default function ProviderProfile() {
                   <CardTitle className="text-base">{t('providerProfile.faq')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {mockFAQs.map((faq, index) => (
+                  {providerFaqs.map((faq, index) => (
                     <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
                       <p className="font-medium text-sm">{faq.question}</p>
                       <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
@@ -538,7 +598,7 @@ export default function ProviderProfile() {
 
             {/* Services Tab */}
             <TabsContent value="services" className="space-y-3 mt-4">
-              {mockServices.map((service) => (
+              {providerServices.map((service) => (
                 <Card key={service.id}>
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
@@ -565,7 +625,7 @@ export default function ProviderProfile() {
             {/* Portfolio Tab */}
             <TabsContent value="portfolio" className="mt-4">
               <div className="grid grid-cols-2 gap-2">
-                {mockPortfolio.map((item) => (
+                {providerPortfolio.map((item) => (
                   <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden">
                     <img 
                       src={item.url} 
@@ -633,7 +693,7 @@ export default function ProviderProfile() {
               </Card>
 
               {/* Individual Reviews */}
-              {mockReviews.map((review) => (
+              {providerReviews.map((review) => (
                 <Card key={review.id}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">

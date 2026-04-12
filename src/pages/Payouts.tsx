@@ -41,16 +41,9 @@ export default function Payouts() {
   const [isAddingMethod, setIsAddingMethod] = useState(false);
   const [payoutType, setPayoutType] = useState<string>('');
   
-  // Mock data - in real implementation, fetch from database
-  const [payoutMethods] = useState<PayoutMethod[]>([
-    { id: '1', type: 'pix', name: isPt ? 'Chave PIX' : isEs ? 'Clave PIX' : 'PIX Key', details: '***@email.com', isDefault: true },
-  ]);
-
-  const [payoutHistory] = useState<PayoutHistory[]>([
-    { id: '1', date: '2024-12-01', amount: 1500, status: 'completed', method: 'PIX', receiptUrl: '#' },
-    { id: '2', date: '2024-11-15', amount: 2300, status: 'completed', method: 'PIX', receiptUrl: '#' },
-    { id: '3', date: '2024-11-01', amount: 890, status: 'completed', method: isPt ? 'Transferência bancária' : isEs ? 'Transferencia bancaria' : 'Bank Transfer', receiptUrl: '#' },
-  ]);
+  // Payout integration - empty until Stripe Connect is configured
+  const [payoutMethods] = useState<PayoutMethod[]>([]);
+  const [payoutHistory] = useState<PayoutHistory[]>([]);
 
   const handleAddMethod = () => {
     toast.success(isPt ? 'Método de recebimento adicionado com sucesso' : isEs ? 'Método de cobro agregado correctamente' : 'Payout method added successfully');
