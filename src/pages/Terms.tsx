@@ -121,6 +121,11 @@ export default function Terms() {
                 ? 'A MD Baise pode verificar credenciais profissionais, incluindo registro no CRM, especializa\u00e7\u00f5es e antecedentes. Profissionais verificados recebem um selo de verifica\u00e7\u00e3o em seus perfis. No entanto, a verifica\u00e7\u00e3o n\u00e3o constitui endosso ou garantia da qualidade dos servi\u00e7os. Os pacientes devem sempre exercer seu pr\u00f3prio julgamento ao escolher um profissional.'
                 : 'MD Baise may verify professional credentials, including CRM registration, specializations, and background checks. Verified professionals receive a verification badge on their profiles. However, verification does not constitute endorsement or guarantee of service quality. Patients should always exercise their own judgment when choosing a provider.'}
             </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              {isPt
+                ? 'A Baise verifica credenciais na medida de sua capacidade, utilizando os documentos fornecidos pelos profissionais. A Baise n\u00e3o se responsabiliza por documentos falsificados, forjados ou adulterados. Profissionais que apresentarem credenciais fraudulentas ser\u00e3o permanentemente banidos e poder\u00e3o enfrentar a\u00e7\u00f5es legais. A Baise n\u00e3o garante a autenticidade de credenciais al\u00e9m do que pode ser razoavelmente verificado a partir dos documentos apresentados.'
+                : 'Baise verifies credentials to the best of its ability using the documents provided by professionals. Baise is not liable for falsified, forged, or misrepresented documents. Professionals who submit fraudulent credentials will be permanently banned and may face legal action. Baise makes no guarantee of the authenticity of credentials beyond what can reasonably be verified from submitted documents.'}
+            </p>
           </section>
 
           <section>
