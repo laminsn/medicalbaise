@@ -3,9 +3,15 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const ALLOWED_ORIGINS = [
-  "https://medicalbaise.lovable.app",
+  "https://medicalbaise.com",
+  "https://www.medicalbaise.com",
   "https://mdbaise.com",
-  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
+  "https://casabaise.com",
+  "https://www.casabaise.com",
+  "https://legalbaise.com",
+  "https://www.legalbaise.com",
+  "https://api.baiseapps.com",
+  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080", "http://localhost:5173"] : []),
 ];
 
 function getCorsHeaders(req: Request) {
@@ -54,12 +60,28 @@ serve(async (req) => {
     if (!user.email) throw new Error("User email not available");
     logStep("User authenticated");
 
-    const { priceId, promoCode } = await req.json();
-    if (!priceId) throw new Error("Price ID required");
+    const { tier, priceId: clientPriceId, promoCode } = await req.json();
 
-    // Validate priceId format — must match Stripe price ID pattern
-    if (typeof priceId !== "string" || !/^price_[A-Za-z0-9]{8,}$/.test(priceId)) {
-      throw new Error("Invalid price ID format");
+    // Server-side tier-to-priceId mapping (prevents client-side price manipulation)
+    const TIER_PRICE_MAP: Record<string, string> = {
+      pro: "price_1Syf5Q8Jqppqq3BaME0ZHv52",
+      elite: "price_1Syf5d8Jqppqq3BacMVbBLkQ",
+      enterprise: "price_1Syf5s8Jqppqq3BaAnA96elD",
+    };
+
+    // Resolve price ID: prefer tier mapping, fall back to validated client priceId
+    let priceId: string;
+    if (tier && TIER_PRICE_MAP[tier]) {
+      priceId = TIER_PRICE_MAP[tier];
+    } else if (clientPriceId && typeof clientPriceId === "string" && /^price_[A-Za-z0-9]{8,}$/.test(clientPriceId)) {
+      // Validate client-provided priceId is in our allowlist
+      const allowedPriceIds = Object.values(TIER_PRICE_MAP);
+      if (!allowedPriceIds.includes(clientPriceId)) {
+        throw new Error("Invalid price ID");
+      }
+      priceId = clientPriceId;
+    } else {
+      throw new Error("Valid tier or price ID required");
     }
     logStep("Request parsed");
 

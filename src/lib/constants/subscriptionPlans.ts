@@ -19,4 +19,4 @@ export const SUBSCRIPTION_PLANS = {
 
 export type SubscriptionTier = keyof typeof SUBSCRIPTION_PLANS | "free";
 
-export const SUMMER_PROMO_COUPON_ID = "nD3dk1Y2";
+// Promo codes are validated server-side only — never expose coupon IDs client-side
