@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Upload, X, FileText, Image } from 'lucide-react';
+import { Loader2, Upload, X, FileText, Image, ShieldCheck } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
@@ -655,6 +655,20 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
               <p className="text-sm text-muted-foreground">
                 {t('provider.credentialDescription', 'We reserve the right to request verification documents at any time, including for random compliance checks or in response to complaints.')}
               </p>
+
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex items-start gap-3">
+                <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">
+                    {isPt ? 'Suas informações são 100% confidenciais' : 'Your information is 100% confidential'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {isPt
+                      ? 'Documentos são criptografados, nunca compartilhados com terceiros e usados exclusivamente para fins de verificação. Uma vez verificados, você receberá um selo de Credenciais Verificadas no seu perfil.'
+                      : 'Documents are encrypted, never shared with third parties, and used solely for verification purposes. Once verified, you will receive a Verified Credentials badge on your profile.'}
+                  </p>
+                </div>
+              </div>
 
               <div className="flex items-start gap-3">
                 <input
