@@ -56,18 +56,16 @@ export default function Team() {
   const [inviteRole, setInviteRole] = useState<string>('member');
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(['services', 'jobs', 'messages']);
 
-  const MOCK_TEAM_MEMBERS: TeamMember[] = [
-    {
-      id: '1',
-      name: t('team.you'),
-      email: 'owner@example.com',
-      role: 'owner',
-      status: 'active',
-      permissions: ['all'],
-    },
-  ];
+  const currentUserMember: TeamMember = {
+    id: user?.id || '1',
+    name: profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : t('team.you'),
+    email: user?.email || '',
+    role: 'owner',
+    status: 'active',
+    permissions: ['all'],
+  };
 
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(MOCK_TEAM_MEMBERS);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([currentUserMember]);
 
   const ROLE_LABELS: Record<string, { label: string; color: string }> = {
     owner: { label: t('team.owner'), color: 'bg-primary text-primary-foreground' },

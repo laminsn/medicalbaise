@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { MEDICAL_CATEGORIES } from '@/lib/constants';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -11,20 +13,10 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
-  Search, Filter, Star, MapPin, Clock, Shield, 
-  ChevronLeft, Users, Briefcase, Award
+  Search, Filter, Star, MapPin, Clock, Shield,
+  ChevronLeft, Users, Briefcase, Award, Loader2
 } from 'lucide-react';
 import { getLocalizedCategoryDescription, getLocalizedCategoryName } from '@/lib/i18n-utils';
-
-// Mock providers for demo
-const MOCK_PROVIDERS = [
-  { id: '1', name: 'João Silva', rating: 4.9, reviews: 127, hourlyRate: 85, responseTime: 2, verified: true, backgroundChecked: true },
-  { id: '2', name: 'Maria Santos', rating: 4.8, reviews: 89, hourlyRate: 95, responseTime: 1, verified: true, backgroundChecked: true },
-  { id: '3', name: 'Carlos Oliveira', rating: 4.7, reviews: 56, hourlyRate: 75, responseTime: 3, verified: true, backgroundChecked: false },
-  { id: '4', name: 'Ana Costa', rating: 4.9, reviews: 203, hourlyRate: 110, responseTime: 1, verified: true, backgroundChecked: true },
-  { id: '5', name: 'Pedro Lima', rating: 4.6, reviews: 42, hourlyRate: 70, responseTime: 4, verified: false, backgroundChecked: false },
-  { id: '6', name: 'Fernanda Souza', rating: 4.8, reviews: 98, hourlyRate: 90, responseTime: 2, verified: true, backgroundChecked: true },
-];
 
 export default function CategoryDetail() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -40,16 +32,44 @@ export default function CategoryDetail() {
 
   const category = MEDICAL_CATEGORIES.find(cat => cat.id === categoryId);
 
+  const { data: providers = [], isLoading } = useQuery({
+    queryKey: ['category-providers', categoryId],
+    queryFn: async () => {
+      const { data: services, error: svcError } = await supabase
+        .from('provider_services')
+        .select('provider_id, service_categories!inner(id)')
+        .eq('service_categories.id', categoryId!);
+      if (svcError) throw svcError;
+      const providerIds = [...new Set((services || []).map((s: any) => s.provider_id))];
+      if (providerIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from('providers')
+        .select('id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours, profiles!inner(first_name, last_name, avatar_url)')
+        .in('id', providerIds);
+      if (error) throw error;
+      return (data || []).map((p: any) => ({
+        id: p.id,
+        name: p.business_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Provider',
+        rating: Number(p.avg_rating) || 0,
+        reviews: p.total_reviews || 0,
+        hourlyRate: 0,
+        responseTime: p.response_time_hours || 24,
+        verified: p.is_verified || false,
+        backgroundChecked: p.is_background_checked || false,
+      }));
+    },
+    enabled: !!categoryId,
+  });
+
   const filteredProviders = useMemo(() => {
-    return MOCK_PROVIDERS.filter(provider => {
+    return providers.filter((provider: any) => {
       if (searchQuery && !provider.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      if (provider.hourlyRate < priceRange[0] || provider.hourlyRate > priceRange[1]) return false;
       if (provider.rating < minRating) return false;
       if (verifiedOnly && !provider.verified) return false;
       if (backgroundCheckedOnly && !provider.backgroundChecked) return false;
       return true;
     });
-  }, [searchQuery, priceRange, minRating, verifiedOnly, backgroundCheckedOnly]);
+  }, [providers, searchQuery, minRating, verifiedOnly, backgroundCheckedOnly]);
 
   if (!category) {
     return (
@@ -101,7 +121,7 @@ export default function CategoryDetail() {
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>{MOCK_PROVIDERS.length} {t('providers.title', 'Providers')}</span>
+                <span>{providers.length} {t('providers.title', 'Providers')}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Briefcase className="w-4 h-4" />
@@ -215,12 +235,18 @@ export default function CategoryDetail() {
 
         {/* Results count */}
         <p className="text-sm text-muted-foreground mb-4">
-          {filteredProviders.length} {t('providers.providersFound')}
+          {isLoading ? '...' : filteredProviders.length} {t('providers.providersFound')}
         </p>
+
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        )}
 
         {/* Provider List */}
         <div className="grid gap-4">
-          {filteredProviders.map((provider) => (
+          {filteredProviders.map((provider: any) => (
             <Link
               key={provider.id}
               to={`/provider/${provider.id}`}
