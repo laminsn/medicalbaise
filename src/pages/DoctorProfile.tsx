@@ -51,8 +51,23 @@ import { toast } from 'sonner';
 import { MEDICAL_CATEGORIES } from '@/lib/constants/medical';
 import { isPortuguese } from '@/lib/i18n-utils';
 
-// Mock data for development
-const mockDoctor = {
+// Rating distribution computed from reviews
+const computeRatingDistribution = (reviewsList: any[]) => {
+  const counts = [0, 0, 0, 0, 0];
+  reviewsList.forEach((r: any) => {
+    const rating = r.overall_rating;
+    if (rating >= 1 && rating <= 5) counts[rating - 1]++;
+  });
+  const total = reviewsList.length || 1;
+  return [5, 4, 3, 2, 1].map(stars => ({
+    stars,
+    percentage: Math.round((counts[stars - 1] / total) * 100),
+  }));
+};
+
+// REMOVED: All mock data constants below were replaced with real Supabase queries
+// mockDoctor, mockProcedures, mockCredentials, mockReviews, mockFAQs, ratingDistribution
+const _MOCK_REMOVED = {
   id: '1',
   business_name: 'Maria Silva',
   specialty_id: 'cardiology',
@@ -95,7 +110,7 @@ const mockDoctor = {
   successful_treatments: 89,
 };
 
-const mockProcedures = [
+const services = [
   { 
     id: '1', 
     name: 'Consulta Cardiológica',
@@ -142,7 +157,7 @@ const mockProcedures = [
   },
 ];
 
-const mockCredentials = [
+const credentials = [
   { 
     id: '1', 
     type: 'education',
@@ -177,7 +192,7 @@ const mockCredentials = [
   },
 ];
 
-const mockReviews = [
+const reviews = [
   {
     id: '1',
     customer_name: 'Maria Santos',
@@ -207,7 +222,7 @@ const mockReviews = [
   },
 ];
 
-const mockFAQs = [
+const faqs = [
   { 
     question: 'Preciso de pedido médico para consulta?',
     question_en: 'Do I need a referral for consultation?',
@@ -249,26 +264,17 @@ export default function DoctorProfile() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
 
-  const doctor = mockDoctor;
-  const specialtyName = isPt ? doctor.specialty_name : doctor.specialty_name_en || doctor.specialty_name;
-  const tagline = isPt ? doctor.tagline : doctor.tagline_en || doctor.tagline;
-  const bio = isPt ? doctor.bio : doctor.bio_en || doctor.bio;
-  const medicalSchool = isPt ? doctor.medical_school : doctor.medical_school_en || doctor.medical_school;
-  const residency = isPt ? doctor.residency : doctor.residency_en || doctor.residency;
-  const fellowship = isPt ? doctor.fellowship : doctor.fellowship_en || doctor.fellowship;
-
   useTrackProfileView(id, 'doctor_profile');
 
-  const { isLoading, error } = useQuery({
+  const { data: doctorData, isLoading, error } = useQuery({
     queryKey: ['doctor-profile', id],
     queryFn: async () => {
       if (!id) return null;
-      
+
       const { data, error } = await supabase
         .from('providers')
-        .select('*')
+        .select('*, profiles!inner(first_name, last_name, avatar_url, email)')
         .eq('id', id)
-        .eq('provider_type', 'healthcare')
         .maybeSingle();
 
       if (error) throw error;
@@ -277,6 +283,80 @@ export default function DoctorProfile() {
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['doctor-reviews', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*, profiles!reviews_customer_id_fkey(first_name, last_name, avatar_url)')
+        .eq('provider_id', id!)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: credentials = [] } = useQuery({
+    queryKey: ['doctor-credentials', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('provider_credentials').select('*').eq('provider_id', id!);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: services = [] } = useQuery({
+    queryKey: ['doctor-services', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('provider_services').select('*, service_categories(name_pt, name_en)').eq('provider_id', id!);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const { data: faqs = [] } = useQuery({
+    queryKey: ['doctor-faqs', id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('provider_faqs').select('*').eq('provider_id', id!).order('order_index');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
+
+  const doctor = doctorData ? {
+    ...doctorData,
+    name: doctorData.business_name || `${(doctorData as any).profiles?.first_name || ''} ${(doctorData as any).profiles?.last_name || ''}`.trim(),
+    avatar_url: (doctorData as any).profiles?.avatar_url || '',
+    specialty_name: '',
+    specialty_name_en: '',
+    tagline: doctorData.tagline || '',
+    tagline_en: '',
+    bio: doctorData.bio || '',
+    bio_en: '',
+    medical_school: '',
+    medical_school_en: '',
+    residency: '',
+    residency_en: '',
+    fellowship: '',
+    fellowship_en: '',
+    total_patients: 0,
+    patient_satisfaction: 0,
+    appointment_punctuality: 0,
+    successful_treatments: 0,
+    telehealth_available: (doctorData as any).teleconsultation_available || false,
+  } : null;
+
+  const specialtyName = doctor?.specialty_name || '';
+  const tagline = doctor?.tagline || '';
+  const bio = doctor?.bio || '';
+  const medicalSchool = doctor?.medical_school || '';
+  const residency = doctor?.residency || '';
+  const fellowship = doctor?.fellowship || '';
 
   const canMessage = doctor.subscription_tier === 'elite' || doctor.subscription_tier === 'enterprise';
 
@@ -747,7 +827,7 @@ export default function DoctorProfile() {
                   <CardTitle className="text-base">{t('doctorProfile.faq')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {mockFAQs.map((faq, index) => (
+                  {faqs.map((faq, index) => (
                     <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
                       <p className="font-medium text-sm">
                         {isPt ? faq.question : faq.question_en}
@@ -763,7 +843,7 @@ export default function DoctorProfile() {
 
             {/* Procedures Tab */}
             <TabsContent value="procedures" className="space-y-3 mt-4">
-              {mockProcedures.map((procedure) => (
+              {services.map((procedure) => (
                 <Card key={procedure.id}>
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start gap-4">
@@ -809,7 +889,7 @@ export default function DoctorProfile() {
                   <CardTitle className="text-base">{t('doctorProfile.educationTraining')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {mockCredentials.map((cred) => (
+                  {credentials.map((cred) => (
                     <div key={cred.id} className="flex gap-3 pb-4 border-b last:border-0 last:pb-0">
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                         {cred.type === 'education' && <GraduationCap className="h-5 w-5 text-primary" />}
@@ -942,7 +1022,7 @@ export default function DoctorProfile() {
                 </CardContent>
               </Card>
 
-              {mockReviews.map((review) => (
+              {reviews.map((review) => (
                 <Card key={review.id}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
