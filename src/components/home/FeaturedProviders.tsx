@@ -41,8 +41,6 @@ export function FeaturedProviders() {
     );
   }
 
-  if (providers.length === 0) return null;
-
   return (
     <section className="px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -51,6 +49,17 @@ export function FeaturedProviders() {
           {t('common.viewAll')}
         </Link>
       </div>
+
+      {providers.length === 0 && !isLoading && (
+        <div className="text-center py-12 rounded-lg bg-card gradient-border">
+          <p className="text-muted-foreground">
+            {t('providers.noFeatured', 'No featured providers yet')}
+          </p>
+          <Link to="/browse" className="text-sm text-primary font-medium hover:underline mt-2 inline-block">
+            {t('nav.explore')}
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {providers.map((provider: any) => (

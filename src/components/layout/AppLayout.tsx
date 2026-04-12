@@ -14,7 +14,7 @@ export function AppLayout({ children, showHeader = true, showNav = true }: AppLa
     <div className="min-h-screen flex flex-col bg-background">
       <PromoBanner />
       {showHeader && <Header />}
-      <main className={`flex-1 ${showNav ? 'pb-20' : ''}`}>
+      <main className={`flex-1 ${showNav ? 'pb-20 md:pb-0' : ''}`}>
         {children}
       </main>
       {showNav && <MobileNav />}

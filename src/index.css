@@ -241,7 +241,7 @@
 
   /* === MOBILE NAVIGATION === */
   .mobile-nav {
-    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border;
+    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border md:hidden;
     padding-bottom: max(0.5rem, var(--safe-area-inset-bottom));
   }
 

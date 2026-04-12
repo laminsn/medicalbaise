@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Menu, MapPin, LayoutDashboard, User, Briefcase, HelpCircle } from 'lucide-react';
+import { Menu, MapPin, LayoutDashboard, User, Briefcase, HelpCircle, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -44,6 +44,10 @@ export function Header() {
           </Link>
           <Link to="/jobs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             {t('nav.jobs')}
+          </Link>
+          <Link to="/feed" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+            <PlayCircle className="w-4 h-4" />
+            {t('nav.feed')}
           </Link>
           {user && (
             <Link to="/post-job" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
