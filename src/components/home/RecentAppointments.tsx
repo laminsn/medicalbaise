@@ -103,17 +103,8 @@ export function RecentAppointments() {
     );
   }
 
-  if (error) {
-    return (
-      <section className="px-4 py-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-destructive/10 text-destructive p-4 rounded-lg text-center">
-            <p className="text-sm">{t('appointments.errorLoading')}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Error state — hide section entirely
+  if (error) return null;
 
   if (!appointments || appointments.length === 0) {
     return null;
