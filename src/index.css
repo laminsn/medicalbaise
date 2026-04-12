@@ -69,7 +69,7 @@
     --error-foreground: 0 0% 100%;
 
     /* === GRADIENTS === */
-    --gradient-primary: linear-gradient(90deg, hsl(187 100% 42%) 0%, hsl(0 0% 0%) 100%);
+    --gradient-primary: linear-gradient(90deg, hsl(187 100% 42%) 0%, hsl(187 100% 28%) 100%);
 
     /* === SHADOWS === */
     --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
@@ -111,6 +111,7 @@
     --border: 0 0% 20%;              /* #333 */
     --input: 0 0% 20%;
     --ring: 187 100% 42%;
+    --gradient-primary: linear-gradient(90deg, hsl(187 100% 22%) 0%, hsl(0 0% 0%) 100%);
 
     /* Status colors - dark mode */
     --success: 187 100% 42%;
