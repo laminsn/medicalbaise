@@ -456,6 +456,18 @@ export default function DoctorProfile() {
                   {t('doctorProfile.acceptingNewPatients')}
                 </Badge>
               )}
+              {doctor.is_verified && (
+                <Badge variant="outline" className="bg-green-50 dark:bg-green-950/30 text-xs border-green-600 text-green-700 dark:text-green-400">
+                  <BadgeCheck className="h-3 w-3 mr-1" />
+                  {isPt ? 'Credenciais Verificadas' : 'Verified Credentials'}
+                </Badge>
+              )}
+              {doctor.is_background_checked && (
+                <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/30 text-xs border-blue-600 text-blue-700 dark:text-blue-400">
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                  {isPt ? 'Antecedentes Verificados' : 'Background Checked'}
+                </Badge>
+              )}
             </div>
 
             {/* Action Buttons */}
