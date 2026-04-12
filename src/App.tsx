@@ -50,6 +50,8 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import HandleRedirect from "./pages/HandleRedirect";
 import BookAppointment from "./pages/BookAppointment";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -117,6 +119,8 @@ const App = () => (
                   <Route path="/post-job" element={<ProtectedRoute><PostJob /></ProtectedRoute>} />
                   <Route path="/help" element={<Learn />} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
                   <Route path="/u/:handle" element={<HandleRedirect />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
