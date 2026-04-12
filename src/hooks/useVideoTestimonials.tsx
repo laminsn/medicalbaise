@@ -67,7 +67,6 @@ export function useVideoTestimonials(providerId?: string) {
 
       setTestimonials(testimonialsWithProfiles);
     } catch (error) {
-      console.error('Error fetching testimonials:', error);
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +130,6 @@ export function useVideoTestimonials(providerId?: string) {
 
       return true;
     } catch (error: any) {
-      console.error('Error uploading testimonial:', error);
       toast({
         title: 'Upload Failed',
         description: error.message || 'Failed to upload testimonial',

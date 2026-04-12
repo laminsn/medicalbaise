@@ -79,7 +79,7 @@ export default function Reviews() {
       if (error) throw error;
       setReviews(data || []);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+
     } finally {
       setIsLoading(false);
     }

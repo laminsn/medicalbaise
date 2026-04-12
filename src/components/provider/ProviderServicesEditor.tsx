@@ -67,7 +67,7 @@ export function ProviderServicesEditor() {
           setInitialServices(serviceIds);
         }
       } catch (error) {
-        console.error('Error fetching services:', error);
+
       } finally {
         setIsLoading(false);
       }
@@ -135,7 +135,7 @@ export function ProviderServicesEditor() {
       setInitialServices([...selectedServices]);
       toast.success(t('provider.servicesUpdated', 'Services updated successfully'));
     } catch (error: any) {
-      console.error('Error saving services:', error);
+
       toast.error(error.message || t('provider.servicesUpdateError', 'Failed to update services'));
     } finally {
       setIsSaving(false);

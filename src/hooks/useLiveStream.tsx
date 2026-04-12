@@ -98,14 +98,11 @@ export function useLiveStream() {
       
       channelRef.current = channel;
       setIsStreaming(true);
-      
-      console.log('Broadcast started:', streamId);
-      
+
       return streamId;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to start broadcast';
       setError(errorMessage);
-      console.error('Broadcast error:', err);
       throw err;
     }
   }, []);
@@ -129,10 +126,8 @@ export function useLiveStream() {
       setIsStreaming(false);
       setViewerCount(0);
       setMessages([]);
-      
-      console.log('Broadcast stopped');
     } catch (err) {
-      console.error('Error stopping broadcast:', err);
+      // Non-fatal: stream resources are cleaned up on unmount regardless
     }
   }, []);
 
@@ -179,12 +174,9 @@ export function useLiveStream() {
       
       channelRef.current = channel;
       setIsWatching(true);
-      
-      console.log('Joined stream:', streamId);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to join stream';
       setError(errorMessage);
-      console.error('Join stream error:', err);
       throw err;
     }
   }, []);
@@ -200,10 +192,8 @@ export function useLiveStream() {
       currentStreamIdRef.current = null;
       setIsWatching(false);
       setMessages([]);
-      
-      console.log('Left stream');
     } catch (err) {
-      console.error('Error leaving stream:', err);
+      // Non-fatal: channel resources are cleaned up on unmount regardless
     }
   }, []);
 

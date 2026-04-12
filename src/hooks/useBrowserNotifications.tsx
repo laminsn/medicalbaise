@@ -21,7 +21,6 @@ export const useBrowserNotifications = () => {
       setPermission(result);
       return result === 'granted';
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
       return false;
     }
   }, [isSupported]);
@@ -50,7 +49,6 @@ export const useBrowserNotifications = () => {
 
       return notification;
     } catch (error) {
-      console.error('Error sending notification:', error);
       return null;
     }
   }, [isSupported, permission]);

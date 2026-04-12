@@ -9,7 +9,7 @@ const NotFound = () => {
   const isEs = i18n.resolvedLanguage?.startsWith("es") || i18n.language.startsWith("es");
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    // 404: non-existent route accessed — no action needed
   }, [location.pathname]);
 
   return (

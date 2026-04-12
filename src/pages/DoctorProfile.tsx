@@ -66,192 +66,6 @@ const computeRatingDistribution = (reviewsList: any[]) => {
   }));
 };
 
-// REMOVED: All mock data constants below were replaced with real Supabase queries
-// mockDoctor, mockProcedures, mockCredentials, mockReviews, mockFAQs, ratingDistribution
-const _MOCK_REMOVED = {
-  id: '1',
-  business_name: 'Maria Silva',
-  specialty_id: 'cardiology',
-  specialty_name: 'Cardiologia',
-  specialty_name_en: 'Cardiology',
-  tagline: 'Especialista em Cardiologia Clínica e Preventiva',
-  tagline_en: 'Specialist in Clinical and Preventive Cardiology',
-  bio: 'Médica cardiologista com mais de 15 anos de experiência no diagnóstico e tratamento de doenças cardiovasculares. Graduada pela USP, com residência no InCor e fellowship em cardiologia intervencionista. Atendimento humanizado com foco na prevenção e no bem-estar dos pacientes.',
-  bio_en: 'Cardiologist with more than 15 years of experience in diagnosing and treating cardiovascular conditions. Graduated from USP, with residency at InCor and fellowship in interventional cardiology. Patient-centered care focused on prevention and long-term well-being.',
-  avatar_url: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400',
-  years_experience: 15,
-  total_patients: 2847,
-  total_reviews: 328,
-  avg_rating: 4.9,
-  response_time_hours: 2,
-  is_verified: true,
-  is_licensed: true,
-  is_board_certified: true,
-  has_hospital_privileges: true,
-  subscription_tier: 'elite',
-  city: 'São Paulo',
-  state: 'SP',
-  crm_number: 'CRM/SP 123456',
-  medical_school: 'Faculdade de Medicina da USP',
-  medical_school_en: 'USP School of Medicine',
-  residency: 'InCor - Instituto do Coração',
-  residency_en: 'InCor - Heart Institute',
-  fellowship: 'Cardiologia Intervencionista - Hospital Sírio-Libanês',
-  fellowship_en: 'Interventional Cardiology - Hospital Sírio-Libanês',
-  languages: ['Português', 'English', 'Español'],
-  consultation_types: ['in-person', 'teleconsultation'],
-  consultation_fee: 350,
-  insurance_accepted: ['Unimed', 'Bradesco Saúde', 'Amil', 'SulAmérica', 'Porto Seguro', 'Golden Cross'],
-  hospital_affiliations: ['Hospital Sírio-Libanês', 'Hospital Israelita Albert Einstein', 'Hospital do Coração (HCor)'],
-  accepts_new_patients: true,
-  telehealth_available: true,
-  emergency_available: false,
-  patient_satisfaction: 96,
-  appointment_punctuality: 94,
-  successful_treatments: 89,
-};
-
-const services = [
-  { 
-    id: '1', 
-    name: 'Consulta Cardiológica',
-    name_en: 'Cardiology Consultation',
-    consultation_fee: 350, 
-    description: 'Avaliação completa do sistema cardiovascular com análise de histórico médico e exame físico',
-    description_en: 'Complete cardiovascular system assessment with medical history analysis and physical examination',
-    duration: '45 minutos',
-    preparation: 'Trazer exames cardiológicos anteriores',
-    is_active: true,
-  },
-  { 
-    id: '2', 
-    name: 'Ecocardiograma com Doppler',
-    name_en: 'Echocardiogram with Doppler',
-    consultation_fee: 480, 
-    description: 'Ultrassom do coração para avaliar estrutura, função e fluxo sanguíneo',
-    description_en: 'Heart ultrasound to evaluate structure, function and blood flow',
-    duration: '30 minutos',
-    preparation: 'Jejum de 3 horas',
-    is_active: true,
-  },
-  { 
-    id: '3', 
-    name: 'Teste Ergométrico',
-    name_en: 'Exercise Stress Test',
-    consultation_fee: 420, 
-    description: 'Avaliação cardiovascular durante exercício físico em esteira',
-    description_en: 'Cardiovascular assessment during treadmill exercise',
-    duration: '40 minutos',
-    preparation: 'Roupas leves, tênis e não fazer refeições pesadas 2h antes',
-    is_active: true,
-  },
-  { 
-    id: '4', 
-    name: 'Holter 24 horas',
-    name_en: '24-hour Holter Monitor',
-    consultation_fee: 550, 
-    description: 'Monitoramento contínuo da atividade elétrica do coração por 24 horas',
-    description_en: 'Continuous monitoring of heart electrical activity for 24 hours',
-    duration: 'Instalação: 15 minutos',
-    preparation: 'Retornar no dia seguinte para retirada',
-    is_active: true,
-  },
-];
-
-const credentials = [
-  { 
-    id: '1', 
-    type: 'education',
-    title: 'Graduação em Medicina',
-    title_en: 'Medical Degree',
-    institution: 'Faculdade de Medicina da Universidade de São Paulo (FMUSP)',
-    year: '2004-2009',
-  },
-  { 
-    id: '2', 
-    type: 'residency',
-    title: 'Residência Médica em Cardiologia',
-    title_en: 'Cardiology Residency',
-    institution: 'InCor - Instituto do Coração HC-FMUSP',
-    year: '2010-2012',
-  },
-  { 
-    id: '3', 
-    type: 'fellowship',
-    title: 'Fellowship em Cardiologia Intervencionista',
-    title_en: 'Interventional Cardiology Fellowship',
-    institution: 'Hospital Sírio-Libanês',
-    year: '2012-2014',
-  },
-  { 
-    id: '4', 
-    type: 'certification',
-    title: 'Título de Especialista em Cardiologia',
-    title_en: 'Board Certification in Cardiology',
-    institution: 'Sociedade Brasileira de Cardiologia (SBC)',
-    year: '2013',
-  },
-];
-
-const reviews = [
-  {
-    id: '1',
-    customer_name: 'Maria Santos',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
-    rating: 5,
-    date: '2 semanas atrás',
-    comment: 'Excelente profissional! Dra. Maria foi muito atenciosa, explicou tudo com clareza e me deixou super tranquila.',
-    quality_rating: 5,
-    professionalism_rating: 5,
-    punctuality_rating: 5,
-    verified: true,
-    helpful_count: 47,
-    provider_response: 'Muito obrigada Maria! Foi um prazer cuidar da sua saúde.',
-  },
-  {
-    id: '2',
-    customer_name: 'João Pedro',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-    rating: 5,
-    date: '1 mês atrás',
-    comment: 'Depois de passar por vários cardiologistas, finalmente encontrei uma médica que realmente se importa.',
-    quality_rating: 5,
-    professionalism_rating: 5,
-    punctuality_rating: 5,
-    verified: true,
-    helpful_count: 34,
-  },
-];
-
-const faqs = [
-  { 
-    question: 'Preciso de pedido médico para consulta?',
-    question_en: 'Do I need a referral for consultation?',
-    answer: 'Não é necessário pedido médico para primeira consulta. Basta agendar diretamente.',
-    answer_en: 'No referral needed for first consultation. Just schedule directly.'
-  },
-  { 
-    question: 'Quais convênios são aceitos?',
-    question_en: 'Which insurance plans are accepted?',
-    answer: 'Atendo Unimed, Bradesco Saúde, Amil, SulAmérica, Porto Seguro e Golden Cross.',
-    answer_en: 'I accept Unimed, Bradesco Saúde, Amil, SulAmérica, Porto Seguro and Golden Cross.'
-  },
-  { 
-    question: 'Realiza atendimento de emergência?',
-    question_en: 'Do you provide emergency care?',
-    answer: 'Não realizo atendimentos de emergência. Em casos urgentes, procure o pronto-socorro mais próximo.',
-    answer_en: 'I do not provide emergency care. In urgent cases, seek the nearest emergency room.'
-  },
-];
-
-const ratingDistribution = [
-  { stars: 5, percentage: 91 },
-  { stars: 4, percentage: 7 },
-  { stars: 3, percentage: 1 },
-  { stars: 2, percentage: 1 },
-  { stars: 1, percentage: 0 },
-];
-
 export default function DoctorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -359,7 +173,9 @@ export default function DoctorProfile() {
   const residency = doctor?.residency || '';
   const fellowship = doctor?.fellowship || '';
 
-  const canMessage = doctor.subscription_tier === 'elite' || doctor.subscription_tier === 'enterprise';
+  const ratingDistribution = computeRatingDistribution(reviews as any[]);
+
+  const canMessage = doctor?.subscription_tier === 'elite' || doctor?.subscription_tier === 'enterprise';
 
   const handleMessageDoctor = async () => {
     if (!user) {
@@ -484,6 +300,17 @@ export default function DoctorProfile() {
               {t('common.backToBrowse')}
             </Button>
           </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!doctor) {
+    return (
+      <AppLayout>
+        <div className="px-4 py-16 text-center">
+          <h1 className="text-2xl font-bold mb-4">{t('doctorProfile.notFound', 'Doctor not found')}</h1>
+          <Button onClick={() => navigate('/browse')} variant="outline">{t('common.backToBrowse')}</Button>
         </div>
       </AppLayout>
     );

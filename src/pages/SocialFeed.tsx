@@ -108,7 +108,7 @@ export default function SocialFeed() {
       .limit(50);
 
     if (error) {
-      console.error('Error fetching posts:', error);
+
       toast.error(t('socialFeed.errorLoading'));
     } else {
       setPosts(data || []);

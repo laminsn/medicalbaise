@@ -57,7 +57,7 @@ export function useStories() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching stories:', error);
+
       return;
     }
 
@@ -203,7 +203,7 @@ export function useStories() {
       toast.success('Story published!');
       fetchStories();
     } catch (err) {
-      console.error('Error uploading story:', err);
+
       toast.error('Failed to publish story');
     } finally {
       setIsUploading(false);

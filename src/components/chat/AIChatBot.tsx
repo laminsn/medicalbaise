@@ -150,7 +150,7 @@ const AIChatBot: React.FC = () => {
     try {
       await streamChat(newMessages);
     } catch (error) {
-      console.error('Chat error:', error);
+
       toast({
         title: t('chatbot.error'),
         description: error instanceof Error ? error.message : t('chatbot.errorDescription'),

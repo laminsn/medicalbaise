@@ -6,12 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useConversation } from '@/hooks/useMessages';
 import { useTranslation } from 'react-i18next';
 import { useCall } from '@/contexts/CallContext';
 import { format, isToday, isYesterday } from 'date-fns';
 import { detectPHI } from '@/lib/phi-detector';
 import { PHIWarningModal } from '@/components/compliance/PHIWarningModal';
+
+// Tiers that can access the chat feature (elite and above)
+const CHAT_ALLOWED_TIERS = new Set(['elite', 'enterprise']);
 
 export default function Chat() {
   const { id } = useParams<{ id: string }>();
@@ -20,26 +24,16 @@ export default function Chat() {
   const { t } = useTranslation();
   const { conversation, messages, loading, sending, sendMessage } = useConversation(id);
   const { startCall } = useCall();
+  const { tier, loading: subLoading } = useSubscription();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [phiWarning, setPHIWarning] = useState<{ detectedTypes: string[] } | null>(null);
   const pendingMessageRef = useRef<string>('');
 
-  // Check if user has Elite+ tier access
-  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!user) {
-        setHasAccess(false);
-        return;
-      }
-      // For now, grant access to all authenticated users
-      // In production, check provider subscription tier or customer status
-      setHasAccess(true);
-    };
-    checkAccess();
-  }, [user]);
+  // Customers always have access; providers need elite+ subscription
+  const hasAccess = !subLoading
+    ? profile?.user_type === 'customer' || CHAT_ALLOWED_TIERS.has(tier)
+    : null;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

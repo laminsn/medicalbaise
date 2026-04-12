@@ -76,7 +76,7 @@ const MapView = () => {
         toast.error(t('map.locationNotFound'));
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+
       toast.error(t('map.locationError'));
     }
   };
@@ -97,7 +97,7 @@ const MapView = () => {
         setIsLocating(false);
       },
       (error) => {
-        console.error('Geolocation error:', error);
+
         toast.error(t('map.geolocationError'));
         setIsLocating(false);
       }

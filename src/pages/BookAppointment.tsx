@@ -108,7 +108,7 @@ export default function BookAppointment() {
       toast.success(t('appointments.requestSent', 'Appointment request sent.'));
       navigate(`/chat/${conversationId}`);
     } catch (submitError) {
-      console.error('Appointment request failed:', submitError);
+
       toast.error(t('appointments.requestFailed', 'Could not send appointment request.'));
     } finally {
       setSubmitting(false);

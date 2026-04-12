@@ -55,7 +55,6 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
         await startPreview(videoRef.current);
         setCameraReady(true);
       } catch (err) {
-        console.error('Camera init error:', err);
         toast.error(t('socialFeed.cameraError', 'Failed to access camera. Please check permissions.'));
       }
     }
@@ -101,13 +100,12 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
             is_live: true,
           });
         if (streamError) {
-          console.error('Error registering live stream:', streamError);
+          // Stream registration failure is non-fatal; recording continues
         }
       }
 
       toast.success(t('socialFeed.liveStarted', 'Recording started!'));
     } catch (err) {
-      console.error('Recording error:', err);
       toast.error(t('socialFeed.recordingError', 'Failed to start recording'));
     }
   };
@@ -183,7 +181,6 @@ export function GoLiveButton({ providerId }: GoLiveButtonProps) {
       // Navigate to feed to see the post
       navigate('/feed');
     } catch (error) {
-      console.error('Error posting recording:', error);
       toast.error(t('socialFeed.postFailed', 'Failed to post recording'));
       throw error;
     }

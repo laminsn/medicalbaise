@@ -43,6 +43,7 @@ import {
   Video,
   Repeat,
   Send,
+  Loader2,
 } from 'lucide-react';
 import { VideoTestimonialList } from '@/components/testimonials/VideoTestimonialList';
 import { UploadTestimonialDialog } from '@/components/testimonials/UploadTestimonialDialog';
@@ -532,9 +533,9 @@ export default function ProviderProfile() {
               <div className="grid grid-cols-2 gap-2">
                 {providerPortfolio.map((item) => (
                   <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden">
-                    <img 
-                      src={item.url} 
-                      alt={item.caption}
+                    <img
+                      src={item.url}
+                      alt={item.caption || 'Portfolio photo'}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

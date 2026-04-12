@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { formatPrice } from '@/lib/currency';
 import { useSearchParams, Link } from 'react-router-dom';
 import { 
@@ -350,12 +351,16 @@ export default function Browse() {
 
   return (
     <AppLayout>
+      <Helmet>
+        <title>{t('browse.title', 'Browse Medical Professionals')} - Medical Baise</title>
+        <meta name="description" content={t('browse.metaDescription', 'Find verified doctors, specialists, and healthcare providers near you. Compare ratings, reviews, and fees.')} />
+      </Helmet>
       <div className="px-4 py-4">
         {/* Search and filters */}
         <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
-            <Search 
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" 
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"
               aria-hidden="true"
             />
             <Input

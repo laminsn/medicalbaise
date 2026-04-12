@@ -116,7 +116,7 @@ export default function ProfileEdit() {
         description: isPt ? 'Sua foto de perfil foi atualizada' : isEs ? 'Tu foto de perfil fue actualizada' : 'Your profile picture has been updated',
       });
     } catch (error: any) {
-      console.error('Error uploading image:', error);
+
       toast({
         title: isPt ? 'Falha no envio' : isEs ? 'Error al subir' : 'Upload failed',
         description: error.message || (isPt ? 'Falha ao enviar imagem' : isEs ? 'No se pudo subir la imagen' : 'Failed to upload image'),
@@ -165,7 +165,7 @@ export default function ProfileEdit() {
       
       navigate('/profile');
     } catch (error: any) {
-      console.error('Error updating profile:', error);
+
       toast({
         title: isPt ? 'Falha na atualização' : isEs ? 'Error al actualizar' : 'Update failed',
         description: error.message || (isPt ? 'Falha ao atualizar perfil' : isEs ? 'No se pudo actualizar el perfil' : 'Failed to update profile'),

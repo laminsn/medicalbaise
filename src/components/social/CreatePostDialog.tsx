@@ -107,7 +107,7 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
       setShowBookNow(true);
       onSuccess();
     } catch (error) {
-      console.error('Error creating post:', error);
+
       toast.error(t('socialFeed.errorCreating'));
     } finally {
       setUploading(false);

@@ -128,7 +128,7 @@ export function QuoteRequestForm({
       reset();
       onClose();
     } catch (error) {
-      console.error('Error submitting quote request:', error);
+
       toast({
         title: t('errors.somethingWentWrong'),
         description: t('quote.requestError'),

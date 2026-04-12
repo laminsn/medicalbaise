@@ -72,7 +72,7 @@ export default function JobsMarketplace() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching jobs:', error);
+
         setLoading(false);
         return;
       }

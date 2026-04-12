@@ -86,7 +86,6 @@ export function useWebRTCCall() {
     channel
       .on('broadcast', { event: 'signal' }, async ({ payload }) => {
         const signal = payload as SignalData;
-        console.log('Received signal:', signal.type, signal);
 
         if (signal.to !== user.id) return;
 
@@ -114,9 +113,7 @@ export function useWebRTCCall() {
             break;
         }
       })
-      .subscribe((status) => {
-        console.log('Call channel status:', status);
-      });
+      .subscribe();
 
     channelRef.current = channel;
 
@@ -147,7 +144,6 @@ export function useWebRTCCall() {
     };
 
     pc.ontrack = (event) => {
-      console.log('Remote track received:', event.streams);
       remoteStreamRef.current = event.streams[0];
       if (audioRef.current) {
         audioRef.current.srcObject = event.streams[0];
@@ -155,7 +151,6 @@ export function useWebRTCCall() {
     };
 
     pc.onconnectionstatechange = () => {
-      console.log('Connection state:', pc.connectionState);
       if (pc.connectionState === 'connected') {
         setCallState(prev => ({ ...prev, status: 'connected' }));
       } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
@@ -190,14 +185,12 @@ export function useWebRTCCall() {
       localStreamRef.current = stream;
       return stream;
     } catch (error) {
-      console.error('Error getting local stream:', error);
       toast.error('Could not access microphone');
       throw error;
     }
   };
 
   const handleIncomingCall = (signal: SignalData) => {
-    console.log('Incoming call from:', signal.fromName);
     setCallState({
       status: 'ringing',
       remoteUserId: signal.from,
@@ -211,7 +204,6 @@ export function useWebRTCCall() {
   };
 
   const handleCallAccepted = async (signal: SignalData) => {
-    console.log('Call accepted by:', signal.fromName);
     setCallState(prev => ({ ...prev, status: 'connecting' }));
 
     try {
@@ -234,13 +226,11 @@ export function useWebRTCCall() {
         data: offer,
       });
     } catch (error) {
-      console.error('Error creating offer:', error);
       endCall();
     }
   };
 
   const handleCallRejected = () => {
-    console.log('Call rejected');
     toast.error('Call was declined');
     cleanup();
     setCallState({
@@ -256,7 +246,6 @@ export function useWebRTCCall() {
   };
 
   const handleCallEnded = () => {
-    console.log('Call ended by remote');
     cleanup();
     setCallState(prev => ({ ...prev, status: 'ended' }));
     setTimeout(() => {
@@ -274,7 +263,6 @@ export function useWebRTCCall() {
   };
 
   const handleOffer = async (signal: SignalData) => {
-    console.log('Received offer');
     try {
       const stream = await getLocalStream();
       const pc = createPeerConnection();
@@ -303,13 +291,11 @@ export function useWebRTCCall() {
         data: answer,
       });
     } catch (error) {
-      console.error('Error handling offer:', error);
       endCall();
     }
   };
 
   const handleAnswer = async (signal: SignalData) => {
-    console.log('Received answer');
     try {
       const pc = peerConnectionRef.current;
       if (pc) {
@@ -322,7 +308,7 @@ export function useWebRTCCall() {
         iceCandidatesQueue.current = [];
       }
     } catch (error) {
-      console.error('Error handling answer:', error);
+      // Error handled: call state remains unchanged
     }
   };
 
@@ -337,7 +323,7 @@ export function useWebRTCCall() {
         iceCandidatesQueue.current.push(candidate);
       }
     } catch (error) {
-      console.error('Error handling ICE candidate:', error);
+      // ICE candidate error is non-fatal; connection will retry via other candidates
     }
   };
 
@@ -366,8 +352,6 @@ export function useWebRTCCall() {
       return;
     }
 
-    console.log('Starting call to:', targetUserName);
-    
     setCallState({
       status: 'calling',
       remoteUserId: targetUserId,
@@ -399,7 +383,6 @@ export function useWebRTCCall() {
   const answerCall = useCallback(async () => {
     if (!callState.remoteUserId) return;
 
-    console.log('Answering call');
     setCallState(prev => ({ ...prev, status: 'connecting' }));
 
     sendSignal({
@@ -414,7 +397,6 @@ export function useWebRTCCall() {
   const declineCall = useCallback(() => {
     if (!callState.remoteUserId) return;
 
-    console.log('Declining call');
     sendSignal({
       type: 'call-reject',
       from: user!.id,

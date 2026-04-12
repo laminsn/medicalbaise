@@ -47,9 +47,7 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       await videoElement.play();
       
       setIsPreviewing(true);
-      console.log('Camera preview started');
     } catch (err) {
-      console.error('Error accessing camera:', err);
       setError(err instanceof Error ? err.message : 'Failed to access camera');
       throw err;
     }
@@ -64,7 +62,6 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       videoRef.current.srcObject = null;
     }
     setIsPreviewing(false);
-    console.log('Camera preview stopped');
   }, []);
 
   const flipCamera = useCallback(async () => {
@@ -119,12 +116,9 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
         setRecordedBlob(blob);
         setRecordedUrl(url);
         options?.onRecordingComplete?.(blob, url);
-        
-        console.log('Recording completed, blob size:', blob.size);
       };
 
-      mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
+      mediaRecorder.onerror = () => {
         setError('Recording error occurred');
       };
 
@@ -137,9 +131,7 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
       }, 1000);
 
       setIsRecording(true);
-      console.log('Recording started with MIME type:', selectedMimeType);
     } catch (err) {
-      console.error('Error starting recording:', err);
       setError(err instanceof Error ? err.message : 'Failed to start recording');
       throw err;
     }
@@ -153,7 +145,6 @@ export function useCameraRecorder(options?: UseCameraRecorderOptions) {
 
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
-      console.log('Recording stopped');
     }
 
     setIsRecording(false);

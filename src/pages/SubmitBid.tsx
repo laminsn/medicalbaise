@@ -125,7 +125,7 @@ export default function SubmitBid() {
       toast.success(t('jobs.bidSubmittedSuccess'));
       navigate(`/job/${id}`);
     } catch (error) {
-      console.error('Error submitting bid:', error);
+
       toast.error(t('jobs.errorSubmittingBid'));
     } finally {
       setLoading(false);

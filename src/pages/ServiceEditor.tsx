@@ -161,7 +161,7 @@ export default function ServiceEditor() {
         }
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+
       toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
@@ -267,7 +267,7 @@ export default function ServiceEditor() {
 
       navigate('/services');
     } catch (error: any) {
-      console.error('Error saving service:', error);
+
       toast.error(error.message || t('common.error'));
     } finally {
       setIsSaving(false);

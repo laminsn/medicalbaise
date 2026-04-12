@@ -131,7 +131,7 @@ export const useMessages = () => {
 
       setConversations(conversationsWithDetails);
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+
     } finally {
       setLoading(false);
     }
@@ -232,7 +232,7 @@ export const useConversation = (conversationId: string | undefined) => {
         .neq('sender_id', user.id);
 
     } catch (error) {
-      console.error('Error fetching conversation:', error);
+
     } finally {
       setLoading(false);
     }
@@ -278,7 +278,7 @@ export const useConversation = (conversationId: string | undefined) => {
 
       return data;
     } catch (error) {
-      console.error('Error sending message:', error);
+
       toast({
         title: 'Error',
         description: 'Failed to send message',
@@ -378,7 +378,7 @@ export const useStartConversation = () => {
       if (error) throw error;
       return data.id;
     } catch (error) {
-      console.error('Error starting conversation:', error);
+
       toast({
         title: 'Error',
         description: 'Failed to start conversation',

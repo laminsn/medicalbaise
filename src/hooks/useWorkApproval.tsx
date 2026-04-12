@@ -46,7 +46,7 @@ export function useWorkApproval(activeJobId?: string) {
       if (error) throw error;
       setMedia((data || []) as WorkApprovalMedia[]);
     } catch (error) {
-      console.error('Error fetching work approval media:', error);
+
     } finally {
       setIsLoading(false);
     }
@@ -151,7 +151,7 @@ export function useWorkApproval(activeJobId?: string) {
       await fetchMedia();
       return true;
     } catch (error: any) {
-      console.error('Error uploading media:', error);
+
       toast({
         title: 'Upload Failed',
         description: error.message || 'Failed to upload media',

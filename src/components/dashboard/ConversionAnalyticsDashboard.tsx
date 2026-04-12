@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/sanitize";
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,7 +108,7 @@ export function ConversionAnalyticsDashboard() {
           setGoogleAnalyticsId(provider.google_analytics_id);
         }
       } catch (error) {
-        console.error('Error fetching provider data:', error);
+
       }
     }
 
@@ -133,7 +134,7 @@ export function ConversionAnalyticsDashboard() {
 
         setEvents(eventsData || []);
       } catch (error) {
-        console.error('Error fetching conversion data:', error);
+
       } finally {
         setLoading(false);
       }
@@ -235,16 +236,16 @@ export function ConversionAnalyticsDashboard() {
 
     const summaryRows = eventSummaries.map(s => `
       <tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${EVENT_CONFIG[s.type]?.label || s.type}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(EVENT_CONFIG[s.type]?.label || s.type)}</td>
         <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${s.count}</td>
       </tr>
     `).join('');
 
     const eventRows = events.slice(0, 50).map(event => `
       <tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${EVENT_CONFIG[event.event_name]?.label || event.event_name}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${event.event_type}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${event.source || 'direct'}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(EVENT_CONFIG[event.event_name]?.label || event.event_name)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(event.event_type)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${escapeHtml(event.source || 'direct')}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${format(new Date(event.created_at), 'MMM d, yyyy HH:mm')}</td>
       </tr>
     `).join('');

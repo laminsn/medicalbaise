@@ -31,7 +31,7 @@ export function useFavorites() {
       if (error) throw error;
       setFavoriteIds(new Set(data?.map(f => f.provider_id) || []));
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+
     }
   };
 
@@ -82,7 +82,7 @@ export function useFavorites() {
         });
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+
       toast({
         title: t('common.error'),
         description: t('favorites.removeError'),

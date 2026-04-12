@@ -31,7 +31,7 @@ export function AdminCreditManager() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, user_id, first_name, last_name, email, phone, user_type, status, handle, bio, city, state, credits_balance, created_at, last_login_at, referral_code')
       .or(`email.ilike.%${sanitizePostgrestValue(searchEmail)}%,handle.ilike.%${sanitizePostgrestValue(searchEmail)}%`)
       .limit(1)
       .maybeSingle();

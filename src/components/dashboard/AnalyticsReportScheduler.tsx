@@ -87,7 +87,7 @@ export function AnalyticsReportScheduler() {
           setEmail(user.email);
         }
       } catch (error) {
-        console.error('Error fetching schedule:', error);
+
       } finally {
         setLoading(false);
       }
@@ -161,7 +161,7 @@ export function AnalyticsReportScheduler() {
       
       setSchedule(updatedSchedule);
     } catch (error) {
-      console.error('Error saving schedule:', error);
+
       toast.error(t('tracking.scheduleError', 'Failed to save schedule'));
     } finally {
       setSaving(false);
@@ -180,7 +180,7 @@ export function AnalyticsReportScheduler() {
       if (error) throw error;
       toast.success(t('tracking.testReportSent', 'Test report sent to your email'));
     } catch (error) {
-      console.error('Error sending test report:', error);
+
       toast.error(t('tracking.testReportError', 'Failed to send test report'));
     } finally {
       setSendingTest(false);

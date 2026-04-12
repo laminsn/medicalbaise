@@ -70,7 +70,6 @@ export function LiveBroadcastDialog({
       videoRef.current.srcObject = stream;
       setCameraReady(true);
     } catch (err) {
-      console.error('Camera init error:', err);
       toast.error(tx('Failed to access camera. Please check permissions.', 'Falha ao acessar a câmera. Verifique as permissões.', 'No se pudo acceder a la cámara. Revisa los permisos.'));
     }
   }, [isPt, isEs]);
@@ -109,13 +108,8 @@ export function LiveBroadcastDialog({
         .from('notifications')
         .insert(notifications);
 
-      if (insertError) {
-        console.error('Failed to notify followers:', insertError);
-      } else {
-        console.log(`Notified ${followers.length} followers about live stream`);
-      }
     } catch (err) {
-      console.error('Error notifying followers:', err);
+      // Follower notification failure is non-fatal; stream continues
     }
   }, [isPt, isEs]);
 

@@ -167,7 +167,7 @@ export function useProviderAnalytics() {
           avgCompletionDays: avgCompletionDays || 2.5,
         });
       } catch (error) {
-        console.error('Error fetching analytics:', error);
+
       } finally {
         setLoading(false);
       }

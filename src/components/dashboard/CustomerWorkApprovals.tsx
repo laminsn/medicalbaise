@@ -134,7 +134,7 @@ export function CustomerWorkApprovals() {
                   {item.media_type === 'video' ? (
                     <video src={item.media_url} className="w-full h-full object-cover" />
                   ) : (
-                    <img src={item.media_url} alt="" className="w-full h-full object-cover" />
+                    <img src={item.media_url} alt={item.active_job?.job?.title || 'Work photo'} className="w-full h-full object-cover" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

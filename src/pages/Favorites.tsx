@@ -65,7 +65,7 @@ export default function Favorites() {
       if (error) throw error;
       setFavorites((data as unknown as FavoriteProvider[]) || []);
     } catch (error) {
-      console.error('Error fetching favorites:', error);
+
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export default function Favorites() {
         description: t('favorites.removedDescription', { name: providerName }),
       });
     } catch (error) {
-      console.error('Error removing favorite:', error);
+
       toast({
         title: t('common.error'),
         description: t('favorites.removeError'),

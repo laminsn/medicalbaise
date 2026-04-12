@@ -121,7 +121,7 @@ export function ScheduleMeetingDialog({
     setIsSubmitting(false);
 
     if (error) {
-      console.error('Error creating meeting:', error);
+
       toast({
         title: t('common.error'),
         description: t('video.createError'),

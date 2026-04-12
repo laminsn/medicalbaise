@@ -170,7 +170,7 @@ export function FollowerMarketingPanel() {
         const batch = notifications.slice(i, i + batchSize);
         const { error } = await supabase.from('notifications').insert(batch);
         if (error) {
-          console.error('Batch insert error:', error);
+
           throw error;
         }
       }
@@ -187,7 +187,7 @@ export function FollowerMarketingPanel() {
       setNotificationType('announcement');
       fetchHistory();
     } catch (err) {
-      console.error('Failed to send blast:', err);
+
       toast.error(t('marketing.blastError', 'Failed to send notifications'));
     } finally {
       setIsSending(false);

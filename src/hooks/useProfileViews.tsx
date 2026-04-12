@@ -30,7 +30,7 @@ export function useTrackProfileView(providerId: string | undefined, source: stri
           });
       } catch (error) {
         // Silently fail - don't affect user experience
-        console.error('Error tracking profile view:', error);
+
       }
     };
 

@@ -67,7 +67,7 @@ export function AdminUserManagement() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, user_id, first_name, last_name, email, phone, user_type, status, handle, bio, city, state, credits_balance, created_at, last_login_at, referral_code')
       .or(`email.ilike.%${sanitizePostgrestValue(searchQuery)}%,first_name.ilike.%${sanitizePostgrestValue(searchQuery)}%,last_name.ilike.%${sanitizePostgrestValue(searchQuery)}%,handle.ilike.%${sanitizePostgrestValue(searchQuery)}%`)
       .limit(20);
 
@@ -83,7 +83,7 @@ export function AdminUserManagement() {
     setLoading(true);
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, user_id, first_name, last_name, email, phone, user_type, status, handle, bio, city, state, credits_balance, created_at, last_login_at, referral_code')
       .order('created_at', { ascending: false })
       .limit(50);
 

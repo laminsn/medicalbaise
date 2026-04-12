@@ -141,7 +141,7 @@ export function useJobStatusUpdate() {
 
       return true;
     } catch (error: any) {
-      console.error('Error updating job status:', error);
+
       toast({
         title: 'Update Failed',
         description: error.message || 'Failed to update job status',

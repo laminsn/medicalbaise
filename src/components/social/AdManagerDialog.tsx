@@ -73,7 +73,7 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching ads:', error);
+
     } else {
       setAds(data || []);
     }
@@ -115,7 +115,7 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
       resetForm();
       fetchAds();
     } catch (error) {
-      console.error('Error creating ad:', error);
+
       toast.error(t('socialFeed.errorCreatingAd'));
     } finally {
       setCreating(false);

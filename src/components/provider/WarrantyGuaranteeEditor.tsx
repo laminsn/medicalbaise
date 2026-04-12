@@ -48,7 +48,7 @@ export function WarrantyGuaranteeEditor() {
         setGuaranteeInfo(data.guarantee_info || '');
       }
     } catch (error) {
-      console.error('Error fetching warranty data:', error);
+
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ export function WarrantyGuaranteeEditor() {
 
       toast.success(t('provider.warrantyUpdated', 'Warranty & guarantee information updated'));
     } catch (error: any) {
-      console.error('Error saving warranty data:', error);
+
       toast.error(error.message || t('provider.saveFailed', 'Failed to save'));
     } finally {
       setIsSaving(false);

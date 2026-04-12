@@ -100,7 +100,7 @@ export function useScheduledServices() {
       if (error) throw error;
       setServices((data || []) as unknown as ScheduledService[]);
     } catch (error) {
-      console.error('Error fetching scheduled services:', error);
+
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +118,7 @@ export function useScheduledServices() {
       setInstances((data || []) as ServiceInstance[]);
       return data as ServiceInstance[];
     } catch (error) {
-      console.error('Error fetching service instances:', error);
+
       return [];
     }
   };
@@ -214,7 +214,7 @@ export function useScheduledServices() {
       await fetchServices();
       return data;
     } catch (error: any) {
-      console.error('Error creating scheduled service:', error);
+
       toast({
         title: 'Scheduling Failed',
         description: error.message || 'Failed to create scheduled service',

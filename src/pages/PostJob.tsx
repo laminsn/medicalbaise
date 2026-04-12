@@ -129,7 +129,7 @@ export default function PostJob() {
       toast.success(t('postJob.jobPublished'));
       navigate('/my-jobs');
     } catch (error) {
-      console.error('Error posting job:', error);
+
       toast.error(t('postJob.errorPosting'));
     } finally {
       setLoading(false);

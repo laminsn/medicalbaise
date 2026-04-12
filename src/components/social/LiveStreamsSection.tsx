@@ -32,7 +32,7 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
       .order('started_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching live streams:', error);
+
       return;
     }
 

@@ -20,14 +20,11 @@ export const useEmailNotifications = () => {
       });
 
       if (error) {
-        console.error('Error sending notification email:', error);
         return { success: false, error };
       }
 
-      console.log('Notification email sent successfully:', data);
       return { success: true, data };
     } catch (err) {
-      console.error('Failed to send notification email:', err);
       return { success: false, error: err };
     }
   };

@@ -53,7 +53,7 @@ export default function MyQuotes() {
         if (error) throw error;
         setQuotes(data || []);
       } catch (error) {
-        console.error('Error fetching quotes:', error);
+
       } finally {
         setIsLoading(false);
       }

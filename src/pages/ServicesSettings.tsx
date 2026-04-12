@@ -125,7 +125,7 @@ export default function ServicesSettings() {
         setServices(servicesData || []);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+
       toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
@@ -156,7 +156,7 @@ export default function ServicesSettings() {
       setServices(prev => prev.filter(s => s.id !== serviceId));
       toast.success(t('services.serviceDeleted', 'Service deleted'));
     } catch (error: any) {
-      console.error('Error deleting service:', error);
+
       toast.error(error.message || t('common.error'));
     }
   };

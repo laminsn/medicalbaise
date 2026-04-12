@@ -44,7 +44,7 @@ export function useSubscription() {
         loading: false,
       });
     } catch (err) {
-      console.error('Error checking subscription:', err);
+
       setState(prev => ({ ...prev, loading: false }));
     }
   }, [user]);

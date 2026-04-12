@@ -41,7 +41,7 @@ async function saveConversionEvent(
       metadata: metadata as Record<string, string> || null,
     }]);
   } catch (error) {
-    console.error('[ProviderPixelTracker] Failed to save conversion event:', error);
+    // Conversion event persistence failed; tracking pixels may still fire independently
   }
 }
 
@@ -129,8 +129,6 @@ function initMetaPixel(pixelId: string) {
   img.src = `https://www.facebook.com/tr?id=${safePixelId}&ev=PageView&noscript=1`;
   noscript.appendChild(img);
   document.body.appendChild(noscript);
-
-  console.log('[ProviderPixelTracker] Meta Pixel initialized:', pixelId);
 }
 
 function initGoogleAnalytics(measurementId: string) {
@@ -159,8 +157,6 @@ function initGoogleAnalytics(measurementId: string) {
     gtag('config', '${safeMeasurementId}');
   `;
   document.head.appendChild(configScript);
-
-  console.log('[ProviderPixelTracker] Google Analytics initialized:', measurementId);
 }
 
 // Conversion tracking functions - now saves to database

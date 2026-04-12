@@ -74,7 +74,7 @@ export function useNotifications() {
       .limit(50);
 
     if (error) {
-      console.error('Error fetching notifications:', error);
+
       return;
     }
 
@@ -93,7 +93,7 @@ export function useNotifications() {
       .order('scheduled_for', { ascending: true });
 
     if (error) {
-      console.error('Error fetching reminders:', error);
+
       return;
     }
 
@@ -111,7 +111,7 @@ export function useNotifications() {
       .maybeSingle();
 
     if (error) {
-      console.error('Error fetching preferences:', error);
+
       return;
     }
 
@@ -141,7 +141,7 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error marking notification as read:', error);
+
       return;
     }
 
@@ -162,7 +162,7 @@ export function useNotifications() {
       .eq('is_read', false);
 
     if (error) {
-      console.error('Error marking all as read:', error);
+
       return;
     }
 
@@ -180,7 +180,7 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error deleting notification:', error);
+
       return;
     }
 
@@ -220,7 +220,7 @@ export function useNotifications() {
       .single();
 
     if (error) {
-      console.error('Error creating reminder:', error);
+
       toast({
         title: isPt ? 'Erro' : isEs ? 'Error' : 'Error',
         description: isPt ? 'Falha ao criar lembrete' : isEs ? 'No se pudo crear el recordatorio' : 'Failed to create reminder',
@@ -247,7 +247,7 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error updating reminder:', error);
+
       return false;
     }
 
@@ -267,7 +267,7 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error deleting reminder:', error);
+
       return false;
     }
 
@@ -285,7 +285,7 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error updating preferences:', error);
+
       return false;
     }
 
@@ -335,11 +335,11 @@ export function useNotifications() {
         )
         .subscribe((status, err) => {
           if (err) {
-            console.error('Realtime subscription error:', err);
+
           }
         });
     } catch (err) {
-      console.error('Failed to setup realtime subscription:', err);
+
     }
 
     return () => {

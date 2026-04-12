@@ -99,7 +99,7 @@ export default function JobDetails() {
         .maybeSingle();
 
       if (jobError) {
-        console.error('Error fetching job:', jobError);
+
         toast.error(t('jobs.errorLoadingJob'));
         navigate('/jobs');
         return;

@@ -237,7 +237,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
         .upload(fileName, cert.file);
 
       if (uploadError) {
-        console.error('Error uploading certification:', uploadError);
+
         continue;
       }
 
@@ -315,7 +315,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
           .insert(servicesInserts);
         
         if (servicesError) {
-          console.error('Error saving services:', servicesError);
+
         }
       }
 
@@ -334,7 +334,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
-      console.error('Error creating provider profile:', error);
+
       toast.error(error.message || t('provider.registrationError'));
     } finally {
       setIsSubmitting(false);

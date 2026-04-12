@@ -49,7 +49,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
       .order('order_index', { ascending: true });
 
     if (error) {
-      console.error('Error fetching addons:', error);
+
     } else {
       setAddons(data || []);
     }
@@ -77,7 +77,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
       .single();
 
     if (error) {
-      console.error('Error adding addon:', error);
+
       toast.error(t('settings.addonAddError', 'Failed to add add-on'));
     } else {
       setAddons([...addons, data]);
@@ -98,7 +98,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
       .eq('id', addonId);
 
     if (error) {
-      console.error('Error updating addon:', error);
+
       toast.error(t('settings.addonUpdateError', 'Failed to update add-on'));
     } else {
       setAddons(addons.map(a => a.id === addonId ? { ...a, is_active: isActive } : a));
@@ -112,7 +112,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
       .eq('id', addonId);
 
     if (error) {
-      console.error('Error deleting addon:', error);
+
       toast.error(t('settings.addonDeleteError', 'Failed to delete add-on'));
     } else {
       setAddons(addons.filter(a => a.id !== addonId));
