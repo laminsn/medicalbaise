@@ -234,7 +234,7 @@ export function useFaceAuth() {
   }, []);
 
   /** Verify a face against stored descriptors (for login) */
-  const verifyFace = useCallback(async (): Promise<{ matched: boolean; userId?: string; email?: string }> => {
+  const verifyFace = useCallback(async (emailForVerification?: string): Promise<{ matched: boolean; userId?: string; email?: string }> => {
     // Rate limit face verification attempts
     if (!checkFaceVerifyRateLimit()) {
       setState((s) => ({
@@ -257,53 +257,27 @@ export function useFaceAuth() {
       return { matched: false };
     }
 
-    // Fetch face descriptors — only email and face_descriptor (no user_id exposed)
-    // RLS should restrict this query; we only select the minimum needed fields.
-    const { data: profiles, error } = await (supabase
-      .from('profiles')
-      .select('email, face_descriptor')
-      .not('face_descriptor', 'is', null) as unknown as Promise<{ data: { email: string | null; face_descriptor: string | null }[] | null; error: unknown }>);
+    // Server-side face verification — descriptors never leave the server
+    const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-face', {
+      body: { descriptor: Array.from(descriptor), email: emailForVerification },
+    });
 
-    if (error || !profiles || profiles.length === 0) {
+    if (verifyError) {
       setState((s) => ({
         ...s,
         status: 'error',
         error: localizeError(
-          'No enrolled faces found. Please sign in with password first and enroll your face.',
-          'Nenhum rosto cadastrado encontrado. Entre com senha primeiro e cadastre seu rosto.',
-          'No se encontraron rostros registrados. Inicia sesión con contraseña y luego registra tu rostro.',
+          'Face verification service unavailable. Please use password login.',
+          'Serviço de verificação facial indisponível. Use login com senha.',
+          'Servicio de verificación facial no disponible. Use inicio de sesión con contraseña.',
         ),
       }));
       return { matched: false };
     }
 
-    // Compare against each stored descriptor
-    let bestMatch: { email: string | null; distance: number } | null = null;
-
-    for (const profile of profiles) {
-      try {
-        const parsed = JSON.parse(profile.face_descriptor as string);
-        // Validate descriptor shape to prevent injection
-        if (!Array.isArray(parsed) || parsed.length !== 128 || !parsed.every((v: unknown) => typeof v === 'number' && isFinite(v as number))) {
-          continue;
-        }
-        const storedDescriptor = new Float32Array(parsed);
-        const distance = faceapi.euclideanDistance(descriptor, storedDescriptor);
-
-        if (distance < FACE_MATCH_THRESHOLD && (!bestMatch || distance < bestMatch.distance)) {
-          bestMatch = {
-            email: profile.email,
-            distance,
-          };
-        }
-      } catch {
-        continue;
-      }
-    }
-
-    if (bestMatch && bestMatch.email) {
+    if (verifyData?.match && verifyData?.email) {
       setState((s) => ({ ...s, status: 'success', error: null }));
-      return { matched: true, email: bestMatch.email };
+      return { matched: true, email: verifyData.email };
     }
 
     setState((s) => ({
