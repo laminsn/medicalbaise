@@ -361,19 +361,16 @@ export default function ProfileEdit() {
                 </p>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="address_cep">{t('profile.cep', 'CEP (Postal Code)')}</Label>
+                  <Label htmlFor="address_cep">{t('profile.postalCode', 'ZIP / Postal Code')}</Label>
                   <Input
                     id="address_cep"
-                    placeholder="00000-000"
+                    placeholder={t('profile.postalCodePlaceholder', '00000-000 or ZIP code')}
                     value={formData.address_cep}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '').slice(0, 8);
-                      const formattedCEP = value.length > 5 
-                        ? `${value.slice(0, 5)}-${value.slice(5)}` 
-                        : value;
-                      setFormData(prev => ({ ...prev, address_cep: formattedCEP }));
+                      const value = e.target.value.slice(0, 10);
+                      setFormData(prev => ({ ...prev, address_cep: value }));
                     }}
-                    maxLength={9}
+                    maxLength={10}
                   />
                 </div>
 

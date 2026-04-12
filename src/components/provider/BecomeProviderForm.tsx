@@ -1084,6 +1084,22 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                   className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                 />
               </div>
+
+              <div className="space-y-2 mt-4">
+                <label className="text-sm font-medium text-foreground">
+                  {isPt ? 'Verifica\u00e7\u00e3o de Antecedentes (opcional)' : 'Background Check (optional)'}
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  {isPt
+                    ? 'Envie uma verifica\u00e7\u00e3o de antecedentes para aumentar a confian\u00e7a dos clientes. Voc\u00ea receber\u00e1 um selo de "Antecedentes Verificados" no seu perfil.'
+                    : 'Upload a background check to increase client trust. You will receive a "Background Checked" badge on your profile.'}
+                </p>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-500/10 file:text-blue-600 hover:file:bg-blue-500/20"
+                />
+              </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
