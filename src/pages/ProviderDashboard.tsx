@@ -20,6 +20,7 @@ import { FollowerMarketingPanel } from '@/components/marketing/FollowerMarketing
 import { ProviderEmailCampaigns } from '@/components/marketing/ProviderEmailCampaigns';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { BidTemplates } from '@/components/provider/BidTemplates';
 import {
   BarChart3,
   MessageSquare,
@@ -204,6 +205,10 @@ export default function ProviderDashboard() {
               <span className="hidden sm:inline">{t('dashboard.tabs.tracking')}</span>
               {!isEnterprise && <Crown className="h-3 w-3 text-purple-400" />}
             </TabsTrigger>
+            <TabsTrigger value="bid-templates" className="gap-2 py-3">
+              <Mail className="h-4 w-4" />
+              <span className="hidden sm:inline">Bid Templates</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="jobs" className="space-y-6">
@@ -267,11 +272,15 @@ export default function ProviderDashboard() {
                 <ConversionAnalyticsDashboard />
               </div>
             ) : (
-              <UpgradePrompt 
-                feature={t('dashboard.features.pixelTracking')} 
+              <UpgradePrompt
+                feature={t('dashboard.features.pixelTracking')}
                 requiredTier="Enterprise"
               />
             )}
+          </TabsContent>
+
+          <TabsContent value="bid-templates" className="space-y-6">
+            <BidTemplates mode="manage" />
           </TabsContent>
         </Tabs>
       </div>
