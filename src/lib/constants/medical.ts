@@ -155,6 +155,15 @@ export const MEDICAL_CATEGORIES: MedicalCategory[] = [
     description_en: 'Ear, nose, and throat specialists',
     description_pt: 'Especialistas em ouvido, nariz e garganta',
   },
+  {
+    id: 'emergency-emt',
+    name_en: 'Emergency / EMT',
+    name_pt: 'Emerg\u00eancia / SAMU',
+    icon: 'Ambulance',
+    color: 'red',
+    description_en: 'Emergency medical technicians, paramedics, and ambulance services',
+    description_pt: 'T\u00e9cnicos em emerg\u00eancia m\u00e9dica, param\u00e9dicos e servi\u00e7os de ambul\u00e2ncia',
+  },
 ];
 
 export const INSURANCE_PROVIDERS = [

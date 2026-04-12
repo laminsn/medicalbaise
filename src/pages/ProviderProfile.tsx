@@ -49,6 +49,7 @@ import { VideoTestimonialList } from '@/components/testimonials/VideoTestimonial
 import { UploadTestimonialDialog } from '@/components/testimonials/UploadTestimonialDialog';
 import { CreateScheduledServiceDialog } from '@/components/scheduling/CreateScheduledServiceDialog';
 import { ProviderFeedTab } from '@/components/provider/ProviderFeedTab';
+import { PortfolioGallery } from '@/components/provider/PortfolioGallery';
 import { useStartConversation } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrackProfileView } from '@/hooks/useProfileViews';
@@ -312,6 +313,15 @@ export default function ProviderProfile() {
                     {provider.address}
                   </Badge>
                 </div>
+                {provider.response_time_hours && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                    <Clock className="w-3 h-3" />
+                    <span>Typically responds in {provider.response_time_hours < 1
+                      ? 'under 1 hour'
+                      : `${Math.round(provider.response_time_hours)} hour${Math.round(provider.response_time_hours) !== 1 ? 's' : ''}`
+                    }</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -530,21 +540,21 @@ export default function ProviderProfile() {
 
             {/* Portfolio Tab */}
             <TabsContent value="portfolio" className="mt-4">
-              <div className="grid grid-cols-2 gap-2">
-                {providerPortfolio.map((item) => (
-                  <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden">
-                    <img
-                      src={item.url}
-                      alt={item.caption || 'Portfolio photo'}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <p className="absolute bottom-2 left-2 right-2 text-white text-xs">
-                      {item.caption}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <PortfolioGallery
+                items={(providerPortfolio as any[]).map((item: any) => ({
+                  id: item.id,
+                  after_url: item.url || item.media_url,
+                  caption: item.caption || '',
+                  category: item.category || '',
+                }))}
+              />
+              {providerPortfolio.length === 0 && (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    {t('providerProfile.noPortfolio', 'No portfolio items yet.')}
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             {/* Video Testimonials Tab */}

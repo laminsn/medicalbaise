@@ -32,10 +32,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Upload, X, FileText, Image, ShieldCheck } from 'lucide-react';
+import { Loader2, Upload, X, FileText, ShieldCheck } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
+import { MEDICAL_CATEGORIES, INSURANCE_PROVIDERS } from '@/lib/constants/medical';
+
+const CONSULTATION_DURATIONS = [
+  { value: 15, label: '15 min' },
+  { value: 30, label: '30 min' },
+  { value: 45, label: '45 min' },
+  { value: 60, label: '60 min' },
+];
 
 interface ServiceCategory {
   id: string;
@@ -60,6 +68,21 @@ const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
   passport_number: z.string().optional(),
   contact_phone: z.string().optional(),
   contact_email: z.string().email().optional().or(z.literal('')),
+  // Medical credentials
+  crm_number: z.string().min(5, isPt ? 'Número CRM inválido' : 'Invalid CRM number'),
+  medical_specialty: z.string().min(1, isPt ? 'Selecione uma especialidade' : 'Please select a specialty'),
+  sub_specialty: z.string().optional(),
+  medical_school: z.string().min(2, isPt ? 'Informe a faculdade de medicina' : 'Please enter your medical school'),
+  graduation_year: z.coerce.number()
+    .min(1950, isPt ? 'Ano de graduação inválido' : 'Invalid graduation year')
+    .max(new Date().getFullYear(), isPt ? 'O ano não pode ser no futuro' : 'Year cannot be in the future'),
+  residency_program: z.string().optional(),
+  hospital_affiliations_text: z.string().optional(),
+  accepted_insurance: z.array(z.string()).optional(),
+  consultation_fee: z.coerce.number().min(0).optional(),
+  consultation_duration_minutes: z.coerce.number().optional(),
+  teleconsultation_available: z.boolean().optional(),
+  accepts_new_patients: z.boolean().optional(),
   // Credential verification
   credential_certification: z.boolean().refine(val => val === true, {
     message: isPt ? 'Você deve certificar suas credenciais' : isEs ? 'Debes certificar tus credenciales' : 'You must certify your credentials',
@@ -141,10 +164,32 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
       passport_number: '',
       contact_phone: '',
       contact_email: '',
+      crm_number: '',
+      medical_specialty: '',
+      sub_specialty: '',
+      medical_school: '',
+      graduation_year: new Date().getFullYear() - 5,
+      residency_program: '',
+      hospital_affiliations_text: '',
+      accepted_insurance: [],
+      consultation_fee: undefined,
+      consultation_duration_minutes: 30,
+      teleconsultation_available: false,
+      accepts_new_patients: true,
       credential_certification: false,
       credential_documents: undefined,
     },
   });
+
+  const selectedInsurance = form.watch('accepted_insurance') ?? [];
+
+  const toggleInsuranceItem = (value: string) => {
+    const current = form.getValues('accepted_insurance') ?? [];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    form.setValue('accepted_insurance', updated);
+  };
 
   const idType = form.watch('id_type');
 
@@ -260,6 +305,11 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
     setIsSubmitting(true);
 
     try {
+      // Parse hospital affiliations from comma-separated text
+      const hospitalAffiliations = data.hospital_affiliations_text
+        ? data.hospital_affiliations_text.split(',').map((s) => s.trim()).filter(Boolean)
+        : [];
+
       // Create provider profile
       const { data: providerData, error: providerError } = await supabase
         .from('providers')
@@ -279,11 +329,50 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
           contact_email: data.id_type === 'alternative' ? data.contact_email : null,
           requires_background_check: data.id_type === 'alternative',
           languages: selectedLanguages,
+          // Medical credentials
+          crm_number: data.crm_number,
+          accepted_insurance: data.accepted_insurance ?? [],
+          hospital_affiliations: hospitalAffiliations,
+          consultation_fee: data.consultation_fee ?? null,
+          consultation_duration_minutes: data.consultation_duration_minutes ?? null,
+          teleconsultation_available: data.teleconsultation_available ?? false,
+          accepts_new_patients: data.accepts_new_patients ?? true,
         })
         .select('id')
         .single();
 
       if (providerError) throw providerError;
+
+      // Save education credentials (medical school + residency)
+      if (providerData) {
+        const educationCredentials = [
+          {
+            provider_id: providerData.id,
+            credential_type: 'education',
+            title: isPt ? 'Graduação em Medicina' : 'Medical Degree',
+            institution: data.medical_school,
+            year: data.graduation_year.toString(),
+          },
+          ...(data.residency_program ? [{
+            provider_id: providerData.id,
+            credential_type: 'residency',
+            title: data.residency_program,
+            institution: data.residency_program,
+            year: null,
+          }] : []),
+          ...(data.sub_specialty ? [{
+            provider_id: providerData.id,
+            credential_type: 'certification',
+            title: data.sub_specialty,
+            institution: '',
+            year: null,
+          }] : []),
+        ];
+
+        if (educationCredentials.length > 0) {
+          await supabase.from('provider_credentials').insert(educationCredentials);
+        }
+      }
 
       // Upload certifications
       if (certifications.length > 0 && providerData) {
@@ -302,21 +391,28 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
         setUploadingCerts(false);
       }
 
+      // Update category_id from medical specialty selection
+      if (providerData && data.medical_specialty) {
+        await supabase
+          .from('providers')
+          .update({ category_id: data.medical_specialty })
+          .eq('id', providerData.id);
+      }
+
       // Save selected services
-      if (selectedServices.length > 0 && providerData) {
-        const servicesInserts = selectedServices.map(categoryId => ({
+      const allServiceIds = Array.from(new Set([
+        ...selectedServices,
+        ...(data.medical_specialty ? [data.medical_specialty] : []),
+      ]));
+
+      if (allServiceIds.length > 0 && providerData) {
+        const servicesInserts = allServiceIds.map(categoryId => ({
           provider_id: providerData.id,
           category_id: categoryId,
           is_quote_based: true,
         }));
-        
-        const { error: servicesError } = await supabase
-          .from('provider_services')
-          .insert(servicesInserts);
-        
-        if (servicesError) {
 
-        }
+        await supabase.from('provider_services').insert(servicesInserts);
       }
 
       // Update user profile type to provider
@@ -481,6 +577,290 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                   </div>
                 </>
               )}
+            </div>
+
+            {/* Medical Credentials Section */}
+            <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+              <h3 className="font-medium flex items-center gap-2">
+                {isPt ? 'Credenciais Médicas' : 'Medical Credentials'}
+              </h3>
+
+              {/* CRM Number */}
+              <FormField
+                control={form.control}
+                name="crm_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {isPt ? 'CRM / Número do Registro Médico' : 'CRM / Medical License Number'}
+                      <span className="text-destructive"> *</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., CRM/SP 123456" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Medical Specialty */}
+              <FormField
+                control={form.control}
+                name="medical_specialty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {isPt ? 'Especialidade Médica' : 'Medical Specialty'}
+                      <span className="text-destructive"> *</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isPt ? 'Selecione uma especialidade' : 'Select a specialty'} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {MEDICAL_CATEGORIES.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {isPt ? cat.name_pt : cat.name_en}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Sub-specialty */}
+              <FormField
+                control={form.control}
+                name="sub_specialty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPt ? 'Subespecialidade (opcional)' : 'Sub-specialty (optional)'}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={isPt ? 'ex: Cardiologia Pediátrica' : 'e.g., Pediatric Cardiology'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Medical School */}
+              <FormField
+                control={form.control}
+                name="medical_school"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {isPt ? 'Faculdade de Medicina' : 'Medical School'}
+                      <span className="text-destructive"> *</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={isPt ? 'ex: USP - Faculdade de Medicina' : 'e.g., USP - Faculdade de Medicina'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Graduation Year */}
+              <FormField
+                control={form.control}
+                name="graduation_year"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {isPt ? 'Ano de Formatura' : 'Graduation Year'}
+                      <span className="text-destructive"> *</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1950}
+                        max={new Date().getFullYear()}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Residency Program */}
+              <FormField
+                control={form.control}
+                name="residency_program"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPt ? 'Programa de Residência (opcional)' : 'Residency Program (optional)'}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={isPt ? 'ex: Residência em Cardiologia — InCor' : 'e.g., Cardiology Residency — InCor'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Hospital Affiliations */}
+              <FormField
+                control={form.control}
+                name="hospital_affiliations_text"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPt ? 'Vínculos Hospitalares (opcional)' : 'Hospital Affiliations (optional)'}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={isPt ? 'ex: Hospital Albert Einstein, Hospital Sírio-Libanês' : 'e.g., Hospital Albert Einstein, Hospital Sírio-Libanês'}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {isPt ? 'Separe os hospitais por vírgula' : 'Separate hospitals with commas'}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Accepted Insurance Plans */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  {isPt ? 'Planos de Saúde Aceitos (opcional)' : 'Accepted Insurance Plans (optional)'}
+                </Label>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-md p-3">
+                  {[
+                    ...INSURANCE_PROVIDERS,
+                    isPt ? 'Particular (sem plano)' : 'Particular (out-of-pocket)',
+                    'SUS',
+                  ].map((plan) => (
+                    <div key={plan} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`insurance-${plan}`}
+                        checked={selectedInsurance.includes(plan)}
+                        onCheckedChange={() => toggleInsuranceItem(plan)}
+                      />
+                      <label
+                        htmlFor={`insurance-${plan}`}
+                        className="text-sm leading-none cursor-pointer"
+                      >
+                        {plan}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Consultation Fee */}
+              <FormField
+                control={form.control}
+                name="consultation_fee"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPt ? 'Valor da Consulta (opcional)' : 'Consultation Fee (optional)'}</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                        <Input
+                          type="number"
+                          min={0}
+                          placeholder="e.g., 250"
+                          className="pl-9"
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Consultation Duration */}
+              <FormField
+                control={form.control}
+                name="consultation_duration_minutes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPt ? 'Duração da Consulta (opcional)' : 'Consultation Duration (optional)'}</FormLabel>
+                    <Select
+                      onValueChange={(v) => field.onChange(Number(v))}
+                      value={field.value ? String(field.value) : undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isPt ? 'Selecione a duração' : 'Select duration'} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CONSULTATION_DURATIONS.map((d) => (
+                          <SelectItem key={d.value} value={String(d.value)}>
+                            {d.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Teleconsultation Available */}
+              <FormField
+                control={form.control}
+                name="teleconsultation_available"
+                render={({ field }) => (
+                  <FormItem className="flex items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value ?? false}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-0.5">
+                      <FormLabel className="font-normal cursor-pointer">
+                        {isPt
+                          ? 'Ofereço teleconsulta / consultas por vídeo'
+                          : 'I offer teleconsultation / video appointments'}
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {/* Accepts New Patients */}
+              <FormField
+                control={form.control}
+                name="accepts_new_patients"
+                render={({ field }) => (
+                  <FormItem className="flex items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value ?? true}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-0.5">
+                      <FormLabel className="font-normal cursor-pointer">
+                        {isPt
+                          ? 'Estou aceitando novos pacientes'
+                          : 'Currently accepting new patients'}
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField

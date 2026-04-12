@@ -10,8 +10,9 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Bell, Moon, Globe, Lock, Trash2, Check, Package, ChevronRight, ScanFace, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Bell, Moon, Globe, Lock, Trash2, Check, Package, ChevronRight, ScanFace, ShieldCheck, CalendarDays } from 'lucide-react';
 import { ProviderAddonsSettings } from '@/components/settings/ProviderAddonsSettings';
+import { DoctorAvailability } from '@/components/appointments/DoctorAvailability';
 import { supabase } from '@/integrations/supabase/client';
 import { FaceAuthEnroll } from '@/components/auth/FaceAuthEnroll';
 import { useFaceAuth } from '@/hooks/useFaceAuth';
@@ -139,6 +140,21 @@ export default function Settings() {
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Availability (Providers only) */}
+            {providerId && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-primary" />
+                    Availability
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <DoctorAvailability />
                 </CardContent>
               </Card>
             )}

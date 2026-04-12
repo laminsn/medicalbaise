@@ -1,122 +1,62 @@
-import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, Loader2, MessageSquare, Video } from 'lucide-react';
+import { Loader2, Star, MapPin, Clock, BadgeCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/useAuth';
-import { useStartConversation } from '@/hooks/useMessages';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { formatPrice } from '@/lib/currency';
+import { AppointmentCalendar } from '@/components/appointments/AppointmentCalendar';
 
-interface ProviderLite {
+interface ProviderProfile {
   id: string;
   business_name: string;
   provider_type: string | null;
   consultation_fee: number | null;
+  consultation_duration_minutes: number | null;
   teleconsultation_available: boolean | null;
   tagline: string | null;
+  avatar_url: string | null;
+  avg_rating: number | null;
+  total_reviews: number | null;
+  is_verified: boolean | null;
+  city: string | null;
+  state: string | null;
 }
 
 export default function BookAppointment() {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const { startConversation } = useStartConversation();
-
-  const [preferredDate, setPreferredDate] = useState('');
-  const [preferredTime, setPreferredTime] = useState('');
-  const [notes, setNotes] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-
-  const appointmentType = useMemo(
-    () => (searchParams.get('type') === 'teleconsultation' ? 'teleconsultation' : 'in-person'),
-    [searchParams],
-  );
 
   const { data: provider, isLoading, error } = useQuery({
-    queryKey: ['appointment-provider', id],
+    queryKey: ['book-appointment-provider', id],
     queryFn: async () => {
       if (!id) return null;
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('providers')
-        .select('id, business_name, provider_type, consultation_fee, teleconsultation_available, tagline')
+        .select(
+          'id, business_name, provider_type, consultation_fee, consultation_duration_minutes, teleconsultation_available, tagline, avatar_url, avg_rating, total_reviews, is_verified, city, state',
+        )
         .eq('id', id)
         .maybeSingle();
 
-      if (error) throw error;
-      return data as ProviderLite | null;
+      if (fetchError) throw fetchError;
+      return data as ProviderProfile | null;
     },
     enabled: !!id,
   });
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!id || !user) {
-      toast.error(t('auth.loginRequired'));
-      navigate('/auth');
-      return;
-    }
-
-    if (!preferredDate || !preferredTime) {
-      toast.error(t('appointments.fillRequiredFields', 'Please choose date and time.'));
-      return;
-    }
-
-    setSubmitting(true);
-
-    try {
-      const conversationId = await startConversation(id);
-      if (!conversationId) {
-        throw new Error('Failed to create conversation');
-      }
-
-      const typeLabel =
-        appointmentType === 'teleconsultation'
-          ? t('doctorProfile.teleconsultation')
-          : t('doctorProfile.bookAppointment');
-
-      const messageLines = [
-        `${t('appointments.requestMessageTitle', 'Appointment request')}: ${typeLabel}`,
-        `${t('appointments.preferredDate', 'Preferred date')}: ${preferredDate}`,
-        `${t('appointments.preferredTime', 'Preferred time')}: ${preferredTime}`,
-      ];
-
-      if (notes.trim()) {
-        messageLines.push(`${t('appointments.notes', 'Notes')}: ${notes.trim()}`);
-      }
-
-      const { error: messageError } = await supabase.from('messages').insert({
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content: messageLines.join('\n'),
-      });
-
-      if (messageError) throw messageError;
-
-      toast.success(t('appointments.requestSent', 'Appointment request sent.'));
-      navigate(`/chat/${conversationId}`);
-    } catch (submitError) {
-
-      toast.error(t('appointments.requestFailed', 'Could not send appointment request.'));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   if (!id) {
-    return <Alert><AlertDescription>{t('common.invalidRequest', 'Invalid request.')}</AlertDescription></Alert>;
+    return (
+      <Alert>
+        <AlertDescription>{t('common.invalidRequest', 'Invalid request.')}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (isLoading) {
@@ -146,101 +86,95 @@ export default function BookAppointment() {
     );
   }
 
-  const isTeleconsultation = appointmentType === 'teleconsultation';
-  const teleconsultationUnavailable = isTeleconsultation && !provider.teleconsultation_available;
+  const location = [provider.city, provider.state].filter(Boolean).join(', ');
 
   return (
     <>
       <Helmet>
-        <title>{t('appointments.requestAppointment', 'Request appointment')} - Brasil Base</title>
+        <title>
+          {t('appointments.bookWith', 'Book with')} {provider.business_name} - Brasil Base
+        </title>
       </Helmet>
       <AppLayout>
-        <div className="container mx-auto px-4 py-6 pb-24 max-w-2xl">
+        <div className="container mx-auto px-4 py-6 pb-24 max-w-2xl space-y-6">
+          {/* Back button */}
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2">
+            ← {t('common.back')}
+          </Button>
+
+          {/* Doctor info card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {isTeleconsultation ? <Video className="h-5 w-5" /> : <Calendar className="h-5 w-5" />}
-                {t('appointments.requestAppointment', 'Request appointment')}
-              </CardTitle>
-              <CardDescription>
-                {provider.business_name}
-                {provider.tagline ? ` • ${provider.tagline}` : ''}
-              </CardDescription>
+            <CardHeader className="pb-4">
+              <div className="flex items-start gap-4">
+                {provider.avatar_url ? (
+                  <img
+                    src={provider.avatar_url}
+                    alt={provider.business_name}
+                    className="w-16 h-16 rounded-full object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-border">
+                    <span className="text-2xl font-bold text-primary">
+                      {provider.business_name.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-bold truncate">{provider.business_name}</h2>
+                    {provider.is_verified && (
+                      <BadgeCheck className="h-5 w-5 text-primary shrink-0" />
+                    )}
+                  </div>
+                  {provider.tagline && (
+                    <p className="text-sm text-muted-foreground mt-0.5">{provider.tagline}</p>
+                  )}
+                  {provider.provider_type && (
+                    <Badge variant="secondary" className="mt-1 text-xs">
+                      {provider.provider_type}
+                    </Badge>
+                  )}
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
+                    {provider.avg_rating ? (
+                      <span className="flex items-center gap-1">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        {provider.avg_rating.toFixed(1)}
+                        {provider.total_reviews ? ` (${provider.total_reviews})` : ''}
+                      </span>
+                    ) : null}
+                    {location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {location}
+                      </span>
+                    )}
+                    {provider.consultation_duration_minutes ? (
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {provider.consultation_duration_minutes} min
+                      </span>
+                    ) : null}
+                    {provider.consultation_fee ? (
+                      <span className="font-semibold text-primary">
+                        {formatPrice(provider.consultation_fee)}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              {teleconsultationUnavailable && (
-                <Alert className="mb-4" variant="destructive">
-                  <AlertDescription>
-                    {t('doctorProfile.telehealthNotAvailable')}
-                  </AlertDescription>
-                </Alert>
-              )}
+          </Card>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="space-y-2">
-                  <Label htmlFor="appointment-date">{t('appointments.preferredDate', 'Preferred date')}</Label>
-                  <Input
-                    id="appointment-date"
-                    type="date"
-                    value={preferredDate}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(event) => setPreferredDate(event.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="appointment-time">{t('appointments.preferredTime', 'Preferred time')}</Label>
-                  <Input
-                    id="appointment-time"
-                    type="time"
-                    value={preferredTime}
-                    onChange={(event) => setPreferredTime(event.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="appointment-notes">
-                    {t('appointments.notes', 'Notes')}
-                  </Label>
-                  <Textarea
-                    id="appointment-notes"
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
-                    placeholder={t(
-                      'appointments.notesPlaceholder',
-                      'Describe symptoms, goals, or anything useful for this appointment.',
-                    )}
-                    rows={4}
-                  />
-                </div>
-
-                {provider.consultation_fee ? (
-                  <p className="text-sm text-muted-foreground">
-                    {t('appointments.consultationFee', 'Consultation fee')}: {formatPrice(provider.consultation_fee)}
-                  </p>
-                ) : null}
-
-                <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => navigate(-1)} className="sm:w-auto">
-                    {t('common.back')}
-                  </Button>
-                  <Button type="submit" disabled={submitting || teleconsultationUnavailable} className="sm:ml-auto">
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {t('common.loading')}
-                      </>
-                    ) : (
-                      <>
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        {t('appointments.sendRequest', 'Send request')}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
+          {/* Calendar booking widget */}
+          <Card>
+            <CardContent className="pt-5">
+              <AppointmentCalendar
+                doctorId={provider.id}
+                doctorName={provider.business_name}
+                consultationFee={provider.consultation_fee}
+                consultationDuration={provider.consultation_duration_minutes}
+                teleconsultationAvailable={provider.teleconsultation_available ?? false}
+              />
             </CardContent>
           </Card>
         </div>

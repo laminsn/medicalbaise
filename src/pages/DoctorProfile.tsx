@@ -164,14 +164,33 @@ export default function DoctorProfile() {
     appointment_punctuality: 0,
     successful_treatments: 0,
     telehealth_available: (doctorData as any).teleconsultation_available || false,
+    // Normalize array fields that may be null
+    hospital_affiliations: (doctorData as any).hospital_affiliations ?? [],
+    insurance_accepted: (doctorData as any).insurance_accepted ?? (doctorData as any).accepted_insurance ?? [],
+    accepted_insurance: (doctorData as any).accepted_insurance ?? (doctorData as any).insurance_accepted ?? [],
+    consultation_types: (doctorData as any).consultation_types ?? [],
+    languages: (doctorData as any).languages ?? [],
   } : null;
 
   const specialtyName = doctor?.specialty_name || '';
   const tagline = doctor?.tagline || '';
   const bio = doctor?.bio || '';
-  const medicalSchool = doctor?.medical_school || '';
-  const residency = doctor?.residency || '';
+  // Pull education info from provider_credentials if available, fall back to provider fields
+  const educationCred = (credentials as any[]).find((c) => c.credential_type === 'education');
+  const residencyCred = (credentials as any[]).find((c) => c.credential_type === 'residency');
+  const subSpecialtyCred = (credentials as any[]).find((c) => c.credential_type === 'certification' && !c.document_url);
+  const medicalSchool = educationCred?.institution || doctor?.medical_school || '';
+  const graduationYear = educationCred?.year || '';
+  const residency = residencyCred?.title || doctor?.residency || '';
   const fellowship = doctor?.fellowship || '';
+  const subSpecialty = subSpecialtyCred?.title || '';
+
+  // Derive specialty display name from category_id
+  const categoryId = (doctor as any)?.category_id || '';
+  const specialtyCategory = MEDICAL_CATEGORIES.find((c) => c.id === categoryId);
+  const specialtyDisplayName = specialtyCategory
+    ? (isPt ? specialtyCategory.name_pt : specialtyCategory.name_en)
+    : specialtyName;
 
   const ratingDistribution = computeRatingDistribution(reviews as any[]);
 
@@ -375,7 +394,7 @@ export default function DoctorProfile() {
                   {getTierBadge(doctor.subscription_tier)}
                   <Badge variant="outline" className="text-xs">
                     <Stethoscope className="h-3 w-3 mr-1" />
-                    {specialtyName}
+                    {specialtyDisplayName || specialtyName}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
                     <MapPin className="h-3 w-3 mr-1" />
@@ -504,21 +523,63 @@ export default function DoctorProfile() {
                   <Separator className="my-4" />
                   
                   <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-muted-foreground">{t('doctorProfile.medicalSchool')}</p>
-                        <p className="text-sm font-medium">{medicalSchool}</p>
+                    {/* CRM / Medical License */}
+                    {(doctor as any).crm_number && (
+                      <div className="flex items-start gap-3">
+                        <ShieldCheck className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{isPt ? 'CRM / Registro Médico' : 'CRM / Medical License'}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium">{(doctor as any).crm_number}</p>
+                            <Badge variant="outline" className="border-green-600 text-green-600 text-xs">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              {isPt ? 'Verificado' : 'Verified'}
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="flex items-start gap-3">
-                      <Hospital className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-muted-foreground">{t('doctorProfile.residency')}</p>
-                        <p className="text-sm font-medium">{residency}</p>
+                    {/* Specialty + Sub-specialty */}
+                    {(specialtyDisplayName || specialtyName) && (
+                      <div className="flex items-start gap-3">
+                        <Stethoscope className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{isPt ? 'Especialidade' : 'Specialty'}</p>
+                          <p className="text-sm font-medium">
+                            {specialtyDisplayName || specialtyName}
+                            {subSpecialty && (
+                              <span className="text-muted-foreground font-normal"> — {subSpecialty}</span>
+                            )}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Medical School */}
+                    {medicalSchool && (
+                      <div className="flex items-start gap-3">
+                        <GraduationCap className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{t('doctorProfile.medicalSchool')}</p>
+                          <p className="text-sm font-medium">
+                            {medicalSchool}
+                            {graduationYear && <span className="text-muted-foreground font-normal"> ({graduationYear})</span>}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Residency */}
+                    {residency && (
+                      <div className="flex items-start gap-3">
+                        <Hospital className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{t('doctorProfile.residency')}</p>
+                          <p className="text-sm font-medium">{residency}</p>
+                        </div>
+                      </div>
+                    )}
 
                     {fellowship && (
                       <div className="flex items-start gap-3">
@@ -530,13 +591,15 @@ export default function DoctorProfile() {
                       </div>
                     )}
 
-                    <div className="flex items-start gap-3">
-                      <LanguagesIcon className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-muted-foreground">{t('doctorProfile.languages')}</p>
-                        <p className="text-sm font-medium">{doctor.languages.join(', ')}</p>
+                    {doctor.languages && doctor.languages.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <LanguagesIcon className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground">{t('doctorProfile.languages')}</p>
+                          <p className="text-sm font-medium">{doctor.languages.join(', ')}</p>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     <div className="flex items-start gap-3">
                       <Calendar className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -550,21 +613,73 @@ export default function DoctorProfile() {
               </Card>
 
               {/* Hospital Affiliations */}
+              {doctor.hospital_affiliations.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Hospital className="h-4 w-4 text-primary" />
+                      {t('doctorProfile.hospitalAffiliations')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {doctor.hospital_affiliations.map((hospital: string, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span>{hospital}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Consultation Info */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Hospital className="h-4 w-4 text-primary" />
-                    {t('doctorProfile.hospitalAffiliations')}
+                    <Clock className="h-4 w-4 text-primary" />
+                    {isPt ? 'Informações de Consulta' : 'Consultation Info'}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {doctor.hospital_affiliations.map((hospital, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <span>{hospital}</span>
-                      </div>
-                    ))}
+                <CardContent className="space-y-3">
+                  {(doctor as any).consultation_fee != null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        {isPt ? 'Valor da consulta' : 'Consultation fee'}
+                      </span>
+                      <span className="text-sm font-semibold text-primary">
+                        {formatPrice((doctor as any).consultation_fee)}
+                      </span>
+                    </div>
+                  )}
+                  {(doctor as any).consultation_duration_minutes && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        {isPt ? 'Duração' : 'Duration'}
+                      </span>
+                      <span className="text-sm font-medium">
+                        {(doctor as any).consultation_duration_minutes}{isPt ? ' minutos' : '-minute consultation'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {doctor.telehealth_available && (
+                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-0">
+                        <Video className="h-3 w-3 mr-1" />
+                        {isPt ? 'Teleconsulta Disponível' : 'Video Consultation Available'}
+                      </Badge>
+                    )}
+                    {(doctor as any).accepts_new_patients ? (
+                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-0">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        {isPt ? 'Aceitando Novos Pacientes' : 'Accepting New Patients'}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        {isPt ? 'Não aceitando novos pacientes' : 'Not Accepting New Patients'}
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -578,11 +693,17 @@ export default function DoctorProfile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {doctor.insurance_accepted.map((insurance, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">{insurance}</Badge>
-                    ))}
-                  </div>
+                  {doctor.insurance_accepted.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {doctor.insurance_accepted.map((insurance: string, idx: number) => (
+                        <Badge key={idx} variant="outline" className="text-xs">{insurance}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="text-xs">
+                      {isPt ? 'Particular (sem plano)' : 'Particular (out-of-pocket)'}
+                    </Badge>
+                  )}
                   <p className="text-xs text-muted-foreground mt-3">{t('doctorProfile.insuranceNote')}</p>
                 </CardContent>
               </Card>
@@ -603,7 +724,7 @@ export default function DoctorProfile() {
                         <span>{t('doctorProfile.inPersonConsultation')}</span>
                       </div>
                     )}
-                    {doctor.consultation_types.includes('teleconsultation') && (
+                    {(doctor.consultation_types.includes('teleconsultation') || doctor.telehealth_available) && (
                       <div className="flex items-center gap-2 text-sm">
                         <Video className="h-4 w-4 text-primary" />
                         <span>{t('doctorProfile.videoConsultation')}</span>
@@ -614,6 +735,9 @@ export default function DoctorProfile() {
                         <Phone className="h-4 w-4 text-primary" />
                         <span>{t('doctorProfile.phoneConsultation')}</span>
                       </div>
+                    )}
+                    {doctor.consultation_types.length === 0 && !doctor.telehealth_available && (
+                      <p className="text-sm text-muted-foreground">{isPt ? 'Consulta presencial' : 'In-person consultation'}</p>
                     )}
                   </div>
                 </CardContent>
@@ -774,14 +898,21 @@ export default function DoctorProfile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-2">
-                    {doctor.insurance_accepted.map((insurance, idx) => (
-                      <div key={idx} className="flex items-center gap-2 p-2 rounded-lg border border-border text-sm">
-                        <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
-                        <span className="truncate">{insurance}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {doctor.insurance_accepted.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {doctor.insurance_accepted.map((insurance: string, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 p-2 rounded-lg border border-border text-sm">
+                          <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
+                          <span className="truncate">{insurance}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-2 rounded-lg border border-border text-sm w-fit">
+                      <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
+                      <span>{isPt ? 'Particular (sem plano)' : 'Particular (out-of-pocket)'}</span>
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground mt-3">{t('doctorProfile.alsoAcceptsSelfPay')}</p>
                 </CardContent>
               </Card>

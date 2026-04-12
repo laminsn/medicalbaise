@@ -1,4 +1,5 @@
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { HIPAADisclaimer } from "@/components/compliance/HIPAADisclaimer";
 import { Toaster } from "@/components/ui/toaster";
 import Settings from "./pages/Settings";
 import Payments from "./pages/Payments";
@@ -79,6 +80,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <HIPAADisclaimer />
             <BrowserRouter>
               <MessageNotificationProvider>
                 <Routes>

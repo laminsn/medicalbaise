@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Send, Loader2, Crown, Phone } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, Crown, Phone, Paperclip, FileText } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,19 +13,33 @@ import { useCall } from '@/contexts/CallContext';
 import { format, isToday, isYesterday } from 'date-fns';
 import { detectPHI } from '@/lib/phi-detector';
 import { PHIWarningModal } from '@/components/compliance/PHIWarningModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 // Tiers that can access the chat feature (elite and above)
 const CHAT_ALLOWED_TIERS = new Set(['elite', 'enterprise']);
+
+const tryParseAttachment = (content: string) => {
+  try {
+    const parsed = JSON.parse(content);
+    if (parsed.__type === 'file_attachment') return parsed;
+  } catch {
+    // not JSON
+  }
+  return null;
+};
 
 export default function Chat() {
   const { id } = useParams<{ id: string }>();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { conversation, messages, loading, sending, sendMessage } = useConversation(id);
   const { startCall } = useCall();
   const { tier, loading: subLoading } = useSubscription();
   const [newMessage, setNewMessage] = useState('');
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [phiWarning, setPHIWarning] = useState<{ detectedTypes: string[] } | null>(null);
   const pendingMessageRef = useRef<string>('');
@@ -162,6 +176,7 @@ export default function Chat() {
           ) : (
             messages.map((message) => {
               const isOwn = message.sender_id === user.id;
+              const attachment = tryParseAttachment(message.content);
               return (
                 <div
                   key={message.id}
@@ -174,7 +189,27 @@ export default function Chat() {
                         : 'bg-muted text-foreground rounded-bl-sm'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    {attachment ? (
+                      attachment.type?.startsWith('image/') ? (
+                        <img
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="max-w-xs rounded-lg"
+                        />
+                      ) : (
+                        <a
+                          href={attachment.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-primary hover:underline"
+                        >
+                          <FileText className="w-4 h-4 shrink-0" />
+                          <span className="text-sm truncate">{attachment.name}</span>
+                        </a>
+                      )
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    )}
                     <p className={`text-xs mt-1 ${isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                       {formatMessageTime(message.created_at)}
                     </p>
@@ -188,16 +223,62 @@ export default function Chat() {
 
         {/* Input */}
         <div className="p-4 border-t border-border bg-card">
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <label className="cursor-pointer p-2 hover:bg-muted rounded-lg transition-colors shrink-0">
+              {uploading ? (
+                <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+              ) : (
+                <Paperclip className="w-5 h-5 text-muted-foreground" />
+              )}
+              <input
+                type="file"
+                accept="image/*,.pdf,.doc,.docx"
+                className="hidden"
+                disabled={uploading || sending}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 10 * 1024 * 1024) {
+                    toast({ title: 'File too large', description: 'Max 10MB', variant: 'destructive' });
+                    return;
+                  }
+                  setUploading(true);
+                  try {
+                    const filePath = `chat/${id}/${Date.now()}_${file.name}`;
+                    const { error: uploadError } = await supabase.storage
+                      .from('chat-attachments')
+                      .upload(filePath, file);
+                    if (uploadError) {
+                      toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
+                      return;
+                    }
+                    const { data: { publicUrl } } = supabase.storage
+                      .from('chat-attachments')
+                      .getPublicUrl(filePath);
+                    const attachmentMsg = JSON.stringify({
+                      __type: 'file_attachment',
+                      url: publicUrl,
+                      name: file.name,
+                      type: file.type,
+                      size: file.size,
+                    });
+                    await sendMessage(attachmentMsg);
+                  } finally {
+                    setUploading(false);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </label>
             <Input
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder={t('messages.typeMessage')}
               className="flex-1"
-              disabled={sending}
+              disabled={sending || uploading}
             />
-            <Button onClick={handleSend} disabled={!newMessage.trim() || sending}>
+            <Button onClick={handleSend} disabled={!newMessage.trim() || sending || uploading}>
               {sending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (

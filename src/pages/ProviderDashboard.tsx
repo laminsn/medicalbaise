@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ProviderAnalytics } from '@/components/dashboard/ProviderAnalytics';
 import { ProviderActiveJobs } from '@/components/dashboard/ProviderActiveJobs';
+import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
 import { AutoReplySettings } from '@/components/messaging/AutoReplySettings';
 import { CustomMessageTemplates } from '@/components/messaging/CustomMessageTemplates';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
@@ -19,11 +20,11 @@ import { FollowerMarketingPanel } from '@/components/marketing/FollowerMarketing
 import { ProviderEmailCampaigns } from '@/components/marketing/ProviderEmailCampaigns';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  BarChart3, 
-  MessageSquare, 
-  Mail, 
-  Calendar, 
+import {
+  BarChart3,
+  MessageSquare,
+  Mail,
+  Calendar,
   Crown,
   ArrowUpRight,
   Loader2,
@@ -31,7 +32,11 @@ import {
   Wallet,
   Target,
   Megaphone,
+  Video,
+  MapPin,
+  Clock,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 type SubscriptionTier = 'free' | 'pro' | 'elite' | 'enterprise';
 
@@ -44,6 +49,7 @@ export default function ProviderDashboard() {
   const [providerTier, setProviderTier] = useState<SubscriptionTier>('free');
   const [isLoading, setIsLoading] = useState(true);
   const [isProvider, setIsProvider] = useState(false);
+  const [currentProviderId, setCurrentProviderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -54,7 +60,7 @@ export default function ProviderDashboard() {
     const fetchProviderData = async () => {
       const { data, error } = await supabase
         .from('providers')
-        .select('subscription_tier')
+        .select('id, subscription_tier')
         .eq('user_id', user.id)
         .single();
 
@@ -62,6 +68,7 @@ export default function ProviderDashboard() {
         setIsProvider(false);
       } else {
         setIsProvider(true);
+        setCurrentProviderId(data.id);
         setProviderTier((data.subscription_tier as SubscriptionTier) || 'free');
       }
       setIsLoading(false);
@@ -155,6 +162,9 @@ export default function ProviderDashboard() {
           </div>
         </div>
 
+        {/* KPI Overview */}
+        <DashboardOverview />
+
         {/* Main Tabs */}
         <Tabs defaultValue="jobs" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 h-auto">
@@ -197,6 +207,7 @@ export default function ProviderDashboard() {
           </TabsList>
 
           <TabsContent value="jobs" className="space-y-6">
+            {currentProviderId && <UpcomingAppointments providerId={currentProviderId} />}
             <ProviderActiveJobs />
           </TabsContent>
 
@@ -265,6 +276,169 @@ export default function ProviderDashboard() {
         </Tabs>
       </div>
     </AppLayout>
+  );
+}
+
+interface AppointmentRecord {
+  conversationId: string;
+  patientName: string;
+  slotDate: string;
+  slotTime: string;
+  appointmentType: 'in_person' | 'teleconsult';
+  status: string;
+}
+
+function UpcomingAppointments({ providerId }: { providerId: string }) {
+  const navigate = useNavigate();
+
+  const { data: appointments = [], isLoading } = useQuery({
+    queryKey: ['upcoming-appointments', providerId],
+    queryFn: async (): Promise<AppointmentRecord[]> => {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Fetch conversations for this provider
+      const { data: convos } = await supabase
+        .from('conversations')
+        .select('id, customer_id')
+        .eq('provider_id', providerId);
+
+      if (!convos || convos.length === 0) return [];
+
+      const convoIds = convos.map((c) => c.id);
+      const customerIds = [...new Set(convos.map((c) => c.customer_id))];
+
+      // Fetch messages that are appointment bookings
+      const { data: msgs } = await supabase
+        .from('messages')
+        .select('content, conversation_id')
+        .in('conversation_id', convoIds);
+
+      if (!msgs) return [];
+
+      // Fetch customer profiles
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, first_name, last_name')
+        .in('user_id', customerIds);
+
+      const profileMap = new Map(
+        (profiles ?? []).map((p) => [
+          p.user_id,
+          [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Patient',
+        ]),
+      );
+
+      const convoCustomerMap = new Map(convos.map((c) => [c.id, c.customer_id]));
+
+      const upcoming: AppointmentRecord[] = [];
+
+      for (const msg of msgs) {
+        try {
+          const obj = JSON.parse(msg.content);
+          if (
+            obj.__type === 'appointment_booking' &&
+            obj.slot_date &&
+            obj.slot_date >= today
+          ) {
+            const customerId = convoCustomerMap.get(msg.conversation_id) ?? '';
+            upcoming.push({
+              conversationId: msg.conversation_id,
+              patientName: profileMap.get(customerId) ?? 'Patient',
+              slotDate: obj.slot_date,
+              slotTime: obj.slot_time,
+              appointmentType: obj.appointment_type ?? 'in_person',
+              status: obj.status ?? 'confirmed',
+            });
+          }
+        } catch {
+          // not an appointment message
+        }
+      }
+
+      return upcoming.sort((a, b) => {
+        const da = `${a.slotDate}T${a.slotTime}`;
+        const db = `${b.slotDate}T${b.slotTime}`;
+        return da < db ? -1 : da > db ? 1 : 0;
+      });
+    },
+    enabled: !!providerId,
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-primary" />
+          Upcoming Appointments
+          {appointments.length > 0 && (
+            <span className="ml-auto text-xs font-normal text-muted-foreground">
+              {appointments.length} scheduled
+            </span>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {appointments.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No upcoming appointments. Share your profile to start receiving bookings.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {appointments.map((appt, idx) => (
+              <button
+                key={`${appt.conversationId}-${idx}`}
+                onClick={() => navigate(`/chat/${appt.conversationId}`)}
+                className="w-full flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/40 transition-colors text-left"
+              >
+                <div className="p-2 bg-primary/10 rounded-full shrink-0">
+                  {appt.appointmentType === 'teleconsult' ? (
+                    <Video className="h-4 w-4 text-primary" />
+                  ) : (
+                    <MapPin className="h-4 w-4 text-primary" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate">{appt.patientName}</p>
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <Clock className="h-3 w-3" />
+                    <span>
+                      {new Date(appt.slotDate + 'T00:00:00').toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      })}{' '}
+                      · {appt.slotTime}
+                    </span>
+                  </div>
+                </div>
+                <div className="shrink-0">
+                  <span
+                    className={[
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                      appt.status === 'confirmed'
+                        ? 'bg-green-500/10 text-green-600'
+                        : 'bg-muted text-muted-foreground',
+                    ].join(' ')}
+                  >
+                    {appt.appointmentType === 'teleconsult' ? 'Video' : 'In-person'}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

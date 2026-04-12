@@ -409,7 +409,34 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              {isPt ? '27. Contato' : '27. Contact Information'}
+              {isPt ? '27. Isenção de Responsabilidade da Plataforma' : '27. Platform Disclaimer'}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Medical Baise é um marketplace que conecta pacientes a profissionais de saúde. A Medical Baise não é um prestador de serviços de saúde, hospital ou clínica. Nós não:'
+                : 'Medical Baise is a marketplace that connects patients with healthcare professionals. Medical Baise is not a healthcare provider, hospital, or clinic. We do not:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Fornecemos conselhos médicos, diagnósticos ou tratamentos' : 'Provide medical advice, diagnoses, or treatment'}</li>
+              <li>{isPt ? 'Armazenamos Registros Eletrônicos de Saúde (EHR) ou prontuários médicos' : 'Store Electronic Health Records (EHR) or medical charts'}</li>
+              <li>{isPt ? 'Processamos, armazenamos ou gerenciamos prescrições' : 'Process, store, or manage prescriptions'}</li>
+              <li>{isPt ? 'Atuamos como entidade coberta pelo HIPAA' : 'Act as a covered entity under HIPAA'}</li>
+            </ul>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              {isPt
+                ? 'Os profissionais de saúde nesta plataforma são profissionais independentes responsáveis pela sua própria conformidade com o HIPAA, seguro de responsabilidade civil médica e licenciamento médico. A Medical Baise recomenda que todos os profissionais de saúde utilizem um sistema de prontuário eletrônico (EHR) em conformidade com o HIPAA para registros de pacientes.'
+                : 'Healthcare providers on this platform are independent professionals responsible for their own HIPAA compliance, malpractice insurance, and medical licensing. Medical Baise recommends that all healthcare providers use a HIPAA-compliant EHR system for patient records.'}
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              {isPt
+                ? 'Para provedores que tratam Informações de Saúde Protegidas (PHI) por meio desta plataforma, a Medical Baise oferece um Acordo de Associado de Negócios (BAA) mediante solicitação. Entre em contato com suporte@medicalbaise.com para solicitar um BAA.'
+                : 'For providers handling Protected Health Information (PHI) through this platform, Medical Baise offers a Business Associate Agreement (BAA) upon request. Contact support@medicalbaise.com to request a BAA.'}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              {isPt ? '28. Contato' : '28. Contact Information'}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               {isPt

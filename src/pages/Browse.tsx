@@ -75,6 +75,7 @@ interface Doctor {
   languages_spoken: string[] | null;
   consultation_types: string[] | null;
   insurance_accepted: string[] | null;
+  accepted_insurance: string[] | null;
   hospital_affiliations: string[] | null;
   accepts_new_patients: boolean | null;
   teleconsultation_available: boolean | null;
@@ -139,6 +140,7 @@ export default function Browse() {
           languages_spoken,
           consultation_types,
           insurance_accepted,
+          accepted_insurance,
           hospital_affiliations,
           accepts_new_patients,
           teleconsultation_available
@@ -205,11 +207,13 @@ export default function Browse() {
       // Telehealth
       if (telehealthOnly && !doctor.teleconsultation_available) return false;
 
-      // Insurance
+      // Insurance (check both accepted_insurance and insurance_accepted columns)
       if (selectedInsurance.length > 0) {
-        const hasMatch = selectedInsurance.some(ins => 
-          doctor.insurance_accepted?.includes(ins)
-        );
+        const allInsurance = [
+          ...(doctor.insurance_accepted ?? []),
+          ...((doctor as any).accepted_insurance ?? []),
+        ];
+        const hasMatch = selectedInsurance.some(ins => allInsurance.includes(ins));
         if (!hasMatch) return false;
       }
 
@@ -377,6 +381,35 @@ export default function Browse() {
               aria-label={t('browse.searchDoctors')}
             />
           </div>
+
+          {/* Quick insurance filter */}
+          <Select
+            value={selectedInsurance.length === 1 ? selectedInsurance[0] : 'all'}
+            onValueChange={(v) => {
+              if (v === 'all') {
+                setSelectedInsurance([]);
+              } else {
+                setSelectedInsurance([v]);
+              }
+              updateURLParams();
+            }}
+          >
+            <SelectTrigger className="h-11 w-auto min-w-[130px] rounded-xl text-xs gap-1" aria-label={t('browse.insuranceAccepted')}>
+              <CreditCard className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+              <SelectValue placeholder={isPt ? 'Convênio' : 'Insurance'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{isPt ? 'Todos os planos' : 'All plans'}</SelectItem>
+              {[
+                ...INSURANCE_PROVIDERS,
+                isPt ? 'Particular (sem plano)' : 'Particular (out-of-pocket)',
+                'SUS',
+              ].map((plan) => (
+                <SelectItem key={plan} value={plan}>{plan}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <SheetTrigger asChild>
               <Button 

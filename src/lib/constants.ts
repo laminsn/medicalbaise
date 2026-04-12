@@ -825,11 +825,6 @@ export const POPULAR_SPECIALTIES = [
   'dermatology',
   'pediatrics',
   'dentistry',
-  'orthopedics',
-  'gynecology',
-  'psychiatry',
-  'ophthalmology',
-  'neurology',
 ];
 
 // Legacy SERVICE_CATEGORIES for backwards compatibility

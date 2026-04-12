@@ -21,6 +21,7 @@ import {
   Calendar,
   Wrench,
 } from 'lucide-react';
+import { BidTemplates } from '@/components/provider/BidTemplates';
 
 export default function SubmitBid() {
   const { id } = useParams<{ id: string }>();
@@ -213,7 +214,11 @@ export default function SubmitBid() {
                   {t('jobs.yourProposal')} *
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 space-y-3">
+                <BidTemplates
+                  mode="select"
+                  onSelect={(content) => setFormData({ ...formData, proposalText: content })}
+                />
                 <Textarea
                   placeholder={t('jobs.proposalPlaceholder')}
                   value={formData.proposalText}
