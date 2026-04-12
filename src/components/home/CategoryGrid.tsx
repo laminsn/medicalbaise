@@ -45,7 +45,7 @@ export function CategoryGrid() {
         </div>
         
         {/* Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
           {popularCategories.map((category) => {
             const Icon = category.icon;
             const name = getLocalizedCategoryName(category, i18n, t);
@@ -83,15 +83,6 @@ export function CategoryGrid() {
           })}
         </div>
 
-        {/* Show count */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-muted-foreground">
-            {t('categories.showingCount', { 
-              count: popularCategories.length,
-              total: MEDICAL_CATEGORIES.length 
-            })}
-          </p>
-        </div>
       </div>
     </section>
   );
