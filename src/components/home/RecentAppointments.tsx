@@ -115,23 +115,7 @@ export function RecentAppointments() {
   }
 
   if (!appointments || appointments.length === 0) {
-    return (
-      <section className="px-4 py-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">
-              {t('appointments.recentAppointments')}
-            </h2>
-          </div>
-          <div className="text-center py-8 bg-card rounded-xl border border-border">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
-            <p className="text-sm text-muted-foreground">
-              {t('appointments.noRecentAppointments')}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (
