@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatPrice, getUserCurrency } from '@/lib/currency';
 
 interface ProviderAddon {
   id: string;
@@ -158,7 +159,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
                   <div className="flex items-center gap-2">
                     <span className="font-medium truncate">{addon.name}</span>
                     <span className="text-primary font-semibold">
-                      R$ {addon.price.toFixed(2)}
+                      {formatPrice(addon.price)}
                     </span>
                   </div>
                   {addon.description && (
@@ -209,7 +210,7 @@ export function ProviderAddonsSettings({ providerId }: ProviderAddonsSettingsPro
             <div className="space-y-2">
               <Label>{t('settings.addonPrice', 'Price')} *</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getUserCurrency()}</span>
                 <Input
                   type="number"
                   value={newPrice}

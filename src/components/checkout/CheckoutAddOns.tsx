@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 export interface AddOn {
   id: string;
@@ -65,7 +66,7 @@ export function CheckoutAddOns({ addOns, selectedAddOns, onAddOnChange, isPro }:
               </p>
             </div>
             <span className="text-sm font-semibold text-primary">
-              +R$ {addon.price.toFixed(2)}
+              +{formatPrice(addon.price)}
             </span>
           </div>
         ))}
@@ -75,7 +76,7 @@ export function CheckoutAddOns({ addOns, selectedAddOns, onAddOnChange, isPro }:
             <span className="text-sm text-muted-foreground">
               {t('checkout.addOnsTotal', 'Add-ons Total')}
             </span>
-            <span className="font-semibold">R$ {totalAddOns.toFixed(2)}</span>
+            <span className="font-semibold">{formatPrice(totalAddOns)}</span>
           </div>
         )}
       </CardContent>

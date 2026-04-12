@@ -1,18 +1,19 @@
+// Prices in USD — converted to local currency at display time
 export const SUBSCRIPTION_PLANS = {
   pro: {
     product_id: "prod_TwYB832UJEVdae",
     price_id: "price_1Syf5Q8Jqppqq3BaME0ZHv52",
-    price: 149,
+    price: 29,
   },
   elite: {
     product_id: "prod_TwYCFDLTvmTaGp",
     price_id: "price_1Syf5d8Jqppqq3BacMVbBLkQ",
-    price: 299,
+    price: 59,
   },
   enterprise: {
     product_id: "prod_TwYC2TfnPnZRND",
     price_id: "price_1Syf5s8Jqppqq3BaAnA96elD",
-    price: 549,
+    price: 109,
   },
 } as const;
 

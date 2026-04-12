@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ChevronLeft, Plus, Wallet, CreditCard, Building2, FileText, Download, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { formatPrice } from '@/lib/currency';
 
 interface PayoutMethod {
   id: string;
@@ -255,7 +256,7 @@ export default function Payouts() {
                     {payoutHistory.map((payout) => (
                       <TableRow key={payout.id}>
                         <TableCell>{new Date(payout.date).toLocaleDateString()}</TableCell>
-                        <TableCell className="font-medium">R$ {payout.amount.toLocaleString()}</TableCell>
+                        <TableCell className="font-medium">{formatPrice(payout.amount)}</TableCell>
                         <TableCell>{payout.method}</TableCell>
                         <TableCell>{getStatusBadge(payout.status)}</TableCell>
                         <TableCell className="text-right">

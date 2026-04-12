@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '@/lib/currency';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useFollowerStats } from '@/hooks/useFollowerStats';
@@ -142,7 +143,7 @@ export function ProviderEmailCampaigns() {
     }
 
     if (!hasEnoughCredits) {
-      toast.error(`Insufficient credits. Need R$${estimatedCost.toFixed(2)}, have R$${creditsBalance.toFixed(2)}`);
+      toast.error(`Insufficient credits. Need ${formatPrice(estimatedCost)}, have ${formatPrice(creditsBalance)}`);
       return;
     }
 
@@ -172,7 +173,7 @@ export function ProviderEmailCampaigns() {
       if (error) throw error;
 
       toast.success(
-        `Campaign sent to ${data.emailsSent} followers! Cost: R$${data.totalCost.toFixed(2)}`
+        `Campaign sent to ${data.emailsSent} followers! Cost: ${formatPrice(data.totalCost)}`
       );
 
       setSubject('');
@@ -227,7 +228,7 @@ export function ProviderEmailCampaigns() {
               <DollarSign className="h-5 w-5 text-amber-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold">R${creditsBalance.toFixed(2)}</p>
+              <p className="text-2xl font-bold">{formatPrice(creditsBalance)}</p>
               <p className="text-xs text-muted-foreground">Credit Balance</p>
             </div>
           </CardContent>
@@ -240,7 +241,7 @@ export function ProviderEmailCampaigns() {
             </div>
             <div>
               <p className="text-2xl font-bold">
-                R${COST_PER_EMAIL.toFixed(2)}
+                {formatPrice(COST_PER_EMAIL)}
               </p>
               <p className="text-xs text-muted-foreground">Per Email</p>
             </div>
@@ -256,7 +257,7 @@ export function ProviderEmailCampaigns() {
             Compose Email Campaign
           </CardTitle>
           <CardDescription>
-            Send branded emails directly to your {followersCount} followers. Each email costs R${COST_PER_EMAIL.toFixed(2)}.
+            Send branded emails directly to your {followersCount} followers. Each email costs {formatPrice(COST_PER_EMAIL)}.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -343,15 +344,15 @@ export function ProviderEmailCampaigns() {
                 <span className="text-sm font-medium">Estimated Cost</span>
               </div>
               <div className="text-right">
-                <p className="font-bold">R${estimatedCost.toFixed(2)}</p>
+                <p className="font-bold">{formatPrice(estimatedCost)}</p>
                 <p className="text-xs text-muted-foreground">
-                  {followersCount} emails × R${COST_PER_EMAIL.toFixed(2)}
+                  {followersCount} emails × {formatPrice(COST_PER_EMAIL)}
                 </p>
               </div>
             </div>
             {!hasEnoughCredits && (
               <p className="text-xs text-destructive mt-2">
-                Insufficient credits. Please add R${(estimatedCost - creditsBalance).toFixed(2)} more.
+                Insufficient credits. Please add {formatPrice(estimatedCost - creditsBalance)} more.
               </p>
             )}
           </div>
@@ -376,7 +377,7 @@ export function ProviderEmailCampaigns() {
             ) : (
               <>
                 <Send className="h-4 w-4" />
-                Send to {followersCount} followers (R${estimatedCost.toFixed(2)})
+                Send to {followersCount} followers ({formatPrice(estimatedCost)})
               </>
             )}
           </Button>
@@ -421,7 +422,7 @@ export function ProviderEmailCampaigns() {
                       {campaign.emails_failed > 0 && (
                         <span className="text-destructive">{campaign.emails_failed} failed</span>
                       )}
-                      <span>R${campaign.total_cost.toFixed(2)}</span>
+                      <span>{formatPrice(campaign.total_cost)}</span>
                       <span>
                         {new Date(campaign.sent_at || campaign.created_at).toLocaleDateString()}
                       </span>

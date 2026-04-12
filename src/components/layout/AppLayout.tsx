@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Header } from './Header';
 import { MobileNav } from './MobileNav';
 import { PromoBanner } from './PromoBanner';
+import { Footer } from './Footer';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ export function AppLayout({ children, showHeader = true, showNav = true }: AppLa
       <main className={`flex-1 ${showNav ? 'pb-20 md:pb-0' : ''}`}>
         {children}
       </main>
+      <Footer />
       {showNav && <MobileNav />}
     </div>
   );

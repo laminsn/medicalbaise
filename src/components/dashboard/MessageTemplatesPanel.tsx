@@ -45,7 +45,7 @@ const defaultTemplates: Record<string, Template[]> = {
   ],
   whatsapp: [
     { id: '1', name: 'Welcome', body: 'Hi {{name}}! Thank you for choosing our services. How can I help?' },
-    { id: '2', name: 'Quote Ready', body: 'Hi {{name}}, your quote is ready: R${{amount}}. Reply YES to confirm.' },
+    { id: '2', name: 'Quote Ready', body: 'Hi {{name}}, your quote is ready: {{amount}}. Reply YES to confirm.' },
     { id: '3', name: 'Review Request', body: "Hi {{name}}, hope you're happy with the work! Would you leave us a review?" },
   ],
 };

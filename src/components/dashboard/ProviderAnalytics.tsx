@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, Users, DollarSign, Star, Eye, MessageSquare, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { useProviderAnalytics } from '@/hooks/useProviderAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatPrice } from '@/lib/currency';
 
 interface StatCardProps {
   title: string;
@@ -46,11 +47,7 @@ export function ProviderAnalytics() {
   const { analytics, loading } = useProviderAnalytics();
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-    }).format(value);
+    return formatPrice(value);
   };
 
   return (

@@ -15,6 +15,7 @@ import {
   Users, Loader2, ExternalLink, Settings,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 
 interface PlanConfig {
   id: SubscriptionTier;
@@ -56,7 +57,7 @@ const PLANS: PlanConfig[] = [
       'All Free features',
       'Up to 5 service listings',
       '20 bids per month',
-      'Bid on jobs up to R$5,000',
+      'Bid on jobs up to $1,000',
       'Schedule video meetings',
       'Add-on services',
     ],
@@ -77,7 +78,7 @@ const PLANS: PlanConfig[] = [
       'Featured bid placement',
       'Auto-reply messages',
       'Custom message templates',
-      'Email campaigns (R$0.05/email)',
+      'Email campaigns ($0.01/email)',
       'Basic analytics',
     ],
   },
@@ -132,7 +133,7 @@ export default function Subscription() {
         'All Free features': 'Todos os recursos do plano gratuito',
         'Up to 5 service listings': 'Até 5 anúncios de serviços',
         '20 bids per month': '20 propostas por mês',
-        'Bid on jobs up to R$5,000': 'Enviar propostas para solicitações até R$5.000',
+        'Bid on jobs up to $1,000': 'Enviar propostas para solicitações até $1.000',
         'Schedule video meetings': 'Agendar videochamadas',
         'Add-on services': 'Serviços adicionais',
         'For established businesses': 'Para negócios estabelecidos',
@@ -143,7 +144,7 @@ export default function Subscription() {
         'Featured bid placement': 'Destaque nas propostas',
         'Auto-reply messages': 'Mensagens de resposta automática',
         'Custom message templates': 'Modelos de mensagem personalizados',
-        'Email campaigns (R$0.05/email)': 'Campanhas de e-mail (R$0,05/e-mail)',
+        'Email campaigns ($0.01/email)': 'Campanhas de e-mail ($0,01/e-mail)',
         'Basic analytics': 'Análises básicas',
         'For large organizations': 'Para grandes organizações',
         'All Elite features': 'Todos os recursos do Elite',
@@ -169,7 +170,7 @@ export default function Subscription() {
         'All Free features': 'Todas las funciones del plan gratis',
         'Up to 5 service listings': 'Hasta 5 servicios publicados',
         '20 bids per month': '20 propuestas por mes',
-        'Bid on jobs up to R$5,000': 'Enviar propuestas en solicitudes de hasta R$5.000',
+        'Bid on jobs up to $1,000': 'Enviar propuestas en solicitudes de hasta $1.000',
         'Schedule video meetings': 'Programar videollamadas',
         'Add-on services': 'Servicios adicionales',
         'For established businesses': 'Para negocios consolidados',
@@ -180,7 +181,7 @@ export default function Subscription() {
         'Featured bid placement': 'Ubicación destacada de propuestas',
         'Auto-reply messages': 'Mensajes de respuesta automática',
         'Custom message templates': 'Plantillas de mensajes personalizadas',
-        'Email campaigns (R$0.05/email)': 'Campañas de correo (R$0,05/correo)',
+        'Email campaigns ($0.01/email)': 'Campañas de correo ($0,01/correo)',
         'Basic analytics': 'Analítica básica',
         'For large organizations': 'Para organizaciones grandes',
         'All Elite features': 'Todas las funciones de Elite',
@@ -372,7 +373,7 @@ export default function Subscription() {
                       </div>
                       <div className="text-right">
                         <span className="text-2xl font-bold">
-                          {plan.price === 0 ? (isPt ? 'Grátis' : isEs ? 'Gratis' : 'Free') : `R$${plan.price}`}
+                          {plan.price === 0 ? (isPt ? 'Grátis' : isEs ? 'Gratis' : 'Free') : formatPrice(plan.price)}
                         </span>
                         {plan.price > 0 && (
                           <span className="text-sm text-muted-foreground">{isPt ? '/mês' : isEs ? '/mes' : '/mo'}</span>

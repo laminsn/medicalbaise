@@ -317,7 +317,99 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              {isPt ? '25. Contato' : '25. Contact Information'}
+              {isPt ? '25. Verifica\u00e7\u00e3o de Credenciais' : '25. Credential Verification'}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Todos os prestadores de servi\u00e7os na Medical Baise devem certificar a precis\u00e3o de suas qualifica\u00e7\u00f5es durante o cadastro. Ao se registrar como prestador de servi\u00e7os, voc\u00ea concorda que:'
+                : 'All service providers on Medical Baise must certify the accuracy of their qualifications during registration. By registering as a service provider, you agree that:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'A Medical Baise reserva-se o direito de solicitar documenta\u00e7\u00e3o de suporte (certificados, diplomas, t\u00edtulos, licen\u00e7as, pr\u00eamios e certifica\u00e7\u00f5es) a qualquer momento.' : 'Medical Baise reserves the right to request supporting documentation (certificates, diplomas, degrees, licenses, awards, and certifications) at any time.'}</li>
+              <li>{isPt ? 'Solicita\u00e7\u00f5es de verifica\u00e7\u00e3o podem ser emitidas para verifica\u00e7\u00f5es aleat\u00f3rias de conformidade, em resposta a reclama\u00e7\u00f5es de clientes ou como parte da garantia de qualidade rotineira.' : 'Verification requests may be issued for random compliance checks, in response to client complaints, or as part of routine quality assurance.'}</li>
+              <li>{isPt ? 'A falha em fornecer a documenta\u00e7\u00e3o solicitada dentro de 14 dias \u00fateis pode resultar em suspens\u00e3o ou encerramento da conta.' : 'Failure to provide requested documentation within 14 business days may result in account suspension or termination.'}</li>
+              <li>{isPt ? 'Fornecer informa\u00e7\u00f5es falsas ou enganosas sobre credenciais constitui viola\u00e7\u00e3o destes Termos e pode resultar em encerramento imediato da conta e potencial a\u00e7\u00e3o legal.' : 'Providing false or misleading credential information constitutes a violation of these Terms and may result in immediate account termination and potential legal action.'}</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              {isPt ? '26. Conformidade com HIPAA' : '26. HIPAA Compliance'}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'A Medical Baise está comprometida com a conformidade com a Lei de Portabilidade e Responsabilidade de Seguros de Saúde (HIPAA) e regulamentos relacionados.'
+                : 'Medical Baise is committed to compliance with the Health Insurance Portability and Accountability Act (HIPAA) and related regulations.'}
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Acordo de Associado de Negócios (BAA)' : 'Business Associate Agreement (BAA)'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'A Medical Baise atua como Associado de Negócios sob o HIPAA. Celebramos Acordos de Associado de Negócios com todos os profissionais de saúde que utilizam nossa plataforma para garantir a proteção das Informações de Saúde Protegidas (PHI).'
+                : 'Medical Baise acts as a Business Associate under HIPAA. We enter into Business Associate Agreements with all healthcare providers who use our platform to ensure the protection of Protected Health Information (PHI).'}
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Informações de Saúde Protegidas (PHI)' : 'Protected Health Information (PHI)'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'PHI inclui qualquer informação de saúde individualmente identificável, incluindo:'
+                : 'PHI includes any individually identifiable health information, including:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Nomes de pacientes, endereços, datas de nascimento e números de CPF' : 'Patient names, addresses, dates of birth, and Social Security numbers'}</li>
+              <li>{isPt ? 'Prontuários médicos, diagnósticos, planos de tratamento e prescrições' : 'Medical records, diagnoses, treatment plans, and prescriptions'}</li>
+              <li>{isPt ? 'Informações de seguro e registros de faturamento' : 'Insurance information and billing records'}</li>
+              <li>{isPt ? 'Qualquer informação que possa identificar um paciente em conexão com sua condição de saúde' : 'Any information that can identify a patient in connection with their health condition'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Segurança de Dados' : 'Data Security'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Implementamos salvaguardas administrativas, físicas e técnicas para proteger PHI, incluindo:'
+                : 'We implement administrative, physical, and technical safeguards to protect PHI, including:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Criptografia de dados em repouso e em trânsito (AES-256, TLS 1.3)' : 'Encryption of data at rest and in transit (AES-256, TLS 1.3)'}</li>
+              <li>{isPt ? 'Controles de acesso baseados em função limitando o acesso a PHI a pessoal autorizado' : 'Role-based access controls limiting PHI access to authorized personnel'}</li>
+              <li>{isPt ? 'Registro de auditoria de todos os acessos e modificações de PHI' : 'Audit logging of all PHI access and modifications'}</li>
+              <li>{isPt ? 'Avaliações de segurança regulares e testes de vulnerabilidade' : 'Regular security assessments and vulnerability testing'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Direitos do Paciente' : 'Patient Rights'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Sob o HIPAA, os pacientes têm o direito de:'
+                : 'Under HIPAA, patients have the right to:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Acessar suas informações de saúde' : 'Access their health information'}</li>
+              <li>{isPt ? 'Solicitar alterações em seus registros' : 'Request amendments to their records'}</li>
+              <li>{isPt ? 'Receber um registro de divulgações' : 'Receive an accounting of disclosures'}</li>
+              <li>{isPt ? 'Solicitar restrições sobre certos usos de seu PHI' : 'Request restrictions on certain uses of their PHI'}</li>
+              <li>{isPt ? 'Registrar reclamações sobre práticas de privacidade' : 'File complaints regarding privacy practices'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Notificação de Violação' : 'Breach Notification'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Em caso de violação de PHI não protegida, a Medical Baise notificará os indivíduos afetados dentro de 60 dias, o Departamento de Saúde e Serviços Humanos e, se aplicável, a mídia, em conformidade com as Regras de Notificação de Violação do HIPAA.'
+                : 'In the event of a breach of unsecured PHI, Medical Baise will notify affected individuals within 60 days, the Department of Health and Human Services, and, if applicable, the media, in accordance with HIPAA Breach Notification Rules.'}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              {isPt ? '27. Contato' : '27. Contact Information'}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               {isPt

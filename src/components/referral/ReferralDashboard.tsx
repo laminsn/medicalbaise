@@ -1,3 +1,4 @@
+import { formatPrice } from '@/lib/currency';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -295,7 +296,7 @@ export function ReferralDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{t('referral.totalEarned')}</p>
-                <p className="text-2xl font-bold text-primary">R${totalEarned}</p>
+                <p className="text-2xl font-bold text-primary">{formatPrice(totalEarned)}</p>
               </div>
               <TrendingUp className="h-8 w-8 text-primary/30" />
             </div>
@@ -306,7 +307,7 @@ export function ReferralDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{t('referral.pending')}</p>
-                <p className="text-2xl font-bold text-amber-600">R${pendingEarnings}</p>
+                <p className="text-2xl font-bold text-amber-600">{formatPrice(pendingEarnings)}</p>
               </div>
               <Users className="h-8 w-8 text-amber-600/30" />
             </div>
@@ -378,7 +379,7 @@ export function ReferralDashboard() {
                     >
                       {getStatusLabel(referral.status)}
                     </Badge>
-                    <p className="text-sm font-medium mt-1">R${referral.credit_amount}</p>
+                    <p className="text-sm font-medium mt-1">{formatPrice(referral.credit_amount)}</p>
                   </div>
                 </div>
               ))}
@@ -429,7 +430,7 @@ export function ReferralDashboard() {
                   </div>
                   <div className="text-right">
                     <Badge>{t('referral.creditedStatus')}</Badge>
-                    <p className="text-sm font-medium mt-1 text-primary">+R${referral.credit_amount}</p>
+                    <p className="text-sm font-medium mt-1 text-primary">+{formatPrice(referral.credit_amount)}</p>
                   </div>
                 </div>
               ))}
@@ -474,8 +475,8 @@ export function ReferralDashboard() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-primary">+R${tier.bonus}</p>
-                    <p className="text-xs text-muted-foreground">{t('referral.total')}: R${tier.totalEarned}</p>
+                    <p className="font-bold text-primary">+{formatPrice(tier.bonus)}</p>
+                    <p className="text-xs text-muted-foreground">{t('referral.total')}: {formatPrice(tier.totalEarned)}</p>
                   </div>
                 </div>
               </div>

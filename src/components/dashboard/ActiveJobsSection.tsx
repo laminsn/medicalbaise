@@ -7,6 +7,7 @@ import { Loader2, Briefcase, Clock, CheckCircle, AlertCircle, MapPin, DollarSign
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { formatPrice } from '@/lib/currency';
 
 interface ActiveJob {
   id: string;
@@ -121,7 +122,7 @@ export function ActiveJobsSection({ onSelectJob }: { onSelectJob?: (jobId: strin
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <DollarSign className="h-4 w-4" />
-                        <span>R$ {job.agreed_price.toLocaleString()}</span>
+                        <span>{formatPrice(job.agreed_price)}</span>
                       </div>
                       {job.expected_completion_date && (
                         <div className="flex items-center gap-2 text-muted-foreground">

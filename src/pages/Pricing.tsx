@@ -11,6 +11,7 @@ import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, Crown, Zap, Building2, Star, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 
 const PLANS = [
   {
@@ -150,7 +151,7 @@ export default function Pricing() {
                   <CardContent>
                     <div className="flex items-baseline gap-1 mb-4">
                       <span className="text-3xl font-bold">
-                        {plan.price === 0 ? t('pricing.free') : `R$${plan.price}`}
+                        {plan.price === 0 ? t('pricing.free') : formatPrice(plan.price)}
                       </span>
                       {plan.price > 0 && <span className="text-muted-foreground">/{t('pricing.month')}</span>}
                     </div>

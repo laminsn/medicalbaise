@@ -11,10 +11,10 @@ export function PromoBanner() {
   if (!isVisible) return null;
 
   const bannerText = isPt
-    ? '🎭 Novos profissionais: primeiros 14 dias GRÁTIS! | 🥳 Especial de Carnaval: primeira taxa de transação grátis! | 🎊 Planos anuais: ganhe 2 meses GRÁTIS! | 🪅 Comemore com a gente!'
+    ? '🌸 Novos profissionais: primeiros 14 dias GRÁTIS! | ✨ Especial de Abril: primeira taxa de transação grátis! | 🎉 Planos anuais: ganhe 2 meses GRÁTIS! | 🌸 Celebre com a gente!'
     : isEs
-      ? '🎭 Nuevos profesionales: ¡primeros 14 días GRATIS! | 🥳 Especial de Carnaval: ¡sin comisión en la primera transacción! | 🎊 Planes anuales: ¡obtén 2 meses GRATIS! | 🪅 ¡Celebra con nosotros!'
-      : '🎭 New Providers: First 14 Days FREE! | 🥳 Carnival Special: First Transaction Fee Waived! | 🎊 Annual Plans: Get 2 Months FREE! | 🪅 Celebrate with us!';
+      ? '🌸 Nuevos profesionales: ¡primeros 14 días GRATIS! | ✨ Especial de Abril: ¡sin comisión en la primera transacción! | 🎉 Planes anuales: ¡obtén 2 meses GRATIS! | 🌸 ¡Celebra con nosotros!'
+      : '🌸 New Providers: First 14 Days FREE! | ✨ April Special: First Transaction Fee Waived! | 🎉 Annual Plans: Get 2 Months FREE! | 🌸 Celebrate with us!';
 
   return (
     <div className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black py-1.5 px-4 overflow-hidden">

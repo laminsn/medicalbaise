@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
@@ -608,9 +609,9 @@ export default function ProviderProfile() {
                       </div>
                       <div className="text-right">
                         {service.hourly_rate ? (
-                          <p className="font-bold text-primary">R${service.hourly_rate}/h</p>
+                          <p className="font-bold text-primary">{formatPrice(service.hourly_rate)}/h</p>
                         ) : (
-                          <p className="font-bold text-primary">R${service.fixed_price}</p>
+                          <p className="font-bold text-primary">{formatPrice(service.fixed_price)}</p>
                         )}
                         <Button size="sm" variant="outline" className="mt-2">
                           {t('providerProfile.request')}

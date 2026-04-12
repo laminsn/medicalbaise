@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScheduledService } from '@/hooks/useScheduledServices';
+import { formatPrice } from '@/lib/currency';
 
 interface ScheduledServiceCardProps {
   service: ScheduledService;
@@ -121,7 +122,7 @@ export function ScheduledServiceCard({
           {service.price_per_visit && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <DollarSign className="h-4 w-4" />
-              <span>R${service.price_per_visit}/visit</span>
+              <span>{formatPrice(service.price_per_visit)}/visit</span>
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -869,7 +870,7 @@ export default function DoctorProfile() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-primary text-lg whitespace-nowrap">
-                          R${procedure.consultation_fee}
+                          {formatPrice(procedure.consultation_fee)}
                         </p>
                         <Button size="sm" className="mt-2 w-full min-w-[100px]" onClick={handleBookAppointment}>
                           <Calendar className="h-3 w-3 mr-1" />

@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useSearchParams, Link } from 'react-router-dom';
 import { 
   Search, 
@@ -467,8 +468,8 @@ export default function Browse() {
                         className="mt-2"
                       />
                       <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                        <span>R${feeRange[0]}</span>
-                        <span>R${feeRange[1]}+</span>
+                        <span>{formatPrice(feeRange[0])}</span>
+                        <span>{formatPrice(feeRange[1])}+</span>
                       </div>
                     </div>
                   </div>
@@ -904,7 +905,7 @@ export default function Browse() {
                         )}
                       </div>
                       <span className="font-semibold text-primary whitespace-nowrap">
-                        R${doctor.consultation_fee || 0}
+                        {formatPrice(doctor.consultation_fee || 0)}
                       </span>
                     </div>
                   </div>

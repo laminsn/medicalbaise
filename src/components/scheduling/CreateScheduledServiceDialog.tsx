@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { useScheduledServices } from '@/hooks/useScheduledServices';
+import { getUserCurrency } from '@/lib/currency';
 
 interface CreateScheduledServiceDialogProps {
   open: boolean;
@@ -267,7 +268,7 @@ export function CreateScheduledServiceDialog({
             <Label>{t('scheduling.pricePerVisit')}</Label>
             <Input
               type="number"
-              placeholder="R$ 0.00"
+              placeholder={`${getUserCurrency()} 0.00`}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />

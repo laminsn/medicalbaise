@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { Search, Edit, Loader2, Save, User } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 interface UserProfile {
   id: string;
@@ -207,7 +208,7 @@ export function AdminUserManagement() {
                           <span className="text-xs text-primary">@{user.handle}</span>
                         )}
                         <span className="text-xs text-muted-foreground">
-                          R${user.credits_balance || 0}
+                          {formatPrice(user.credits_balance || 0)}
                         </span>
                       </div>
                     </div>

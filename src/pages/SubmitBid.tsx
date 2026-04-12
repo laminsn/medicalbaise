@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice, getUserCurrency } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -169,11 +170,11 @@ export default function SubmitBid() {
               {job.budget_disclosed && (job.budget_min || job.budget_max) && (
                 <div className="flex items-center gap-1 text-sm text-primary font-medium">
                   <DollarSign className="w-4 h-4" />
-                  {job.budget_min && job.budget_max 
-                    ? `R$${job.budget_min.toLocaleString()} - R$${job.budget_max.toLocaleString()}`
-                    : job.budget_min 
-                      ? `R$${job.budget_min.toLocaleString()}+`
-                      : `${t('jobs.upTo')} R$${job.budget_max?.toLocaleString()}`
+                  {job.budget_min && job.budget_max
+                    ? `${formatPrice(job.budget_min)} - ${formatPrice(job.budget_max)}`
+                    : job.budget_min
+                      ? `${formatPrice(job.budget_min)}+`
+                      : `${t('jobs.upTo')} ${formatPrice(job.budget_max || 0)}`
                   }
                 </div>
               )}
@@ -191,7 +192,7 @@ export default function SubmitBid() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getUserCurrency()}</span>
                   <Input
                     type="number"
                     placeholder="0.00"

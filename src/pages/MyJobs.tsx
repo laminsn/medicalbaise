@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -232,7 +233,7 @@ export default function MyJobs() {
                             {(job.budget_min || job.budget_max) && (
                               <span className="flex items-center gap-1 text-primary font-medium">
                                 <DollarSign className="w-4 h-4" />
-                                R${job.budget_min || 0} - R${job.budget_max || 0}
+                                {formatPrice(job.budget_min || 0)} - {formatPrice(job.budget_max || 0)}
                               </span>
                             )}
                           </div>
@@ -295,7 +296,7 @@ export default function MyJobs() {
                           </span>
                           {job.final_price && (
                             <span className="font-medium text-primary">
-                              R${job.final_price}
+                              {formatPrice(job.final_price)}
                             </span>
                           )}
                         </div>

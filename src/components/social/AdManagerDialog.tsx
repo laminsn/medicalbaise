@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '@/lib/currency';
 import { Plus, TrendingUp, Eye, MousePointer, DollarSign, Play, Pause, Trash2 } from 'lucide-react';
 import {
   Dialog,
@@ -244,7 +245,7 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label>{t('socialFeed.budget')} (R$)</Label>
+                      <Label>{t('socialFeed.budget')} (USD)</Label>
                       <Input
                         type="number"
                         value={budget}
@@ -306,7 +307,7 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
                           <div className="flex items-center gap-4 text-sm">
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-3 w-3" />
-                              R${ad.spent?.toFixed(2) || '0.00'} / R${ad.budget?.toFixed(2)}
+                              {formatPrice(ad.spent || 0)} / {formatPrice(ad.budget || 0)}
                             </span>
                             <span className="flex items-center gap-1">
                               <Eye className="h-3 w-3" />
@@ -351,7 +352,7 @@ export function AdManagerDialog({ open, onOpenChange, providerId }: AdManagerDia
               <Card>
                 <CardContent className="p-4 text-center">
                   <DollarSign className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <p className="text-2xl font-bold">R${totalSpent.toFixed(2)}</p>
+                  <p className="text-2xl font-bold">{formatPrice(totalSpent)}</p>
                   <p className="text-sm text-muted-foreground">{t('socialFeed.totalSpent')}</p>
                 </CardContent>
               </Card>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -157,7 +158,7 @@ export default function CategoryDetail() {
                 {/* Price Range */}
                 <div>
                   <Label className="mb-3 block">
-                    {t('filters.priceRange', 'Price range')}: R${priceRange[0]} - R${priceRange[1]}
+                    {t('filters.priceRange', 'Price range')}: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
                   </Label>
                   <Slider
                     value={priceRange}
@@ -285,7 +286,7 @@ export default function CategoryDetail() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold text-foreground">R${provider.hourlyRate}/h</p>
+                <p className="font-semibold text-foreground">{formatPrice(provider.hourlyRate)}/h</p>
                 <p className="text-xs text-muted-foreground">{t('providers.startingAt')}</p>
               </div>
             </Link>

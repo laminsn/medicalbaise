@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -181,9 +182,9 @@ export default function JobDetails() {
   const formatBudget = (min: number | null, max: number | null, disclosed: boolean | null) => {
     if (!disclosed) return t('jobs.budgetToDiscuss');
     if (!min && !max) return t('jobs.budgetToDiscuss');
-    if (min && max) return `R$${min.toLocaleString()} - R$${max.toLocaleString()}`;
-    if (min) return `R$${min.toLocaleString()}+`;
-    if (max) return t('jobs.upTo') + ` R$${max.toLocaleString()}`;
+    if (min && max) return `${formatPrice(min)} - ${formatPrice(max)}`;
+    if (min) return `${formatPrice(min)}+`;
+    if (max) return t('jobs.upTo') + ` ${formatPrice(max)}`;
     return t('jobs.budgetToDiscuss');
   };
 
@@ -478,7 +479,7 @@ export default function JobDetails() {
                           </div>
                           <div className="text-right">
                             <p className="font-bold text-primary text-lg">
-                              R${bid.quoted_price.toLocaleString()}
+                              {formatPrice(bid.quoted_price)}
                             </p>
                             {bid.status === 'accepted' && (
                               <Badge className="bg-green-500">{t('jobs.accepted')}</Badge>

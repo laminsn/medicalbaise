@@ -841,26 +841,26 @@ export const SERVICE_CATEGORIES = MEDICAL_CATEGORIES.map(cat => ({
   color: cat.color,
 }));
 
-// Consultation fee ranges
+// Consultation fee ranges — min/max values are in USD, converted to local currency at display time
 export const CONSULTATION_FEE_RANGES = [
-  { label: 'R$ 0 - R$ 100', min: 0, max: 100 },
-  { label: 'R$ 100 - R$ 200', min: 100, max: 200 },
-  { label: 'R$ 200 - R$ 300', min: 200, max: 300 },
-  { label: 'R$ 300 - R$ 500', min: 300, max: 500 },
-  { label: 'R$ 500 - R$ 1,000', min: 500, max: 1000 },
-  { label: 'R$ 1,000+', min: 1000, max: null },
+  { label: '$0 - $20', min: 0, max: 20 },
+  { label: '$20 - $40', min: 20, max: 40 },
+  { label: '$40 - $60', min: 40, max: 60 },
+  { label: '$60 - $100', min: 60, max: 100 },
+  { label: '$100 - $200', min: 100, max: 200 },
+  { label: '$200+', min: 200, max: null },
   { label: 'Covered by insurance', min: null, max: null },
 ];
 
-// Legacy CONSULTATION_FEES for backwards compatibility
+// Legacy CONSULTATION_FEES for backwards compatibility — min/max values in USD
 export const CONSULTATION_FEES = [
-  { id: 'under_100', label: 'Up to R$100', min: 0, max: 100 },
-  { id: '100_200', label: 'R$100 - R$200', min: 100, max: 200 },
-  { id: '200_350', label: 'R$200 - R$350', min: 200, max: 350 },
-  { id: '350_500', label: 'R$350 - R$500', min: 350, max: 500 },
-  { id: '500_750', label: 'R$500 - R$750', min: 500, max: 750 },
-  { id: '750_1000', label: 'R$750 - R$1.000', min: 750, max: 1000 },
-  { id: 'above_1000', label: 'Above R$1.000', min: 1000, max: null },
+  { id: 'under_20', label: 'Under $20', min: 0, max: 20 },
+  { id: '20_40', label: '$20 - $40', min: 20, max: 40 },
+  { id: '40_70', label: '$40 - $70', min: 40, max: 70 },
+  { id: '70_100', label: '$70 - $100', min: 70, max: 100 },
+  { id: '100_150', label: '$100 - $150', min: 100, max: 150 },
+  { id: '150_200', label: '$150 - $200', min: 150, max: 200 },
+  { id: 'above_200', label: 'Above $200', min: 200, max: null },
   { id: 'insurance', label: 'Insurance accepted', min: null, max: null },
 ] as const;
 
@@ -900,6 +900,7 @@ export const URGENCY_LEVELS = [
   { id: 'scheduled', label: 'Scheduled', description: 'Specific date' },
 ] as const;
 
+// Prices in USD — converted to local currency at display time
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Basic',
@@ -917,7 +918,7 @@ export const SUBSCRIPTION_TIERS = {
   },
   pro: {
     name: 'Pro',
-    price: 149,
+    price: 29,
     canBid: true,
     bidsPerMonth: 20,
     maxBidAmount: 5000,
@@ -935,7 +936,7 @@ export const SUBSCRIPTION_TIERS = {
   },
   elite: {
     name: 'Elite',
-    price: 299,
+    price: 59,
     canBid: true,
     bidsPerMonth: -1,
     maxBidAmount: -1,
@@ -953,7 +954,7 @@ export const SUBSCRIPTION_TIERS = {
   },
   enterprise: {
     name: 'Enterprise',
-    price: 549,
+    price: 109,
     canBid: true,
     bidsPerMonth: -1,
     maxBidAmount: -1,

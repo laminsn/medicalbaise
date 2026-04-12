@@ -851,9 +851,9 @@
     "goHome": "Ir para o início"
   },
   "promo": {
-    "badge": "Promoção de Verão",
+    "badge": "Promoção de Abril",
     "title": "25% OFF no primeiro serviço",
-    "description": "Use o código VERAO2024 e economize até R$100",
+    "description": "Use o código ABRIL2026 e economize até R$100",
     "cta": "Agendar agora",
     "providerTitle": "Você é um prestador de serviços?",
     "providerDescription": "Junte-se à nossa rede e conecte-se com clientes que procuram seus serviços.",
@@ -1591,7 +1591,13 @@
     "allSpecialties": "Todas as Especialidades",
     "location": "Localização",
     "allLocations": "Todas as Localizações",
-    "applyFilters": "Aplicar Filtros"
+    "applyFilters": "Aplicar Filtros",
+    "loginWall": {
+      "title": "Quer ver mais?",
+      "description": "Cadastre-se ou faça login para acessar o feed completo, criar posts e conectar-se com profissionais.",
+      "signup": "Cadastre-se Grátis",
+      "login": "Entrar"
+    }
   },
   "liveStream": {
     "liveNow": "Transmissões Ao Vivo",

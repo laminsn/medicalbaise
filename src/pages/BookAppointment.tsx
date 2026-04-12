@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useStartConversation } from '@/hooks/useMessages';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { formatPrice } from '@/lib/currency';
 
 interface ProviderLite {
   id: string;
@@ -217,7 +218,7 @@ export default function BookAppointment() {
 
                 {provider.consultation_fee ? (
                   <p className="text-sm text-muted-foreground">
-                    {t('appointments.consultationFee', 'Consultation fee')}: R${provider.consultation_fee}
+                    {t('appointments.consultationFee', 'Consultation fee')}: {formatPrice(provider.consultation_fee)}
                   </p>
                 ) : null}
 

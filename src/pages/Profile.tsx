@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
@@ -168,7 +169,7 @@ export default function Profile() {
               )}
               {profile?.credits_balance > 0 && (
                 <Badge variant="secondary" className="mt-1 bg-primary/10 text-primary">
-                  R${profile.credits_balance} {t('profile.creditsBalance')}
+                  {formatPrice(profile.credits_balance)} {t('profile.creditsBalance')}
                 </Badge>
               )}
             </div>

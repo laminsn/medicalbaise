@@ -288,7 +288,24 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              {isPt ? '17. Encarregado de Prote\u00e7\u00e3o de Dados (DPO)' : '17. Data Protection Officer (DPO)'}
+              {isPt ? '17. Dados de Credenciais' : '17. Credential Data'}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Quando voc\u00ea envia documentos de credenciais (certificados, diplomas, licen\u00e7as, etc.), processamos esses dados da seguinte forma:'
+                : 'When you upload credential documents (certificates, diplomas, licenses, etc.), we process this data as follows:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? '<strong>Armazenamento:</strong> Documentos de credenciais s\u00e3o armazenados com seguran\u00e7a com criptografia em repouso.' : '<strong>Storage:</strong> Credential documents are stored securely with encryption at rest.'}</li>
+              <li>{isPt ? '<strong>Acesso:</strong> Apenas funcion\u00e1rios autorizados da Medical Baise podem acessar as credenciais enviadas para fins de verifica\u00e7\u00e3o.' : '<strong>Access:</strong> Only authorized Medical Baise staff may access uploaded credentials for verification purposes.'}</li>
+              <li>{isPt ? '<strong>Reten\u00e7\u00e3o:</strong> Documentos de credenciais s\u00e3o retidos pela dura\u00e7\u00e3o de sua conta ativa mais 2 anos ap\u00f3s o encerramento da conta.' : '<strong>Retention:</strong> Credential documents are retained for the duration of your active account plus 2 years after account closure.'}</li>
+              <li>{isPt ? '<strong>Exclus\u00e3o:</strong> Voc\u00ea pode solicitar a exclus\u00e3o de credenciais enviadas a qualquer momento entrando em contato com o suporte.' : '<strong>Deletion:</strong> You may request deletion of uploaded credentials at any time by contacting support.'}</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              {isPt ? '18. Encarregado de Prote\u00e7\u00e3o de Dados (DPO)' : '18. Data Protection Officer (DPO)'}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               {isPt
@@ -307,7 +324,85 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              {isPt ? '18. Contato' : '18. Contact Information'}
+              {isPt ? '19. Conformidade com HIPAA e Proteção de PHI' : '19. HIPAA Compliance & PHI Protection'}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Além das proteções da LGPD, a Medical Baise adota práticas alinhadas com a Lei de Portabilidade e Responsabilidade de Seguros de Saúde (HIPAA) para usuários e parceiros que operam em conformidade com padrões internacionais de saúde.'
+                : 'In addition to LGPD protections, Medical Baise adopts practices aligned with the Health Insurance Portability and Accountability Act (HIPAA) for users and partners operating under international healthcare standards.'}
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Tratamento de Informações de Saúde Protegidas (PHI)' : 'Handling of Protected Health Information (PHI)'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'PHI inclui qualquer informação de saúde individualmente identificável transmitida ou mantida em qualquer forma ou meio. Tratamos PHI com o mais alto nível de proteção, incluindo:'
+                : 'PHI includes any individually identifiable health information transmitted or maintained in any form or medium. We treat PHI with the highest level of protection, including:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Coleta mínima necessária — coletamos apenas PHI estritamente necessário para a prestação de serviços' : 'Minimum necessary collection — we collect only PHI strictly necessary for service delivery'}</li>
+              <li>{isPt ? 'Controles de acesso rigorosos — acesso a PHI restrito a pessoal autorizado com base em função' : 'Strict access controls — PHI access restricted to authorized personnel based on role'}</li>
+              <li>{isPt ? 'Criptografia em trânsito e em repouso (TLS 1.3 e AES-256)' : 'Encryption in transit and at rest (TLS 1.3 and AES-256)'}</li>
+              <li>{isPt ? 'Trilhas de auditoria completas de todos os acessos, modificações e divulgações de PHI' : 'Complete audit trails of all PHI access, modifications, and disclosures'}</li>
+              <li>{isPt ? 'Acordos de Associado de Negócios (BAAs) com todos os subprocessadores que lidam com PHI' : 'Business Associate Agreements (BAAs) with all sub-processors handling PHI'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Detecção de PHI em Comunicações' : 'PHI Detection in Communications'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Nossa plataforma inclui mecanismos de detecção automática de PHI em mensagens e comunicações. Quando detectado, os usuários são alertados antes de enviar informações potencialmente sensíveis. Profissionais de saúde são notificados quando pacientes compartilham PHI para garantir o tratamento adequado dessas informações.'
+                : 'Our platform includes automatic PHI detection mechanisms in messages and communications. When detected, users are alerted before sending potentially sensitive information. Healthcare providers are notified when patients share PHI to ensure proper handling of that information.'}
+            </p>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Direitos do Paciente sob HIPAA' : 'Patient Rights Under HIPAA'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Para usuários e contextos cobertos pelo HIPAA, os pacientes têm direitos adicionais:'
+                : 'For users and contexts covered by HIPAA, patients have additional rights:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Acesso às suas informações de saúde protegidas' : 'Access to their protected health information'}</li>
+              <li>{isPt ? 'Solicitar correções ou emendas ao seu PHI' : 'Request corrections or amendments to their PHI'}</li>
+              <li>{isPt ? 'Obter um registro das divulgações de seu PHI' : 'Obtain an accounting of disclosures of their PHI'}</li>
+              <li>{isPt ? 'Solicitar restrições sobre como seu PHI é usado ou divulgado' : 'Request restrictions on how their PHI is used or disclosed'}</li>
+              <li>{isPt ? 'Receber comunicações confidenciais sobre assuntos de saúde' : 'Receive confidential communications about health matters'}</li>
+              <li>{isPt ? 'Registrar reclamações sobre práticas de privacidade sem retaliação' : 'File complaints about privacy practices without retaliation'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Notificação de Violação de PHI' : 'PHI Breach Notification'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Em caso de violação de PHI não protegida, seguimos um protocolo rigoroso de notificação:'
+                : 'In the event of a breach of unsecured PHI, we follow a strict notification protocol:'}
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1 text-muted-foreground">
+              <li>{isPt ? 'Notificação aos indivíduos afetados dentro de 60 dias após a descoberta da violação' : 'Notification to affected individuals within 60 days of breach discovery'}</li>
+              <li>{isPt ? 'Notificação ao Departamento de Saúde e Serviços Humanos (HHS) conforme exigido' : 'Notification to the Department of Health and Human Services (HHS) as required'}</li>
+              <li>{isPt ? 'Notificação à mídia para violações que afetam mais de 500 indivíduos em uma área geográfica' : 'Media notification for breaches affecting more than 500 individuals in a geographic area'}</li>
+              <li>{isPt ? 'Notificação paralela à ANPD conforme exigido pela LGPD' : 'Parallel notification to ANPD as required under LGPD'}</li>
+              <li>{isPt ? 'Relatório de violação interno com análise de causa raiz e ações corretivas' : 'Internal breach report with root cause analysis and corrective actions'}</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mt-4 mb-2">
+              {isPt ? 'Acordo de Associado de Negócios (BAA)' : 'Business Associate Agreement (BAA)'}
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {isPt
+                ? 'Profissionais de saúde que utilizam a plataforma Medical Baise podem solicitar a celebração de um Acordo de Associado de Negócios (BAA) para conformidade total com HIPAA. Entre em contato com privacidade@medicalbaise.com para solicitar um BAA.'
+                : 'Healthcare providers using the Medical Baise platform may request to enter into a Business Associate Agreement (BAA) for full HIPAA compliance. Contact privacidade@medicalbaise.com to request a BAA.'}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              {isPt ? '20. Contato' : '20. Contact Information'}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               {isPt

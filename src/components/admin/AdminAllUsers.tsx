@@ -17,6 +17,7 @@ import { Search, Loader2, Users, RefreshCw, ChevronLeft, ChevronRight } from 'lu
 import { format } from 'date-fns';
 import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { formatPrice } from '@/lib/currency';
 
 interface UserWithLogin {
   id: string;
@@ -214,7 +215,7 @@ export function AdminAllUsers() {
                             {[user.city, user.state].filter(Boolean).join(', ') || '—'}
                           </TableCell>
                           <TableCell className="text-sm font-medium">
-                            R${user.credits_balance || 0}
+                            {formatPrice(user.credits_balance || 0)}
                           </TableCell>
                           <TableCell>
                             <Badge

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice, getUserCurrency } from '@/lib/currency';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -113,7 +114,7 @@ export default function Payments() {
                   <Wallet className="h-8 w-8" />
                   <div>
                     <p className="text-sm opacity-90">{t('payments.balance')}</p>
-                    <p className="text-3xl font-bold">R$ {profile?.credits_balance || 0}</p>
+                    <p className="text-3xl font-bold">{formatPrice(profile?.credits_balance || 0)}</p>
                   </div>
                 </div>
                 <Button 
@@ -227,14 +228,14 @@ export default function Payments() {
                     size="sm"
                     onClick={() => setFundAmount(String(amount))}
                   >
-                    R${amount}
+                    {formatPrice(amount)}
                   </Button>
                 ))}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="custom-amount">{t('payments.customAmount', 'Custom Amount')}</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{getUserCurrency()}</span>
                   <Input
                     id="custom-amount"
                     type="number"
@@ -246,7 +247,7 @@ export default function Payments() {
                 </div>
               </div>
               <Button onClick={handleAddFunds} className="w-full">
-                {t('payments.addFundsButton', 'Add R${{amount}} to Balance', { amount: fundAmount || '0' })}
+                {t('payments.addFundsButton', 'Add {{amount}} to Balance', { amount: formatPrice(Number(fundAmount) || 0) })}
               </Button>
             </div>
           </DialogContent>

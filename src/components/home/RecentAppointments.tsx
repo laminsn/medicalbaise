@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MEDICAL_CATEGORIES } from '@/lib/constants';
 import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { formatPrice } from '@/lib/currency';
 
 interface Appointment {
   id: string;
@@ -172,7 +173,7 @@ export function RecentAppointments() {
                     <div className="flex items-center gap-1">
                       <Banknote className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                       <span>
-                        R${appointment.consultation_fee_min} - R${appointment.consultation_fee_max}
+                        {formatPrice(appointment.consultation_fee_min)} - {formatPrice(appointment.consultation_fee_max)}
                       </span>
                     </div>
                   )}

@@ -155,6 +155,11 @@ export default function SocialFeed() {
     setFilteredPosts(filtered);
   }, [posts, selectedSpecialty, selectedLocation]);
 
+  const isAuthenticated = !!user;
+
+  // Gate: non-authenticated users see only the first 3 posts
+  const visiblePosts = isAuthenticated ? filteredPosts : filteredPosts.slice(0, 3);
+
   const handlePostCreated = () => {
     setShowCreatePost(false);
     toast.success(t('socialFeed.postCreated'));
@@ -269,7 +274,7 @@ export default function SocialFeed() {
               )}
             </div>
           ) : (
-            filteredPosts.map((post) => (
+            visiblePosts.map((post) => (
               <SocialPostCard
                 key={post.id}
                 post={post}
@@ -282,6 +287,33 @@ export default function SocialFeed() {
             ))
           )}
         </div>
+
+        {/* Login Wall — shown after 3 posts for non-authenticated users */}
+        {!isAuthenticated && filteredPosts.length >= 3 && (
+          <div className="relative">
+            {/* Gradient fade overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10" />
+
+            <div className="relative z-20 flex flex-col items-center justify-center py-16 px-4 text-center">
+              <div className="bg-card border border-border rounded-xl p-8 max-w-md shadow-lg">
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  {t('feed.loginWall.title', 'Want to see more?')}
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  {t('feed.loginWall.description', 'Sign up or log in to access the full feed, create posts, and connect with professionals.')}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90">
+                    {t('feed.loginWall.signup', 'Sign Up Free')}
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate('/auth?mode=login')}>
+                    {t('feed.loginWall.login', 'Log In')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Floating Action Button for providers */}
         {isProvider && (

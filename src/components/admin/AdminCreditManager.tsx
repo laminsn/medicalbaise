@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { DollarSign, Plus, Minus, Search, Loader2 } from 'lucide-react';
+import { formatPrice } from '@/lib/currency';
 
 export function AdminCreditManager() {
   const { t, i18n } = useTranslation();
@@ -145,7 +146,7 @@ export function AdminCreditManager() {
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">{t('admin.currentBalance')}</p>
                   <p className="text-2xl font-bold text-primary">
-                    R${foundUser.credits_balance || 0}
+                    {formatPrice(foundUser.credits_balance || 0)}
                   </p>
                 </div>
               </div>

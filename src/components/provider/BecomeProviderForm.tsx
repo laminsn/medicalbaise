@@ -60,6 +60,11 @@ const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
   passport_number: z.string().optional(),
   contact_phone: z.string().optional(),
   contact_email: z.string().email().optional().or(z.literal('')),
+  // Credential verification
+  credential_certification: z.boolean().refine(val => val === true, {
+    message: isPt ? 'Você deve certificar suas credenciais' : isEs ? 'Debes certificar tus credenciales' : 'You must certify your credentials',
+  }),
+  credential_documents: z.any().optional(),
 }).refine((data) => {
   if (data.id_type === 'cpf_cnpj') {
     return data.cpf_cnpj && data.cpf_cnpj.length >= 11;
@@ -136,6 +141,8 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
       passport_number: '',
       contact_phone: '',
       contact_email: '',
+      credential_certification: false,
+      credential_documents: undefined,
     },
   });
 
@@ -637,6 +644,52 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
               <p className="text-xs text-muted-foreground">
                 {t('provider.acceptedFormats')}
               </p>
+            </div>
+
+            {/* Credential Verification */}
+            <div className="space-y-4 border-t border-border pt-6">
+              <h3 className="text-lg font-semibold text-foreground">
+                {t('provider.credentialVerification', 'Credential Verification')}
+              </h3>
+
+              <p className="text-sm text-muted-foreground">
+                {t('provider.credentialDescription', 'We reserve the right to request verification documents at any time, including for random compliance checks or in response to complaints.')}
+              </p>
+
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="credential_certification"
+                  {...form.register('credential_certification')}
+                  className="mt-1 h-4 w-4 rounded border-border"
+                  required
+                />
+                <label htmlFor="credential_certification" className="text-sm text-foreground">
+                  {t('provider.credentialCertify', 'I certify that all information provided is accurate and truthful. I can provide supporting documentation (certificates, diplomas, degrees, licenses, awards, and/or certifications) upon request to verify my qualifications.')}
+                  <span className="text-destructive"> *</span>
+                </label>
+              </div>
+              {form.formState.errors.credential_certification && (
+                <p className="text-sm text-destructive">
+                  {t('provider.credentialRequired', 'You must certify your credentials to continue.')}
+                </p>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  {t('provider.uploadCredentials', 'Upload Credentials (optional)')}
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  {t('provider.uploadDescription', 'Upload certificates, diplomas, licenses, or other credentials. Accepted formats: PDF, JPG, PNG (max 10MB each).')}
+                </p>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  multiple
+                  onChange={(e) => form.setValue('credential_documents', e.target.files)}
+                  className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                />
+              </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { formatPrice } from '@/lib/currency';
 
 interface Job {
   id: string;
@@ -135,9 +136,9 @@ export default function JobsMarketplace() {
   const formatBudget = (min: number | null, max: number | null, disclosed: boolean | null) => {
     if (!disclosed) return t('jobs.budgetToDiscuss');
     if (!min && !max) return t('jobs.budgetToDiscuss');
-    if (min && max) return `R$${min.toLocaleString()} - R$${max.toLocaleString()}`;
-    if (min) return `R$${min.toLocaleString()}+`;
-    if (max) return `R$${max.toLocaleString()}`;
+    if (min && max) return `${formatPrice(min)} - ${formatPrice(max)}`;
+    if (min) return `${formatPrice(min)}+`;
+    if (max) return formatPrice(max);
     return t('jobs.budgetToDiscuss');
   };
 

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale } from '@/lib/i18n-utils';
+import { formatPrice } from '@/lib/currency';
 
 export default function MyBids() {
   const { user } = useAuth();
@@ -92,7 +93,7 @@ export default function MyBids() {
         job_title: b.jobs_posted?.title || '',
         job_location: b.jobs_posted?.location_address || '',
         job_budget: b.jobs_posted?.budget_min && b.jobs_posted?.budget_max
-          ? `R$${b.jobs_posted.budget_min} - R$${b.jobs_posted.budget_max}`
+          ? `${formatPrice(b.jobs_posted.budget_min)} - ${formatPrice(b.jobs_posted.budget_max)}`
           : '',
         total_bids: 0,
       }));
@@ -192,7 +193,7 @@ export default function MyBids() {
                         <div className="flex items-center gap-4 text-sm">
                           <span className="flex items-center gap-1 font-medium text-primary">
                             <DollarSign className="w-4 h-4" />
-                            R${bid.quoted_price.toLocaleString()}
+                            {formatPrice(bid.quoted_price)}
                           </span>
                           <span className="text-muted-foreground">
                             {t('jobs.jobBudget')}: {bid.job_budget}
@@ -231,7 +232,7 @@ export default function MyBids() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-1 font-medium">
                         <DollarSign className="w-4 h-4 text-primary" />
-                        R${bid.quoted_price.toLocaleString()}
+                        {formatPrice(bid.quoted_price)}
                       </span>
                       <span className="text-muted-foreground">
                         {formatDistanceToNow(new Date(bid.submitted_at), { addSuffix: true, locale: dateLocale })}

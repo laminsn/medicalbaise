@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { getDateFnsLocale, isPortuguese, isSpanish } from '@/lib/i18n-utils';
+import { formatPrice } from '@/lib/currency';
 
 // Mock data for recent jobs
 const RECENT_JOBS = [
@@ -102,7 +103,7 @@ export function RecentJobs() {
               </div>
               <div className="flex items-center gap-1">
                 <Banknote className="w-3.5 h-3.5" />
-                <span>R${job.budget_min} - R${job.budget_max}</span>
+                <span>{formatPrice(job.budget_min)} - {formatPrice(job.budget_max)}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />

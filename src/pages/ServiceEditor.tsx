@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { getUserCurrency } from '@/lib/currency';
 
 interface ServiceAddon {
   id?: string;
@@ -450,7 +451,7 @@ export default function ServiceEditor() {
 
               {pricingType === 'hourly' && (
                 <div className="space-y-2">
-                  <Label>{t('services.hourlyRate', 'Hourly Rate')} (R$)</Label>
+                  <Label>{t('services.hourlyRate', 'Hourly Rate')} ({getUserCurrency()})</Label>
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -462,7 +463,7 @@ export default function ServiceEditor() {
 
               {pricingType === 'fixed' && (
                 <div className="space-y-2">
-                  <Label>{t('services.fixedPrice', 'Fixed Price')} (R$)</Label>
+                  <Label>{t('services.fixedPrice', 'Fixed Price')} ({getUserCurrency()})</Label>
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -611,7 +612,7 @@ export default function ServiceEditor() {
                         onChange={(e) => updateAddon(index, 'description', e.target.value)}
                       />
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">R$</span>
+                        <span className="text-sm text-muted-foreground">{getUserCurrency()}</span>
                         <Input
                           type="number"
                           placeholder="0.00"

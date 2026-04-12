@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner';
 import { ProviderAddonsSettings } from '@/components/settings/ProviderAddonsSettings';
 import { getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { formatPrice } from '@/lib/currency';
 
 interface ServiceCategory {
   id: string;
@@ -253,12 +254,12 @@ export default function ServicesSettings() {
                                 ) : service.fixed_price ? (
                                   <Badge variant="secondary">
                                     <DollarSign className="h-3 w-3 mr-1" />
-                                    R${service.fixed_price}
+                                    {formatPrice(service.fixed_price)}
                                   </Badge>
                                 ) : service.hourly_rate ? (
                                   <Badge variant="secondary">
                                     <DollarSign className="h-3 w-3 mr-1" />
-                                    R${service.hourly_rate}/h
+                                    {formatPrice(service.hourly_rate)}/h
                                   </Badge>
                                 ) : null}
                                 {service.warranties && service.warranties.length > 0 && (

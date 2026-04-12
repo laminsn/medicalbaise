@@ -851,9 +851,9 @@
     "goHome": "Go to home"
   },
   "promo": {
-    "badge": "Summer Promotion",
+    "badge": "April Promotion",
     "title": "25% OFF your first service",
-    "description": "Use code SUMMER2024 and save up to R$100",
+    "description": "Use code APRIL2026 and save up to R$100",
     "cta": "Book now",
     "providerTitle": "Are you a service provider?",
     "providerDescription": "Join our network and connect with customers looking for your services.",
@@ -1591,7 +1591,13 @@
     "allSpecialties": "All Specialties",
     "location": "Location",
     "allLocations": "All Locations",
-    "applyFilters": "Apply Filters"
+    "applyFilters": "Apply Filters",
+    "loginWall": {
+      "title": "Want to see more?",
+      "description": "Sign up or log in to access the full feed, create posts, and connect with professionals.",
+      "signup": "Sign Up Free",
+      "login": "Log In"
+    }
   },
   "liveStream": {
     "liveNow": "Live Now",

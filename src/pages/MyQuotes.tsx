@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { formatPrice } from '@/lib/currency';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileText, Clock, CheckCircle, XCircle, MessageCircle, ArrowLeft } from 'lucide-react';
@@ -165,7 +166,7 @@ export default function MyQuotes() {
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-3">
                     {quote.budget_min && quote.budget_max && (
                       <span className="bg-muted px-2 py-1 rounded">
-                        R${quote.budget_min} - R${quote.budget_max}
+                        {formatPrice(quote.budget_min)} - {formatPrice(quote.budget_max)}
                       </span>
                     )}
                     <span className="bg-muted px-2 py-1 rounded">
@@ -181,7 +182,7 @@ export default function MyQuotes() {
                   {quote.status === 'responded' && quote.quoted_price && (
                     <div className="bg-primary/10 rounded-lg p-3 mb-3">
                       <p className="text-sm font-medium text-primary">
-                        {t('quote.responded')}: R${quote.quoted_price}
+                        {t('quote.responded')}: {formatPrice(quote.quoted_price)}
                       </p>
                       {quote.response_message && (
                         <p className="text-sm text-muted-foreground mt-1">
