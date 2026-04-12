@@ -230,7 +230,7 @@ export function ConversionAnalyticsDashboard() {
 
   // Export to PDF (printable report)
   const exportToPDF = () => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
     if (!printWindow) return;
 
     const summaryRows = eventSummaries.map(s => `

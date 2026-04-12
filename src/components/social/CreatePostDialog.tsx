@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Video, Upload, X } from 'lucide-react';
 import {
@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { detectPHI } from '@/lib/phi-detector';
+import { PHIWarningModal } from '@/components/compliance/PHIWarningModal';
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -29,6 +31,8 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const [uploading, setUploading] = useState(false);
   const [showBookNow, setShowBookNow] = useState(true);
+  const [phiWarning, setPHIWarning] = useState<{ detectedTypes: string[] } | null>(null);
+  const pendingSubmitRef = useRef<boolean>(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,20 +63,21 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
     setMediaPreview(null);
   };
 
-  const handleSubmit = async () => {
+  const performSubmit = async () => {
     if (!providerId || !mediaFile) {
       toast.error(t('socialFeed.mediaRequired'));
       return;
     }
 
     setUploading(true);
+    pendingSubmitRef.current = false;
 
     try {
       // Upload media to storage
       const fileExt = mediaFile.name.split('.').pop();
       const fileName = `${providerId}/${Date.now()}.${fileExt}`;
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('testimonials')
         .upload(fileName, mediaFile);
 
@@ -109,6 +114,24 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
     }
   };
 
+  const handleSubmit = async () => {
+    if (!providerId || !mediaFile) {
+      toast.error(t('socialFeed.mediaRequired'));
+      return;
+    }
+
+    if (content.trim()) {
+      const phiResult = detectPHI(content);
+      if (phiResult.hasPHI) {
+        pendingSubmitRef.current = true;
+        setPHIWarning({ detectedTypes: phiResult.detectedTypes });
+        return;
+      }
+    }
+
+    await performSubmit();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -135,7 +158,7 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
           {/* Media Upload */}
           <div className="space-y-2">
             <Label>{t('socialFeed.media')} *</Label>
-            
+
             {mediaPreview ? (
               <div className="relative rounded-lg overflow-hidden bg-muted">
                 {mediaType === 'video' ? (
@@ -225,6 +248,18 @@ export function CreatePostDialog({ open, onOpenChange, providerId, onSuccess }: 
           </div>
         </div>
       </DialogContent>
+
+      {phiWarning && (
+        <PHIWarningModal
+          detectedTypes={phiWarning.detectedTypes}
+          onEdit={() => setPHIWarning(null)}
+          onSendAnyway={() => {
+            setPHIWarning(null);
+            performSubmit();
+          }}
+          onClose={() => setPHIWarning(null)}
+        />
+      )}
     </Dialog>
   );
 }

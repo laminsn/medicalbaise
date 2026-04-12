@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -52,105 +52,6 @@ import { useStartConversation } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrackProfileView } from '@/hooks/useProfileViews';
 import { toast } from 'sonner';
-
-// Mock provider data - replace with real data from Supabase
-const mockProvider = {
-  id: '1',
-  business_name: 'Clean Pro SP',
-  tagline: 'Limpeza profissional com qualidade garantida',
-  bio: 'Com mais de 10 anos de experiência em limpeza residencial e comercial, a Clean Pro SP oferece serviços de alta qualidade com produtos ecológicos. Nossa equipe é treinada e certificada para atender às suas necessidades com profissionalismo e eficiência.',
-  avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200',
-  years_experience: 10,
-  total_jobs: 347,
-  total_reviews: 128,
-  avg_rating: 4.9,
-  response_time_hours: 1,
-  is_verified: true,
-  is_background_checked: true,
-  is_insured: true,
-  is_licensed: true,
-  subscription_tier: 'elite',
-  address: 'São Paulo, SP',
-  service_radius_km: 25,
-  languages: ['Português', 'English'],
-  business_type: 'company',
-  completion_rate: 98,
-  on_time_rate: 96,
-  repeat_customer_rate: 67,
-};
-
-const providerServices = [
-  { id: '1', name: 'Limpeza Residencial', hourly_rate: 80, description: 'Limpeza completa de casas e apartamentos' },
-  { id: '2', name: 'Limpeza Comercial', hourly_rate: 100, description: 'Escritórios e espaços comerciais' },
-  { id: '3', name: 'Limpeza Pós-Obra', fixed_price: 500, description: 'Limpeza pesada após reformas' },
-  { id: '4', name: 'Limpeza de Vidros', hourly_rate: 60, description: 'Janelas e superfícies de vidro' },
-];
-
-const providerReviews = [
-  {
-    id: '1',
-    customer_name: 'Maria S.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
-    rating: 5,
-    date: '2 semanas atrás',
-    comment: 'Excelente serviço! A equipe foi super profissional e pontual. Minha casa ficou impecável. Recomendo muito!',
-    quality_rating: 5,
-    professionalism_rating: 5,
-    punctuality_rating: 5,
-    verified: true,
-    helpful_count: 47,
-    provider_response: 'Obrigado Maria! Foi um prazer atender você. Estamos sempre à disposição!',
-  },
-  {
-    id: '2',
-    customer_name: 'João P.',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-    rating: 5,
-    date: '1 mês atrás',
-    comment: 'Contratei para limpeza pós-obra e superou minhas expectativas. Muito cuidadosos com os detalhes.',
-    quality_rating: 5,
-    professionalism_rating: 5,
-    punctuality_rating: 4,
-    verified: true,
-    helpful_count: 23,
-  },
-  {
-    id: '3',
-    customer_name: 'Ana L.',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100',
-    rating: 4,
-    date: '2 meses atrás',
-    comment: 'Bom serviço, preço justo. Voltaria a contratar.',
-    quality_rating: 4,
-    professionalism_rating: 5,
-    punctuality_rating: 4,
-    verified: true,
-    helpful_count: 12,
-  },
-];
-
-const providerPortfolio = [
-  { id: '1', url: 'https://images.unsplash.com/photo-1527515545081-5db817172677?w=400', caption: 'Sala de estar - Antes e depois' },
-  { id: '2', url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400', caption: 'Banheiro renovado' },
-  { id: '3', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400', caption: 'Cozinha limpa' },
-  { id: '4', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400', caption: 'Escritório comercial' },
-  { id: '5', url: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400', caption: 'Apartamento completo' },
-  { id: '6', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400', caption: 'Casa de luxo' },
-];
-
-const providerFaqs = [
-  { question: 'Vocês fornecem os materiais de limpeza?', answer: 'Sim, utilizamos produtos profissionais e ecológicos. Caso prefira, podemos usar os seus materiais.' },
-  { question: 'Qual é a política de cancelamento?', answer: 'Cancelamentos com mais de 24h de antecedência são gratuitos. Menos de 24h, cobramos 50% do valor.' },
-  { question: 'Atendem aos finais de semana?', answer: 'Sim, atendemos sábados das 9h às 16h. Domingos e feriados sob consulta.' },
-];
-
-const ratingDistribution = [
-  { stars: 5, percentage: 89 },
-  { stars: 4, percentage: 8 },
-  { stars: 3, percentage: 2 },
-  { stars: 2, percentage: 1 },
-  { stars: 1, percentage: 0 },
-];
 
 export default function ProviderProfile() {
   const { id } = useParams();
@@ -227,6 +128,19 @@ export default function ProviderProfile() {
     avatar_url: (providerData as any).profiles?.avatar_url || '',
   } : null;
 
+  const ratingDistribution = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    (providerReviews as any[]).forEach((r: any) => {
+      const rating = r.overall_rating ?? r.rating;
+      if (rating >= 1 && rating <= 5) counts[rating - 1]++;
+    });
+    const total = (providerReviews as any[]).length || 1;
+    return [5, 4, 3, 2, 1].map(stars => ({
+      stars,
+      percentage: Math.round((counts[stars - 1] / total) * 100),
+    }));
+  }, [providerReviews]);
+
   // Track profile view when component mounts
   useTrackProfileView(id, 'profile_page');
 
@@ -263,8 +177,7 @@ export default function ProviderProfile() {
     }
   }, [pixelData, id, provider.business_name]);
 
-  // Check if user has Elite+ tier for messaging (mock implementation)
-  const canMessage = true; // TODO: Replace with actual tier check from provider subscription
+  const canMessage = provider?.subscription_tier === 'elite' || provider?.subscription_tier === 'enterprise';
 
   const handleMessageProvider = async () => {
     if (!user) {
@@ -283,7 +196,6 @@ export default function ProviderProfile() {
 
     try {
       setIsStartingConversation(true);
-      // Use the provider's id from the URL params or mock data
       const providerId = id || provider.id;
       const conversationId = await startConversation(providerId);
       if (conversationId) {
@@ -326,6 +238,27 @@ export default function ProviderProfile() {
         return <Badge variant="secondary">Pro</Badge>;
     }
   };
+
+  if (isLoadingProvider) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (!provider) {
+    return (
+      <AppLayout>
+        <div className="px-4 py-16 text-center">
+          <h1 className="text-2xl font-bold mb-4">{t('providerProfile.notFound', 'Provider not found')}</h1>
+          <Button onClick={() => navigate(-1)} variant="outline">{t('common.back', 'Back')}</Button>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <>
@@ -550,51 +483,22 @@ export default function ProviderProfile() {
                 </CardContent>
               </Card>
 
-              {/* Warranty & Guarantees */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-primary" />
-                    {t('providerProfile.warrantyGuarantees', 'Warranty & Guarantees')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-green-600" />
-                      <span className="font-medium text-sm">{t('providerProfile.serviceWarranty', 'Service Warranty')}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground pl-6">
-                      {t('providerProfile.mockWarranty', '1-year warranty on all installations. Free repairs for any defects in workmanship.')}
-                    </p>
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Award className="h-4 w-4 text-amber-500" />
-                      <span className="font-medium text-sm">{t('providerProfile.satisfactionGuarantee', 'Satisfaction Guarantee')}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground pl-6">
-                      {t('providerProfile.mockGuarantee', '100% satisfaction guaranteed. If you\'re not happy with our work, we\'ll redo it for free.')}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* FAQ */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t('providerProfile.faq')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {providerFaqs.map((faq, index) => (
-                    <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
-                      <p className="font-medium text-sm">{faq.question}</p>
-                      <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              {providerFaqs.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{t('providerProfile.faq')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {providerFaqs.map((faq, index) => (
+                      <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
+                        <p className="font-medium text-sm">{faq.question}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             {/* Services Tab */}

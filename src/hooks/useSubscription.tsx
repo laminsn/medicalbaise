@@ -67,7 +67,7 @@ export function useSubscription() {
 
     if (error) throw error;
     if (data?.url) {
-      window.open(data.url, '_blank');
+      window.open(data.url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -75,7 +75,7 @@ export function useSubscription() {
     const { data, error } = await supabase.functions.invoke('customer-portal');
     if (error) throw error;
     if (data?.url) {
-      window.open(data.url, '_blank');
+      window.open(data.url, '_blank', 'noopener,noreferrer');
     }
   };
 

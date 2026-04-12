@@ -195,7 +195,7 @@ const JobLocationMap: React.FC<JobLocationMapProps> = ({
 
   const openInMaps = () => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${activeJob.job.location_lat},${activeJob.job.location_lng}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (

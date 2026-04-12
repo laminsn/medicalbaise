@@ -153,7 +153,7 @@ export function ReferralDashboard() {
     };
     
     if (urls[platform]) {
-      window.open(urls[platform], '_blank');
+      window.open(urls[platform], '_blank', 'noopener,noreferrer');
     }
   };
 

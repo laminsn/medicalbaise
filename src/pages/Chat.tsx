@@ -10,6 +10,8 @@ import { useConversation } from '@/hooks/useMessages';
 import { useTranslation } from 'react-i18next';
 import { useCall } from '@/contexts/CallContext';
 import { format, isToday, isYesterday } from 'date-fns';
+import { detectPHI } from '@/lib/phi-detector';
+import { PHIWarningModal } from '@/components/compliance/PHIWarningModal';
 
 export default function Chat() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,8 @@ export default function Chat() {
   const { startCall } = useCall();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [phiWarning, setPHIWarning] = useState<{ detectedTypes: string[] } | null>(null);
+  const pendingMessageRef = useRef<string>('');
 
   // Check if user has Elite+ tier access
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
@@ -41,11 +45,23 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const performSend = async (content: string) => {
+    await sendMessage(content);
+  };
+
   const handleSend = async () => {
     if (!newMessage.trim() || sending) return;
-    const content = newMessage;
+    const content = newMessage.trim();
+
+    const phiResult = detectPHI(content);
+    if (phiResult.hasPHI) {
+      pendingMessageRef.current = content;
+      setPHIWarning({ detectedTypes: phiResult.detectedTypes });
+      return;
+    }
+
     setNewMessage('');
-    await sendMessage(content);
+    await performSend(content);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -197,6 +213,27 @@ export default function Chat() {
           </div>
         </div>
       </div>
+
+      {phiWarning && (
+        <PHIWarningModal
+          detectedTypes={phiWarning.detectedTypes}
+          onEdit={() => {
+            setPHIWarning(null);
+            pendingMessageRef.current = '';
+          }}
+          onSendAnyway={() => {
+            const content = pendingMessageRef.current;
+            setPHIWarning(null);
+            pendingMessageRef.current = '';
+            setNewMessage('');
+            performSend(content);
+          }}
+          onClose={() => {
+            setPHIWarning(null);
+            pendingMessageRef.current = '';
+          }}
+        />
+      )}
     </AppLayout>
   );
 }

@@ -1,3 +1,4 @@
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import Settings from "./pages/Settings";
 import Payments from "./pages/Payments";
@@ -70,6 +71,7 @@ const MessageNotificationProvider = ({ children }: { children: React.ReactNode }
 };
 
 const App = () => (
+  <ErrorBoundary>
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -132,6 +134,7 @@ const App = () => (
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
+  </ErrorBoundary>
 );
 
 export default App;
