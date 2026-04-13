@@ -49,11 +49,9 @@ export function Header() {
             <PlayCircle className="w-4 h-4" />
             {t('nav.feed')}
           </Link>
-          {user && (
-            <Link to="/post-job" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              {t('nav.postJob')}
-            </Link>
-          )}
+          <Link to="/post-job" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t('nav.postJob', 'Post')}
+          </Link>
         </nav>
 
         {/* Right side */}

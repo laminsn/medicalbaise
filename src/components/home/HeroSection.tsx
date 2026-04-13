@@ -106,9 +106,9 @@ export function HeroSection() {
         </form>
 
         <div className="flex justify-center mb-4">
-          <Link to="/post-job">
+          <Link to="/browse">
             <Button variant="outline" size="lg" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8">
-              {t('nav.postJob', 'Post a Job')}
+              {t('hero.bookAppointment', 'Book Appointment')}
             </Button>
           </Link>
         </div>
