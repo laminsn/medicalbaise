@@ -31,6 +31,8 @@ export default function Auth() {
   const [showFaceAuth, setShowFaceAuth] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['portuguese']);
   const [formData, setFormData] = useState({
     email: '',
@@ -47,12 +49,13 @@ export default function Auth() {
   const signUpSchema = z.object({
     email: z.string().email(t('auth.invalidEmail')),
     password: z.string()
-      .min(12, t('security.passwordMinLength12'))
-      .refine((val) => validatePasswordStrength(val).isValid, {
-        message: t('security.passwordRequirements'),
-      }),
-    firstName: z.string().min(2, t('auth.firstNameTooShort')).optional(),
-    lastName: z.string().min(2, t('auth.lastNameTooShort')).optional(),
+      .min(8, t('auth.passwordMin', 'Password must be at least 8 characters'))
+      .max(128)
+      .regex(/[A-Z]/, t('auth.passwordUppercase', 'Must contain an uppercase letter'))
+      .regex(/[a-z]/, t('auth.passwordLowercase', 'Must contain a lowercase letter'))
+      .regex(/[0-9]/, t('auth.passwordNumber', 'Must contain a number')),
+    firstName: z.string().min(2, t('auth.firstNameTooShort', 'First name must be at least 2 characters')),
+    lastName: z.string().min(2, t('auth.lastNameTooShort', 'Last name must be at least 2 characters')),
   });
 
   const signInSchema = z.object({
@@ -66,7 +69,10 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
 
@@ -240,7 +246,7 @@ export default function Auth() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl font-bold text-primary-foreground">B</span>
+            <span className="text-2xl font-bold text-primary-foreground">MD</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">
             {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
@@ -369,13 +375,38 @@ export default function Auth() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t('auth.password')}</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">{t('auth.password')}</Label>
+              {!isSignUp && (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-xs text-primary p-0 h-auto"
+                  onClick={async () => {
+                    if (!formData.email) {
+                      toast({ title: t('auth.enterEmailFirst', 'Please enter your email first'), variant: 'destructive' });
+                      return;
+                    }
+                    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    if (error) {
+                      toast({ title: t('auth.resetError', 'Error sending reset email'), variant: 'destructive' });
+                    } else {
+                      toast({ title: t('auth.resetSent', 'Password reset email sent. Check your inbox.') });
+                    }
+                  }}
+                >
+                  {t('auth.forgotPassword', 'Forgot password?')}
+                </Button>
+              )}
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••••••"
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="pl-10 pr-10"
@@ -413,10 +444,32 @@ export default function Auth() {
             </div>
           )}
 
+          {isSignUp && (
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border"
+              />
+              <label htmlFor="terms" className="text-xs text-muted-foreground">
+                {t('auth.agreeToTerms', 'I agree to the')}{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {t('auth.termsOfService', 'Terms of Service')}
+                </a>{' '}
+                {t('common.and', 'and')}{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {t('auth.privacyPolicy', 'Privacy Policy')}
+                </a>
+              </label>
+            </div>
+          )}
+
           <Button
             type="submit"
             className="w-full h-12 bg-primary hover:bg-primary/90 font-semibold"
-            disabled={loading || (!isSignUp && formData.email ? isAccountLocked(formData.email).locked : false)}
+            disabled={loading || (isSignUp && !termsAccepted) || (!isSignUp && formData.email ? isAccountLocked(formData.email).locked : false)}
           >
             {loading ? t('common.loading') : isSignUp ? t('auth.createAccount') : t('auth.signIn')}
           </Button>
