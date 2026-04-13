@@ -6,7 +6,7 @@ import {
   User, Settings, Heart, Clock, MessageSquare, Star, 
   CreditCard, Gift, HelpCircle, LogOut, ChevronRight, ChevronLeft,
   Briefcase, FileText, Crown,
-  Users, Plug, Wallet, AtSign, Shield
+  Users, Plug, Wallet, AtSign, Shield, LayoutDashboard
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -49,6 +49,10 @@ export default function Profile() {
   // Build menu items dynamically based on tier
   const accountItems = [
     { icon: User, label: t('profile.editProfile'), path: '/profile/edit' },
+    // Always show Customer Dashboard
+    { icon: LayoutDashboard, label: t('dashboard.customerDashboard', 'Customer Dashboard'), path: '/customer-dashboard' },
+    // Show Provider Dashboard if they're a provider
+    ...(isProvider ? [{ icon: LayoutDashboard, label: t('dashboard.providerDashboard', 'Provider Dashboard'), path: '/provider-dashboard' }] : []),
     { icon: Crown, label: t('profile.subscription'), path: '/subscription' },
     { icon: Settings, label: t('profile.settings'), path: '/settings' },
     { icon: CreditCard, label: t('profile.payments'), path: '/payments' },
@@ -56,7 +60,7 @@ export default function Profile() {
 
   // Add services and payouts for providers
   if (isProvider) {
-    accountItems.splice(2, 0, { icon: Briefcase, label: t('services.title', 'My Services'), path: '/services' });
+    accountItems.splice(4, 0, { icon: Briefcase, label: t('services.title', 'My Services'), path: '/services' });
     accountItems.push({ icon: Wallet, label: t('payouts.title', 'Payouts'), path: '/payouts' });
   }
 

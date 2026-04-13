@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { SkillTagBadges } from '@/components/provider/SkillTagSelector';
 import { useFavorites } from '@/hooks/useFavorites';
 import {
   Star,
@@ -469,6 +470,9 @@ export default function DoctorProfile() {
                 </Badge>
               )}
             </div>
+
+            {/* Skill Tags */}
+            {doctor?.id && <SkillTagBadges providerId={doctor.id} />}
 
             {/* Action Buttons */}
             <div className="grid grid-cols-2 gap-2 mt-4">

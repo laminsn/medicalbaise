@@ -9,10 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  ArrowLeft, Plus, Trash2, Loader2, Package, DollarSign, ChevronRight, 
+import {
+  ArrowLeft, Plus, Trash2, Loader2, Package, DollarSign, ChevronRight,
   Shield, Award, Settings2, Sparkles
 } from 'lucide-react';
+import { SkillTagSelector } from '@/components/provider/SkillTagSelector';
 import { toast } from 'sonner';
 import { ProviderAddonsSettings } from '@/components/settings/ProviderAddonsSettings';
 import { getLocalizedCategoryName } from '@/lib/i18n-utils';
@@ -196,6 +197,24 @@ export default function ServicesSettings() {
             </div>
           </div>
 
+
+          {/* Skill Tags Section */}
+          {providerId && (
+            <Card className="mb-4">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  {t('services.specialties', 'Specialties & Skills')}
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {t('services.specialtiesDesc', 'Select your specific areas of expertise. These show as badges on your profile and help clients find you.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SkillTagSelector providerId={providerId} />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Services Accordion */}
           <Accordion type="multiple" defaultValue={['services', 'warranties', 'addons']} className="space-y-4">
