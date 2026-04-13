@@ -118,7 +118,7 @@ export function HeroSection() {
           <span className="text-sm text-muted-foreground">
             {t('common.popular')}:
           </span>
-          {POPULAR_SPECIALTIES.map((specialtyId) => {
+          {POPULAR_SPECIALTIES.slice(0, 5).map((specialtyId) => {
             const specialty = MEDICAL_CATEGORIES.find(cat => cat.id === specialtyId);
             if (!specialty) return null;
 
