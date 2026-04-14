@@ -102,6 +102,16 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+
+    if (isSignUp && !termsAccepted) {
+      toast({
+        title: t('auth.termsRequired', 'Please accept the terms'),
+        description: t('auth.mustAcceptTerms', 'You must accept the Terms of Service and Privacy Policy to create an account.'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -141,10 +151,12 @@ export default function Auth() {
           }
         } else {
           toast({
-            title: t('auth.accountCreatedSuccess'),
-            description: t('auth.welcomeToBrasilBase'),
+            title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
+            description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
+            duration: 10000,
           });
-          navigate('/');
+          setIsSignUp(false);
+          setFormData(prev => ({ ...prev, password: '' }));
         }
       } else {
         const result = signInSchema.safeParse(formData);

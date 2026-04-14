@@ -47,11 +47,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Defer profile fetch with setTimeout to avoid deadlock
+
+        // Defer profile ensure with setTimeout to avoid deadlock
         if (session?.user) {
+          const meta = session.user.user_metadata || {};
           setTimeout(() => {
-            fetchProfile(session.user.id);
+            ensureProfile(session.user.id, {
+              email: session.user.email,
+              full_name: meta.full_name || meta.name,
+              first_name: meta.first_name,
+              last_name: meta.last_name,
+              avatar_url: meta.avatar_url || meta.picture,
+            });
           }, 0);
         } else {
           setProfile(null);
@@ -64,23 +71,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        const meta = session.user.user_metadata || {};
+        ensureProfile(session.user.id, {
+          email: session.user.email,
+          full_name: meta.full_name || meta.name,
+          first_name: meta.first_name,
+          last_name: meta.last_name,
+          avatar_url: meta.avatar_url || meta.picture,
+        });
       }
+      setLoading(false);
+    }).catch(() => {
+      // If Supabase is unreachable, still allow the app to render
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
+  const ensureProfile = async (userId: string, userData?: { email?: string; full_name?: string; avatar_url?: string; first_name?: string; last_name?: string }) => {
+    // First try to fetch existing profile
+    const { data: existingProfile } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
 
-    if (!error && data) {
-      setProfile(data as Profile);
+    if (existingProfile) {
+      setProfile(existingProfile as Profile);
+      return;
+    }
+
+    // Profile doesn't exist — create one (handles OAuth users where DB trigger may have failed)
+    const firstName = userData?.first_name ||
+      (userData?.full_name ? userData.full_name.split(' ')[0] : null);
+    const lastName = userData?.last_name ||
+      (userData?.full_name ? userData.full_name.split(' ').slice(1).join(' ') : null);
+
+    const handle = `user_${userId.slice(0, 8)}`;
+    const referralCode = `REF${userId.slice(0, 6).toUpperCase()}`;
+
+    const { data: newProfile, error } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: userId,
+        email: userData?.email || null,
+        first_name: firstName,
+        last_name: lastName,
+        avatar_url: userData?.avatar_url || null,
+        user_type: 'customer',
+        handle,
+        referral_code: referralCode,
+        credits_balance: 0,
+        status: 'active',
+        languages: ['portuguese'],
+      })
+      .select()
+      .single();
+
+    if (!error && newProfile) {
+      setProfile(newProfile as Profile);
+    } else if (error?.code === '23505') {
+      // Duplicate key — profile was created by trigger between our check and insert
+      const { data: retryProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (retryProfile) setProfile(retryProfile as Profile);
     }
   };
 
@@ -153,7 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     if (user) {
-      await fetchProfile(user.id);
+      await ensureProfile(user.id);
     }
   };
 

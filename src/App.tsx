@@ -54,6 +54,7 @@ import HandleRedirect from "./pages/HandleRedirect";
 import BookAppointment from "./pages/BookAppointment";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import AuthCallback from "./pages/AuthCallback";
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -86,6 +87,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/categories" element={<Categories />} />
                   <Route path="/categories/:categoryId" element={<CategoryDetail />} />
