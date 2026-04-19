@@ -31,7 +31,7 @@ const APP_ACCENTS: Record<BaiseApp, string> = {
 
 const IN_APP_TARGET = '/discover';
 
-const RAW_APP = (import.meta.env.VITE_BAISE_APP ?? 'casa') as string;
+const RAW_APP = ((import.meta.env.VITE_BAISE_APP ?? 'casa') as string).trim().toLowerCase();
 const CURRENT_APP: BaiseApp =
   RAW_APP === 'medical' || RAW_APP === 'legal' ? RAW_APP : 'casa';
 const CURRENT_ACCENT = APP_ACCENTS[CURRENT_APP];
