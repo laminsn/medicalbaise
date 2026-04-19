@@ -6,7 +6,6 @@ import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { FeaturedProviders } from '@/components/home/FeaturedProviders';
 import { RecentAppointments } from '@/components/home/RecentAppointments';
 import { PromoSection } from '@/components/home/PromoSection';
-import { BaiseAppsPromo } from '@/components/home/BaiseAppsPromo';
 import AIChatBot from '@/components/chat/AIChatBot';
 import { useTranslation } from 'react-i18next';
 
@@ -42,7 +41,6 @@ const Index = () => {
           <FeaturedProviders />
           <RecentAppointments />
           <PromoSection />
-          <BaiseAppsPromo />
         </main>
         <AIChatBot />
       </AppLayout>

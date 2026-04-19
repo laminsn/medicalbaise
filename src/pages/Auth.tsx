@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera, ScanFace } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,16 @@ import { LanguageSelector } from '@/components/LanguageSelector';
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 import { FaceAuthVerify } from '@/components/auth/FaceAuthVerify';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   validatePasswordStrength,
   isAccountLocked,
   recordFailedAttempt,
@@ -22,6 +32,8 @@ import {
   formatLockoutTime,
 } from '@/lib/security';
 
+const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
+
 export default function Auth() {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
@@ -29,6 +41,30 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showFaceAuth, setShowFaceAuth] = useState(false);
+  const [showFaceLoginInfo, setShowFaceLoginInfo] = useState(false);
+
+  const handleFaceLoginClick = () => {
+    if (typeof window !== 'undefined' && window.localStorage.getItem(FACE_LOGIN_ACK_KEY) === 'true') {
+      setShowFaceAuth(true);
+    } else {
+      setShowFaceLoginInfo(true);
+    }
+  };
+
+  const handleFaceLoginContinue = () => {
+    try {
+      window.localStorage.setItem(FACE_LOGIN_ACK_KEY, 'true');
+    } catch {
+      // localStorage may be unavailable (private mode) — proceed anyway
+    }
+    setShowFaceLoginInfo(false);
+    setShowFaceAuth(true);
+  };
+
+  const handleFaceLoginCreateAccount = () => {
+    setShowFaceLoginInfo(false);
+    setIsSignUp(true);
+  };
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -274,12 +310,53 @@ export default function Auth() {
             type="button"
             variant="outline"
             className="w-full h-12 mb-3 font-medium border-primary/30 hover:border-primary"
-            onClick={() => setShowFaceAuth(true)}
+            onClick={handleFaceLoginClick}
           >
             <Camera className="w-5 h-5 mr-2" />
             {t('security.signInWithFace')}
           </Button>
         )}
+
+        {/* First-time face-login education modal */}
+        <AlertDialog open={showFaceLoginInfo} onOpenChange={setShowFaceLoginInfo}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <ScanFace className="w-5 h-5 text-primary" aria-hidden="true" />
+                </div>
+                <AlertDialogTitle>
+                  {t('security.faceLoginInfoTitle', 'Face login requires an account')}
+                </AlertDialogTitle>
+              </div>
+              <AlertDialogDescription className="text-left pt-1">
+                {t('security.faceLoginInfoLead', "First time? Here's how face login works:")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <ol className="space-y-3 text-sm text-foreground" aria-label="Face login setup steps">
+              {[
+                t('security.faceLoginInfoStep1', "Create a full account with your email — face login can't create one for you."),
+                t('security.faceLoginInfoStep2', 'Sign in once, then enroll your face in Settings → Face Login.'),
+                t('security.faceLoginInfoStep3', 'After that, you can use your face to sign in on any device with a webcam.'),
+              ].map((step, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <span className="leading-relaxed">{step}</span>
+                </li>
+              ))}
+            </ol>
+            <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
+              <AlertDialogCancel onClick={handleFaceLoginCreateAccount} className="mt-0">
+                {t('security.faceLoginInfoCreate', 'Create account first')}
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleFaceLoginContinue}>
+                {t('security.faceLoginInfoContinue', 'I have an account — continue')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Google Sign In */}
         <Button

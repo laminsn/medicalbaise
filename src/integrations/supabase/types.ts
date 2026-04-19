@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -29,6 +29,7 @@ export type Database = {
           job_status: string
           payment_status: string
           payment_structure: string
+          platform: Database["public"]["Enums"]["baise_platform"]
           provider_id: string
           start_date: string | null
           updated_at: string | null
@@ -47,6 +48,7 @@ export type Database = {
           job_status?: string
           payment_status?: string
           payment_structure?: string
+          platform?: Database["public"]["Enums"]["baise_platform"]
           provider_id: string
           start_date?: string | null
           updated_at?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           job_status?: string
           payment_status?: string
           payment_structure?: string
+          platform?: Database["public"]["Enums"]["baise_platform"]
           provider_id?: string
           start_date?: string | null
           updated_at?: string | null
@@ -796,6 +799,7 @@ export type Database = {
           materials_included: string | null
           max_bids: number | null
           patient_notes: string | null
+          platform: Database["public"]["Enums"]["baise_platform"]
           preferred_end_date: string | null
           preferred_start_date: string | null
           status: Database["public"]["Enums"]["job_status"] | null
@@ -825,6 +829,7 @@ export type Database = {
           materials_included?: string | null
           max_bids?: number | null
           patient_notes?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
           preferred_end_date?: string | null
           preferred_start_date?: string | null
           status?: Database["public"]["Enums"]["job_status"] | null
@@ -854,6 +859,7 @@ export type Database = {
           materials_included?: string | null
           max_bids?: number | null
           patient_notes?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
           preferred_end_date?: string | null
           preferred_start_date?: string | null
           status?: Database["public"]["Enums"]["job_status"] | null
@@ -1494,9 +1500,11 @@ export type Database = {
           first_name: string | null
           handle: string | null
           id: string
+          is_provider: boolean | null
           languages: string[] | null
           last_name: string | null
           phone: string | null
+          platforms: Database["public"]["Enums"]["baise_platform"][]
           referral_code: string | null
           state: string | null
           status: string | null
@@ -1522,9 +1530,11 @@ export type Database = {
           first_name?: string | null
           handle?: string | null
           id?: string
+          is_provider?: boolean | null
           languages?: string[] | null
           last_name?: string | null
           phone?: string | null
+          platforms?: Database["public"]["Enums"]["baise_platform"][]
           referral_code?: string | null
           state?: string | null
           status?: string | null
@@ -1550,9 +1560,11 @@ export type Database = {
           first_name?: string | null
           handle?: string | null
           id?: string
+          is_provider?: boolean | null
           languages?: string[] | null
           last_name?: string | null
           phone?: string | null
+          platforms?: Database["public"]["Enums"]["baise_platform"][]
           referral_code?: string | null
           state?: string | null
           status?: string | null
@@ -1982,6 +1994,49 @@ export type Database = {
           },
         ]
       }
+      provider_skills: {
+        Row: {
+          created_at: string | null
+          id: string
+          provider_id: string
+          skill_tag_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          provider_id: string
+          skill_tag_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          provider_id?: string
+          skill_tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_skills_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_skills_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_skills_skill_tag_id_fkey"
+            columns: ["skill_tag_id"]
+            isOneToOne: false
+            referencedRelation: "skill_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       providers: {
         Row: {
           accepted_insurance: string[] | null
@@ -2021,6 +2076,7 @@ export type Database = {
           location_lng: number | null
           meta_pixel_id: string | null
           passport_number: string | null
+          platform: Database["public"]["Enums"]["baise_platform"]
           provider_type: string | null
           requires_background_check: boolean | null
           response_time_hours: number | null
@@ -2078,6 +2134,7 @@ export type Database = {
           location_lng?: number | null
           meta_pixel_id?: string | null
           passport_number?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
           provider_type?: string | null
           requires_background_check?: boolean | null
           response_time_hours?: number | null
@@ -2135,6 +2192,7 @@ export type Database = {
           location_lng?: number | null
           meta_pixel_id?: string | null
           passport_number?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
           provider_type?: string | null
           requires_background_check?: boolean | null
           response_time_hours?: number | null
@@ -2597,6 +2655,7 @@ export type Database = {
           name_en: string
           name_pt: string
           order_index: number | null
+          platform: Database["public"]["Enums"]["baise_platform"]
         }
         Insert: {
           color?: string | null
@@ -2606,6 +2665,7 @@ export type Database = {
           name_en: string
           name_pt: string
           order_index?: number | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
         }
         Update: {
           color?: string | null
@@ -2615,6 +2675,7 @@ export type Database = {
           name_en?: string
           name_pt?: string
           order_index?: number | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
         }
         Relationships: []
       }
@@ -2734,6 +2795,41 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "provider_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skill_tags: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          name_en: string
+          name_pt: string
+          platform: Database["public"]["Enums"]["baise_platform"]
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name_en: string
+          name_pt: string
+          platform: Database["public"]["Enums"]["baise_platform"]
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          name_en?: string
+          name_pt?: string
+          platform?: Database["public"]["Enums"]["baise_platform"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_tags_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -3210,96 +3306,128 @@ export type Database = {
       }
       providers_public: {
         Row: {
+          accepts_new_patients: boolean | null
+          avatar_url: string | null
           avg_rating: number | null
           bio: string | null
           business_name: string | null
           business_type: string | null
+          city: string | null
+          consultation_fee: number | null
+          consultation_types: string[] | null
           created_at: string | null
-          google_analytics_id: string | null
+          crm_number: string | null
+          emergency_available: boolean | null
           guarantee_info: string | null
+          hospital_affiliations: string[] | null
           id: string | null
           is_background_checked: boolean | null
           is_insured: boolean | null
           is_licensed: boolean | null
           is_verified: boolean | null
           languages: string[] | null
-          location_lat: number | null
-          location_lng: number | null
-          meta_pixel_id: string | null
+          platform: Database["public"]["Enums"]["baise_platform"] | null
           response_time_hours: number | null
           service_radius_km: number | null
+          specialty_id: string | null
+          state: string | null
           subscription_tier:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline: string | null
+          teleconsultation_available: boolean | null
           total_jobs: number | null
+          total_patients: number | null
           total_reviews: number | null
-          updated_at: string | null
           user_id: string | null
           warranty_info: string | null
           years_experience: number | null
         }
         Insert: {
+          accepts_new_patients?: boolean | null
+          avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null
           business_name?: string | null
           business_type?: string | null
+          city?: string | null
+          consultation_fee?: number | null
+          consultation_types?: string[] | null
           created_at?: string | null
-          google_analytics_id?: string | null
+          crm_number?: string | null
+          emergency_available?: boolean | null
           guarantee_info?: string | null
+          hospital_affiliations?: string[] | null
           id?: string | null
           is_background_checked?: boolean | null
           is_insured?: boolean | null
           is_licensed?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
-          location_lat?: number | null
-          location_lng?: number | null
-          meta_pixel_id?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"] | null
           response_time_hours?: number | null
           service_radius_km?: number | null
+          specialty_id?: string | null
+          state?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
+          teleconsultation_available?: boolean | null
           total_jobs?: number | null
+          total_patients?: number | null
           total_reviews?: number | null
-          updated_at?: string | null
           user_id?: string | null
           warranty_info?: string | null
           years_experience?: number | null
         }
         Update: {
+          accepts_new_patients?: boolean | null
+          avatar_url?: string | null
           avg_rating?: number | null
           bio?: string | null
           business_name?: string | null
           business_type?: string | null
+          city?: string | null
+          consultation_fee?: number | null
+          consultation_types?: string[] | null
           created_at?: string | null
-          google_analytics_id?: string | null
+          crm_number?: string | null
+          emergency_available?: boolean | null
           guarantee_info?: string | null
+          hospital_affiliations?: string[] | null
           id?: string | null
           is_background_checked?: boolean | null
           is_insured?: boolean | null
           is_licensed?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
-          location_lat?: number | null
-          location_lng?: number | null
-          meta_pixel_id?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"] | null
           response_time_hours?: number | null
           service_radius_km?: number | null
+          specialty_id?: string | null
+          state?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
           tagline?: string | null
+          teleconsultation_available?: boolean | null
           total_jobs?: number | null
+          total_patients?: number | null
           total_reviews?: number | null
-          updated_at?: string | null
           user_id?: string | null
           warranty_info?: string | null
           years_experience?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "providers_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -3322,6 +3450,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      baise_platform: "casa_baise" | "medical_baise" | "legal_baise"
       bid_status:
         | "submitted"
         | "under_review"
@@ -3472,6 +3601,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      baise_platform: ["casa_baise", "medical_baise", "legal_baise"],
       bid_status: [
         "submitted",
         "under_review",

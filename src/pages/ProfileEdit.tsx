@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ProviderServicesEditor } from '@/components/provider/ProviderServicesEditor';
 import { WarrantyGuaranteeEditor } from '@/components/provider/WarrantyGuaranteeEditor';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
+import { lookupCep, geocodeAddress } from '@/lib/geocoding';
 
 export default function ProfileEdit() {
   const { user, profile, refreshProfile } = useAuth();
@@ -29,6 +30,7 @@ export default function ProfileEdit() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLookingUpCep, setIsLookingUpCep] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     profile?.languages || ['portuguese']
   );
@@ -127,11 +129,42 @@ export default function ProfileEdit() {
     }
   };
 
+  const handleCepBlur = async () => {
+    const cep = formData.address_cep.trim();
+    if (!cep || cep.replace(/\D/g, '').length !== 8) return;
+    setIsLookingUpCep(true);
+    try {
+      const result = await lookupCep(cep);
+      if (!result) return;
+      setFormData((prev) => ({
+        ...prev,
+        address_street: prev.address_street.trim() ? prev.address_street : result.street,
+        address_neighborhood: prev.address_neighborhood.trim()
+          ? prev.address_neighborhood
+          : result.neighborhood,
+        city: prev.city.trim() ? prev.city : result.city,
+        state: prev.state.trim() ? prev.state : result.state,
+      }));
+    } finally {
+      setIsLookingUpCep(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Best-effort geocode of the full address to lat/lng.
+      const coords = await geocodeAddress({
+        street: formData.address_street.trim(),
+        number: formData.address_number.trim(),
+        neighborhood: formData.address_neighborhood.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        cep: formData.address_cep.trim(),
+      });
+
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -151,6 +184,8 @@ export default function ProfileEdit() {
           address_number: formData.address_number.trim() || null,
           address_complement: formData.address_complement.trim() || null,
           address_neighborhood: formData.address_neighborhood.trim() || null,
+          address_lat: coords?.lat ?? null,
+          address_lng: coords?.lng ?? null,
         })
         .eq('user_id', user.id);
 
@@ -361,7 +396,12 @@ export default function ProfileEdit() {
                 </p>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="address_cep">{t('profile.postalCode', 'ZIP / Postal Code')}</Label>
+                  <Label htmlFor="address_cep" className="flex items-center gap-2">
+                    {t('profile.postalCode', 'ZIP / Postal Code')}
+                    {isLookingUpCep && (
+                      <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                    )}
+                  </Label>
                   <Input
                     id="address_cep"
                     placeholder={t('profile.postalCodePlaceholder', '00000-000 or ZIP code')}
@@ -370,8 +410,17 @@ export default function ProfileEdit() {
                       const value = e.target.value.slice(0, 10);
                       setFormData(prev => ({ ...prev, address_cep: value }));
                     }}
+                    onBlur={handleCepBlur}
                     maxLength={10}
+                    inputMode="numeric"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    {isPt
+                      ? 'Digite seu CEP e preencheremos o endereço automaticamente.'
+                      : isEs
+                        ? 'Ingresa tu CEP y completaremos la dirección automáticamente.'
+                        : 'Enter your Brazilian CEP and we\u2019ll fill in the address.'}
+                  </p>
                 </div>
 
                 <div className="space-y-2">

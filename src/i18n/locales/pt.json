@@ -103,6 +103,7 @@
   },
   "nav": {
     "home": "Início",
+    "discover": "Descobrir",
     "browse": "Explorar",
     "explore": "Explorar",
     "jobs": "Trabalhos",
@@ -111,6 +112,89 @@
     "postJob": "Publicar Trabalho",
     "map": "Mapa",
     "feed": "Feed"
+  },
+  "hub": {
+    "metaTitle": "Baise Group — Uma rede confiável para serviços residenciais, de saúde e jurídicos no Brasil",
+    "metaDescription": "Três plataformas, uma promessa. Encontre profissionais residenciais, médicos e advogados verificados em todo o Brasil. Escolha sua plataforma para começar.",
+    "tagline": "Casa · Medical · Legal",
+    "heroBadge": "O marketplace de profissionais de confiança do Brasil",
+    "youAreHere": "Você está aqui",
+    "hero": {
+      "titlePart1": "Três plataformas.",
+      "titlePart2": "Uma promessa.",
+      "subtitle": "Encontre profissionais verificados em residencial, saúde e jurídico — todos no padrão Baise Group. Escolha uma plataforma abaixo para começar."
+    },
+    "casa": {
+      "title": "Casa Baise",
+      "blurb": "Sua casa em mãos de confiança. De um cano vazando a uma reforma completa, encontre o profissional que você realmente recomendaria.",
+      "cta": "Encontrar profissional",
+      "bullets": [
+        "Faxineiros, encanadores, eletricistas e mais 23 categorias",
+        "Verificados, avaliados, prontos para contratar",
+        "Contratação direta ou propostas competitivas — você decide",
+        "Avaliações reais de clientes reais",
+        "Pagamento seguro em BRL com proteção de garantia"
+      ]
+    },
+    "medical": {
+      "title": "Medical Baise",
+      "blurb": "Médicos, dentistas, terapeutas e especialistas em quem confiar — agendamento em minutos, não em semanas.",
+      "cta": "Encontrar médico",
+      "bullets": [
+        "Médicos, dentistas, terapeutas e especialistas",
+        "Licença verificada em cada perfil",
+        "Agende consultas — presenciais ou online",
+        "Experiência focada em privacidade do paciente",
+        "Convênio ou particular — sua escolha"
+      ]
+    },
+    "legal": {
+      "title": "Legal Baise",
+      "blurb": "Advogados, notários e especialistas jurídicos — confidenciais, credenciados e claros sobre preços desde o primeiro contato.",
+      "cta": "Encontrar advogado",
+      "bullets": [
+        "Advogados em 10 áreas de atuação",
+        "OAB-credenciados, verificados, com seguro",
+        "Honorários fixos ou por hora — sua escolha",
+        "Consultas confidenciais desde a primeira mensagem",
+        "Bilíngue: Português e English"
+      ]
+    },
+    "sso": {
+      "eyebrow": "Disponível agora",
+      "title": "Uma conta Baise. As três plataformas.",
+      "subtitle": "Faça login uma vez e mantenha seu perfil verificado, formas de pagamento e avaliações sincronizados entre Casa, Medical e Legal Baise. Menos atrito, mais confiança."
+    },
+    "benefits": {
+      "eyebrow": "Por que Baise Group",
+      "title": "Padrões que não vacilam.",
+      "verified": {
+        "title": "Profissionais verificados",
+        "desc": "Identidade e credenciais checadas em todas as plataformas — sem exceções."
+      },
+      "bilingual": {
+        "title": "Multilíngue",
+        "desc": "Português, English, Español — sua escolha, a qualquer hora, em todos os fluxos."
+      },
+      "secure": {
+        "title": "Pagamentos seguros",
+        "desc": "Transações criptografadas, recibos claros, garantia quando importa."
+      },
+      "local": {
+        "title": "Feito para o Brasil",
+        "desc": "Regras locais, idioma local, sinais de confiança locais — projetado para como o Brasil realmente funciona."
+      }
+    },
+    "trust": {
+      "eyebrow": "Confiados por",
+      "line": "Milhares de profissionais em todo o Brasil — e as pessoas que os contrataram — escolhem Baise para se encontrarem."
+    },
+    "footer": {
+      "label": "Rodapé",
+      "discover": "Descobrir",
+      "terms": "Termos",
+      "privacy": "Privacidade"
+    }
   },
   "auth": {
     "signIn": "Entrar",
@@ -1739,7 +1823,14 @@
     "faceAuthSignInFailed": "Rosto verificado mas o login falhou. Use login com senha.",
     "startFaceScan": "Iniciar Escaneamento Facial",
     "verifyMyFace": "Verificar Meu Rosto",
-    "otpSentCheckEmail": "Código enviado. Verifique seu email."
+    "otpSentCheckEmail": "Código enviado. Verifique seu email.",
+    "faceLoginInfoTitle": "O login facial requer uma conta",
+    "faceLoginInfoLead": "Primeira vez? Veja como funciona o login facial:",
+    "faceLoginInfoStep1": "Crie uma conta completa com seu e-mail — o login facial não cria conta para você.",
+    "faceLoginInfoStep2": "Entre uma vez e cadastre seu rosto em Configurações → Login Facial.",
+    "faceLoginInfoStep3": "Depois disso, você pode usar seu rosto para entrar em qualquer dispositivo com webcam.",
+    "faceLoginInfoContinue": "Já tenho uma conta — continuar",
+    "faceLoginInfoCreate": "Criar conta primeiro"
   },
   "address": {
     "street": "Rua",

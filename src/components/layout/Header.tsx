@@ -35,6 +35,9 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
+          <Link to="/discover" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t('nav.discover', 'Discover')}
+          </Link>
           <Link to="/browse" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             {t('nav.explore')}
           </Link>

@@ -103,6 +103,7 @@
   },
   "nav": {
     "home": "Home",
+    "discover": "Discover",
     "browse": "Find Doctors",
     "explore": "Explore",
     "jobs": "Jobs",
@@ -111,6 +112,89 @@
     "postJob": "Post",
     "map": "Map",
     "feed": "Feed"
+  },
+  "hub": {
+    "metaTitle": "Baise Group — One trusted network for home, health, and legal services in Brazil",
+    "metaDescription": "Three platforms, one promise. Find verified home service pros, doctors, and lawyers across Brazil. Choose your platform to start searching.",
+    "tagline": "Casa · Medical · Legal",
+    "heroBadge": "Brazil's marketplace for trusted pros",
+    "youAreHere": "You are here",
+    "hero": {
+      "titlePart1": "Three platforms.",
+      "titlePart2": "One promise.",
+      "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start."
+    },
+    "casa": {
+      "title": "Casa Baise",
+      "blurb": "Your home, in trusted hands. From a leaking pipe to a full renovation, find the pro you'd actually recommend.",
+      "cta": "Find a home pro",
+      "bullets": [
+        "Cleaners, plumbers, electricians & 23 more categories",
+        "Verified, rated, ready to book",
+        "Direct hire or competitive bids — your call",
+        "Real reviews from real homeowners",
+        "Secure payments in BRL with escrow protection"
+      ]
+    },
+    "medical": {
+      "title": "Medical Baise",
+      "blurb": "Doctors, dentists, therapists, and specialists you can trust — booked in minutes, not weeks.",
+      "cta": "Find a doctor",
+      "bullets": [
+        "Doctors, dentists, therapists & specialists",
+        "License-verified on every profile",
+        "Book consultations — in-person or online",
+        "Privacy-first patient experience",
+        "Insurance and private-pay supported"
+      ]
+    },
+    "legal": {
+      "title": "Legal Baise",
+      "blurb": "Lawyers, notários, and legal experts — confidential, credentialed, and clear about pricing from day one.",
+      "cta": "Find a lawyer",
+      "bullets": [
+        "Lawyers across 10 practice areas",
+        "OAB-credentialed, vetted, insured",
+        "Fixed-fee or hourly — your choice",
+        "Confidential consultations from the first message",
+        "Bilingual: Português & English"
+      ]
+    },
+    "sso": {
+      "eyebrow": "Live now",
+      "title": "One Baise account. All three platforms.",
+      "subtitle": "Sign in once and we'll keep your verified profile, payment methods, and reviews in sync across Casa, Medical, and Legal Baise. Less friction, more trust."
+    },
+    "benefits": {
+      "eyebrow": "Why Baise Group",
+      "title": "Standards that don't bend.",
+      "verified": {
+        "title": "Verified pros",
+        "desc": "Identity and credentials checked on every platform — no exceptions."
+      },
+      "bilingual": {
+        "title": "Multilingual",
+        "desc": "Português, English, Español — your choice, anytime, in every flow."
+      },
+      "secure": {
+        "title": "Secure payments",
+        "desc": "Encrypted transactions, clear receipts, escrow when it matters."
+      },
+      "local": {
+        "title": "Built for Brazil",
+        "desc": "Local rules, local language, local trust signals — designed for the way Brasil actually works."
+      }
+    },
+    "trust": {
+      "eyebrow": "Trusted by",
+      "line": "Thousands of professionals across Brazil — and the people who hired them — pick Baise to find each other."
+    },
+    "footer": {
+      "label": "Footer",
+      "discover": "Discover",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
   },
   "auth": {
     "signIn": "Sign In",
@@ -1739,7 +1823,14 @@
     "faceAuthSignInFailed": "Face verified but sign-in failed. Please use password login.",
     "startFaceScan": "Start Face Scan",
     "verifyMyFace": "Verify My Face",
-    "otpSentCheckEmail": "Code sent. Check your email."
+    "otpSentCheckEmail": "Code sent. Check your email.",
+    "faceLoginInfoTitle": "Face login requires an account",
+    "faceLoginInfoLead": "First time? Here's how face login works:",
+    "faceLoginInfoStep1": "Create a full account with your email — face login can't create one for you.",
+    "faceLoginInfoStep2": "Sign in once, then enroll your face in Settings → Face Login.",
+    "faceLoginInfoStep3": "After that, you can use your face to sign in on any device with a webcam.",
+    "faceLoginInfoContinue": "I have an account — continue",
+    "faceLoginInfoCreate": "Create account first"
   },
   "address": {
     "street": "Street",

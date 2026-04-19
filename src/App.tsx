@@ -14,6 +14,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import BaiseHubLanding from "./components/hub/BaiseHubLanding";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Browse from "./pages/Browse";
@@ -85,7 +86,8 @@ const App = () => (
             <BrowserRouter>
               <MessageNotificationProvider>
                 <Routes>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<BaiseHubLanding />} />
+                  <Route path="/discover" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/browse" element={<Browse />} />
