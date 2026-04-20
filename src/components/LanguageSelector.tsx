@@ -17,16 +17,30 @@ const languages = [
 export function LanguageSelector() {
   const { i18n } = useTranslation();
 
-  const resolved = i18n.resolvedLanguage || i18n.language;
+  const resolved = i18n.resolvedLanguage || i18n.language || '';
   const currentLanguage =
     languages.find((lang) => resolved.startsWith(lang.code)) ||
     languages.find((lang) => lang.code === 'pt') ||
     languages[0];
 
+  const pickLanguage = (code: string) => {
+    void i18n.changeLanguage(code);
+    try {
+      localStorage.setItem('i18nextLng', code);
+    } catch {
+      // localStorage unavailable (private mode) — language change still applied via i18n.
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-1.5 text-muted-foreground"
+          aria-label="Change language"
+        >
           <Globe className="w-4 h-4" />
           <span className="text-sm">{currentLanguage.flag}</span>
         </Button>
@@ -35,7 +49,10 @@ export function LanguageSelector() {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => i18n.changeLanguage(lang.code)}
+            onSelect={(event) => {
+              event.preventDefault();
+              pickLanguage(lang.code);
+            }}
             className={resolved.startsWith(lang.code) ? 'bg-accent' : ''}
           >
             <span className="mr-2">{lang.flag}</span>

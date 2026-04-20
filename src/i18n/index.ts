@@ -14,13 +14,20 @@ i18n
       pt: { translation: pt },
       es: { translation: es },
     },
+    supportedLngs: ['en', 'es', 'pt'],
+    load: 'languageOnly',
     fallbackLng: 'pt',
+    nonExplicitSupportedLngs: true,
     interpolation: {
       escapeValue: false,
     },
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+    },
+    react: {
+      useSuspense: false,
+      bindI18n: 'languageChanged loaded',
     },
   });
 
