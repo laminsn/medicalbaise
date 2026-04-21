@@ -194,6 +194,33 @@
       "discover": "Descobrir",
       "terms": "Termos",
       "privacy": "Privacidade"
+    },
+    "pros": {
+      "eyebrow": "Para Profissionais",
+      "title": "Seu espaço seguro para fazer seu negócio crescer.",
+      "subtitle": "Profissionais de serviços, especialistas médicos e advogados — poste seu trabalho, faça lives, publique stories e transforme espectadores em clientes. Apenas membros verificados, clientes avaliados e um feed que premia o bom trabalho.",
+      "goLive": {
+        "label": "Ao Vivo",
+        "desc": "Faça Q&As, demos ou consultas virtuais em tempo real."
+      },
+      "stream": {
+        "label": "Transmitir",
+        "desc": "Mostre seu trabalho na hora — visita ao estúdio, walkthroughs, projetos novos."
+      },
+      "post": {
+        "label": "Publicar",
+        "desc": "Fotos, texto e vídeos que constroem seu portfólio ao longo do tempo."
+      },
+      "stories": {
+        "label": "Stories",
+        "desc": "Destaques de 24 horas que mantêm você na frente de quem busca hoje."
+      },
+      "promote": {
+        "label": "Promover",
+        "desc": "Impulsione seus melhores posts e destaque-se quando precisar de alcance."
+      },
+      "ctaPrimary": "Tornar-se profissional",
+      "ctaSecondary": "Explorar o feed"
     }
   },
   "auth": {

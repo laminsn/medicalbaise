@@ -9,6 +9,11 @@ import {
   KeyRound,
   Sparkles,
   Compass,
+  Radio,
+  Video,
+  PenSquare,
+  Megaphone,
+  ArrowRight,
 } from 'lucide-react';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
@@ -236,6 +241,92 @@ export default function BaiseHubLanding() {
             </div>
           </section>
 
+          {/* For Professionals — post, stream, go live, stories, promote */}
+          <section className="relative px-4 sm:px-6 pb-14 md:pb-20">
+            <div className="max-w-5xl mx-auto">
+              <div
+                className="relative overflow-hidden rounded-2xl p-7 md:p-10"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 7%) 100%)',
+                  border: `1px solid ${BORDER}`,
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  className="absolute -bottom-24 -left-20 w-72 h-72 rounded-full blur-3xl opacity-25"
+                  style={{
+                    background: `linear-gradient(135deg, ${APP_ACCENTS.casa}, ${APP_ACCENTS.medical}, ${APP_ACCENTS.legal})`,
+                  }}
+                />
+
+                <div className="relative">
+                  <p
+                    className="text-[10.5px] font-bold tracking-[0.18em] uppercase mb-3"
+                    style={{ color: CURRENT_ACCENT }}
+                  >
+                    {t('hub.pros.eyebrow')}
+                  </p>
+                  <h2 className="text-2xl md:text-[32px] font-bold text-white mb-3 tracking-tight leading-tight">
+                    {t('hub.pros.title')}
+                  </h2>
+                  <p className="text-[15px] md:text-base text-white/65 leading-relaxed max-w-2xl mb-8">
+                    {t('hub.pros.subtitle')}
+                  </p>
+
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
+                    <FeaturePill
+                      icon={Radio}
+                      label={t('hub.pros.goLive.label')}
+                      desc={t('hub.pros.goLive.desc')}
+                    />
+                    <FeaturePill
+                      icon={Video}
+                      label={t('hub.pros.stream.label')}
+                      desc={t('hub.pros.stream.desc')}
+                    />
+                    <FeaturePill
+                      icon={PenSquare}
+                      label={t('hub.pros.post.label')}
+                      desc={t('hub.pros.post.desc')}
+                    />
+                    <FeaturePill
+                      icon={Sparkles}
+                      label={t('hub.pros.stories.label')}
+                      desc={t('hub.pros.stories.desc')}
+                    />
+                    <FeaturePill
+                      icon={Megaphone}
+                      label={t('hub.pros.promote.label')}
+                      desc={t('hub.pros.promote.desc')}
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link
+                      to="/auth?mode=signup&role=provider"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all hover:-translate-y-0.5"
+                      style={{
+                        background: `linear-gradient(135deg, ${CURRENT_ACCENT} 0%, ${CURRENT_ACCENT}dd 100%)`,
+                        color: '#fff',
+                        boxShadow: `0 8px 24px -10px ${CURRENT_ACCENT}aa`,
+                      }}
+                    >
+                      <span>{t('hub.pros.ctaPrimary')}</span>
+                      <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    </Link>
+                    <Link
+                      to="/feed"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold border border-white/15 text-white/85 hover:text-white hover:border-white/30 transition-all"
+                    >
+                      <span>{t('hub.pros.ctaSecondary')}</span>
+                      <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Why Baise Group */}
           <section
             className="relative px-4 sm:px-6 py-14 md:py-20"
@@ -356,6 +447,36 @@ function BenefitCard({ icon: Icon, title, desc }: BenefitCardProps) {
         {title}
       </h3>
       <p className="text-[13.5px] text-white/55 leading-relaxed">{desc}</p>
+    </div>
+  );
+}
+
+interface FeaturePillProps {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  desc: string;
+}
+
+function FeaturePill({ icon: Icon, label, desc }: FeaturePillProps) {
+  return (
+    <div
+      className="relative rounded-xl p-3.5 transition-all duration-300 hover:bg-white/[0.03]"
+      style={{
+        backgroundColor: 'hsl(0 0% 11%)',
+        border: '1px solid hsl(0 0% 16%)',
+      }}
+    >
+      <div
+        className="inline-flex items-center justify-center w-8 h-8 rounded-lg mb-2.5"
+        style={{
+          backgroundColor: `${CURRENT_ACCENT}22`,
+          border: `1px solid ${CURRENT_ACCENT}33`,
+        }}
+      >
+        <Icon className="w-4 h-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
+      </div>
+      <p className="font-semibold text-white text-[13px] tracking-tight mb-1">{label}</p>
+      <p className="text-[11.5px] text-white/55 leading-snug">{desc}</p>
     </div>
   );
 }

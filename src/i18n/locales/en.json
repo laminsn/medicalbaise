@@ -194,6 +194,33 @@
       "discover": "Discover",
       "terms": "Terms",
       "privacy": "Privacy"
+    },
+    "pros": {
+      "eyebrow": "For Professionals",
+      "title": "Your safe space to grow your business.",
+      "subtitle": "Service pros, medical specialists, and legal experts — post your work, go live, share stories, and turn viewers into clients. Verified members only, vetted clients, and a feed that rewards great work.",
+      "goLive": {
+        "label": "Go Live",
+        "desc": "Host Q&As, demos, or virtual consultations in real time."
+      },
+      "stream": {
+        "label": "Stream",
+        "desc": "Share your craft as it happens — studio tours, walkthroughs, fresh work."
+      },
+      "post": {
+        "label": "Post",
+        "desc": "Photos, text, and video updates that build your portfolio over time."
+      },
+      "stories": {
+        "label": "Stories",
+        "desc": "24-hour highlights that keep you in front of clients searching today."
+      },
+      "promote": {
+        "label": "Promote",
+        "desc": "Boost your best posts and land featured placement when you want reach."
+      },
+      "ctaPrimary": "Become a provider",
+      "ctaSecondary": "Explore the feed"
     }
   },
   "auth": {
