@@ -34,6 +34,36 @@ export default function MyBids() {
   const [activeTab, setActiveTab] = useState('active');
   const dateLocale = getDateFnsLocale(i18n);
 
+  const { data: bids = [], isLoading: isLoadingBids } = useQuery({
+    queryKey: ['my-bids', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      const { data: provider } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!provider) return [];
+      const { data, error } = await supabase
+        .from('bids')
+        .select('*, jobs_posted!inner(title, location_address, budget_min, budget_max)')
+        .eq('provider_id', provider.id)
+        .order('submitted_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((b: any) => ({
+        ...b,
+        job_title: b.jobs_posted?.title || '',
+        job_location: b.jobs_posted?.location_address || '',
+        job_budget: b.jobs_posted?.budget_min && b.jobs_posted?.budget_max
+          ? `${formatPrice(b.jobs_posted.budget_min)} - ${formatPrice(b.jobs_posted.budget_max)}`
+          : '',
+        total_bids: 0,
+      }));
+    },
+    enabled: !!user?.id,
+  });
+
   if (!user) {
     return (
       <>
@@ -72,34 +102,6 @@ export default function MyBids() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
-
-  const { data: bids = [], isLoading: isLoadingBids } = useQuery({
-    queryKey: ['my-bids', user?.id],
-    queryFn: async () => {
-      const { data: provider } = await supabase
-        .from('providers')
-        .select('id')
-        .eq('user_id', user!.id)
-        .maybeSingle();
-      if (!provider) return [];
-      const { data, error } = await supabase
-        .from('bids')
-        .select('*, jobs_posted!inner(title, location_address, budget_min, budget_max)')
-        .eq('provider_id', provider.id)
-        .order('submitted_at', { ascending: false });
-      if (error) throw error;
-      return (data || []).map((b: any) => ({
-        ...b,
-        job_title: b.jobs_posted?.title || '',
-        job_location: b.jobs_posted?.location_address || '',
-        job_budget: b.jobs_posted?.budget_min && b.jobs_posted?.budget_max
-          ? `${formatPrice(b.jobs_posted.budget_min)} - ${formatPrice(b.jobs_posted.budget_max)}`
-          : '',
-        total_bids: 0,
-      }));
-    },
-    enabled: !!user?.id,
-  });
 
   const activeBids = bids.filter((b: any) => ['submitted', 'under_review'].includes(b.status));
   const historyBids = bids.filter((b: any) => ['accepted', 'declined', 'withdrawn', 'expired'].includes(b.status));

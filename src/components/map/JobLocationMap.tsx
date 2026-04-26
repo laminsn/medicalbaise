@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { escapeHtml } from '@/lib/sanitize';
 
 interface JobLocationMapProps {
   activeJobId: string;
@@ -117,8 +118,8 @@ const JobLocationMap: React.FC<JobLocationMapProps> = ({
             new mapboxgl.Popup({ offset: 25 })
               .setHTML(`
                 <div class="p-3">
-                  <h3 class="font-semibold">${activeJob.job.title}</h3>
-                  <p class="text-sm text-muted-foreground">${activeJob.job.location_address || ''}</p>
+                  <h3 class="font-semibold">${escapeHtml(activeJob.job.title || '')}</h3>
+                  <p class="text-sm text-muted-foreground">${escapeHtml(activeJob.job.location_address || '')}</p>
                 </div>
               `)
           )
