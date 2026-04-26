@@ -10,6 +10,7 @@ import { ProviderAnalytics } from '@/components/dashboard/ProviderAnalytics';
 import { ProviderActiveJobs } from '@/components/dashboard/ProviderActiveJobs';
 import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
+import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { AutoReplySettings } from '@/components/messaging/AutoReplySettings';
 import { CustomMessageTemplates } from '@/components/messaging/CustomMessageTemplates';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
@@ -19,7 +20,9 @@ import { ConversionAnalyticsDashboard } from '@/components/dashboard/ConversionA
 import { FollowerMarketingPanel } from '@/components/marketing/FollowerMarketingPanel';
 import { ProviderEmailCampaigns } from '@/components/marketing/ProviderEmailCampaigns';
 import { useAuth } from '@/hooks/useAuth';
+import { useProviderAnalytics } from '@/hooks/useProviderAnalytics';
 import { supabase } from '@/integrations/supabase/client';
+import { formatPrice } from '@/lib/currency';
 import { BidTemplates } from '@/components/provider/BidTemplates';
 import {
   BarChart3,
@@ -52,6 +55,7 @@ export default function ProviderDashboard() {
   const [providerTier, setProviderTier] = useState<SubscriptionTier>('free');
   const [isLoading, setIsLoading] = useState(true);
   const [isProvider, setIsProvider] = useState(false);
+  const { analytics } = useProviderAnalytics();
   const [currentProviderId, setCurrentProviderId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -83,6 +87,7 @@ export default function ProviderDashboard() {
   const isEliteOrAbove = providerTier === 'elite' || providerTier === 'enterprise';
   const isProOrAbove = isEliteOrAbove || providerTier === 'pro';
   const isEnterprise = providerTier === 'enterprise';
+  const tierMeter = providerTier === 'enterprise' ? 100 : providerTier === 'elite' ? 86 : providerTier === 'pro' ? 68 : 38;
   const tierLabel = (tier: SubscriptionTier) => {
     if (!isPt && !isEs) return tier;
     if (tier === 'free') return isEs ? 'gratis' : 'gratuito';
@@ -196,6 +201,38 @@ export default function ProviderDashboard() {
               description: 'Check earnings movement and payout setup.',
               icon: Wallet,
               onClick: () => navigate('/payouts'),
+            },
+          ]}
+        />
+
+        <DashboardVisualKpis
+          title="Performance visual board"
+          description="Ratings, earnings, care timelines, and operating meters for quick decision-making."
+          ratingLabel="Average rating"
+          ratingValue={analytics?.avgRating}
+          ratingDetail={`${analytics?.totalReviews || 0} review${analytics?.totalReviews === 1 ? '' : 's'} contributing to patient trust.`}
+          revenueLabel="Revenue generated"
+          revenueValue={formatPrice(analytics?.totalRevenue || 0)}
+          revenueDetail={`${analytics?.totalJobs || 0} completed care request${analytics?.totalJobs === 1 ? '' : 's'} tracked in the provider workspace.`}
+          timelineLabel="6-month revenue timeline"
+          timelineData={(analytics?.monthlyData || []).map((item) => ({ label: item.month, value: item.revenue }))}
+          barLabel="Care requests completed by month"
+          barData={(analytics?.monthlyData || []).map((item) => ({ label: item.month, value: item.jobs }))}
+          meters={[
+            {
+              label: 'Completion rate',
+              value: analytics?.completionRate ?? 100,
+              detail: 'Percent of started care requests that reach completion.',
+            },
+            {
+              label: 'Response rate',
+              value: analytics?.responseRate ?? 100,
+              detail: 'Conversation responsiveness signal.',
+            },
+            {
+              label: 'Tier leverage',
+              value: tierMeter,
+              detail: 'How much of the growth toolkit is available on this plan.',
             },
           ]}
         />

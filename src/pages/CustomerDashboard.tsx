@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ActiveJobsSection } from '@/components/dashboard/ActiveJobsSection';
 import { CustomerWorkApprovals } from '@/components/dashboard/CustomerWorkApprovals';
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
+import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import JobLocationMap from '@/components/map/JobLocationMap';
 import { useAuth } from '@/hooks/useAuth';
@@ -181,6 +182,46 @@ export default function CustomerDashboard() {
               description: 'Review provider conversations and follow-ups.',
               icon: MessageSquare,
               onClick: () => navigate('/messages'),
+            },
+          ]}
+        />
+
+        <DashboardVisualKpis
+          title="Visual KPI snapshot"
+          description="A quick read on care requests, approvals, scheduled visits, and patient follow-through."
+          ratingLabel="Provider rating signal"
+          ratingDetail="Ratings appear after completed care interactions, helping you compare providers over time."
+          revenueLabel="Care spend visibility"
+          revenueValue="Tracked per request"
+          revenueDetail="Approved services and payments stay connected to each healthcare request."
+          timelineLabel="Care timeline"
+          timelineData={[
+            { label: 'Active', value: counts?.jobs || 0 },
+            { label: 'Scheduled', value: counts?.scheduled || 0 },
+            { label: 'Approvals', value: counts?.approvals || 0 },
+            { label: 'Clear', value: counts?.approvals ? 0 : 1 },
+          ]}
+          barLabel="Care workload mix"
+          barData={[
+            { label: 'Requests', value: counts?.jobs || 0 },
+            { label: 'Visits', value: counts?.scheduled || 0 },
+            { label: 'Reviews', value: counts?.approvals || 0 },
+          ]}
+          meters={[
+            {
+              label: 'Approval health',
+              value: counts?.approvals ? Math.max(30, 100 - counts.approvals * 20) : 100,
+              detail: counts?.approvals ? 'Care updates need review.' : 'No review blockers right now.',
+            },
+            {
+              label: 'Schedule coverage',
+              value: counts?.scheduled ? 88 : 45,
+              detail: counts?.scheduled ? 'You have upcoming care on the calendar.' : 'Schedule services to improve continuity.',
+            },
+            {
+              label: 'Follow-up readiness',
+              value: counts?.jobs || counts?.scheduled ? 82 : 58,
+              detail: 'Use requests, messages, and provider search to keep care moving.',
             },
           ]}
         />
