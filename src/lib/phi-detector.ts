@@ -4,7 +4,7 @@
  */
 
 const SSN_PATTERN = /\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b/;
-const DOB_PATTERN = /\b(?:born|dob|birth|nascimento|nascido)[\s:]*\d{1,2}[\s/\-\.]\d{1,2}[\s/\-\.]\d{2,4}\b/i;
+const DOB_PATTERN = /\b(?:born|dob|birth|nascimento|nascido)[\s:]*\d{1,2}[\s/.-]\d{1,2}[\s/.-]\d{2,4}\b/i;
 const MEDICAL_RECORD_PATTERN = /\b(?:MRN|medical record|prontuário|registro médico)[\s:#]*[\w\d-]+\b/i;
 const INSURANCE_PATTERN = /\b(?:insurance|seguro|policy|apólice)[\s:#]*[\w\d-]{6,}\b/i;
 const PHONE_PATTERN = /\b(?:\+?1[-\s]?)?\(?\d{3}\)?[-\s]?\d{3}[-\s]?\d{4}\b/;
