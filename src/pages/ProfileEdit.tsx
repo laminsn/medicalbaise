@@ -288,7 +288,7 @@ export default function ProfileEdit() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {t('profile.handleDescription', 'Your unique shareable link:')} medicalbaise.com/u/{formData.handle || '...'}
+                    {t('profile.handleDescription', 'Your unique shareable link:')} www.mdbaise.com/u/{formData.handle || '...'}
                   </p>
                 </div>
 

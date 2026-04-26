@@ -3,15 +3,20 @@ import { useParams, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function HandleRedirect() {
   const { handle } = useParams<{ handle: string }>();
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [providerId, setProviderId] = useState<string | null>(null);
+  const [ownProfile, setOwnProfile] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const resolveHandle = async () => {
+      if (authLoading) return;
+
       if (!handle) {
         setNotFound(true);
         setLoading(false);
@@ -40,15 +45,17 @@ export default function HandleRedirect() {
 
       if (provider) {
         setProviderId(provider.id);
+      } else if (user?.id === profile.user_id) {
+        setOwnProfile(true);
       } else {
-        // Not a provider, redirect to a generic profile view
+        // Non-provider profiles do not have a public detail page yet.
         setNotFound(true);
       }
       setLoading(false);
     };
 
     resolveHandle();
-  }, [handle]);
+  }, [authLoading, handle, user?.id]);
 
   if (loading) {
     return (
@@ -62,6 +69,10 @@ export default function HandleRedirect() {
 
   if (providerId) {
     return <Navigate to={`/provider/${providerId}`} replace />;
+  }
+
+  if (ownProfile) {
+    return <Navigate to="/profile" replace />;
   }
 
   if (notFound) {
