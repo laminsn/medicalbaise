@@ -5,11 +5,11 @@ import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ProviderAnalytics } from '@/components/dashboard/ProviderAnalytics';
 import { ProviderActiveJobs } from '@/components/dashboard/ProviderActiveJobs';
 import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
+import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { AutoReplySettings } from '@/components/messaging/AutoReplySettings';
 import { CustomMessageTemplates } from '@/components/messaging/CustomMessageTemplates';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
@@ -36,6 +36,8 @@ import {
   Video,
   MapPin,
   Clock,
+  Search,
+  Settings,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -89,15 +91,6 @@ export default function ProviderDashboard() {
     return isEs ? 'empresarial' : 'enterprise';
   };
 
-  const getTierBadgeColor = (tier: SubscriptionTier) => {
-    switch (tier) {
-      case 'enterprise': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
-      case 'elite': return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
-      case 'pro': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
-
   if (isLoading) {
     return (
       <AppLayout>
@@ -139,29 +132,62 @@ export default function ProviderDashboard() {
       </Helmet>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
-            <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge className={`${getTierBadgeColor(providerTier)} capitalize`}>
-              <Crown className="h-3 w-3 mr-1" />
-              {tierLabel(providerTier)} {t('common.tier')}
-            </Badge>
-            {!isEliteOrAbove && (
-              <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate('/subscription')}>
-                <ArrowUpRight className="h-4 w-4" />
-                {t('dashboard.upgradeTier')}
-              </Button>
-            )}
-            <Button size="sm" variant="outline" className="gap-1" onClick={() => navigate('/payouts')}>
-              <Wallet className="h-4 w-4" />
-              {t('payouts.title', 'Payouts')}
-            </Button>
-          </div>
-        </div>
+        <DashboardCommandCenter
+          eyebrow="Medical Baise"
+          title={t('dashboard.title', 'My Dashboard')}
+          description={t('dashboard.subtitle', 'Run your healthcare practice workspace: appointments, patient requests, services, messaging, and growth tools.')}
+          badge={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
+          metrics={[
+            {
+              label: 'Provider tier',
+              value: tierLabel(providerTier),
+              detail: isEliteOrAbove ? 'Automation and campaigns are available.' : 'Upgrade when you need automation and campaigns.',
+              icon: Crown,
+              tone: providerTier === 'free' ? 'amber' : 'purple',
+            },
+            {
+              label: 'Care queue',
+              value: 'Jobs',
+              detail: 'Appointments and active service requests stay organized.',
+              icon: Briefcase,
+              tone: 'blue',
+            },
+            {
+              label: 'Revenue',
+              value: 'Payouts',
+              detail: 'Review payout methods, account status, and earnings.',
+              icon: Wallet,
+              tone: 'green',
+            },
+            {
+              label: 'Growth',
+              value: isProOrAbove ? 'Enabled' : 'Limited',
+              detail: 'Marketing, analytics, and tracking tools live below.',
+              icon: Megaphone,
+              tone: 'purple',
+            },
+          ]}
+          actions={[
+            {
+              label: 'Find jobs',
+              description: 'Browse patient requests and appointment opportunities.',
+              icon: Search,
+              onClick: () => navigate('/jobs'),
+            },
+            {
+              label: 'Manage services',
+              description: 'Update specialties, pricing, add-ons, and availability.',
+              icon: Settings,
+              onClick: () => navigate('/services'),
+            },
+            {
+              label: t('payouts.title', 'Payouts'),
+              description: 'Check earnings movement and payout setup.',
+              icon: Wallet,
+              onClick: () => navigate('/payouts'),
+            },
+          ]}
+        />
 
         {/* KPI Overview */}
         <DashboardOverview />

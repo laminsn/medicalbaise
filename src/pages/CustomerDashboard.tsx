@@ -8,16 +8,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ActiveJobsSection } from '@/components/dashboard/ActiveJobsSection';
 import { CustomerWorkApprovals } from '@/components/dashboard/CustomerWorkApprovals';
+import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import JobLocationMap from '@/components/map/JobLocationMap';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Briefcase, 
   Calendar, 
   Image, 
   MapPin,
   Loader2,
-  Plus
+  Plus,
+  ClipboardList,
+  Clock,
+  CheckCircle,
+  Search,
+  MessageSquare
 } from 'lucide-react';
 
 export default function CustomerDashboard() {
@@ -25,6 +33,48 @@ export default function CustomerDashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+
+  const { data: counts } = useQuery({
+    queryKey: ['dashboard-counts', user?.id],
+    queryFn: async () => {
+      if (!user) return { jobs: 0, scheduled: 0, approvals: 0 };
+
+      const { data: activeJobs } = await supabase
+        .from('active_jobs')
+        .select('id')
+        .eq('customer_id', user.id);
+
+      const jobIds = activeJobs?.map((job) => job.id) || [];
+
+      const [jobsRes, scheduledRes, approvalsRes] = await Promise.all([
+        supabase
+          .from('active_jobs')
+          .select('id', { count: 'exact', head: true })
+          .eq('customer_id', user.id)
+          .in('job_status', ['pending_start', 'in_progress']),
+        supabase
+          .from('scheduled_services')
+          .select('id', { count: 'exact', head: true })
+          .eq('customer_id', user.id)
+          .eq('status', 'active'),
+        jobIds.length > 0
+          ? supabase
+              .from('work_approval_media')
+              .select('id', { count: 'exact', head: true })
+              .in('active_job_id', jobIds)
+              .eq('status', 'pending')
+          : Promise.resolve({ count: 0 }),
+      ]);
+
+      return {
+        jobs: jobsRes.count || 0,
+        scheduled: scheduledRes.count || 0,
+        approvals: approvalsRes.count || 0,
+      };
+    },
+    enabled: !!user,
+    staleTime: 30 * 1000,
+  });
 
   if (loading) {
     return (
@@ -67,17 +117,62 @@ export default function CustomerDashboard() {
       </Helmet>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">{t('customerDashboard.title')}</h1>
-            <p className="text-muted-foreground">{t('customerDashboard.subtitle')}</p>
-          </div>
-          <Button onClick={() => navigate('/post-job')} className="gap-2">
-            <Plus className="h-4 w-4" />
-            {t('nav.postJob')}
-          </Button>
-        </div>
+        <DashboardCommandCenter
+          eyebrow="Medical Baise"
+          title={t('customerDashboard.title', 'My Dashboard')}
+          description={t('customerDashboard.subtitle', 'Track appointments, healthcare service requests, approvals, and provider conversations from one workspace.')}
+          badge={counts?.approvals ? `${counts.approvals} pending approval${counts.approvals === 1 ? '' : 's'}` : 'All clear'}
+          metrics={[
+            {
+              label: t('customerDashboard.stats.activeJobs', 'Active Jobs'),
+              value: counts?.jobs || 0,
+              detail: 'Open healthcare requests and active care services.',
+              icon: ClipboardList,
+              tone: 'blue',
+            },
+            {
+              label: t('customerDashboard.stats.scheduled', 'Scheduled'),
+              value: counts?.scheduled || 0,
+              detail: 'Upcoming appointments and recurring services.',
+              icon: Clock,
+              tone: 'green',
+            },
+            {
+              label: t('customerDashboard.stats.pendingApprovals', 'Pending'),
+              value: counts?.approvals || 0,
+              detail: 'Care updates or work media waiting for review.',
+              icon: CheckCircle,
+              tone: 'amber',
+            },
+            {
+              label: 'Workspace',
+              value: 'Patient',
+              detail: 'Built for booking, tracking, and follow-up.',
+              icon: Briefcase,
+              tone: 'purple',
+            },
+          ]}
+          actions={[
+            {
+              label: t('nav.postJob', 'Post a Job'),
+              description: 'Request healthcare help with specialty, location, and timing.',
+              icon: Plus,
+              onClick: () => navigate('/post-job'),
+            },
+            {
+              label: 'Browse providers',
+              description: 'Find doctors and healthcare professionals by specialty.',
+              icon: Search,
+              onClick: () => navigate('/browse'),
+            },
+            {
+              label: 'Messages',
+              description: 'Review provider conversations and follow-ups.',
+              icon: MessageSquare,
+              onClick: () => navigate('/messages'),
+            },
+          ]}
+        />
 
         {/* Main Tabs */}
         <Tabs defaultValue="jobs" className="space-y-6">
