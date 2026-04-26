@@ -137,6 +137,17 @@ export default function ProviderDashboard() {
           title={t('dashboard.title', 'My Dashboard')}
           description={t('dashboard.subtitle', 'Run your healthcare practice workspace: appointments, patient requests, services, messaging, and growth tools.')}
           badge={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
+          focus={{
+            label: 'Care operations',
+            title: isProOrAbove ? 'Keep patient demand moving' : 'Set up the care workflow first',
+            description: isProOrAbove
+              ? 'Use analytics, patient messages, and service settings to stay responsive and credible.'
+              : 'Focus on available requests, services, and payout setup before adding growth automation.',
+            icon: Target,
+            tone: isProOrAbove ? 'purple' : 'blue',
+            actionLabel: isProOrAbove ? 'View analytics' : 'Find requests',
+            onAction: () => navigate(isProOrAbove ? '/dashboard' : '/jobs'),
+          }}
           metrics={[
             {
               label: 'Provider tier',

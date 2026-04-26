@@ -122,6 +122,17 @@ export default function CustomerDashboard() {
           title={t('customerDashboard.title', 'My Dashboard')}
           description={t('customerDashboard.subtitle', 'Track appointments, healthcare service requests, approvals, and provider conversations from one workspace.')}
           badge={counts?.approvals ? `${counts.approvals} pending approval${counts.approvals === 1 ? '' : 's'}` : 'All clear'}
+          focus={{
+            label: 'Priority',
+            title: counts?.approvals ? 'Review care updates waiting on you' : 'Your patient workspace is clear',
+            description: counts?.approvals
+              ? 'Check provider media, approve completed work, or request changes before the care request closes.'
+              : 'Start a care request, browse providers, or check messages when something needs attention.',
+            icon: counts?.approvals ? CheckCircle : ClipboardList,
+            tone: counts?.approvals ? 'amber' : 'green',
+            actionLabel: counts?.approvals ? 'Open approvals' : 'Post a request',
+            onAction: () => counts?.approvals ? setActiveTab('approvals') : navigate('/post-job'),
+          }}
           metrics={[
             {
               label: t('customerDashboard.stats.activeJobs', 'Active Jobs'),
