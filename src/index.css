@@ -300,6 +300,24 @@
     box-shadow: var(--shadow-red);
   }
 
+  .baise-logo-track {
+    animation: baise-logo-scroll 26s linear infinite;
+  }
+
+  .baise-logo-marquee:hover .baise-logo-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .baise-logo-track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      transform: none;
+      width: 100%;
+    }
+  }
+
   /* Float up animation for stream reactions */
   @keyframes floatUp {
     0% {
@@ -313,5 +331,14 @@
       transform: translateY(-250px) scale(0.4);
       opacity: 0;
     }
+  }
+}
+
+@keyframes baise-logo-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
