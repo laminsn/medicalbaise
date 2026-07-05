@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   BadgeCheck,
+  BadgeDollarSign,
   BarChart3,
+  Calculator,
   CheckCircle2,
   ClipboardCheck,
   FileDown,
@@ -19,6 +21,7 @@ import {
   MessageCircle,
   Percent,
   ReceiptText,
+  RotateCcw,
   Sparkles,
   Compass,
   Radio,
@@ -60,10 +63,14 @@ const CURRENT_ACCENT = APP_ACCENTS[CURRENT_APP];
 const BG = 'hsl(0 0% 7%)'; // matches each app's --background dark token (#121212)
 const FG = 'hsl(0 0% 100%)';
 const BORDER = 'hsl(0 0% 18%)';
+const PROVIDER_AUTH_TARGET = '/auth?mode=signup&role=provider';
+const CLIENT_AUTH_TARGET = '/auth?mode=signup';
 
 const PAYMENT_LOGOS = [
   { src: '/payment-logos/visa.svg', alt: 'Visa' },
   { src: '/payment-logos/mastercard.webp', alt: 'Mastercard' },
+  { src: '/payment-logos/apple-pay.png', alt: 'Apple Pay' },
+  { src: '/payment-logos/google-pay.png', alt: 'Google Pay' },
   { src: '/payment-logos/american-express.png', alt: 'American Express' },
   { src: '/payment-logos/discover.png', alt: 'Discover' },
   { src: '/payment-logos/pix.png', alt: 'Pix' },
@@ -119,9 +126,9 @@ const REVIEW_CARDS = [
 ];
 
 const HERO_CTA_LINKS = [
-  { label: 'Explore trusted pros', to: '/discover', tone: 'primary' },
-  { label: 'Become a provider', to: '/auth?mode=signup&role=provider', tone: 'secondary' },
-  { label: 'View pricing', to: '/pricing', tone: 'ghost' },
+  { label: 'Find trusted pros', to: '/discover', tone: 'primary' },
+  { label: 'Grow your service business', to: PROVIDER_AUTH_TARGET, tone: 'secondary' },
+  { label: 'Create account for upgrades', to: PROVIDER_AUTH_TARGET, tone: 'ghost' },
 ];
 
 const COMPARISON_ROWS = [
@@ -185,25 +192,25 @@ const COMPARISON_ROWS = [
 
 const PLATFORM_SCREENSHOTS = [
   {
-    src: '/platform-screenshots/discover.png',
-    title: 'Find trusted pros faster',
-    body: 'A focused discovery experience for comparing categories, providers, reviews, and next steps before a client books.',
-    cta: 'Browse providers',
-    to: '/discover',
+    src: '/platform-screenshots/provider-command.png',
+    title: 'Command every lead, job, and dollar',
+    body: 'A revenue-focused back office for leads, active jobs, invoices, reviews, campaigns, cash flow, and the Big 7 CEO metrics.',
+    cta: 'Create account to view',
+    to: PROVIDER_AUTH_TARGET,
   },
   {
-    src: '/platform-screenshots/feed.png',
-    title: 'Turn service work into social proof',
-    body: 'Posts, stories, live updates, and provider content help businesses show their process, results, and personality.',
-    cta: 'Open the feed',
-    to: '/feed',
+    src: '/platform-screenshots/analytics-dashboard.png',
+    title: 'Turn content into sponsor-ready growth',
+    body: 'Track reach, engagement, UGC performance, audience growth, and sponsor signals from the same business dashboard.',
+    cta: 'Sign in to view analytics',
+    to: PROVIDER_AUTH_TARGET,
   },
   {
-    src: '/platform-screenshots/jobs.png',
-    title: 'Manage jobs, bids, and follow-up',
-    body: 'Clients can post work, providers can compete for opportunities, and both sides keep a clearer record of progress.',
-    cta: 'See jobs',
-    to: '/jobs',
+    src: '/platform-screenshots/payment-ledger.png',
+    title: 'Collect, refund, release, and reconcile',
+    body: 'Run POS payments, branded invoices, refunds, service credits, subcontractor releases, and accounting-ready records.',
+    cta: 'Create account for revenue tools',
+    to: PROVIDER_AUTH_TARGET,
   },
 ];
 
@@ -211,17 +218,17 @@ const BUSINESS_FEATURES = [
   {
     icon: Users,
     title: 'Client acquisition',
-    body: 'Profiles, categories, search, jobs, referrals, and CTAs bring new leads into one place.',
+    body: 'Profiles, search, jobs, referrals, and CTAs convert marketplace traffic into qualified leads.',
   },
   {
     icon: Megaphone,
-    title: 'Marketing engine',
-    body: 'Run posts, coupons, promotions, email campaigns, WhatsApp campaigns, and UGC pushes.',
+    title: 'Marketing that ships',
+    body: 'Run posts, coupons, email, WhatsApp, promotions, and UGC campaigns without leaving the platform.',
   },
   {
     icon: WalletCards,
-    title: 'Invoicing and payment processing',
-    body: 'Move from quote to invoice, payment, receipt, and record without losing the paper trail.',
+    title: 'Quote-to-cash flow',
+    body: 'Move from quote to invoice, payment, receipt, refund, and ledger record without losing proof.',
   },
   {
     icon: ClipboardCheck,
@@ -255,8 +262,8 @@ const BUSINESS_FEATURES = [
   },
   {
     icon: BarChart3,
-    title: 'Big 7 CEO metrics',
-    body: 'Track revenue, leads, conversion, CAC, repeat business, cash flow, and review velocity from the dashboard.',
+    title: 'Big 7 CEO dashboard',
+    body: 'Track revenue, leads, conversion, CAC, repeat business, cash flow, and review velocity in one view.',
   },
 ];
 
@@ -264,12 +271,12 @@ const UPGRADE_FEATURES = [
   {
     icon: TrendingUp,
     title: 'Influencer analytics upgrade',
-    body: 'Advanced social analytics for content reach, engagement, sponsor reporting, social media growth, and UGC campaigns.',
+    body: 'Advanced reach, engagement, sponsor reporting, social growth, and UGC analytics for providers ready to scale.',
   },
   {
     icon: BadgeCheck,
-    title: 'Verified provider badge',
-    body: 'Requires an upgraded or monthly account, background check status, and a rating above 4 stars.',
+    title: 'Verified badge advantage',
+    body: 'Paid verification can display background-check status and 4+ star reputation where buyers make decisions.',
   },
   {
     icon: Gauge,
@@ -281,8 +288,8 @@ const UPGRADE_FEATURES = [
 const CLIENT_RECORD_FEATURES = [
   {
     icon: ReceiptText,
-    title: 'Full transaction history',
-    body: 'Clients can pull receipts, invoices, payment proof, provider history, and service records from their account.',
+    title: 'Proof on demand',
+    body: 'Clients can pull receipts, invoices, payment proof, provider history, and service records whenever they need them.',
   },
   {
     icon: FileDown,
@@ -293,6 +300,39 @@ const CLIENT_RECORD_FEATURES = [
     icon: Filter,
     title: 'Custom filters',
     body: 'Filter by date, provider, service category, status, payment method, amount, or business purpose.',
+  },
+];
+
+const PAYMENT_OPERATIONS = [
+  {
+    icon: BadgeDollarSign,
+    title: 'Provider POS checkout',
+    body: 'Create on-site payment checkout for card, wallet, Pix, or internal-balance workflows from the provider account.',
+  },
+  {
+    icon: RotateCcw,
+    title: 'Refunds that protect loyalty',
+    body: 'Refund to the original method when eligible, or issue branded service credit that keeps future revenue inside Baise.',
+  },
+  {
+    icon: WalletCards,
+    title: 'Internal balance payments',
+    body: 'Providers can service invoices from customer credits or internal account balances with a complete ledger trail.',
+  },
+  {
+    icon: Users,
+    title: 'Subcontractor payment rails',
+    body: 'Assign subcontractors, collect on site, transfer balances, and release funds against agreed benchmarks.',
+  },
+  {
+    icon: Calculator,
+    title: 'Accounting-ready books',
+    body: 'Every transaction can attach to provider, client, service, subcontractor, invoice, milestone, and balance-transfer records.',
+  },
+  {
+    icon: ReceiptText,
+    title: 'Branded invoices and receipts',
+    body: 'Invoices include unique invoice and client IDs, dates, timestamps, service descriptions, logos, and discreet Baise branding.',
   },
 ];
 
@@ -316,6 +356,11 @@ const FAQ_ITEMS = [
     question: 'Can clients download records for taxes or proof?',
     answer:
       'Clients can keep a full transaction history and use monthly, MTD, annual, bulk, and custom filtered downloads for receipts, invoices, proof, and tax organization.',
+  },
+  {
+    question: 'How does POS and subcontractor collection work?',
+    answer:
+      'Providers can create POS checkout links tied to detailed invoices. Subcontractors can collect on site under the contractor brand, with funds recorded to the right contractor account and released against agreed milestones.',
   },
 ];
 
@@ -422,18 +467,20 @@ export default function BaiseHubLanding() {
               {t('hub.heroBadge')}
             </p>
             <h1 className="text-[40px] sm:text-[56px] md:text-[76px] font-extrabold text-white tracking-[-0.035em] mb-6 leading-[0.98]">
-              {t('hub.hero.titlePart1')}{' '}
+              The trust engine for{' '}
               <span
                 className="bg-clip-text text-transparent"
                 style={{
                   backgroundImage: `linear-gradient(120deg, ${APP_ACCENTS.casa}, ${APP_ACCENTS.medical}, ${APP_ACCENTS.legal})`,
                 }}
               >
-                {t('hub.hero.titlePart2')}
+                service growth.
               </span>
             </h1>
             <p className="text-base md:text-xl text-white/65 max-w-2xl mx-auto leading-relaxed">
-              {t('hub.hero.subtitle')}
+              Baise helps clients find verified professionals, pay with confidence, and keep
+              proof of every service, while providers get the tools to market, sell, collect,
+              and manage their business from one platform.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               {HERO_CTA_LINKS.map((cta) => (
@@ -529,13 +576,14 @@ export default function BaiseHubLanding() {
                       className="text-[10.5px] font-bold tracking-[0.18em] uppercase mb-2"
                       style={{ color: CURRENT_ACCENT }}
                     >
-                      {t('hub.sso.eyebrow')}
+                      One account. More repeat business.
                     </p>
                     <h2 className="text-2xl md:text-[28px] font-bold text-white mb-2 tracking-tight">
-                      {t('hub.sso.title')}
+                      Keep profiles, payments, reviews, and history connected across Baise.
                     </h2>
                     <p className="text-[15px] md:text-base text-white/65 leading-relaxed max-w-2xl">
-                      {t('hub.sso.subtitle')}
+                      A single Baise identity gives clients less friction and gives providers a
+                      stronger customer record across Casa, Medical, and Legal Baise.
                     </p>
                   </div>
                 </div>
@@ -566,13 +614,14 @@ export default function BaiseHubLanding() {
                     className="text-[10.5px] font-bold tracking-[0.18em] uppercase mb-3"
                     style={{ color: CURRENT_ACCENT }}
                   >
-                    {t('hub.pros.eyebrow')}
+                    Content that converts
                   </p>
                   <h2 className="text-2xl md:text-[32px] font-bold text-white mb-3 tracking-tight leading-tight">
-                    {t('hub.pros.title')}
+                    Give providers a social engine built for bookings.
                   </h2>
                   <p className="text-[15px] md:text-base text-white/65 leading-relaxed max-w-2xl mb-8">
-                    {t('hub.pros.subtitle')}
+                    Providers can post work, stream expertise, go live, share stories, promote
+                    offers, and turn content engagement into booked clients and measurable growth.
                   </p>
 
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
@@ -646,32 +695,32 @@ export default function BaiseHubLanding() {
                   className="text-[10.5px] font-bold tracking-[0.18em] uppercase mb-3"
                   style={{ color: CURRENT_ACCENT }}
                 >
-                  {t('hub.benefits.eyebrow')}
+                  Why users choose Baise
                 </p>
                 <h2 className="text-3xl md:text-[40px] font-bold text-white tracking-tight">
-                  {t('hub.benefits.title')}
+                  A trust layer built to convert browsers into buyers.
                 </h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 md:gap-6">
                 <BenefitCard
                   icon={ShieldCheck}
-                  title={t('hub.benefits.verified.title')}
-                  desc={t('hub.benefits.verified.desc')}
+                  title="Verified confidence"
+                  desc="Identity, credentials, ratings, and trust signals sit where buyers make decisions."
                 />
                 <BenefitCard
                   icon={Globe2}
-                  title={t('hub.benefits.bilingual.title')}
-                  desc={t('hub.benefits.bilingual.desc')}
+                  title="National and global reach"
+                  desc="Built for Brazil-based services and international users who need clarity before hiring."
                 />
                 <BenefitCard
                   icon={Lock}
-                  title={t('hub.benefits.secure.title')}
-                  desc={t('hub.benefits.secure.desc')}
+                  title="Secure payment rails"
+                  desc="Checkout, invoices, receipts, refunds, credits, and records keep trust moving after the hire."
                 />
                 <BenefitCard
                   icon={Compass}
-                  title={t('hub.benefits.local.title')}
-                  desc={t('hub.benefits.local.desc')}
+                  title="Built for real service work"
+                  desc="Local expectations, bilingual context, provider proof, and business operations in one place."
                 />
               </div>
             </div>
@@ -679,16 +728,19 @@ export default function BaiseHubLanding() {
 
           <ClientRecordsSection />
 
+          <PaymentOperationsSection />
+
           {/* Trust strip */}
           <section className="relative px-4 sm:px-6 py-12 md:py-16">
             <div className="max-w-5xl mx-auto text-center">
               <p
                 className="text-[10.5px] font-bold tracking-[0.18em] uppercase text-white/40 mb-5"
               >
-                {t('hub.trust.eyebrow')}
+                Built to earn the click
               </p>
               <p className="text-xl md:text-2xl text-white/85 leading-relaxed font-medium tracking-tight">
-                {t('hub.trust.line')}
+                Baise turns discovery into booked work with trust signals, marketing tools,
+                secure payment flows, and records that make clients come back.
               </p>
             </div>
           </section>
@@ -750,18 +802,19 @@ function PainPointsSection() {
                 className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
                 style={{ color: CURRENT_ACCENT }}
               >
-                Pain points
+                The gap in today's market
               </p>
               <h2
                 id="pain-points-heading"
                 className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
               >
-                What makes hiring feel risky.
+                Baise removes the friction that stops people from hiring.
               </h2>
             </div>
             <p className="max-w-2xl text-[15px] leading-relaxed text-white/62 md:text-base">
-              Before Baise, the hard part is not choosing a category. It is proving who is trustworthy,
-              what it costs, where the conversation lives, and whether the payment will be handled safely.
+              Clients want proof before they pay. Providers want a reliable way to win trust,
+              close the job, collect the money, and keep the customer. Baise brings those moments
+              into one conversion-focused marketplace.
             </p>
           </div>
 
@@ -805,34 +858,34 @@ function ComparisonTableSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Better than scattered research
+              Why Baise wins
             </p>
             <h2
               id="comparison-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Built for national and international users who need proof.
+              One trusted workflow beats the patchwork of searches, videos, referrals, and DIY.
             </h2>
           </div>
           <div className="space-y-4">
             <p className="text-[15px] leading-relaxed text-white/62 md:text-base">
-              Baise brings marketplace trust, social proof, payments, records, and business tools
-              into one workflow, while search, videos, referrals, and DIY projects leave users
-              stitching the risky parts together themselves.
+              Baise packages discovery, social proof, secure transactions, provider verification,
+              marketing support, and transaction records into one platform designed for national
+              and international users who need confidence before they commit.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/discover"
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
               >
-                Compare providers
+                See trusted providers
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
                 to="/auth?mode=signup&role=provider"
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
               >
-                List your business
+                Sell on Baise
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -927,14 +980,14 @@ function SocialProofSection() {
                 className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
                 style={{ color: CURRENT_ACCENT }}
               >
-                Social proof
+                Trust that sells
               </p>
               <h2 className="mb-4 text-2xl font-bold tracking-tight text-white md:text-[32px]">
-                Floating reviews that make trust visible.
+                Put confidence in front of every visitor before they choose a pro.
               </h2>
               <p className="text-[15px] leading-relaxed text-white/60">
-                The homepage now carries the quick confidence cues visitors expect before they click
-                into a category, profile, quote, or booking flow.
+                Ratings, review previews, and trust messaging help visitors move from browsing to
+                booking with less hesitation and more confidence in the Baise network.
               </p>
             </div>
 
@@ -1003,6 +1056,8 @@ function SocialProofSection() {
 }
 
 function PlatformScreenshotsSection() {
+  const [featuredScreenshot, ...supportingScreenshots] = PLATFORM_SCREENSHOTS;
+
   return (
     <section
       className="relative px-4 sm:px-6 pb-14 md:pb-20"
@@ -1015,31 +1070,61 @@ function PlatformScreenshotsSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Platform preview
+              Provider revenue suite
             </p>
             <h2
               id="platform-preview-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Screens from the experience users step into.
+              Sell the power behind every booking, invoice, and growth campaign.
             </h2>
           </div>
           <Link
-            to="/discover"
+            to={PROVIDER_AUTH_TARGET}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white md:self-auto"
           >
-            Start exploring
+            Create account to preview
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
-          {PLATFORM_SCREENSHOTS.map((screenshot) => (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+          <article className="overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] shadow-2xl">
+            <div className="aspect-[16/9] overflow-hidden bg-black">
+              <img
+                src={featuredScreenshot.src}
+                alt={featuredScreenshot.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+            <div className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-end md:p-6">
+              <div>
+                <h3 className="mb-2 text-xl font-bold tracking-tight text-white md:text-2xl">
+                  {featuredScreenshot.title}
+                </h3>
+                <p className="max-w-2xl text-[13.5px] leading-relaxed text-white/58 md:text-sm">
+                  {featuredScreenshot.body}
+                </p>
+              </div>
+              <Link
+                to={featuredScreenshot.to}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-bold transition-colors hover:border-white/30 hover:text-white"
+                style={{ color: CURRENT_ACCENT }}
+              >
+                {featuredScreenshot.cta}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </article>
+
+          <div className="grid gap-4">
+            {supportingScreenshots.map((screenshot) => (
             <article
               key={screenshot.title}
-              className="overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] shadow-2xl"
+              className="grid overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] shadow-2xl sm:grid-cols-[0.88fr_1.12fr] lg:grid-cols-1"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-black">
+              <div className="aspect-[16/10] overflow-hidden bg-black sm:aspect-auto lg:aspect-[16/9]">
                 <img
                   src={screenshot.src}
                   alt={screenshot.title}
@@ -1064,7 +1149,8 @@ function PlatformScreenshotsSection() {
                 </Link>
               </div>
             </article>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -1072,6 +1158,9 @@ function PlatformScreenshotsSection() {
 }
 
 function BusinessOperatingSection() {
+  const providerBenefits = [...BUSINESS_FEATURES, ...UPGRADE_FEATURES];
+  const repeatedProviderBenefits = [...providerBenefits, ...providerBenefits];
+
   return (
     <section
       className="relative px-4 sm:px-6 pb-14 md:pb-20"
@@ -1084,94 +1173,91 @@ function BusinessOperatingSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Provider business command center
+              Provider growth engine
             </p>
             <h2
               id="business-operating-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Service providers can run the full business from Baise.
+              Turn service providers into better marketers, operators, and CEOs.
             </h2>
           </div>
           <div className="space-y-4">
             <p className="text-[15px] leading-relaxed text-white/62 md:text-base">
-              The platform is positioned as more than a listing. It connects client acquisition,
-              marketing, invoicing, payment processing, reviews, coupons, inspections, campaigns,
-              referrals, receipts, tax records, and executive metrics in one operating layer.
+              Baise is more than a listing. It gives providers the front-office and back-office
+              tools to attract clients, market services, invoice, collect payments, manage reviews,
+              launch campaigns, track taxes, and understand the numbers that drive growth.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                to="/auth?mode=signup&role=provider"
+                to={PROVIDER_AUTH_TARGET}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: CURRENT_ACCENT }}
               >
-                Start provider account
+                Build your provider profile
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
-                to="/pricing"
+                to={PROVIDER_AUTH_TARGET}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
               >
-                Compare upgrades
+                Create account for upgrades
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {BUSINESS_FEATURES.map((feature) => (
-              <OperatingFeatureCard key={feature.title} {...feature} />
-            ))}
+        <div
+          className="baise-provider-benefit-marquee overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] p-3"
+          aria-label="Provider business benefits"
+        >
+          <div className="baise-provider-benefit-track flex w-max gap-3">
+            {repeatedProviderBenefits.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <article
+                  key={`${feature.title}-${index}`}
+                  className="w-[244px] shrink-0 rounded-xl border border-white/10 bg-black/24 p-3.5"
+                >
+                  <span
+                    className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: `${CURRENT_ACCENT}22`,
+                      border: `1px solid ${CURRENT_ACCENT}33`,
+                    }}
+                  >
+                    <Icon className="h-4 w-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
+                  </span>
+                  <h3 className="mb-2 text-[15px] font-bold tracking-tight text-white">
+                    {feature.title}
+                  </h3>
+                  <p className="line-clamp-3 text-[12px] leading-relaxed text-white/55">
+                    {feature.body}
+                  </p>
+                </article>
+              );
+            })}
           </div>
+        </div>
 
-          <aside className="rounded-2xl border border-white/12 bg-white/[0.055] p-5 md:p-6">
-            <p
-              className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: CURRENT_ACCENT }}
-            >
-              Paid growth features
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/12 bg-white/[0.045] p-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-bold text-white">
+              Upgrade into verification, influencer analytics, sponsor metrics, and UGC reporting.
             </p>
-            <h3 className="mb-3 text-2xl font-bold tracking-tight text-white">
-              Upgrade for verified trust and influencer analytics.
-            </h3>
-            <p className="mb-5 text-[14px] leading-relaxed text-white/58">
-              Advanced provider accounts can highlight stronger trust signals and deeper social
-              performance for sponsors, creators, agencies, and service businesses building content.
+            <p className="mt-1 text-[13px] leading-relaxed text-white/52">
+              Paid provider tools help serious businesses turn trust, content, and campaign
+              performance into a stronger sales story.
             </p>
-            <div className="space-y-3">
-              {UPGRADE_FEATURES.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <div key={feature.title} className="flex gap-3 rounded-xl bg-black/28 p-3">
-                    <span
-                      className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                      style={{
-                        backgroundColor: `${CURRENT_ACCENT}22`,
-                        border: `1px solid ${CURRENT_ACCENT}33`,
-                      }}
-                    >
-                      <Icon className="h-4 w-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-bold text-white">{feature.title}</span>
-                      <span className="block text-[12.5px] leading-relaxed text-white/55">
-                        {feature.body}
-                      </span>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <Link
-              to="/subscription"
-              className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
-            >
-              Upgrade provider tools
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </aside>
+          </div>
+          <Link
+            to={PROVIDER_AUTH_TARGET}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
+          >
+            Sign in to upgrade
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>
@@ -1195,33 +1281,33 @@ function ClientRecordsSection() {
             className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
             style={{ color: CURRENT_ACCENT }}
           >
-            Client records
+            Client retention layer
           </p>
           <h2
             id="client-records-heading"
             className="mb-4 text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
           >
-            Every receipt, invoice, and proof record stays within reach.
+            Give clients a reason to come back after every transaction.
           </h2>
           <p className="mb-6 text-[15px] leading-relaxed text-white/62 md:text-base">
-            Clients can keep a full transaction history for personal proof, business expense
-            tracking, tax organization, and repeat-service planning across national and
-            international use cases.
+            Full receipts, invoices, payment proof, service history, and exportable records turn
+            Baise into a useful account clients keep using for proof, taxes, repeat service, and
+            business expense tracking.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
-              to="/auth?mode=signup"
+              to={CLIENT_AUTH_TARGET}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
               style={{ backgroundColor: CURRENT_ACCENT }}
             >
-              Create client account
+              Create a client account
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
-              to="/payments"
+              to={CLIENT_AUTH_TARGET}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
             >
-              View payment history
+              Create account for records
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
@@ -1252,6 +1338,90 @@ function ClientRecordsSection() {
   );
 }
 
+function PaymentOperationsSection() {
+  return (
+    <section
+      className="relative px-4 sm:px-6 py-14 md:py-20"
+      aria-labelledby="payment-operations-heading"
+    >
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 grid gap-4 md:grid-cols-[0.8fr_1.2fr] md:items-end">
+          <div>
+            <p
+              className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: CURRENT_ACCENT }}
+            >
+              Revenue operations
+            </p>
+            <h2
+              id="payment-operations-heading"
+              className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
+            >
+              POS, invoices, refunds, subcontractors, and books in one flow.
+            </h2>
+          </div>
+          <div className="space-y-4">
+            <p className="text-[15px] leading-relaxed text-white/62 md:text-base">
+              Providers can collect on site, issue branded invoices, process refunds or service
+              credits, manage internal balances, route subcontractor payments, and keep every
+              transaction tied to accounting-ready records.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                to={PROVIDER_AUTH_TARGET}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+                style={{ backgroundColor: CURRENT_ACCENT }}
+              >
+                Create account for revenue tools
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link
+                to={PROVIDER_AUTH_TARGET}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
+              >
+                Sign in for payouts
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {PAYMENT_OPERATIONS.map((feature) => (
+            <OperatingFeatureCard key={feature.title} {...feature} />
+          ))}
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-white/12 bg-white/[0.045] p-5 md:p-6">
+          <div className="grid gap-4 md:grid-cols-[0.75fr_1.25fr] md:items-center">
+            <div>
+              <p className="mb-2 text-sm font-bold text-white">Subcontractor collection without customer confusion</p>
+              <p className="text-[13.5px] leading-relaxed text-white/58">
+                Subcontractors can collect payment under the contractor-facing brand while Baise
+                routes funds to the right ledger and releases balances against agreed milestones
+                or benchmarks.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-4">
+              {['Client pays POS', 'Invoice + IDs', 'Funds held', 'Benchmark release'].map((step, index) => (
+                <div key={step} className="rounded-xl border border-white/10 bg-black/25 p-3">
+                  <span
+                    className="mb-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-black"
+                    style={{ backgroundColor: CURRENT_ACCENT }}
+                  >
+                    {index + 1}
+                  </span>
+                  <p className="text-[12px] font-bold leading-snug text-white">{step}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FAQSection() {
   return (
     <section
@@ -1264,13 +1434,13 @@ function FAQSection() {
             className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
             style={{ color: CURRENT_ACCENT }}
           >
-            FAQ
+            Buyer confidence
           </p>
           <h2
             id="faq-heading"
             className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
           >
-            Quick answers before users choose a path.
+            Answers that remove friction before signup.
           </h2>
         </div>
 
@@ -1302,14 +1472,14 @@ function FAQSection() {
             to="/discover"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
           >
-            Find a trusted pro
+            Find a pro now
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
-            to="/auth?mode=signup&role=provider"
+            to={PROVIDER_AUTH_TARGET}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
           >
-            Grow as a provider
+            Start selling on Baise
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -1336,14 +1506,18 @@ function PaymentMethodsSection() {
             className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
             style={{ color: CURRENT_ACCENT }}
           >
-            Trusted payment methods
+            Checkout confidence
           </p>
           <h2
             id="payment-methods-heading"
             className="text-3xl font-bold tracking-tight text-white md:text-[40px]"
           >
-            Familiar payment signals at the finish line.
+            Payment brands users recognize before they click pay.
           </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-white/56 md:text-base">
+            Trusted payment signals help clients feel safer at checkout and help providers close
+            more jobs with fewer doubts at the final step.
+          </p>
         </div>
         <div
           className="baise-logo-marquee relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4"

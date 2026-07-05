@@ -304,12 +304,25 @@
     animation: baise-logo-scroll 26s linear infinite;
   }
 
+  .baise-provider-benefit-track {
+    animation: baise-provider-benefit-scroll 38s linear infinite;
+  }
+
   .baise-logo-marquee:hover .baise-logo-track {
     animation-play-state: paused;
   }
 
+  .baise-provider-benefit-marquee:hover .baise-provider-benefit-track {
+    animation-play-state: paused;
+  }
+
+  .baise-provider-benefit-marquee {
+    mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .baise-logo-track {
+    .baise-logo-track,
+    .baise-provider-benefit-track {
       animation: none;
       flex-wrap: wrap;
       justify-content: center;
@@ -331,6 +344,15 @@
       transform: translateY(-250px) scale(0.4);
       opacity: 0;
     }
+  }
+}
+
+@keyframes baise-provider-benefit-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
