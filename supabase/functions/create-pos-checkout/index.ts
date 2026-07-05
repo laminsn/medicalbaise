@@ -147,13 +147,61 @@ serve(async (req) => {
     });
 
     if (paymentMethod === "internal_balance") {
+      const balanceBucket = safeReleaseBenchmark ? "pending" : "available";
+
+      await supabaseAdmin
+        .from("provider_payment_transactions")
+        .update({
+          status: "succeeded",
+          processed_at: new Date().toISOString(),
+          metadata: {
+            invoice_number: invoice.invoice_number,
+            client_display_id: invoice.client_display_id,
+            requested_payment_method: paymentMethod,
+            balance_bucket: balanceBucket,
+            internal_balance_recorded: true,
+          },
+        })
+        .eq("id", transaction.id);
+
+      await supabaseAdmin
+        .from("provider_invoices")
+        .update({
+          payment_status: "paid",
+          paid_at: new Date().toISOString(),
+        })
+        .eq("id", invoice.id);
+
+      await supabaseAdmin.from("provider_ledger_entries").insert({
+        provider_id: provider.id,
+        related_transaction_id: transaction.id,
+        invoice_id: invoice.id,
+        subcontractor_id: body.subcontractorId || null,
+        entry_type: balanceBucket === "pending" ? "payment_pending" : "payment_available",
+        direction: "credit",
+        amount,
+        currency,
+        memo: safeReleaseBenchmark
+          ? `Internal balance payment held until benchmark: ${safeReleaseBenchmark}`
+          : `Internal balance payment available for invoice ${invoice.invoice_number}`,
+      });
+
+      const { error: balanceError } = await supabaseAdmin.rpc("apply_provider_balance_delta", {
+        target_provider_id: provider.id,
+        balance_bucket: balanceBucket,
+        delta_amount: amount,
+        balance_currency: currency,
+      });
+
+      if (balanceError) throw balanceError;
+
       return new Response(
         JSON.stringify({
           invoiceId: invoice.id,
           invoiceNumber: invoice.invoice_number,
           clientId: invoice.client_display_id,
           transactionId: transaction.id,
-          status: "internal_balance_processing",
+          status: "succeeded",
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );

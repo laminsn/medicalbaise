@@ -3431,6 +3431,10 @@ export type Database = {
       }
     }
     Functions: {
+      promote_current_user_to_provider: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

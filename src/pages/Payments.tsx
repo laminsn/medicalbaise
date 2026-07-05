@@ -42,6 +42,8 @@ import {
 } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { CheckoutAddOns, DEFAULT_ADDONS } from '@/components/checkout/CheckoutAddOns';
+import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
+import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice, getUserCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
@@ -613,20 +615,27 @@ export default function Payments() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <History className="h-4 w-4" />
-                    {t('payments.transactionHistory')}
+                    Provider records
                   </CardTitle>
                   <CardDescription>
-                    Upcoming records will include receipts, invoices, refunds, credits, balance transfers, and subcontractor releases.
+                    Full invoices, receipts, exports, flexible plans, and transaction filters are available in the provider workspace below.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p className="text-sm">{t('payments.noTransactions')}</p>
-                  </div>
+                  <Button variant="outline" className="w-full" onClick={() => document.getElementById('provider-payment-workspace')?.scrollIntoView({ behavior: 'smooth' })}>
+                    Open provider payment workspace
+                  </Button>
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          <div className="mt-6">
+            <ClientTransactionHistory />
+          </div>
+
+          <div id="provider-payment-workspace" className="mt-6">
+            <ProviderPaymentsWorkspace />
           </div>
         </div>
 

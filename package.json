@@ -4,13 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "dev": "VITE_BAISE_APP=medical vite",
+    "build": "VITE_BAISE_APP=medical vite build",
+    "build:dev": "VITE_BAISE_APP=medical vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:i18n": "node scripts/validate-i18n.mjs",
-    "generate:es-locale": "node scripts/generate-es-locale.mjs"
+    "generate:es-locale": "node scripts/generate-es-locale.mjs",
+    "ios:sync": "npm run build && PATH=$HOME/.gem/ruby/2.6.0/bin:$PATH LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync ios",
+    "ios:open": "cap open ios",
+    "ios:build:sim": "npm run build && PATH=$HOME/.gem/ruby/2.6.0/bin:$PATH LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync ios && xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -destination 'generic/platform=iOS Simulator' build",
+    "ios:archive": "npm run build && PATH=$HOME/.gem/ruby/2.6.0/bin:$PATH LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync ios && xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release -destination 'generic/platform=iOS' -archivePath build/App.xcarchive archive"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.4",

@@ -15,12 +15,20 @@ export function PromoBanner() {
     : isEs
       ? '🌸 Nuevos profesionales: ¡primeros 14 días GRATIS! | ✨ Especial de Abril: ¡sin comisión en la primera transacción! | 🎉 Planes anuales: ¡obtén 2 meses GRATIS! | 🌸 ¡Celebra con nosotros!'
       : '🌸 New Providers: First 14 Days FREE! | ✨ April Special: First Transaction Fee Waived! | 🎉 Annual Plans: Get 2 Months FREE! | 🌸 Celebrate with us!';
+  const mobileBannerText = isPt
+    ? '✨ Especial de Abril: primeira taxa grátis'
+    : isEs
+      ? '✨ Especial de Abril: primera comisión gratis'
+      : '✨ April Special: First transaction fee waived';
 
   return (
-    <div className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black py-1.5 px-4 overflow-hidden">
-      <div className="flex items-center justify-between">
-        <div className="flex-1 overflow-hidden relative">
-          <div className="animate-marquee whitespace-nowrap inline-block">
+    <div className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black py-1.5 px-3 sm:px-4 overflow-hidden">
+      <div className="flex items-center justify-between gap-2">
+        <p className="min-w-0 flex-1 truncate text-sm font-bold sm:hidden">
+          {mobileBannerText}
+        </p>
+        <div className="relative hidden flex-1 overflow-hidden sm:block">
+          <div className="inline-block whitespace-nowrap animate-marquee">
             <span className="text-sm font-bold mx-8">{bannerText}</span>
             <span className="text-sm font-bold mx-8">{bannerText}</span>
             <span className="text-sm font-bold mx-8">{bannerText}</span>
@@ -29,7 +37,7 @@ export function PromoBanner() {
         </div>
         <button
           onClick={() => setIsVisible(false)}
-          className="ml-4 hover:bg-black/20 rounded-full p-0.5 transition-colors flex-shrink-0"
+          className="shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/20"
           aria-label={isPt ? 'Fechar banner' : isEs ? 'Cerrar banner' : 'Close banner'}
         >
           <X size={16} />

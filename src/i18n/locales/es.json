@@ -99,7 +99,9 @@
     "tryAgain": "Intentar otra vez",
     "clearFilters": "Limpiar filtros",
     "discard": "Desechar",
-    "invalidRequest": "Solicitud no válida."
+    "invalidRequest": "Solicitud no válida.",
+    "and": "y",
+    "viewProfile": "Ver perfil"
   },
   "nav": {
     "home": "Hogar",
@@ -111,7 +113,9 @@
     "profile": "Perfil",
     "postJob": "Reservar cita",
     "map": "Mapa",
-    "feed": "Alimentar"
+    "feed": "Alimentar",
+    "help": "Ayuda",
+    "menu": "Menú"
   },
   "hub": {
     "metaTitle": "Baise Group — Una red de confianza para servicios del hogar, salud y legales en Brasil",
@@ -122,7 +126,9 @@
     "hero": {
       "titlePart1": "Tres plataformas.",
       "titlePart2": "Una promesa.",
-      "subtitle": "Encuentra profesionales verificados en hogar, salud y legal — todos con el estándar Baise Group. Elige una plataforma abajo para empezar."
+      "subtitle": "Encuentra profesionales verificados en hogar, salud y legal — todos con el estándar Baise Group. Elige una plataforma abajo para empezar.",
+      "ctaFind": "Encontrar profesionales confiables",
+      "ctaProvider": "Haz crecer tu negocio de servicios"
     },
     "casa": {
       "title": "Casa Baise",
@@ -196,9 +202,9 @@
       "privacy": "Privacidad"
     },
     "pros": {
-      "eyebrow": "Para Profesionales",
-      "title": "Tu espacio seguro para hacer crecer tu negocio.",
-      "subtitle": "Profesionales de servicios, especialistas médicos y abogados — publica tu trabajo, transmite en vivo, comparte historias y convierte espectadores en clientes. Solo miembros verificados, clientes evaluados y un feed que premia el buen trabajo.",
+      "eyebrow": "Contenido que convierte",
+      "title": "Muestra tu trabajo donde los clientes ya están buscando.",
+      "subtitle": "Los proveedores pueden publicar actualizaciones, compartir historias, transmitir experiencia, promocionar ofertas y convertir atención en consultas.",
       "goLive": {
         "label": "En Vivo",
         "desc": "Organiza Q&As, demos o consultas virtuales en tiempo real."
@@ -219,8 +225,159 @@
         "label": "Promocionar",
         "desc": "Impulsa tus mejores publicaciones y destácate cuando necesites alcance."
       },
-      "ctaPrimary": "Ser profesional",
+      "ctaPrimary": "Convertirme en proveedor",
       "ctaSecondary": "Explorar el feed"
+    },
+    "apps": {
+      "eyebrow": "Elige tu camino",
+      "title": "Encuentra el proveedor confiable adecuado para el servicio que necesitas."
+    },
+    "floatingRating": "Con la confianza de más de 30,000 pequeñas empresas, agencias y usuarios globales",
+    "socialProof": {
+      "ariaLabel": "Prueba social de Baise Group",
+      "eyebrow": "Confianza que vende",
+      "title": "Confiado globalmente para encontrar proveedores de servicios confiables.",
+      "subtitle": "Los clientes ven calificaciones, reseñas y perfiles claros antes de reservar. Los proveedores obtienen un lugar confiable para ser encontrados, elegidos y contratados.",
+      "googleReviews": "Reseñas de Google",
+      "sampleReview": "Reseña de muestra"
+    },
+    "reviews": {
+      "mariana": {
+        "role": "Dueña de pequeña empresa",
+        "body": "Baise hizo sencillo comparar profesionales confiables, revisar precios y reservar con confianza."
+      },
+      "daniel": {
+        "role": "Operador de agencia",
+        "body": "El flujo de pago se sintió seguro, los perfiles fueron claros y toda la experiencia nos ahorró tiempo."
+      },
+      "priya": {
+        "role": "Cliente global",
+        "body": "Pude pasar del descubrimiento a los mensajes y al pago sin perder confianza en ningún paso."
+      }
+    },
+    "platform": {
+      "eyebrow": "Para proveedores de servicios",
+      "title": "Una plataforma poderosa diseñada para apoyar a cada proveedor en cada etapa de su crecimiento.",
+      "cta": "Crear cuenta de proveedor",
+      "screenshots": {
+        "revenue": {
+          "title": "Suite de ingresos para proveedores",
+          "body": "Gestiona prospectos, trabajos, facturas, pagos, reseñas y flujo de caja desde un solo back office.",
+          "cta": "Crear cuenta de proveedor"
+        },
+        "growth": {
+          "title": "Motor de crecimiento para proveedores",
+          "body": "Sigue alcance, campañas, reseñas, referidos y señales de rendimiento que ayudan a crecer los servicios.",
+          "cta": "Empezar a crecer"
+        },
+        "records": {
+          "title": "Pagos y registros",
+          "body": "Cobra pagos únicos, recurrentes, programados o por hitos y mantén organizado el historial de transacciones.",
+          "cta": "Acceder a herramientas"
+        }
+      }
+    },
+    "business": {
+      "eyebrow": "Motor de crecimiento para proveedores",
+      "title": "Herramientas para que los proveedores sean encontrados, reservados, pagados y recordados.",
+      "subtitle": "Una capa operativa simple para adquisición de clientes, pagos, reseñas, campañas, planes recurrentes, recibos, referidos y visibilidad del negocio.",
+      "cta": "Crear tu perfil de proveedor",
+      "ariaLabel": "Beneficios comerciales para proveedores",
+      "summary": "Suite de ingresos. Motor de crecimiento. Contenido que convierte."
+    },
+    "providerFeatures": {
+      "clientAcquisition": {
+        "title": "Adquisición de clientes",
+        "body": "Sé descubierto por personas que buscan ayuda confiable activamente."
+      },
+      "marketing": {
+        "title": "Herramientas de marketing",
+        "body": "Promociona servicios con publicaciones, campañas, ofertas y novedades."
+      },
+      "payments": {
+        "title": "Pagos y facturas",
+        "body": "Envía facturas, acepta pagos y mantén recibos organizados."
+      },
+      "flexiblePayments": {
+        "title": "Planes de pago flexibles",
+        "body": "Ofrece pagos únicos, semanales, mensuales, programados o basados en hitos."
+      },
+      "serviceProof": {
+        "title": "Prueba de servicio",
+        "body": "Adjunta notas, fotos e historial de trabajo a los servicios completados."
+      },
+      "messaging": {
+        "title": "Email y WhatsApp",
+        "body": "Llega a prospectos y clientes anteriores con campañas simples."
+      },
+      "offers": {
+        "title": "Cupones y ofertas",
+        "body": "Crea promociones que convierten interés en reservas."
+      },
+      "reviews": {
+        "title": "Reseñas y seguimiento",
+        "body": "Construye confianza con reseñas ligadas a historial real de servicio."
+      },
+      "referrals": {
+        "title": "Crecimiento por referidos",
+        "body": "Convierte clientes satisfechos en trabajo recurrente e introducciones."
+      },
+      "records": {
+        "title": "Recibos y registros",
+        "body": "Mantén recibos e historial de transacciones buscables en un solo lugar."
+      },
+      "dashboard": {
+        "title": "Panel de negocio",
+        "body": "Ve ingresos, prospectos, reseñas, trabajo recurrente y flujo de caja."
+      },
+      "socialAnalytics": {
+        "title": "Analíticas sociales",
+        "body": "Comprende alcance de contenido, interacción y crecimiento de audiencia."
+      },
+      "verifiedBadge": {
+        "title": "Insignia verificada",
+        "body": "Muestra señales de confianza más fuertes cuando los clientes comparan proveedores."
+      },
+      "performance": {
+        "title": "Información de rendimiento",
+        "body": "Detecta qué funciona en servicios, contenido y campañas."
+      }
+    },
+    "faq": {
+      "eyebrow": "Confianza del comprador",
+      "title": "Respuestas que eliminan fricción antes del registro.",
+      "ctaFind": "Encontrar un profesional ahora",
+      "ctaProvider": "Empezar a vender en Baise",
+      "find": {
+        "question": "¿Cómo me ayuda Baise a encontrar un proveedor confiable?",
+        "answer": "Baise reúne perfiles, reseñas, detalles de servicio y confianza de pago en un solo lugar para que puedas comparar antes de reservar."
+      },
+      "providerGrowth": {
+        "question": "¿Los proveedores pueden usar Baise para crecer?",
+        "answer": "Sí. Los proveedores pueden ser encontrados, mostrar su trabajo, recopilar reseñas, enviar facturas, aceptar pagos y mantener registros de clientes organizados."
+      },
+      "paymentPlans": {
+        "question": "¿Los proveedores pueden ofrecer pagos recurrentes o por hitos?",
+        "answer": "Sí. Los proveedores pueden ofrecer pagos únicos, suscripciones, servicios semanales o mensuales, cronogramas de pago y liberaciones basadas en hitos."
+      },
+      "account": {
+        "question": "¿Necesito una cuenta para acceder a las herramientas de proveedor?",
+        "answer": "Sí. Los paneles, pagos, facturas, registros y herramientas de gestión del negocio requieren crear una cuenta e iniciar sesión."
+      },
+      "clientRecords": {
+        "question": "¿Los clientes pueden guardar recibos e historial de servicio?",
+        "answer": "Sí. Los clientes pueden guardar recibos, facturas, comprobantes de pago, historial de proveedores y registros de servicio dentro de su cuenta."
+      },
+      "services": {
+        "question": "¿Qué tipos de servicios admite Baise?",
+        "answer": "Baise conecta personas con profesionales confiables en servicios del hogar, médicos y legales a través de Casa, Medical y Legal Baise."
+      }
+    },
+    "payments": {
+      "eyebrow": "Confianza en el checkout",
+      "title": "Marcas de pago que los usuarios reconocen antes de pagar.",
+      "subtitle": "Las señales de pago confiables ayudan a que los clientes se sientan más seguros y a que los proveedores cierren más trabajos con menos dudas al final.",
+      "ariaLabel": "Métodos de pago aceptados"
     }
   },
   "auth": {
@@ -252,10 +409,25 @@
     "lastNameTooShort": "Apellido demasiado corto",
     "loginToPost": "Inicia sesión para reservar",
     "loginRequired": "Debes iniciar sesión para reservar una cita",
-    "login": "Acceso"
+    "login": "Acceso",
+    "agreeToTerms": "Acepto los",
+    "checkEmailToVerify": "Revisa tu correo para verificar tu cuenta.",
+    "completingSignIn": "Completando inicio de sesión...",
+    "enterEmailFirst": "Ingresa tu correo electrónico primero.",
+    "forgotPassword": "Olvidé mi contraseña",
+    "mustAcceptTerms": "Debes aceptar los términos para continuar.",
+    "passwordLowercase": "Una letra minúscula",
+    "passwordMin": "Al menos 8 caracteres",
+    "passwordNumber": "Un número",
+    "passwordUppercase": "Una letra mayúscula",
+    "privacyPolicy": "Política de privacidad",
+    "resetError": "No se pudo enviar el enlace de restablecimiento. Inténtalo de nuevo.",
+    "resetSent": "Enlace de restablecimiento enviado. Revisa tu correo.",
+    "termsOfService": "Términos de servicio",
+    "termsRequired": "Debes aceptar los Términos de servicio y la Política de privacidad."
   },
   "header": {
-    "login": "Acceso",
+    "login": "Iniciar sesión",
     "customerDashboard": "Mis citas",
     "providerDashboard": "Panel médico"
   },
@@ -271,7 +443,8 @@
     "licensedDoctors": "Profesionales Licenciados",
     "verifiedReviews": "Reseñas verificadas",
     "secureBooking": "Reserva Segura",
-    "cta": "Reservar cita"
+    "cta": "Reservar cita",
+    "bookAppointment": "Reservar cita"
   },
   "categories": {
     "title": "Especialidades populares",
@@ -485,7 +658,7 @@
     "earnReward": "Gana 20 reales",
     "other": "Otro",
     "shareProfile": "Compartir perfil",
-    "shareMessage": "Únase a Brasil Base con mi código de referencia: {{code}}",
+    "shareMessage": "Únete a MD Baise con mi código de referencia: {{code}}",
     "linkCopied": "¡Enlace copiado al portapapeles!",
     "copyFailed": "No se pudo copiar el enlace",
     "copyLink": "Copiar enlace",
@@ -531,7 +704,9 @@
     "bioPlaceholder": "Cuéntanos sobre ti...",
     "yourProfileLink": "Enlace de tu perfil",
     "scanQRCode": "Escanear código QR",
-    "useCamera": "Utilice su cámara para abrir este enlace."
+    "useCamera": "Utilice su cámara para abrir este enlace.",
+    "postalCode": "Código postal",
+    "postalCodePlaceholder": "Ingresa tu código postal"
   },
   "admin": {
     "title": "Panel de administración",
@@ -617,7 +792,7 @@
     "inviteDescription": "Envía una invitación para agregar un nuevo miembro a tu equipo",
     "emailAddress": "Dirección de correo electrónico",
     "emailPlaceholder": "colleague@company.com",
-    "role": "Role",
+    "role": "Rol",
     "adminFull": "Administrador - Acceso completo",
     "managerLimited": "Administrador: acceso de administrador limitado",
     "memberBasic": "Miembro - Acceso básico",
@@ -873,8 +1048,9 @@
     "addCard": "Agregar tarjeta",
     "paymentMethodAdded": "¡El método de pago se agregó exitosamente!",
     "fillAllFields": "Por favor complete todos los datos de la tarjeta",
-    "securePaymentNote": "Los pagos son procesados ​​de forma segura por Stripe.",
-    "stripeRedirect": "Serás redirigido al proceso de pago Stripe."
+    "securePaymentNote": "Los pagos son procesados de forma segura por Stripe.",
+    "stripeRedirect": "Serás redirigido al proceso de pago Stripe.",
+    "useStripePortal": "Usar portal de Stripe"
   },
   "messages": {
     "title": "Mensajes",
@@ -936,7 +1112,9 @@
     "telehealth": "Video",
     "emergency": "Emergencia",
     "yearsExp": "años exp",
-    "patients": "pacientes"
+    "patients": "pacientes",
+    "metaDescription": "Encuentra profesionales verificados y servicios de confianza en Baise.",
+    "title": "Buscar profesionales"
   },
   "urgency": {
     "emergency": "Emergencia",
@@ -953,7 +1131,8 @@
     "privacy": "Privacidad",
     "terms": "Términos",
     "contact": "Contacto",
-    "copyright": "© 2024 Brasil Base. Reservados todos los derechos."
+    "copyright": "© 2024 MD Baise. Todos los derechos reservados.",
+    "rights": "Todos los derechos reservados."
   },
   "errors": {
     "somethingWentWrong": "algo salió mal",
@@ -1010,7 +1189,9 @@
     "mockWarranty": "Atención de seguimiento incluida. Consultas gratuitas para cualquier inquietud relacionada con el tratamiento.",
     "mockGuarantee": "100% satisfacción del paciente garantizada. Garantizamos una atención de calidad y abordamos todas sus inquietudes.",
     "followers": "Seguidores",
-    "following": "Siguiente"
+    "following": "Siguiente",
+    "noPortfolio": "Aún no hay portafolio disponible.",
+    "notFound": "Proveedor no encontrado"
   },
   "quote": {
     "requestQuote": "Solicitar cita",
@@ -1109,20 +1290,26 @@
     "servicesOfferedDescription": "Seleccione todos los servicios que proporciona",
     "servicesSelected": "{{count}} servicios seleccionados",
     "servicesUpdated": "Servicios actualizados exitosamente",
-    "servicesUpdateError": "No se pudieron actualizar los servicios"
+    "servicesUpdateError": "No se pudieron actualizar los servicios",
+    "credentialCertify": "Certifico que mis credenciales son exactas y están actualizadas.",
+    "credentialDescription": "Sube licencias, certificaciones o documentos que ayuden a verificar tu experiencia.",
+    "credentialRequired": "Las credenciales son obligatorias.",
+    "credentialVerification": "Verificación de credenciales",
+    "uploadCredentials": "Subir credenciales",
+    "uploadDescription": "Agrega documentos para ayudar a los clientes a confiar en tu negocio."
   },
   "referral": {
     "pageTitle": "Programa de referencias: MD Baise",
     "pageDescription": "Recomiende amigos y gane R$ 20 por referencia. Acumula bonificaciones y desbloquea recompensas especiales.",
     "referAndEarn": "Refiera y gane",
     "loginToAccess": "Inicie sesión para acceder a su código de referencia y comenzar a ganar R$ 20 por referencia",
-    "login": "Acceso",
+    "login": "Iniciar sesión",
     "programTitle": "Programa de referencia",
     "programDescription": "Recomiende pacientes y gane R$ 20 por referencia",
     "yourCode": "Tu código de referencia",
     "copied": "¡Copiado!",
     "copiedDescription": "Código de referencia copiado al portapapeles",
-    "shareMessage": "¡Usa mi código {{code}} y ​​obtén R$20 de descuento en MD Baise! {{link}}",
+    "shareMessage": "¡Usa mi código {{code}} y obtén R$20 de descuento en MD Baise! {{link}}",
     "totalEarned": "Total ganado",
     "pending": "Pendiente",
     "nextBonus": "Próximo bono",
@@ -1224,7 +1411,7 @@
     "scheduleMeeting": "Programar videollamada",
     "scheduleMeetingDesc": "Configurar una videollamada con Zoom o Google Meet",
     "proRequired": "Pro Plan requerido",
-    "proRequiredDesc": "Las videollamadas están disponibles para el nivel Pro y ​​superior",
+    "proRequiredDesc": "Las videollamadas están disponibles para el plan Pro y superior",
     "proFeature": "Pro Característica",
     "upgradeToSchedule": "Actualice a Pro para programar videollamadas con clientes y proveedores.",
     "meetingType": "Tipo de reunión",
@@ -1345,7 +1532,7 @@
     "placeholder": "Escribe tu mensaje...",
     "welcomeMessage": "¡Hola! ¿Cómo puedo ayudarte hoy?",
     "eliteFeature": "Elite+ Característica",
-    "upgradeDescription": "Actualice al nivel Elite o Enterprise para acceder a nuestro asistente de atención al cliente con tecnología de inteligencia artificial.",
+    "upgradeDescription": "Cambia al plan Elite o Enterprise para acceder a nuestro asistente de atención al cliente con IA.",
     "upgradeButton": "Actualiza ahora",
     "error": "Error",
     "errorDescription": "No se pudo obtener respuesta. Por favor inténtalo de nuevo."
@@ -1462,8 +1649,8 @@
     },
     "upgrade": {
       "title": "Desbloquear {{feature}}",
-      "description": "Actualice al nivel {{tier}} para acceder a esta función y hacer crecer su negocio.",
-      "button": "Actualizar a {{tier}}"
+      "description": "Cambia al plan {{tier}} para acceder a esta función y hacer crecer tu negocio.",
+      "button": "Cambiar a {{tier}}"
     },
     "analytics": {
       "totalJobs": "Empleos totales",
@@ -1478,7 +1665,9 @@
       "repeatCustomers": "Clientes repetidos",
       "avgCompletionTime": "Tiempo promedio de finalización",
       "completionRate": "Tasa de finalización"
-    }
+    },
+    "customerDashboard": "Panel del cliente",
+    "providerDashboard": "Panel del proveedor"
   },
   "customerDashboard": {
     "title": "Mi panel",
@@ -1515,6 +1704,11 @@
       "selectJob": "Seleccione un trabajo para ver la ubicación",
       "description": "Vaya a la pestaña Trabajos activos y seleccione un trabajo para ver su ubicación en el mapa.",
       "viewJobs": "Ver trabajos activos"
+    },
+    "stats": {
+      "activeJobs": "Trabajos activos",
+      "pendingApprovals": "Aprobaciones pendientes",
+      "scheduled": "Programados"
     }
   },
   "pixelTracking": {
@@ -1680,7 +1874,9 @@
     "servicesAdded": "Servicios agregados exitosamente",
     "warranties": "Garantías",
     "warrantyInfoDesc": "Explique la cobertura de su garantía.",
-    "weekendAvailable": "Disponibilidad de fin de semana"
+    "weekendAvailable": "Disponibilidad de fin de semana",
+    "specialties": "Especialidades",
+    "specialtiesDesc": "Elige las áreas donde ofreces servicios."
   },
   "subscription": {
     "title": "Suscripción",
@@ -1702,7 +1898,13 @@
     "allSpecialties": "Todas las especialidades",
     "location": "Ubicación",
     "allLocations": "Todas las ubicaciones",
-    "applyFilters": "Aplicar filtros"
+    "applyFilters": "Aplicar filtros",
+    "loginWall": {
+      "description": "Inicia sesión o crea una cuenta para ver publicaciones, historias y actualizaciones de proveedores verificados.",
+      "login": "Iniciar sesión",
+      "signup": "Crear cuenta",
+      "title": "Inicia sesión para ver el feed"
+    }
   },
   "liveStream": {
     "liveNow": "Vive ahora",
@@ -1746,7 +1948,8 @@
     "requestFailed": "No se pudo enviar la solicitud de cita.",
     "requestMessageTitle": "Solicitud de cita",
     "requestSent": "Solicitud de cita enviada.",
-    "sendRequest": "Enviar solicitud"
+    "sendRequest": "Enviar solicitud",
+    "bookWith": "Reservar con"
   },
   "doctorProfile": {
     "loading": "Cargando perfil de médico...",
@@ -1798,7 +2001,8 @@
     "professionalism": "Profesionalismo",
     "punctuality": "Puntualidad",
     "doctorResponse": "La respuesta del médico",
-    "helpful": "Útil"
+    "helpful": "Útil",
+    "notFound": "Perfil no encontrado"
   },
   "security": {
     "weak": "Débil",
@@ -2271,5 +2475,9 @@
       "name": "ORL (Otorrinolaringología)",
       "description": "Especialistas en oído, nariz y garganta"
     }
+  },
+  "legal": {
+    "privacyTitle": "Política de privacidad",
+    "termsTitle": "Términos de servicio"
   }
 }

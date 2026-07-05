@@ -69,49 +69,49 @@ const PAYMENT_LOGOS = [
 const REVIEW_CARDS = [
   {
     name: 'Mariana Costa',
-    role: 'Small business owner',
+    roleKey: 'hub.reviews.mariana.role',
     rating: '4.9',
-    body: 'Baise made it simple to compare trusted professionals, review pricing, and book with confidence.',
+    bodyKey: 'hub.reviews.mariana.body',
   },
   {
     name: 'Daniel Ribeiro',
-    role: 'Agency operator',
+    roleKey: 'hub.reviews.daniel.role',
     rating: '4.8',
-    body: 'The payment flow felt secure, the profiles were clear, and the whole experience saved us time.',
+    bodyKey: 'hub.reviews.daniel.body',
   },
   {
     name: 'Priya Mendes',
-    role: 'Global client',
+    roleKey: 'hub.reviews.priya.role',
     rating: '4.7',
-    body: 'I could move from discovery to messaging to payment without losing trust at any step.',
+    bodyKey: 'hub.reviews.priya.body',
   },
 ];
 
 const HERO_CTA_LINKS = [
-  { label: 'Find trusted pros', to: '/discover', tone: 'primary' },
-  { label: 'Grow your service business', to: PROVIDER_AUTH_TARGET, tone: 'secondary' },
+  { labelKey: 'hub.hero.ctaFind', to: '/discover', tone: 'primary' },
+  { labelKey: 'hub.hero.ctaProvider', to: PROVIDER_AUTH_TARGET, tone: 'secondary' },
 ];
 
 const PLATFORM_SCREENSHOTS = [
   {
     src: '/platform-screenshots/provider-command.png',
-    title: 'Provider revenue suite',
-    body: 'Manage leads, jobs, invoices, payments, reviews, and cash flow from one back office.',
-    cta: 'Create provider account',
+    titleKey: 'hub.platform.screenshots.revenue.title',
+    bodyKey: 'hub.platform.screenshots.revenue.body',
+    ctaKey: 'hub.platform.screenshots.revenue.cta',
     to: PROVIDER_AUTH_TARGET,
   },
   {
     src: '/platform-screenshots/analytics-dashboard.png',
-    title: 'Provider growth engine',
-    body: 'Track reach, campaigns, reviews, referrals, and performance signals that help services grow.',
-    cta: 'Start growing',
+    titleKey: 'hub.platform.screenshots.growth.title',
+    bodyKey: 'hub.platform.screenshots.growth.body',
+    ctaKey: 'hub.platform.screenshots.growth.cta',
     to: PROVIDER_AUTH_TARGET,
   },
   {
     src: '/platform-screenshots/payment-ledger.png',
-    title: 'Payments and records',
-    body: 'Collect one-off, recurring, scheduled, or milestone payments and keep transaction history organized.',
-    cta: 'Access tools',
+    titleKey: 'hub.platform.screenshots.records.title',
+    bodyKey: 'hub.platform.screenshots.records.body',
+    ctaKey: 'hub.platform.screenshots.records.cta',
     to: PROVIDER_AUTH_TARGET,
   },
 ];
@@ -119,109 +119,103 @@ const PLATFORM_SCREENSHOTS = [
 const BUSINESS_FEATURES = [
   {
     icon: Users,
-    title: 'Client acquisition',
-    body: 'Get discovered by people actively looking for trusted help.',
+    titleKey: 'hub.providerFeatures.clientAcquisition.title',
+    bodyKey: 'hub.providerFeatures.clientAcquisition.body',
   },
   {
     icon: Megaphone,
-    title: 'Marketing tools',
-    body: 'Promote services with posts, campaigns, offers, and updates.',
+    titleKey: 'hub.providerFeatures.marketing.title',
+    bodyKey: 'hub.providerFeatures.marketing.body',
   },
   {
     icon: WalletCards,
-    title: 'Payments and invoices',
-    body: 'Send invoices, accept payments, and keep receipts organized.',
+    titleKey: 'hub.providerFeatures.payments.title',
+    bodyKey: 'hub.providerFeatures.payments.body',
   },
   {
     icon: CalendarClock,
-    title: 'Flexible payment plans',
-    body: 'Offer one-off, weekly, monthly, scheduled, or milestone-based payments.',
+    titleKey: 'hub.providerFeatures.flexiblePayments.title',
+    bodyKey: 'hub.providerFeatures.flexiblePayments.body',
   },
   {
     icon: ClipboardCheck,
-    title: 'Service proof',
-    body: 'Attach notes, photos, and job history to completed work.',
+    titleKey: 'hub.providerFeatures.serviceProof.title',
+    bodyKey: 'hub.providerFeatures.serviceProof.body',
   },
   {
     icon: Mail,
-    title: 'Email and WhatsApp',
-    body: 'Reach leads and past clients with simple campaigns.',
+    titleKey: 'hub.providerFeatures.messaging.title',
+    bodyKey: 'hub.providerFeatures.messaging.body',
   },
   {
     icon: Percent,
-    title: 'Coupons and offers',
-    body: 'Create promotions that help turn interest into bookings.',
+    titleKey: 'hub.providerFeatures.offers.title',
+    bodyKey: 'hub.providerFeatures.offers.body',
   },
   {
     icon: MessageCircle,
-    title: 'Reviews and follow-up',
-    body: 'Build trust with reviews tied to real service history.',
+    titleKey: 'hub.providerFeatures.reviews.title',
+    bodyKey: 'hub.providerFeatures.reviews.body',
   },
   {
     icon: Handshake,
-    title: 'Referral growth',
-    body: 'Turn happy clients into repeat work and introductions.',
+    titleKey: 'hub.providerFeatures.referrals.title',
+    bodyKey: 'hub.providerFeatures.referrals.body',
   },
   {
     icon: ReceiptText,
-    title: 'Receipts and records',
-    body: 'Keep searchable receipts and transaction history in one place.',
+    titleKey: 'hub.providerFeatures.records.title',
+    bodyKey: 'hub.providerFeatures.records.body',
   },
   {
     icon: BarChart3,
-    title: 'Business dashboard',
-    body: 'See revenue, leads, reviews, repeat work, and cash flow.',
+    titleKey: 'hub.providerFeatures.dashboard.title',
+    bodyKey: 'hub.providerFeatures.dashboard.body',
   },
 ];
 
 const UPGRADE_FEATURES = [
   {
     icon: TrendingUp,
-    title: 'Social analytics',
-    body: 'Understand content reach, engagement, and audience growth.',
+    titleKey: 'hub.providerFeatures.socialAnalytics.title',
+    bodyKey: 'hub.providerFeatures.socialAnalytics.body',
   },
   {
     icon: BadgeCheck,
-    title: 'Verified badge',
-    body: 'Show stronger trust signals when buyers compare providers.',
+    titleKey: 'hub.providerFeatures.verifiedBadge.title',
+    bodyKey: 'hub.providerFeatures.verifiedBadge.body',
   },
   {
     icon: Gauge,
-    title: 'Performance insights',
-    body: 'Spot what is working across services, content, and campaigns.',
+    titleKey: 'hub.providerFeatures.performance.title',
+    bodyKey: 'hub.providerFeatures.performance.body',
   },
 ];
 
 const FAQ_ITEMS = [
   {
-    question: 'How does Baise help me find a trusted service provider?',
-    answer:
-      'Baise brings provider profiles, reviews, service details, and payment confidence into one place so you can compare before you book.',
+    questionKey: 'hub.faq.find.question',
+    answerKey: 'hub.faq.find.answer',
   },
   {
-    question: 'Can service providers use Baise to grow their business?',
-    answer:
-      'Yes. Providers can use Baise to get found, show their work, collect reviews, send invoices, accept payments, and keep client records organized.',
+    questionKey: 'hub.faq.providerGrowth.question',
+    answerKey: 'hub.faq.providerGrowth.answer',
   },
   {
-    question: 'Can providers offer recurring or milestone payments?',
-    answer:
-      'Yes. Providers can support one-off payments, subscriptions, weekly or monthly services, payment schedules, and benchmark-based payment releases.',
+    questionKey: 'hub.faq.paymentPlans.question',
+    answerKey: 'hub.faq.paymentPlans.answer',
   },
   {
-    question: 'Do I need an account to access provider tools?',
-    answer:
-      'Yes. Provider dashboards, payment tools, invoices, records, and business management features require account creation and sign in.',
+    questionKey: 'hub.faq.account.question',
+    answerKey: 'hub.faq.account.answer',
   },
   {
-    question: 'Can clients keep receipts and service history?',
-    answer:
-      'Yes. Clients can keep receipts, invoices, payment proof, provider history, and service records inside their account.',
+    questionKey: 'hub.faq.clientRecords.question',
+    answerKey: 'hub.faq.clientRecords.answer',
   },
   {
-    question: 'What types of services does Baise support?',
-    answer:
-      'Baise connects people with trusted professionals across home services, medical services, and legal services through Casa, Medical, and Legal Baise.',
+    questionKey: 'hub.faq.services.question',
+    answerKey: 'hub.faq.services.answer',
   },
 ];
 
@@ -344,7 +338,7 @@ export default function BaiseHubLanding() {
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               {HERO_CTA_LINKS.map((cta) => (
                 <Link
-                  key={cta.label}
+                  key={cta.labelKey}
                   to={cta.to}
                   className={
                     cta.tone === 'primary'
@@ -362,7 +356,7 @@ export default function BaiseHubLanding() {
                       : undefined
                   }
                 >
-                  {cta.label}
+                  {t(cta.labelKey)}
                 </Link>
               ))}
             </div>
@@ -415,6 +409,8 @@ export default function BaiseHubLanding() {
 }
 
 function AppCardsSection() {
+  const { t } = useTranslation();
+
   return (
     <section
       className="relative px-4 sm:px-6 pb-14 md:pb-20"
@@ -426,13 +422,13 @@ function AppCardsSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Choose your path
+              {t('hub.apps.eyebrow')}
             </p>
             <h2
               id="hub-apps-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Find the right trusted provider for the service you need.
+              {t('hub.apps.title')}
             </h2>
         </div>
 
@@ -457,10 +453,12 @@ function AppCardsSection() {
 }
 
 function SocialProofSection() {
+  const { t } = useTranslation();
+
   return (
     <section
       className="relative px-4 sm:px-6 pb-12 md:pb-16"
-      aria-label="Baise Group social proof"
+      aria-label={t('hub.socialProof.ariaLabel')}
     >
       <div className="max-w-6xl mx-auto">
         <div
@@ -480,14 +478,13 @@ function SocialProofSection() {
                 className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
                 style={{ color: CURRENT_ACCENT }}
               >
-                Trust that sells
+                {t('hub.socialProof.eyebrow')}
               </p>
               <h2 className="mb-4 text-2xl font-bold tracking-tight text-white md:text-[32px]">
-                Trusted globally to find trusted service providers.
+                {t('hub.socialProof.title')}
               </h2>
               <p className="text-[15px] leading-relaxed text-white/60">
-                Clients get ratings, reviews, and clear provider profiles before they book.
-                Service providers get a trusted place to be found, chosen, and hired.
+                {t('hub.socialProof.subtitle')}
               </p>
             </div>
 
@@ -507,9 +504,9 @@ function SocialProofSection() {
                   >
                     <div className="mb-3 flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-black text-white">Google Reviews</p>
+                        <p className="text-sm font-black text-white">{t('hub.socialProof.googleReviews')}</p>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/38">
-                          Sample review
+                          {t('hub.socialProof.sampleReview')}
                         </p>
                       </div>
                       <span className="rounded-full bg-white px-2 py-1 text-xs font-black text-black">
@@ -526,7 +523,7 @@ function SocialProofSection() {
                       ))}
                     </div>
                     <p className="mb-4 text-[13px] leading-relaxed text-white/74">
-                      "{review.body}"
+                      "{t(review.bodyKey)}"
                     </p>
                     <div className="flex items-center gap-2">
                       <span
@@ -541,7 +538,7 @@ function SocialProofSection() {
                       </span>
                       <div>
                         <p className="text-xs font-bold text-white">{review.name}</p>
-                        <p className="text-[11px] text-white/45">{review.role}</p>
+                        <p className="text-[11px] text-white/45">{t(review.roleKey)}</p>
                       </div>
                     </div>
                   </article>
@@ -556,6 +553,7 @@ function SocialProofSection() {
 }
 
 function PlatformScreenshotsSection() {
+  const { t } = useTranslation();
   const [featuredScreenshot, ...supportingScreenshots] = PLATFORM_SCREENSHOTS;
 
   return (
@@ -570,20 +568,20 @@ function PlatformScreenshotsSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              For service providers
+              {t('hub.platform.eyebrow')}
             </p>
             <h2
               id="platform-preview-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Powerful platform designed to support every service provider at every stage of their growth.
+              {t('hub.platform.title')}
             </h2>
           </div>
           <Link
             to={PROVIDER_AUTH_TARGET}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white md:self-auto"
           >
-            Create provider account
+            {t('hub.platform.cta')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -593,7 +591,7 @@ function PlatformScreenshotsSection() {
             <div className="aspect-[16/9] overflow-hidden bg-black">
               <img
                 src={featuredScreenshot.src}
-                alt={featuredScreenshot.title}
+                alt={t(featuredScreenshot.titleKey)}
                 className="h-full w-full object-cover"
                 loading="lazy"
               />
@@ -601,10 +599,10 @@ function PlatformScreenshotsSection() {
             <div className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-end md:p-6">
               <div>
                 <h3 className="mb-2 text-xl font-bold tracking-tight text-white md:text-2xl">
-                  {featuredScreenshot.title}
+                  {t(featuredScreenshot.titleKey)}
                 </h3>
                 <p className="max-w-2xl text-[13.5px] leading-relaxed text-white/58 md:text-sm">
-                  {featuredScreenshot.body}
+                  {t(featuredScreenshot.bodyKey)}
                 </p>
               </div>
               <Link
@@ -612,7 +610,7 @@ function PlatformScreenshotsSection() {
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-bold transition-colors hover:border-white/30 hover:text-white"
                 style={{ color: CURRENT_ACCENT }}
               >
-                {featuredScreenshot.cta}
+                {t(featuredScreenshot.ctaKey)}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -621,30 +619,30 @@ function PlatformScreenshotsSection() {
           <div className="grid gap-4">
             {supportingScreenshots.map((screenshot) => (
             <article
-              key={screenshot.title}
+              key={screenshot.titleKey}
               className="grid overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] shadow-2xl sm:grid-cols-[0.88fr_1.12fr] lg:grid-cols-1"
             >
               <div className="aspect-[16/10] overflow-hidden bg-black sm:aspect-auto lg:aspect-[16/9]">
                 <img
                   src={screenshot.src}
-                  alt={screenshot.title}
+                  alt={t(screenshot.titleKey)}
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
               </div>
               <div className="p-5">
                 <h3 className="mb-2 text-lg font-bold tracking-tight text-white">
-                  {screenshot.title}
+                  {t(screenshot.titleKey)}
                 </h3>
                 <p className="mb-4 text-[13.5px] leading-relaxed text-white/58">
-                  {screenshot.body}
+                  {t(screenshot.bodyKey)}
                 </p>
                 <Link
                   to={screenshot.to}
                   className="inline-flex items-center gap-2 text-sm font-bold transition-colors hover:text-white"
                   style={{ color: CURRENT_ACCENT }}
                 >
-                  {screenshot.cta}
+                  {t(screenshot.ctaKey)}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </div>
@@ -658,6 +656,7 @@ function PlatformScreenshotsSection() {
 }
 
 function BusinessOperatingSection() {
+  const { t } = useTranslation();
   const providerBenefits = [...BUSINESS_FEATURES, ...UPGRADE_FEATURES];
   const repeatedProviderBenefits = [...providerBenefits, ...providerBenefits];
 
@@ -673,19 +672,18 @@ function BusinessOperatingSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Provider growth engine
+              {t('hub.business.eyebrow')}
             </p>
             <h2
               id="business-operating-heading"
               className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
             >
-              Tools to help providers get found, booked, paid, and remembered.
+              {t('hub.business.title')}
             </h2>
           </div>
           <div className="space-y-4">
             <p className="text-[15px] leading-relaxed text-white/62 md:text-base">
-              A simple operating layer for client acquisition, payments, reviews, campaigns,
-              recurring plans, receipts, referrals, and business visibility.
+              {t('hub.business.subtitle')}
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
@@ -693,7 +691,7 @@ function BusinessOperatingSection() {
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                 style={{ backgroundColor: CURRENT_ACCENT }}
               >
-                Build your provider profile
+                {t('hub.business.cta')}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -702,14 +700,14 @@ function BusinessOperatingSection() {
 
         <div
           className="baise-provider-benefit-marquee overflow-hidden rounded-2xl border border-white/12 bg-white/[0.045] p-3"
-          aria-label="Provider business benefits"
+          aria-label={t('hub.business.ariaLabel')}
         >
           <div className="baise-provider-benefit-track flex w-max gap-3">
             {repeatedProviderBenefits.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <article
-                  key={`${feature.title}-${index}`}
+                  key={`${feature.titleKey}-${index}`}
                   className="w-[244px] shrink-0 rounded-xl border border-white/10 bg-black/24 p-3.5"
                 >
                   <span
@@ -722,10 +720,10 @@ function BusinessOperatingSection() {
                     <Icon className="h-4 w-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
                   </span>
                   <h3 className="mb-2 text-[15px] font-bold tracking-tight text-white">
-                    {feature.title}
+                    {t(feature.titleKey)}
                   </h3>
                   <p className="line-clamp-3 text-[12px] leading-relaxed text-white/55">
-                    {feature.body}
+                    {t(feature.bodyKey)}
                   </p>
                 </article>
               );
@@ -734,7 +732,7 @@ function BusinessOperatingSection() {
         </div>
 
         <p className="mt-4 text-center text-[13px] font-semibold text-white/45">
-          Provider revenue suite. Provider growth engine. Content that converts.
+          {t('hub.business.summary')}
         </p>
       </div>
     </section>
@@ -767,14 +765,13 @@ function ProfessionalContentSection() {
               className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
               style={{ color: CURRENT_ACCENT }}
             >
-              Content that converts
+              {t('hub.pros.eyebrow')}
             </p>
             <h2 className="mb-3 text-2xl font-bold leading-tight tracking-tight text-white md:text-[32px]">
-              Show your work where clients are already looking.
+              {t('hub.pros.title')}
             </h2>
             <p className="mb-8 max-w-2xl text-[15px] leading-relaxed text-white/65 md:text-base">
-              Providers can post updates, share stories, stream expertise, promote offers,
-              and turn attention into inquiries.
+              {t('hub.pros.subtitle')}
             </p>
 
             <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
@@ -815,14 +812,14 @@ function ProfessionalContentSection() {
                   boxShadow: `0 8px 24px -10px ${CURRENT_ACCENT}aa`,
                 }}
               >
-                <span>Become a provider</span>
+                <span>{t('hub.pros.ctaPrimary')}</span>
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <Link
                 to="/feed"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-white/85 transition-all hover:border-white/30 hover:text-white"
               >
-                <span>Explore the feed</span>
+                <span>{t('hub.pros.ctaSecondary')}</span>
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -834,6 +831,8 @@ function ProfessionalContentSection() {
 }
 
 function FAQSection() {
+  const { t } = useTranslation();
+
   return (
     <section
       className="relative px-4 sm:px-6 pb-14 md:pb-20"
@@ -845,25 +844,25 @@ function FAQSection() {
             className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
             style={{ color: CURRENT_ACCENT }}
           >
-            Buyer confidence
+            {t('hub.faq.eyebrow')}
           </p>
           <h2
             id="faq-heading"
             className="text-3xl font-bold leading-tight tracking-tight text-white md:text-[42px]"
           >
-            Answers that remove friction before signup.
+            {t('hub.faq.title')}
           </h2>
         </div>
 
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, index) => (
             <details
-              key={item.question}
+              key={item.questionKey}
               className="group rounded-2xl border border-white/12 bg-white/[0.045] p-5"
               open={index === 0}
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-bold text-white">
-                {item.question}
+                {t(item.questionKey)}
                 <span
                   className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/12 text-sm transition-transform group-open:rotate-45"
                   aria-hidden="true"
@@ -872,7 +871,7 @@ function FAQSection() {
                 </span>
               </summary>
               <p className="mt-3 max-w-3xl text-[14px] leading-relaxed text-white/58">
-                {item.answer}
+                {t(item.answerKey)}
               </p>
             </details>
           ))}
@@ -883,14 +882,14 @@ function FAQSection() {
             to="/discover"
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-black transition-all hover:-translate-y-0.5 hover:bg-white/90"
           >
-            Find a pro now
+            {t('hub.faq.ctaFind')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             to={PROVIDER_AUTH_TARGET}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-semibold text-white/85 transition-all hover:-translate-y-0.5 hover:border-white/30 hover:text-white"
           >
-            Start selling on Baise
+            {t('hub.faq.ctaProvider')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
@@ -900,6 +899,7 @@ function FAQSection() {
 }
 
 function PaymentMethodsSection() {
+  const { t } = useTranslation();
   const repeatedLogos = [...PAYMENT_LOGOS, ...PAYMENT_LOGOS];
 
   return (
@@ -917,22 +917,21 @@ function PaymentMethodsSection() {
             className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
             style={{ color: CURRENT_ACCENT }}
           >
-            Checkout confidence
+            {t('hub.payments.eyebrow')}
           </p>
           <h2
             id="payment-methods-heading"
             className="text-3xl font-bold tracking-tight text-white md:text-[40px]"
           >
-            Payment brands users recognize before they click pay.
+            {t('hub.payments.title')}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-white/56 md:text-base">
-            Trusted payment signals help clients feel safer at checkout and help providers close
-            more jobs with fewer doubts at the final step.
+            {t('hub.payments.subtitle')}
           </p>
         </div>
         <div
           className="baise-logo-marquee relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4"
-          aria-label="Accepted payment methods"
+          aria-label={t('hub.payments.ariaLabel')}
         >
           <div className="baise-logo-track flex w-max gap-3">
             {repeatedLogos.map((logo, index) => (
@@ -955,6 +954,8 @@ function PaymentMethodsSection() {
 }
 
 function FloatingRatingCard() {
+  const { t } = useTranslation();
+
   return (
     <div
       className="absolute left-5 right-5 top-5 z-10 rounded-2xl border bg-black/90 px-4 py-3 text-left shadow-2xl backdrop-blur md:left-auto md:right-7 md:top-[-22px] md:w-[360px]"
@@ -969,7 +970,7 @@ function FloatingRatingCard() {
             <span className="ml-1 text-sm font-black text-white">4.8</span>
           </div>
           <p className="text-[12px] font-semibold leading-snug text-white/80">
-            Trusted by over 30,000 small business, agencies and global users worldwide
+            {t('hub.floatingRating')}
           </p>
         </div>
         <div className="flex -space-x-2" aria-hidden="true">

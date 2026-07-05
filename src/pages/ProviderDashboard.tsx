@@ -24,6 +24,10 @@ import { useProviderAnalytics } from '@/hooks/useProviderAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/lib/currency';
 import { BidTemplates } from '@/components/provider/BidTemplates';
+import { ProviderCalendarManager } from '@/components/provider/ProviderCalendarManager';
+import { ProviderIntegrationsManager } from '@/components/provider/ProviderIntegrationsManager';
+import { ProviderMessagingCommandCenter } from '@/components/provider/ProviderMessagingCommandCenter';
+import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
 import {
   BarChart3,
   MessageSquare,
@@ -41,6 +45,8 @@ import {
   Clock,
   Search,
   Settings,
+  CreditCard,
+  PlugZap,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -170,8 +176,8 @@ export default function ProviderDashboard() {
             },
             {
               label: 'Revenue',
-              value: 'Payouts',
-              detail: 'Review payout methods, account status, and earnings.',
+              value: 'Payments',
+              detail: 'Create invoices, plans, POS payments, and exports.',
               icon: Wallet,
               tone: 'green',
             },
@@ -197,10 +203,10 @@ export default function ProviderDashboard() {
               onClick: () => navigate('/services'),
             },
             {
-              label: t('payouts.title', 'Payouts'),
-              description: 'Check earnings movement and payout setup.',
+              label: 'Payments',
+              description: 'Create payment plans, POS checkout, and exports.',
               icon: Wallet,
-              onClick: () => navigate('/payouts'),
+              onClick: () => navigate('/payments'),
             },
           ]}
         />
@@ -242,10 +248,26 @@ export default function ProviderDashboard() {
 
         {/* Main Tabs */}
         <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 h-auto">
+          <TabsList className="grid h-auto w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-12">
             <TabsTrigger value="jobs" className="gap-2 py-3">
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.jobs', 'Jobs')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="gap-2 py-3">
+              <CreditCard className="h-4 w-4" />
+              <span className="hidden sm:inline">Payments</span>
+            </TabsTrigger>
+            <TabsTrigger value="scheduled" className="gap-2 py-3">
+              <Calendar className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('dashboard.tabs.scheduled')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="campaigns" className="gap-2 py-3">
+              <Mail className="h-4 w-4" />
+              <span className="hidden sm:inline">Campaigns</span>
+            </TabsTrigger>
+            <TabsTrigger value="integrations" className="gap-2 py-3">
+              <PlugZap className="h-4 w-4" />
+              <span className="hidden sm:inline">Integrations</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2 py-3">
               <BarChart3 className="h-4 w-4" />
@@ -254,15 +276,6 @@ export default function ProviderDashboard() {
             <TabsTrigger value="marketing" className="gap-2 py-3">
               <Megaphone className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.marketing', 'Marketing')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="emailCampaigns" className="gap-2 py-3" disabled={!isEliteOrAbove}>
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">{isPt ? 'Campanhas de email' : isEs ? 'Campañas de correo' : 'Email Campaigns'}</span>
-              {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
-            </TabsTrigger>
-            <TabsTrigger value="scheduled" className="gap-2 py-3">
-              <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.scheduled')}</span>
             </TabsTrigger>
             <TabsTrigger value="autoReply" className="gap-2 py-3" disabled={!isEliteOrAbove}>
               <MessageSquare className="h-4 w-4" />
@@ -290,29 +303,39 @@ export default function ProviderDashboard() {
             <ProviderActiveJobs />
           </TabsContent>
 
+          <TabsContent value="payments" className="space-y-6">
+            <ProviderPaymentsWorkspace />
+          </TabsContent>
+
+          <TabsContent value="scheduled" className="space-y-6">
+            <ProviderCalendarManager />
+            <ScheduledServicesSection />
+          </TabsContent>
+
+          <TabsContent value="campaigns" className="space-y-6">
+            <ProviderMessagingCommandCenter />
+            {isPt || isEs ? (
+              <TranslationPendingCard isEs={isEs} />
+            ) : isEliteOrAbove ? (
+              <ProviderEmailCampaigns />
+            ) : (
+              <UpgradePrompt
+                feature={isPt ? 'Campanhas de email' : isEs ? 'Campañas de correo' : 'Outbound email campaign automation'}
+                requiredTier="Elite"
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-6">
+            <ProviderIntegrationsManager />
+          </TabsContent>
+
           <TabsContent value="analytics" className="space-y-6">
             <ProviderAnalytics />
           </TabsContent>
 
           <TabsContent value="marketing" className="space-y-6">
             <FollowerMarketingPanel />
-          </TabsContent>
-
-          <TabsContent value="emailCampaigns" className="space-y-6">
-            {isPt || isEs ? (
-              <TranslationPendingCard isEs={isEs} />
-            ) : isEliteOrAbove ? (
-              <ProviderEmailCampaigns />
-            ) : (
-              <UpgradePrompt 
-                feature={isPt ? 'Campanhas de email' : isEs ? 'Campañas de correo' : 'Email Campaigns'}
-                requiredTier="Elite"
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="scheduled" className="space-y-6">
-            <ScheduledServicesSection />
           </TabsContent>
 
           <TabsContent value="autoReply" className="space-y-6">

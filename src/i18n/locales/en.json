@@ -99,7 +99,9 @@
     "tryAgain": "Try again",
     "clearFilters": "Clear filters",
     "discard": "Discard",
-    "invalidRequest": "Invalid request."
+    "invalidRequest": "Invalid request.",
+    "and": "and",
+    "viewProfile": "View Profile"
   },
   "nav": {
     "home": "Home",
@@ -111,7 +113,9 @@
     "profile": "Profile",
     "postJob": "Post",
     "map": "Map",
-    "feed": "Feed"
+    "feed": "Feed",
+    "help": "Help & Training",
+    "menu": "Menu"
   },
   "hub": {
     "metaTitle": "Baise Group — One trusted network for home, health, and legal services in Brazil",
@@ -122,7 +126,9 @@
     "hero": {
       "titlePart1": "Three platforms.",
       "titlePart2": "One promise.",
-      "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start."
+      "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start.",
+      "ctaFind": "Find trusted pros",
+      "ctaProvider": "Grow your service business"
     },
     "casa": {
       "title": "Casa Baise",
@@ -196,9 +202,9 @@
       "privacy": "Privacy"
     },
     "pros": {
-      "eyebrow": "For Professionals",
-      "title": "Your safe space to grow your business.",
-      "subtitle": "Service pros, medical specialists, and legal experts — post your work, go live, share stories, and turn viewers into clients. Verified members only, vetted clients, and a feed that rewards great work.",
+      "eyebrow": "Content that converts",
+      "title": "Show your work where clients are already looking.",
+      "subtitle": "Providers can post updates, share stories, stream expertise, promote offers, and turn attention into inquiries.",
       "goLive": {
         "label": "Go Live",
         "desc": "Host Q&As, demos, or virtual consultations in real time."
@@ -221,6 +227,157 @@
       },
       "ctaPrimary": "Become a provider",
       "ctaSecondary": "Explore the feed"
+    },
+    "apps": {
+      "eyebrow": "Choose your path",
+      "title": "Find the right trusted provider for the service you need."
+    },
+    "floatingRating": "Trusted by over 30,000 small business, agencies and global users worldwide",
+    "socialProof": {
+      "ariaLabel": "Baise Group social proof",
+      "eyebrow": "Trust that sells",
+      "title": "Trusted globally to find trusted service providers.",
+      "subtitle": "Clients get ratings, reviews, and clear provider profiles before they book. Service providers get a trusted place to be found, chosen, and hired.",
+      "googleReviews": "Google Reviews",
+      "sampleReview": "Sample review"
+    },
+    "reviews": {
+      "mariana": {
+        "role": "Small business owner",
+        "body": "Baise made it simple to compare trusted professionals, review pricing, and book with confidence."
+      },
+      "daniel": {
+        "role": "Agency operator",
+        "body": "The payment flow felt secure, the profiles were clear, and the whole experience saved us time."
+      },
+      "priya": {
+        "role": "Global client",
+        "body": "I could move from discovery to messaging to payment without losing trust at any step."
+      }
+    },
+    "platform": {
+      "eyebrow": "For service providers",
+      "title": "Powerful platform designed to support every service provider at every stage of their growth.",
+      "cta": "Create provider account",
+      "screenshots": {
+        "revenue": {
+          "title": "Provider revenue suite",
+          "body": "Manage leads, jobs, invoices, payments, reviews, and cash flow from one back office.",
+          "cta": "Create provider account"
+        },
+        "growth": {
+          "title": "Provider growth engine",
+          "body": "Track reach, campaigns, reviews, referrals, and performance signals that help services grow.",
+          "cta": "Start growing"
+        },
+        "records": {
+          "title": "Payments and records",
+          "body": "Collect one-off, recurring, scheduled, or milestone payments and keep transaction history organized.",
+          "cta": "Access tools"
+        }
+      }
+    },
+    "business": {
+      "eyebrow": "Provider growth engine",
+      "title": "Tools to help providers get found, booked, paid, and remembered.",
+      "subtitle": "A simple operating layer for client acquisition, payments, reviews, campaigns, recurring plans, receipts, referrals, and business visibility.",
+      "cta": "Build your provider profile",
+      "ariaLabel": "Provider business benefits",
+      "summary": "Provider revenue suite. Provider growth engine. Content that converts."
+    },
+    "providerFeatures": {
+      "clientAcquisition": {
+        "title": "Client acquisition",
+        "body": "Get discovered by people actively looking for trusted help."
+      },
+      "marketing": {
+        "title": "Marketing tools",
+        "body": "Promote services with posts, campaigns, offers, and updates."
+      },
+      "payments": {
+        "title": "Payments and invoices",
+        "body": "Send invoices, accept payments, and keep receipts organized."
+      },
+      "flexiblePayments": {
+        "title": "Flexible payment plans",
+        "body": "Offer one-off, weekly, monthly, scheduled, or milestone-based payments."
+      },
+      "serviceProof": {
+        "title": "Service proof",
+        "body": "Attach notes, photos, and job history to completed work."
+      },
+      "messaging": {
+        "title": "Email and WhatsApp",
+        "body": "Reach leads and past clients with simple campaigns."
+      },
+      "offers": {
+        "title": "Coupons and offers",
+        "body": "Create promotions that help turn interest into bookings."
+      },
+      "reviews": {
+        "title": "Reviews and follow-up",
+        "body": "Build trust with reviews tied to real service history."
+      },
+      "referrals": {
+        "title": "Referral growth",
+        "body": "Turn happy clients into repeat work and introductions."
+      },
+      "records": {
+        "title": "Receipts and records",
+        "body": "Keep searchable receipts and transaction history in one place."
+      },
+      "dashboard": {
+        "title": "Business dashboard",
+        "body": "See revenue, leads, reviews, repeat work, and cash flow."
+      },
+      "socialAnalytics": {
+        "title": "Social analytics",
+        "body": "Understand content reach, engagement, and audience growth."
+      },
+      "verifiedBadge": {
+        "title": "Verified badge",
+        "body": "Show stronger trust signals when buyers compare providers."
+      },
+      "performance": {
+        "title": "Performance insights",
+        "body": "Spot what is working across services, content, and campaigns."
+      }
+    },
+    "faq": {
+      "eyebrow": "Buyer confidence",
+      "title": "Answers that remove friction before signup.",
+      "ctaFind": "Find a pro now",
+      "ctaProvider": "Start selling on Baise",
+      "find": {
+        "question": "How does Baise help me find a trusted service provider?",
+        "answer": "Baise brings provider profiles, reviews, service details, and payment confidence into one place so you can compare before you book."
+      },
+      "providerGrowth": {
+        "question": "Can service providers use Baise to grow their business?",
+        "answer": "Yes. Providers can use Baise to get found, show their work, collect reviews, send invoices, accept payments, and keep client records organized."
+      },
+      "paymentPlans": {
+        "question": "Can providers offer recurring or milestone payments?",
+        "answer": "Yes. Providers can support one-off payments, subscriptions, weekly or monthly services, payment schedules, and benchmark-based payment releases."
+      },
+      "account": {
+        "question": "Do I need an account to access provider tools?",
+        "answer": "Yes. Provider dashboards, payment tools, invoices, records, and business management features require account creation and sign in."
+      },
+      "clientRecords": {
+        "question": "Can clients keep receipts and service history?",
+        "answer": "Yes. Clients can keep receipts, invoices, payment proof, provider history, and service records inside their account."
+      },
+      "services": {
+        "question": "What types of services does Baise support?",
+        "answer": "Baise connects people with trusted professionals across home services, medical services, and legal services through Casa, Medical, and Legal Baise."
+      }
+    },
+    "payments": {
+      "eyebrow": "Checkout confidence",
+      "title": "Payment brands users recognize before they click pay.",
+      "subtitle": "Trusted payment signals help clients feel safer at checkout and help providers close more jobs with fewer doubts at the final step.",
+      "ariaLabel": "Accepted payment methods"
     }
   },
   "auth": {
@@ -252,7 +409,22 @@
     "lastNameTooShort": "Last name too short",
     "loginToPost": "Login to book",
     "loginRequired": "You need to be logged in to book an appointment",
-    "login": "Login"
+    "login": "Login",
+    "agreeToTerms": "I agree to the",
+    "checkEmailToVerify": "Please check your email to verify your account",
+    "completingSignIn": "Completing sign in...",
+    "enterEmailFirst": "Please enter your email first",
+    "forgotPassword": "Forgot password?",
+    "mustAcceptTerms": "You must accept the Terms of Service and Privacy Policy",
+    "passwordLowercase": "Must contain a lowercase letter",
+    "passwordMin": "Password must be at least 8 characters",
+    "passwordNumber": "Must contain a number",
+    "passwordUppercase": "Must contain an uppercase letter",
+    "privacyPolicy": "Privacy Policy",
+    "resetError": "Error sending reset email",
+    "resetSent": "Password reset email sent. Check your inbox.",
+    "termsOfService": "Terms of Service",
+    "termsRequired": "Please accept the terms"
   },
   "header": {
     "login": "Login",
@@ -271,7 +443,8 @@
     "licensedDoctors": "Licensed Professionals",
     "verifiedReviews": "Verified Reviews",
     "secureBooking": "Secure Booking",
-    "cta": "Book Appointment"
+    "cta": "Book Appointment",
+    "bookAppointment": "Book Appointment"
   },
   "categories": {
     "title": "Popular Specialties",
@@ -485,7 +658,7 @@
     "earnReward": "Earn R$20",
     "other": "Other",
     "shareProfile": "Share Profile",
-    "shareMessage": "Join Brasil Base with my referral code: {{code}}",
+    "shareMessage": "Join MD Baise with my referral code: {{code}}",
     "linkCopied": "Link copied to clipboard!",
     "copyFailed": "Failed to copy link",
     "copyLink": "Copy Link",
@@ -531,7 +704,9 @@
     "bioPlaceholder": "Tell us about yourself...",
     "yourProfileLink": "Your profile link",
     "scanQRCode": "Scan QR code",
-    "useCamera": "Use your camera to open this link."
+    "useCamera": "Use your camera to open this link.",
+    "postalCode": "ZIP / Postal Code",
+    "postalCodePlaceholder": "00000-000 or ZIP code"
   },
   "admin": {
     "title": "Admin Dashboard",
@@ -874,7 +1049,8 @@
     "paymentMethodAdded": "Payment method added successfully!",
     "fillAllFields": "Please fill all card details",
     "securePaymentNote": "Payments are securely processed by Stripe.",
-    "stripeRedirect": "You will be redirected to Stripe checkout."
+    "stripeRedirect": "You will be redirected to Stripe checkout.",
+    "useStripePortal": "Payment methods are managed through our secure payment processor."
   },
   "messages": {
     "title": "Messages",
@@ -936,7 +1112,9 @@
     "telehealth": "Video",
     "emergency": "Emergency",
     "yearsExp": "years exp",
-    "patients": "patients"
+    "patients": "patients",
+    "metaDescription": "Find verified home service providers near you. Compare ratings, reviews, and prices for plumbers, electricians, cleaners, and more.",
+    "title": "Browse Service Providers"
   },
   "urgency": {
     "emergency": "Emergency",
@@ -953,7 +1131,8 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "contact": "Contact",
-    "copyright": "© 2024 Brasil Base. All rights reserved."
+    "copyright": "© 2024 MD Baise. All rights reserved.",
+    "rights": "All rights reserved."
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
@@ -1010,7 +1189,9 @@
     "mockWarranty": "Follow-up care included. Free consultations for any treatment-related concerns.",
     "mockGuarantee": "100% patient satisfaction guaranteed. We ensure quality care and address all your concerns.",
     "followers": "Followers",
-    "following": "Following"
+    "following": "Following",
+    "noPortfolio": "No portfolio items yet",
+    "notFound": "Provider Not Found"
   },
   "quote": {
     "requestQuote": "Request Appointment",
@@ -1109,7 +1290,13 @@
     "servicesOfferedDescription": "Select all services you provide",
     "servicesSelected": "{{count}} services selected",
     "servicesUpdated": "Services updated successfully",
-    "servicesUpdateError": "Failed to update services"
+    "servicesUpdateError": "Failed to update services",
+    "credentialCertify": "I certify that all information provided is accurate and truthful. I can provide supporting documentation (certificates, diplomas, degrees, licenses, awards, and/or certifications) upon request to verify my qualifications.",
+    "credentialDescription": "We reserve the right to request verification documents at any time, including for random compliance checks or in response to complaints.",
+    "credentialRequired": "You must certify your credentials to continue.",
+    "credentialVerification": "Credential Verification",
+    "uploadCredentials": "Upload Credentials (optional)",
+    "uploadDescription": "Upload certificates, diplomas, licenses, or other credentials. Accepted formats: PDF, JPG, PNG (max 10MB each)."
   },
   "referral": {
     "pageTitle": "Referral Program - MD Baise",
@@ -1478,7 +1665,9 @@
       "repeatCustomers": "Repeat Customers",
       "avgCompletionTime": "Avg Completion Time",
       "completionRate": "Completion Rate"
-    }
+    },
+    "customerDashboard": "Customer Dashboard",
+    "providerDashboard": "Provider Dashboard"
   },
   "customerDashboard": {
     "title": "My Dashboard",
@@ -1515,6 +1704,11 @@
       "selectJob": "Select a Job to View Location",
       "description": "Go to the Active Jobs tab and select a job to view its location on the map.",
       "viewJobs": "View Active Jobs"
+    },
+    "stats": {
+      "activeJobs": "Active Jobs",
+      "pendingApprovals": "Pending",
+      "scheduled": "Scheduled"
     }
   },
   "pixelTracking": {
@@ -1680,7 +1874,9 @@
     "servicesAdded": "Services added successfully",
     "warranties": "Warranties",
     "warrantyInfoDesc": "Explain your warranty coverage",
-    "weekendAvailable": "Weekend availability"
+    "weekendAvailable": "Weekend availability",
+    "specialties": "Specialties & Skills",
+    "specialtiesDesc": "Select your specific areas of expertise. These show as badges on your profile and help clients find you."
   },
   "subscription": {
     "title": "Subscription",
@@ -1752,7 +1948,8 @@
     "requestFailed": "Could not send appointment request.",
     "requestMessageTitle": "Appointment request",
     "requestSent": "Appointment request sent.",
-    "sendRequest": "Send request"
+    "sendRequest": "Send request",
+    "bookWith": "Book with"
   },
   "doctorProfile": {
     "loading": "Loading doctor profile...",
@@ -1804,7 +2001,8 @@
     "professionalism": "Professionalism",
     "punctuality": "Punctuality",
     "doctorResponse": "Doctor's Response",
-    "helpful": "Helpful"
+    "helpful": "Helpful",
+    "notFound": "Doctor not found"
   },
   "security": {
     "weak": "Weak",
@@ -2277,5 +2475,9 @@
       "name": "ENT (Otolaryngology)",
       "description": "Ear, nose, and throat specialists"
     }
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service"
   }
 }

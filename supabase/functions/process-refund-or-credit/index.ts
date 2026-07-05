@@ -169,6 +169,26 @@ serve(async (req) => {
       memo: reason || `Payment adjustment for ${originalTransaction.id}`,
     });
 
+    const { error: balanceError } = await supabaseAdmin.rpc("apply_provider_balance_delta", {
+      target_provider_id: originalTransaction.provider_id,
+      balance_bucket: "available",
+      delta_amount: -amount,
+      balance_currency: originalTransaction.currency,
+    });
+
+    if (balanceError) throw balanceError;
+
+    if (body.destination === "internal_balance") {
+      const { error: internalBalanceError } = await supabaseAdmin.rpc("apply_provider_balance_delta", {
+        target_provider_id: originalTransaction.provider_id,
+        balance_bucket: "internal_credit",
+        delta_amount: amount,
+        balance_currency: originalTransaction.currency,
+      });
+
+      if (internalBalanceError) throw internalBalanceError;
+    }
+
     const invoice = originalTransaction.invoice as Record<string, unknown> | null;
     const customerId = invoice?.customer_id as string | null | undefined;
     if ((body.destination === "service_credit" || body.destination === "internal_balance") && customerId) {

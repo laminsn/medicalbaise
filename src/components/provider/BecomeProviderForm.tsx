@@ -140,7 +140,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const { user, updateProfile } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [certifications, setCertifications] = useState<UploadedFile[]>([]);
   const [uploadingCerts, setUploadingCerts] = useState(false);
@@ -415,16 +415,13 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
         await supabase.from('provider_services').insert(servicesInserts);
       }
 
-      // Update user profile type to provider
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ user_type: 'provider' })
-        .eq('user_id', user.id);
+      // Promote through a guarded RPC so database hardening can allow this one transition.
+      const { error: profileError } = await supabase.rpc('promote_current_user_to_provider');
 
       if (profileError) throw profileError;
 
-      // Update local profile state
-      await updateProfile({ user_type: 'provider' });
+      // Update local profile state after the database transition completes.
+      await refreshProfile();
 
       toast.success(t('provider.registrationSuccess'));
       onOpenChange(false);
