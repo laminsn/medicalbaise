@@ -11,6 +11,7 @@ import {
   MessageCircle,
   PlugZap,
   RefreshCcw,
+  Send,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -87,6 +88,12 @@ const CATALOG_META = [
     category: 'messaging',
     icon: MessageCircle,
   },
+  {
+    key: 'postiz',
+    name: 'Postiz',
+    category: 'social',
+    icon: Send,
+  },
 ] as const;
 
 const INTEGRATION_COPY = {
@@ -101,6 +108,7 @@ const INTEGRATION_COPY = {
       quickbooks: 'Sync invoices, customers, payments, refunds, credits, subcontractor costs, and tax records.',
       plaid: 'Verify bank accounts, reconcile payouts, and enrich transaction visibility.',
       whatsapp_business: 'Send fallback reminders and campaign messages while keeping the portal as the source of truth.',
+      postiz: 'Schedule and sync provider social content across connected Postiz channels while keeping campaigns tied to Baise records.',
     },
     requiredTitle: 'API integrations',
     requiredDescription: 'Create a provider account to connect productivity, AI, accounting, banking, and messaging tools.',
@@ -137,6 +145,7 @@ const INTEGRATION_COPY = {
       quickbooks: 'Sincroniza facturas, clientes, pagos, reembolsos, creditos, costos de subcontratistas y registros fiscales.',
       plaid: 'Verifica cuentas bancarias, reconcilia pagos y mejora la visibilidad de transacciones.',
       whatsapp_business: 'Envia recordatorios y campanas de apoyo mientras el portal sigue siendo la fuente principal.',
+      postiz: 'Programa y sincroniza contenido social del proveedor en canales conectados de Postiz manteniendo campanas ligadas a Baise.',
     },
     requiredTitle: 'Integraciones API',
     requiredDescription: 'Crea una cuenta de proveedor para conectar herramientas de productividad, IA, contabilidad, banca y mensajes.',
@@ -173,6 +182,7 @@ const INTEGRATION_COPY = {
       quickbooks: 'Sincronize faturas, clientes, pagamentos, reembolsos, creditos, custos de subcontratados e registros fiscais.',
       plaid: 'Verifique contas bancarias, reconcilie repasses e melhore a visibilidade das transacoes.',
       whatsapp_business: 'Envie lembretes e campanhas de apoio mantendo o portal como fonte principal.',
+      postiz: 'Agende e sincronize conteudo social do prestador nos canais conectados do Postiz mantendo campanhas ligadas ao Baise.',
     },
     requiredTitle: 'Integracoes API',
     requiredDescription: 'Crie uma conta de prestador para conectar ferramentas de produtividade, IA, contabilidade, bancos e mensagens.',
@@ -337,6 +347,11 @@ export function ProviderIntegrationsManager() {
                 )}
                 {record?.last_sync_at && (
                   <p className="mt-2 text-xs text-muted-foreground">{copy.lastSync} {new Date(record.last_sync_at).toLocaleString()}</p>
+                )}
+                {typeof record?.metadata?.channels_count === 'number' && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {record.metadata.channels_count} Postiz channel{record.metadata.channels_count === 1 ? '' : 's'} synced
+                  </p>
                 )}
                 <div className="mt-4 flex gap-2">
                   <Button size="sm" className="flex-1" disabled={isBusy} onClick={() => manageIntegration(integration, 'connect')}>

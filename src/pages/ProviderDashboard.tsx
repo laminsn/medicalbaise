@@ -28,6 +28,7 @@ import { ProviderCalendarManager } from '@/components/provider/ProviderCalendarM
 import { ProviderIntegrationsManager } from '@/components/provider/ProviderIntegrationsManager';
 import { ProviderMessagingCommandCenter } from '@/components/provider/ProviderMessagingCommandCenter';
 import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
+import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
 import {
   BarChart3,
   MessageSquare,
@@ -253,6 +254,10 @@ export default function ProviderDashboard() {
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t('dashboard.tabs.jobs', 'Jobs')}</span>
             </TabsTrigger>
+            <TabsTrigger value="crm" className="gap-2 py-3">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">CRM</span>
+            </TabsTrigger>
             <TabsTrigger value="payments" className="gap-2 py-3">
               <CreditCard className="h-4 w-4" />
               <span className="hidden sm:inline">Payments</span>
@@ -301,6 +306,10 @@ export default function ProviderDashboard() {
           <TabsContent value="jobs" className="space-y-6">
             {currentProviderId && <UpcomingAppointments providerId={currentProviderId} />}
             <ProviderActiveJobs />
+          </TabsContent>
+
+          <TabsContent value="crm" className="space-y-6">
+            <ProviderCRMWorkspace />
           </TabsContent>
 
           <TabsContent value="payments" className="space-y-6">

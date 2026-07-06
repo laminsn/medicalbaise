@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Bell, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBrowserNotifications } from '@/hooks/useBrowserNotifications';
+import { toast } from 'sonner';
 
 const DISMISSED_KEY = 'notification_dismissed_at';
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
@@ -16,7 +17,7 @@ function shouldShowBanner(): boolean {
 
 export const NotificationPermissionBanner = () => {
   const { t } = useTranslation();
-  const { isSupported, permission, requestPermission } = useBrowserNotifications();
+  const { isSupported, permission, requestPermission, registerPushSubscription, registrationError } = useBrowserNotifications();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,13 @@ export const NotificationPermissionBanner = () => {
   };
 
   const handleEnable = async () => {
-    await requestPermission();
+    const registered = await registerPushSubscription();
+    if (!registered) {
+      const permissionGranted = await requestPermission();
+      if (permissionGranted && registrationError) {
+        toast.info(registrationError);
+      }
+    }
     localStorage.setItem(DISMISSED_KEY, String(Date.now()));
     setVisible(false);
   };

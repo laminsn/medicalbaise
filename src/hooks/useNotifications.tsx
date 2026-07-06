@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
 import { useTranslation } from 'react-i18next';
+import { useBrowserNotifications } from '@/hooks/useBrowserNotifications';
 
 export interface Notification {
   id: string;
@@ -56,6 +57,7 @@ export function useNotifications() {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const { isGranted, sendNotification } = useBrowserNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<ScheduledReminder[]>([]);
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
@@ -331,6 +333,13 @@ export function useNotifications() {
               title: newNotification.title,
               description: newNotification.message,
             });
+
+            if (isGranted) {
+              sendNotification(newNotification.title, {
+                body: newNotification.message,
+                data: { url: newNotification.action_url || '/notifications' },
+              });
+            }
           }
         )
         .subscribe((status, err) => {
@@ -345,7 +354,7 @@ export function useNotifications() {
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user?.id, isGranted, sendNotification]);
 
   return {
     notifications,
