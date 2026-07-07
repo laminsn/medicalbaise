@@ -30,6 +30,7 @@ import { ProviderOperationsLog } from '@/components/provider/ProviderOperationsL
 import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
 import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
 import { ProviderWorkflowCommandCenter } from '@/components/provider/ProviderWorkflowCommandCenter';
+import { ProviderDeliveryCommandCenter } from '@/components/provider/ProviderDeliveryCommandCenter';
 import {
   BarChart3,
   Calendar,
@@ -282,6 +283,7 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="work" className="space-y-6">
+            <ProviderDeliveryCommandCenter />
             <ProviderCalendarManager />
             <ScheduledServicesSection />
             <BidTemplates mode="manage" />
