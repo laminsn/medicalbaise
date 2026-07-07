@@ -29,6 +29,7 @@ import { ProviderMessagingCommandCenter } from '@/components/provider/ProviderMe
 import { ProviderOperationsLog } from '@/components/provider/ProviderOperationsLog';
 import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
 import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
+import { ProviderWorkflowCommandCenter } from '@/components/provider/ProviderWorkflowCommandCenter';
 import {
   BarChart3,
   Calendar,
@@ -271,6 +272,7 @@ export default function ProviderDashboard() {
 
           <TabsContent value="today" className="space-y-6">
             <DashboardOverview />
+            <ProviderWorkflowCommandCenter />
             {currentProviderId && <UpcomingAppointments providerId={currentProviderId} />}
             <ProviderActiveJobs />
           </TabsContent>

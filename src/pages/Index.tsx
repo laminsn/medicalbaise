@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { HeroSection } from '@/components/home/HeroSection';
+import { HomeTrustStrip } from '@/components/home/HomeTrustStrip';
 import { ProTierBanner } from '@/components/home/ProTierBanner';
 import { CategoryGrid } from '@/components/home/CategoryGrid';
 import { FeaturedProviders } from '@/components/home/FeaturedProviders';
@@ -36,6 +37,7 @@ const Index = () => {
       <AppLayout>
         <main className="flex flex-col min-h-screen">
           <HeroSection />
+          <HomeTrustStrip />
           <ProTierBanner />
           <CategoryGrid />
           <FeaturedProviders />
