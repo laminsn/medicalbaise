@@ -26,6 +26,7 @@ import { BidTemplates } from '@/components/provider/BidTemplates';
 import { ProviderCalendarManager } from '@/components/provider/ProviderCalendarManager';
 import { ProviderIntegrationsManager } from '@/components/provider/ProviderIntegrationsManager';
 import { ProviderMessagingCommandCenter } from '@/components/provider/ProviderMessagingCommandCenter';
+import { ProviderOperationsLog } from '@/components/provider/ProviderOperationsLog';
 import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPaymentsWorkspace';
 import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
 import {
@@ -37,6 +38,7 @@ import {
   Briefcase,
   Wallet,
   Target,
+  Users,
   Megaphone,
   Video,
   MapPin,
@@ -305,6 +307,7 @@ export default function ProviderDashboard() {
 
           <TabsContent value="settings" className="space-y-6">
             <ProviderIntegrationsManager />
+            <ProviderOperationsLog />
             {isEliteOrAbove ? (
               <>
                 <AutoReplySettings providerTier={providerTier} />
