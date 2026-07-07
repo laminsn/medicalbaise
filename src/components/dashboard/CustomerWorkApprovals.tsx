@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Image, Clock, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, Image, Clock, CheckCircle, XCircle, PenLine } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { SignaturePad } from '@/components/signature/SignaturePad';
 
 interface WorkApprovalMedia {
   id: string;
@@ -24,9 +27,46 @@ interface WorkApprovalMedia {
   } | null;
 }
 
+interface ProviderWorkSignoff {
+  id: string;
+  title: string;
+  signoff_type: string;
+  status: string;
+  signer_name: string | null;
+  signer_email: string | null;
+  signature_data_url: string | null;
+  signed_at: string | null;
+  notes: string | null;
+  created_at: string;
+  provider: {
+    business_name: string | null;
+  } | null;
+  quote: {
+    title: string | null;
+    quote_number: string | null;
+  } | null;
+  project: {
+    project_name: string | null;
+  } | null;
+}
+
+interface ProviderWorkAttachment {
+  id: string;
+  signoff_id: string | null;
+  file_name: string;
+  file_path: string;
+  bucket_id: string;
+  mime_type: string | null;
+  attachment_type: string;
+  caption: string | null;
+  signed_url?: string | null;
+  created_at: string;
+}
+
 export function CustomerWorkApprovals() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [signatureForms, setSignatureForms] = useState<Record<string, { signerName: string; signatureDataUrl: string }>>({});
 
   const { data: approvals, isLoading, refetch } = useQuery({
     queryKey: ['customer-work-approvals', user?.id],
@@ -68,6 +108,56 @@ export function CustomerWorkApprovals() {
     enabled: !!user,
   });
 
+  const { data: signoffData, isLoading: isLoadingSignoffs, refetch: refetchSignoffs } = useQuery({
+    queryKey: ['customer-provider-signoffs', user?.id],
+    queryFn: async () => {
+      const [signoffsRes, attachmentsRes] = await Promise.all([
+        supabase
+          .from('provider_work_signoffs')
+          .select(`
+            id,
+            title,
+            signoff_type,
+            status,
+            signer_name,
+            signer_email,
+            signature_data_url,
+            signed_at,
+            notes,
+            created_at,
+            provider:providers (business_name),
+            quote:provider_quote_records (title, quote_number),
+            project:provider_projects (project_name)
+          `)
+          .eq('customer_id', user?.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('provider_work_attachments')
+          .select('id, signoff_id, file_name, file_path, bucket_id, mime_type, attachment_type, caption, created_at')
+          .eq('customer_id', user?.id)
+          .order('created_at', { ascending: false }),
+      ]);
+
+      if (signoffsRes.error) throw signoffsRes.error;
+      if (attachmentsRes.error) throw attachmentsRes.error;
+
+      const attachments = await Promise.all(
+        ((attachmentsRes.data || []) as ProviderWorkAttachment[]).map(async (attachment) => {
+          const { data } = await supabase.storage
+            .from(attachment.bucket_id || 'provider-work-media')
+            .createSignedUrl(attachment.file_path, 60 * 60);
+          return { ...attachment, signed_url: data?.signedUrl || null };
+        }),
+      );
+
+      return {
+        signoffs: (signoffsRes.data || []) as unknown as ProviderWorkSignoff[],
+        attachments,
+      };
+    },
+    enabled: !!user,
+  });
+
   const handleApprove = async (id: string) => {
     const { error } = await supabase
       .from('work_approval_media')
@@ -96,8 +186,45 @@ export function CustomerWorkApprovals() {
     }
   };
 
+  const handleSignOff = async (signoff: ProviderWorkSignoff) => {
+    const form = signatureForms[signoff.id];
+    if (!form?.signatureDataUrl) {
+      toast.error(t('workApproval.signatureRequired', 'Please add your signature first.'));
+      return;
+    }
+
+    const { error } = await supabase
+      .from('provider_work_signoffs')
+      .update({
+        status: 'signed',
+        signer_name: form.signerName || signoff.signer_name || user?.email || null,
+        signature_data_url: form.signatureDataUrl,
+        signature_method: 'drawn',
+        signed_by: user?.id,
+        signed_at: new Date().toISOString(),
+        signed_user_agent: navigator.userAgent,
+      })
+      .eq('id', signoff.id)
+      .eq('customer_id', user?.id);
+
+    if (error) {
+      toast.error(t('workApproval.signError', 'Could not save signature.'));
+      return;
+    }
+
+    toast.success(t('workApproval.signSuccess', 'Sign-off saved.'));
+    setSignatureForms((prev) => {
+      const next = { ...prev };
+      delete next[signoff.id];
+      return next;
+    });
+    refetchSignoffs();
+  };
+
   const pendingApprovals = approvals?.filter(a => a.status === 'pending') || [];
   const recentApprovals = approvals?.slice(0, 5) || [];
+  const signoffs = signoffData?.signoffs || [];
+  const proofAttachments = signoffData?.attachments || [];
 
   if (isLoading) {
     return (
@@ -110,7 +237,111 @@ export function CustomerWorkApprovals() {
   }
 
   return (
-    <Card>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <PenLine className="h-5 w-5" />
+              {t('workApproval.signoffsTitle', 'Client sign-offs')}
+            </CardTitle>
+            {signoffs.filter((item) => item.status === 'requested').length > 0 && (
+              <Badge variant="destructive">
+                {signoffs.filter((item) => item.status === 'requested').length} {t('customerDashboard.workApprovals.pending')}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingSignoffs ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : signoffs.length > 0 ? (
+            <div className="space-y-4">
+              {signoffs.slice(0, 6).map((signoff) => {
+                const form = signatureForms[signoff.id] || { signerName: signoff.signer_name || '', signatureDataUrl: '' };
+                const attachments = proofAttachments.filter((attachment) => attachment.signoff_id === signoff.id);
+                return (
+                  <div key={signoff.id} className="rounded-lg border border-border/50 p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="font-medium">{signoff.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {signoff.provider?.business_name || signoff.quote?.title || signoff.project?.project_name || format(new Date(signoff.created_at), 'MMM dd, yyyy')}
+                        </p>
+                      </div>
+                      <Badge className={
+                        signoff.status === 'signed' ? 'bg-green-500/20 text-green-500' :
+                        signoff.status === 'declined' ? 'bg-red-500/20 text-red-500' :
+                        'bg-yellow-500/20 text-yellow-500'
+                      }>
+                        {signoff.status}
+                      </Badge>
+                    </div>
+                    {signoff.notes && <p className="mt-2 text-sm text-muted-foreground">{signoff.notes}</p>}
+                    {attachments.length > 0 && (
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        {attachments.slice(0, 4).map((attachment) => (
+                          attachment.signed_url ? (
+                            <a key={attachment.id} href={attachment.signed_url} target="_blank" rel="noreferrer" className="rounded-md border p-2 text-sm hover:bg-muted">
+                              {attachment.mime_type?.startsWith('image/') ? (
+                                <img src={attachment.signed_url} alt={attachment.caption || attachment.file_name} className="mb-2 h-24 w-full rounded object-cover" />
+                              ) : null}
+                              <span className="line-clamp-1">{attachment.caption || attachment.file_name}</span>
+                            </a>
+                          ) : (
+                            <div key={attachment.id} className="rounded-md border p-2 text-sm text-muted-foreground">
+                              <span className="line-clamp-1">{attachment.caption || attachment.file_name}</span>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    )}
+                    {signoff.status === 'requested' && (
+                      <div className="mt-4 space-y-3">
+                        <Input
+                          value={form.signerName}
+                          placeholder={t('workApproval.signerName', 'Your name')}
+                          onChange={(event) => setSignatureForms((prev) => ({
+                            ...prev,
+                            [signoff.id]: { ...form, signerName: event.target.value },
+                          }))}
+                        />
+                        <SignaturePad
+                          value={form.signatureDataUrl}
+                          onChange={(signatureDataUrl) => setSignatureForms((prev) => ({
+                            ...prev,
+                            [signoff.id]: { ...form, signatureDataUrl },
+                          }))}
+                          clearLabel={t('workApproval.clearSignature', 'Clear signature')}
+                          placeholder={t('workApproval.signHere', 'Sign here')}
+                        />
+                        <Button size="sm" onClick={() => handleSignOff(signoff)}>
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          {t('workApproval.signOff', 'Sign off')}
+                        </Button>
+                      </div>
+                    )}
+                    {signoff.status === 'signed' && signoff.signature_data_url && (
+                      <img src={signoff.signature_data_url} alt={signoff.title} className="mt-3 max-h-20 rounded border bg-background object-contain" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <PenLine className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground text-sm">
+                {t('workApproval.noSignoffs', 'No client sign-offs are waiting right now.')}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
@@ -189,6 +420,7 @@ export function CustomerWorkApprovals() {
           </div>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 }

@@ -47,7 +47,7 @@ export default function CustomerDashboard() {
 
       const jobIds = activeJobs?.map((job) => job.id) || [];
 
-      const [jobsRes, scheduledRes, approvalsRes] = await Promise.all([
+      const [jobsRes, scheduledRes, approvalsRes, signoffsRes] = await Promise.all([
         supabase
           .from('active_jobs')
           .select('id', { count: 'exact', head: true })
@@ -65,12 +65,17 @@ export default function CustomerDashboard() {
               .in('active_job_id', jobIds)
               .eq('status', 'pending')
           : Promise.resolve({ count: 0 }),
+        supabase
+          .from('provider_work_signoffs')
+          .select('id', { count: 'exact', head: true })
+          .eq('customer_id', user.id)
+          .eq('status', 'requested'),
       ]);
 
       return {
         jobs: jobsRes.count || 0,
         scheduled: scheduledRes.count || 0,
-        approvals: approvalsRes.count || 0,
+        approvals: (approvalsRes.count || 0) + (signoffsRes.count || 0),
       };
     },
     enabled: !!user,

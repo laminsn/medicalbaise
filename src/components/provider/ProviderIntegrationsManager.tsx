@@ -5,6 +5,8 @@ import {
   Building2,
   CalendarDays,
   Cloud,
+  Copy,
+  KeyRound,
   Landmark,
   Loader2,
   Mail,
@@ -12,11 +14,13 @@ import {
   PlugZap,
   RefreshCcw,
   Send,
+  ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -29,6 +33,18 @@ type IntegrationRecord = {
   scopes: string[];
   last_sync_at: string | null;
   metadata?: Record<string, unknown> | null;
+};
+
+type ProviderApiKey = {
+  id: string;
+  key_name: string;
+  key_prefix: string;
+  key_last_four: string;
+  scopes: string[];
+  status: string;
+  created_at: string;
+  last_used_at: string | null;
+  expires_at: string | null;
 };
 
 const db = supabase as any;
@@ -133,6 +149,18 @@ const INTEGRATION_COPY = {
     serverDescription: 'The portal stores integration status and config, not raw API secrets in the browser.',
     recordsTitle: 'Campaigns stay tied to records',
     recordsDescription: 'Messages, invoices, receipts, and calendar activity remain connected for proof and taxes.',
+    apiKeyTitle: 'AI API keys',
+    apiKeyDescription: 'Generate provider-scoped keys for approved AI assistants and automation tools. Full keys are shown once.',
+    keyName: 'Key name',
+    createKey: 'Generate key',
+    revokeKey: 'Revoke',
+    oneTimeKey: 'Copy this key now. It will not be shown again.',
+    copyKey: 'Copy key',
+    copied: 'Copied.',
+    keyCreated: 'API key generated.',
+    keyRevoked: 'API key revoked.',
+    keyError: 'Unable to manage API keys.',
+    noKeys: 'No AI API keys yet.',
   },
   es: {
     catalog: {
@@ -170,6 +198,18 @@ const INTEGRATION_COPY = {
     serverDescription: 'El portal guarda estado y configuracion, no secretos API en el navegador.',
     recordsTitle: 'Las campanas quedan ligadas a registros',
     recordsDescription: 'Mensajes, facturas, recibos y calendario permanecen conectados para prueba e impuestos.',
+    apiKeyTitle: 'Claves API de IA',
+    apiKeyDescription: 'Genera claves del proveedor para asistentes de IA y automatizaciones aprobadas. La clave completa se muestra una sola vez.',
+    keyName: 'Nombre de clave',
+    createKey: 'Generar clave',
+    revokeKey: 'Revocar',
+    oneTimeKey: 'Copia esta clave ahora. No se mostrara otra vez.',
+    copyKey: 'Copiar clave',
+    copied: 'Copiado.',
+    keyCreated: 'Clave API generada.',
+    keyRevoked: 'Clave API revocada.',
+    keyError: 'No se pudieron gestionar las claves API.',
+    noKeys: 'Aun no hay claves API de IA.',
   },
   pt: {
     catalog: {
@@ -207,6 +247,18 @@ const INTEGRATION_COPY = {
     serverDescription: 'O portal guarda status e configuracao, nao segredos de API no navegador.',
     recordsTitle: 'Campanhas ficam ligadas aos registros',
     recordsDescription: 'Mensagens, faturas, recibos e calendario permanecem conectados para prova e impostos.',
+    apiKeyTitle: 'Chaves API de IA',
+    apiKeyDescription: 'Gere chaves do prestador para assistentes de IA e automacoes aprovadas. A chave completa aparece uma unica vez.',
+    keyName: 'Nome da chave',
+    createKey: 'Gerar chave',
+    revokeKey: 'Revogar',
+    oneTimeKey: 'Copie esta chave agora. Ela nao sera exibida novamente.',
+    copyKey: 'Copiar chave',
+    copied: 'Copiado.',
+    keyCreated: 'Chave API gerada.',
+    keyRevoked: 'Chave API revogada.',
+    keyError: 'Nao foi possivel gerenciar chaves API.',
+    noKeys: 'Ainda nao ha chaves API de IA.',
   },
 } as const;
 
@@ -229,8 +281,12 @@ export function ProviderIntegrationsManager() {
   );
   const [providerId, setProviderId] = useState<string | null>(null);
   const [records, setRecords] = useState<IntegrationRecord[]>([]);
+  const [apiKeys, setApiKeys] = useState<ProviderApiKey[]>([]);
+  const [keyName, setKeyName] = useState('Provider AI key');
+  const [createdApiKey, setCreatedApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [apiKeyBusy, setApiKeyBusy] = useState(false);
 
   const recordsByKey = useMemo(
     () => new Map(records.map((record) => [record.integration_key, record])),
@@ -251,13 +307,22 @@ export function ProviderIntegrationsManager() {
     if (!nextProviderId) return;
     setIsLoading(true);
     try {
-      const { data, error } = await db
+      const [{ data, error }, apiKeysRes] = await Promise.all([
+        db
         .from('provider_integrations')
         .select('id, integration_key, display_name, category, status, scopes, last_sync_at, metadata')
         .eq('provider_id', nextProviderId)
-        .order('display_name', { ascending: true });
+        .order('display_name', { ascending: true }),
+        db
+          .from('provider_ai_api_keys')
+          .select('id, key_name, key_prefix, key_last_four, scopes, status, created_at, last_used_at, expires_at')
+          .eq('provider_id', nextProviderId)
+          .order('created_at', { ascending: false }),
+      ]);
       if (error) throw error;
+      if (apiKeysRes.error) throw apiKeysRes.error;
       setRecords(data || []);
+      setApiKeys(apiKeysRes.data || []);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.recordsError);
     } finally {
@@ -297,6 +362,50 @@ export function ProviderIntegrationsManager() {
     } finally {
       setBusyKey(null);
     }
+  };
+
+  const createApiKey = async () => {
+    setApiKeyBusy(true);
+    setCreatedApiKey('');
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-provider-ai-api-key', {
+        body: {
+          action: 'create',
+          keyName,
+          scopes: ['ai.records.read', 'ai.records.write', 'ai.campaigns.write'],
+        },
+      });
+      if (error) throw error;
+      setCreatedApiKey(data?.apiKey || '');
+      toast.success(copy.keyCreated);
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.keyError);
+    } finally {
+      setApiKeyBusy(false);
+    }
+  };
+
+  const revokeApiKey = async (keyId: string) => {
+    setApiKeyBusy(true);
+    try {
+      const { error } = await supabase.functions.invoke('manage-provider-ai-api-key', {
+        body: { action: 'revoke', keyId },
+      });
+      if (error) throw error;
+      toast.success(copy.keyRevoked);
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.keyError);
+    } finally {
+      setApiKeyBusy(false);
+    }
+  };
+
+  const copyCreatedKey = async () => {
+    if (!createdApiKey) return;
+    await navigator.clipboard.writeText(createdApiKey);
+    toast.success(copy.copied);
   };
 
   if (!providerId) {
@@ -368,6 +477,63 @@ export function ProviderIntegrationsManager() {
               </article>
             );
           })}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRound className="h-5 w-5" />
+            {copy.apiKeyTitle}
+          </CardTitle>
+          <CardDescription>{copy.apiKeyDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+          <div className="space-y-3 rounded-lg border p-4">
+            <label className="space-y-2 text-sm font-medium">
+              <span>{copy.keyName}</span>
+              <Input value={keyName} onChange={(event) => setKeyName(event.target.value)} />
+            </label>
+            <Button onClick={createApiKey} disabled={apiKeyBusy || keyName.trim().length < 3} className="w-full">
+              {apiKeyBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
+              {copy.createKey}
+            </Button>
+            {createdApiKey && (
+              <div className="space-y-2 rounded-md border bg-muted p-3">
+                <p className="text-xs font-medium text-muted-foreground">{copy.oneTimeKey}</p>
+                <code className="block break-all rounded bg-background p-2 text-xs">{createdApiKey}</code>
+                <Button size="sm" variant="outline" onClick={copyCreatedKey}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  {copy.copyKey}
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="space-y-3">
+            {apiKeys.length === 0 ? (
+              <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">{copy.noKeys}</p>
+            ) : apiKeys.map((apiKey) => (
+              <div key={apiKey.id} className="rounded-lg border p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{apiKey.key_name}</p>
+                    <p className="text-xs text-muted-foreground">{apiKey.key_prefix}_...{apiKey.key_last_four}</p>
+                  </div>
+                  <Badge variant={apiKey.status === 'active' ? 'default' : 'secondary'}>{apiKey.status}</Badge>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {apiKey.scopes.map((scope) => <Badge key={scope} variant="outline">{scope}</Badge>)}
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">{new Date(apiKey.created_at).toLocaleString()}</p>
+                  <Button size="sm" variant="outline" disabled={apiKeyBusy || apiKey.status !== 'active'} onClick={() => revokeApiKey(apiKey.id)}>
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    {copy.revokeKey}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

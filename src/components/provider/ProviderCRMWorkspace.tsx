@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next';
 import {
   Bell,
   Briefcase,
+  Camera,
   CheckCircle2,
   ClipboardList,
   FileText,
   Loader2,
   MessageSquare,
+  PenLine,
   Plus,
   Send,
   Target,
+  Upload,
   Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -31,9 +34,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/lib/currency';
+import { SignaturePad } from '@/components/signature/SignaturePad';
 
 type CRMContact = {
   id: string;
+  customer_id: string | null;
   full_name: string;
   company_name: string | null;
   email: string | null;
@@ -117,6 +122,40 @@ type CRMActivity = {
   channel: string;
   status: string;
   due_at: string | null;
+  created_at: string;
+};
+
+type WorkSignoff = {
+  id: string;
+  contact_id: string | null;
+  quote_id: string | null;
+  project_id: string | null;
+  customer_id: string | null;
+  title: string;
+  signoff_type: string;
+  status: string;
+  signer_name: string | null;
+  signer_email: string | null;
+  signature_data_url: string | null;
+  signed_at: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+type WorkAttachment = {
+  id: string;
+  contact_id: string | null;
+  quote_id: string | null;
+  project_id: string | null;
+  signoff_id: string | null;
+  file_name: string;
+  file_path: string;
+  bucket_id: string;
+  file_size: number | null;
+  mime_type: string | null;
+  attachment_type: string;
+  caption: string | null;
+  signed_url?: string | null;
   created_at: string;
 };
 
@@ -206,6 +245,29 @@ const CRM_COPY = {
     markContacted: 'Mark contacted',
     convertToProject: 'Convert to project',
     markDone: 'Mark done',
+    signoffTitle: 'Client sign-off and proof',
+    signoffDescription: 'Collect approvals, signatures, completed-work photos, unexpected-problem evidence, and quote or estimate attachments.',
+    createSignoff: 'Create sign-off request',
+    signoffName: 'Sign-off title',
+    signoffType: 'Sign-off type',
+    signerName: 'Signer name',
+    signerEmail: 'Signer email',
+    captureSignature: 'Capture client signature',
+    clearSignature: 'Clear signature',
+    saveSignature: 'Save signed approval',
+    signatureRequired: 'Draw or capture a client signature first.',
+    createdSignoff: 'Sign-off request created.',
+    signedSignoff: 'Client sign-off saved.',
+    uploadProof: 'Upload work proof',
+    attachmentType: 'Attachment type',
+    attachmentCaption: 'Caption',
+    files: 'Files',
+    uploadFiles: 'Upload files',
+    uploadedFiles: 'Proof uploaded.',
+    noSignoffs: 'No sign-off records yet.',
+    noAttachments: 'No proof files yet.',
+    signoffList: 'Sign-off records',
+    attachmentList: 'Proof and attachments',
   },
   es: {
     requiredTitle: 'Gestion de CRM',
@@ -290,6 +352,29 @@ const CRM_COPY = {
     markContacted: 'Marcar contactado',
     convertToProject: 'Convertir en proyecto',
     markDone: 'Completar',
+    signoffTitle: 'Aprobacion del cliente y prueba',
+    signoffDescription: 'Recolecta aprobaciones, firmas, fotos de trabajo terminado, evidencia de problemas y adjuntos de cotizaciones o estimados.',
+    createSignoff: 'Crear solicitud de aprobacion',
+    signoffName: 'Titulo de aprobacion',
+    signoffType: 'Tipo de aprobacion',
+    signerName: 'Nombre del firmante',
+    signerEmail: 'Email del firmante',
+    captureSignature: 'Capturar firma del cliente',
+    clearSignature: 'Borrar firma',
+    saveSignature: 'Guardar aprobacion firmada',
+    signatureRequired: 'Dibuja o captura una firma primero.',
+    createdSignoff: 'Solicitud de aprobacion creada.',
+    signedSignoff: 'Aprobacion del cliente guardada.',
+    uploadProof: 'Subir prueba del trabajo',
+    attachmentType: 'Tipo de adjunto',
+    attachmentCaption: 'Descripcion',
+    files: 'Archivos',
+    uploadFiles: 'Subir archivos',
+    uploadedFiles: 'Prueba subida.',
+    noSignoffs: 'Aun no hay aprobaciones.',
+    noAttachments: 'Aun no hay pruebas.',
+    signoffList: 'Registros de aprobacion',
+    attachmentList: 'Pruebas y adjuntos',
   },
   pt: {
     requiredTitle: 'Gestao de CRM',
@@ -374,6 +459,29 @@ const CRM_COPY = {
     markContacted: 'Marcar contactado',
     convertToProject: 'Converter em projeto',
     markDone: 'Concluir',
+    signoffTitle: 'Aprovacao do cliente e prova',
+    signoffDescription: 'Colete aprovacoes, assinaturas, fotos do trabalho concluido, evidencias de problemas e anexos de orcamentos ou estimativas.',
+    createSignoff: 'Criar solicitacao de aprovacao',
+    signoffName: 'Titulo da aprovacao',
+    signoffType: 'Tipo de aprovacao',
+    signerName: 'Nome do assinante',
+    signerEmail: 'Email do assinante',
+    captureSignature: 'Capturar assinatura do cliente',
+    clearSignature: 'Limpar assinatura',
+    saveSignature: 'Salvar aprovacao assinada',
+    signatureRequired: 'Desenhe ou capture uma assinatura primeiro.',
+    createdSignoff: 'Solicitacao de aprovacao criada.',
+    signedSignoff: 'Aprovacao do cliente salva.',
+    uploadProof: 'Enviar prova do trabalho',
+    attachmentType: 'Tipo de anexo',
+    attachmentCaption: 'Descricao',
+    files: 'Arquivos',
+    uploadFiles: 'Enviar arquivos',
+    uploadedFiles: 'Prova enviada.',
+    noSignoffs: 'Ainda nao ha aprovacoes.',
+    noAttachments: 'Ainda nao ha provas.',
+    signoffList: 'Registros de aprovacao',
+    attachmentList: 'Provas e anexos',
   },
 } as const;
 
@@ -387,6 +495,8 @@ const quoteStatuses = ['draft', 'sent', 'viewed', 'accepted', 'declined', 'expir
 const projectStatuses = ['planning', 'scheduled', 'in_progress', 'waiting_client', 'on_hold', 'completed', 'cancelled'];
 const projectPriorities = ['low', 'normal', 'high', 'urgent'];
 const activityTypes = ['note', 'call', 'email', 'whatsapp', 'portal_message', 'meeting', 'task', 'follow_up', 'campaign', 'payment', 'review_request'];
+const signoffTypes = ['quote_acceptance', 'estimate_approval', 'work_completed', 'milestone', 'problem_acknowledgement', 'change_order', 'proof_review'];
+const attachmentTypes = ['completed_work', 'unexpected_problem', 'proof', 'quote_attachment', 'estimate_attachment', 'before', 'after', 'other'];
 
 const getCopyKey = (language?: string) => {
   if (language?.startsWith('es')) return 'es';
@@ -404,6 +514,9 @@ const toLocalInputValue = (date: Date) => {
   return local.toISOString().slice(0, 16);
 };
 
+const sanitizeFileName = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120) || 'upload';
+
 export function ProviderCRMWorkspace() {
   const { user } = useAuth();
   const { i18n } = useTranslation();
@@ -415,8 +528,12 @@ export function ProviderCRMWorkspace() {
   const [projects, setProjects] = useState<ProviderProject[]>([]);
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [activities, setActivities] = useState<CRMActivity[]>([]);
+  const [signoffs, setSignoffs] = useState<WorkSignoff[]>([]);
+  const [attachments, setAttachments] = useState<WorkAttachment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [attachmentFiles, setAttachmentFiles] = useState<FileList | null>(null);
+  const [signatureDataUrl, setSignatureDataUrl] = useState('');
 
   const [contactForm, setContactForm] = useState({
     fullName: '',
@@ -488,6 +605,27 @@ export function ProviderCRMWorkspace() {
     notify: true,
   });
 
+  const [signoffForm, setSignoffForm] = useState({
+    contactId: '',
+    quoteId: '',
+    projectId: '',
+    title: '',
+    signoffType: 'work_completed',
+    signerName: '',
+    signerEmail: '',
+    notes: '',
+    selectedSignoffId: '',
+  });
+
+  const [attachmentForm, setAttachmentForm] = useState({
+    contactId: '',
+    quoteId: '',
+    projectId: '',
+    signoffId: '',
+    attachmentType: 'proof',
+    caption: '',
+  });
+
   const contactById = useMemo(
     () => new Map(contacts.map((contact) => [contact.id, contact])),
     [contacts],
@@ -524,17 +662,28 @@ export function ProviderCRMWorkspace() {
     if (!nextProviderId) return;
     setIsLoading(true);
     try {
-      const [contactsRes, oppsRes, quotesRes, projectsRes, tasksRes, activitiesRes] = await Promise.all([
+      const [contactsRes, oppsRes, quotesRes, projectsRes, tasksRes, activitiesRes, signoffsRes, attachmentsRes] = await Promise.all([
         db.from('provider_crm_contacts').select('*').eq('provider_id', nextProviderId).order('updated_at', { ascending: false }).limit(100),
         db.from('provider_crm_opportunities').select('*').eq('provider_id', nextProviderId).order('updated_at', { ascending: false }).limit(100),
         db.from('provider_quote_records').select('*').eq('provider_id', nextProviderId).order('updated_at', { ascending: false }).limit(100),
         db.from('provider_projects').select('*').eq('provider_id', nextProviderId).order('updated_at', { ascending: false }).limit(100),
         db.from('provider_project_tasks').select('*').eq('provider_id', nextProviderId).order('due_at', { ascending: true, nullsFirst: false }).limit(100),
         db.from('provider_crm_activities').select('*').eq('provider_id', nextProviderId).order('created_at', { ascending: false }).limit(100),
+        db.from('provider_work_signoffs').select('*').eq('provider_id', nextProviderId).order('created_at', { ascending: false }).limit(100),
+        db.from('provider_work_attachments').select('*').eq('provider_id', nextProviderId).order('created_at', { ascending: false }).limit(100),
       ]);
 
-      const firstError = [contactsRes, oppsRes, quotesRes, projectsRes, tasksRes, activitiesRes].find((result) => result.error)?.error;
+      const firstError = [contactsRes, oppsRes, quotesRes, projectsRes, tasksRes, activitiesRes, signoffsRes, attachmentsRes].find((result) => result.error)?.error;
       if (firstError) throw firstError;
+
+      const attachmentsWithUrls = await Promise.all(
+        (attachmentsRes.data || []).map(async (attachment: WorkAttachment) => {
+          const { data } = await supabase.storage
+            .from(attachment.bucket_id || 'provider-work-media')
+            .createSignedUrl(attachment.file_path, 60 * 60);
+          return { ...attachment, signed_url: data?.signedUrl || null };
+        }),
+      );
 
       setContacts(contactsRes.data || []);
       setOpportunities(oppsRes.data || []);
@@ -542,6 +691,8 @@ export function ProviderCRMWorkspace() {
       setProjects(projectsRes.data || []);
       setTasks(tasksRes.data || []);
       setActivities(activitiesRes.data || []);
+      setSignoffs(signoffsRes.data || []);
+      setAttachments(attachmentsWithUrls);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.recordsError);
     } finally {
@@ -810,6 +961,115 @@ export function ProviderCRMWorkspace() {
     }
   };
 
+  const createSignoff = async () => {
+    if (!providerId || !user) return;
+    if (signoffForm.title.trim().length < 3) {
+      toast.error(copy.validationActivity);
+      return;
+    }
+    const contact = contactById.get(signoffForm.contactId);
+    setIsSaving(true);
+    try {
+      const { data, error } = await db.from('provider_work_signoffs').insert({
+        provider_id: providerId,
+        contact_id: signoffForm.contactId || null,
+        quote_id: signoffForm.quoteId || null,
+        project_id: signoffForm.projectId || null,
+        customer_id: contact?.customer_id || null,
+        requested_by: user.id,
+        title: signoffForm.title,
+        signoff_type: signoffForm.signoffType,
+        status: 'requested',
+        signer_name: signoffForm.signerName || contact?.full_name || null,
+        signer_email: signoffForm.signerEmail || contact?.email || null,
+        notes: signoffForm.notes || null,
+      }).select('id').single();
+      if (error) throw error;
+      toast.success(copy.createdSignoff);
+      setSignoffForm((prev) => ({ ...prev, title: '', notes: '', selectedSignoffId: data?.id || prev.selectedSignoffId }));
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.createError);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveSignature = async () => {
+    if (!providerId || !user) return;
+    if (!signoffForm.selectedSignoffId || !signatureDataUrl) {
+      toast.error(copy.signatureRequired);
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const { error } = await db
+        .from('provider_work_signoffs')
+        .update({
+          status: 'signed',
+          signer_name: signoffForm.signerName || null,
+          signer_email: signoffForm.signerEmail || null,
+          signature_data_url: signatureDataUrl,
+          signature_method: 'drawn',
+          signed_by: user.id,
+          signed_at: new Date().toISOString(),
+          signed_user_agent: navigator.userAgent,
+        })
+        .eq('id', signoffForm.selectedSignoffId)
+        .eq('provider_id', providerId);
+      if (error) throw error;
+      toast.success(copy.signedSignoff);
+      setSignatureDataUrl('');
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.createError);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const uploadAttachments = async () => {
+    if (!providerId || !user || !attachmentFiles?.length) return;
+    const files = Array.from(attachmentFiles);
+    const contact = contactById.get(attachmentForm.contactId);
+    setIsSaving(true);
+    try {
+      for (const file of files) {
+        const filePath = `${user.id}/${providerId}/${Date.now()}-${sanitizeFileName(file.name)}`;
+        const { error: uploadError } = await supabase.storage
+          .from('provider-work-media')
+          .upload(filePath, file, { upsert: false });
+        if (uploadError) throw uploadError;
+
+        const { error } = await db.from('provider_work_attachments').insert({
+          provider_id: providerId,
+          contact_id: attachmentForm.contactId || null,
+          quote_id: attachmentForm.quoteId || null,
+          project_id: attachmentForm.projectId || null,
+          signoff_id: attachmentForm.signoffId || null,
+          customer_id: contact?.customer_id || null,
+          uploaded_by: user.id,
+          file_name: file.name,
+          file_path: filePath,
+          bucket_id: 'provider-work-media',
+          file_size: file.size,
+          mime_type: file.type || null,
+          attachment_type: attachmentForm.attachmentType,
+          caption: attachmentForm.caption || null,
+        });
+        if (error) throw error;
+      }
+      toast.success(copy.uploadedFiles);
+      setAttachmentFiles(null);
+      setAttachmentForm((prev) => ({ ...prev, caption: '' }));
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.createError);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const updateRecord = async (table: string, id: string, updates: Record<string, unknown>) => {
     const { error } = await db.from(table).update(updates).eq('id', id);
     if (error) {
@@ -993,6 +1253,126 @@ export function ProviderCRMWorkspace() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PenLine className="h-5 w-5" />
+                {copy.signoffTitle}
+              </CardTitle>
+              <CardDescription>{copy.signoffDescription}</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-6 xl:grid-cols-2">
+              <div className="space-y-3">
+                <ContactSelect label={copy.contacts} value={signoffForm.contactId} contacts={contacts} emptyLabel={copy.allContacts} onChange={(value) => setSignoffForm((prev) => ({ ...prev, contactId: value }))} />
+                <Field label={copy.quotes}>
+                  <Select value={signoffForm.quoteId || 'none'} onValueChange={(value) => setSignoffForm((prev) => ({ ...prev, quoteId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.quotes}</SelectItem>
+                      {quotes.map((quote) => <SelectItem key={quote.id} value={quote.id}>{quote.quote_number || quote.title}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={copy.projects}>
+                  <Select value={signoffForm.projectId || 'none'} onValueChange={(value) => setSignoffForm((prev) => ({ ...prev, projectId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.projects}</SelectItem>
+                      {projects.map((project) => <SelectItem key={project.id} value={project.id}>{project.project_name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={copy.signoffName}><Input value={signoffForm.title} onChange={(event) => setSignoffForm((prev) => ({ ...prev, title: event.target.value }))} /></Field>
+                <SelectField label={copy.signoffType} value={signoffForm.signoffType} onChange={(value) => setSignoffForm((prev) => ({ ...prev, signoffType: value }))} values={signoffTypes} />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field label={copy.signerName}><Input value={signoffForm.signerName} onChange={(event) => setSignoffForm((prev) => ({ ...prev, signerName: event.target.value }))} /></Field>
+                  <Field label={copy.signerEmail}><Input type="email" value={signoffForm.signerEmail} onChange={(event) => setSignoffForm((prev) => ({ ...prev, signerEmail: event.target.value }))} /></Field>
+                </div>
+                <Field label={copy.notes}><Textarea value={signoffForm.notes} onChange={(event) => setSignoffForm((prev) => ({ ...prev, notes: event.target.value }))} /></Field>
+                <Button onClick={createSignoff} disabled={isSaving} className="w-full">
+                  <PenLine className="mr-2 h-4 w-4" />
+                  {copy.createSignoff}
+                </Button>
+              </div>
+              <div className="space-y-3">
+                <Field label={copy.captureSignature}>
+                  <Select value={signoffForm.selectedSignoffId || 'none'} onValueChange={(value) => setSignoffForm((prev) => ({ ...prev, selectedSignoffId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.signoffList}</SelectItem>
+                      {signoffs.filter((signoff) => signoff.status !== 'signed').map((signoff) => (
+                        <SelectItem key={signoff.id} value={signoff.id}>{signoff.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <SignaturePad
+                  value={signatureDataUrl}
+                  onChange={setSignatureDataUrl}
+                  clearLabel={copy.clearSignature}
+                  placeholder={copy.captureSignature}
+                />
+                <Button onClick={saveSignature} disabled={isSaving || !signoffForm.selectedSignoffId} className="w-full">
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  {copy.saveSignature}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Camera className="h-5 w-5" />
+                {copy.uploadProof}
+              </CardTitle>
+              <CardDescription>{copy.signoffDescription}</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 lg:grid-cols-2">
+              <div className="space-y-3">
+                <ContactSelect label={copy.contacts} value={attachmentForm.contactId} contacts={contacts} emptyLabel={copy.allContacts} onChange={(value) => setAttachmentForm((prev) => ({ ...prev, contactId: value }))} />
+                <Field label={copy.quotes}>
+                  <Select value={attachmentForm.quoteId || 'none'} onValueChange={(value) => setAttachmentForm((prev) => ({ ...prev, quoteId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.quotes}</SelectItem>
+                      {quotes.map((quote) => <SelectItem key={quote.id} value={quote.id}>{quote.quote_number || quote.title}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={copy.projects}>
+                  <Select value={attachmentForm.projectId || 'none'} onValueChange={(value) => setAttachmentForm((prev) => ({ ...prev, projectId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.projects}</SelectItem>
+                      {projects.map((project) => <SelectItem key={project.id} value={project.id}>{project.project_name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <div className="space-y-3">
+                <Field label={copy.signoffList}>
+                  <Select value={attachmentForm.signoffId || 'none'} onValueChange={(value) => setAttachmentForm((prev) => ({ ...prev, signoffId: value === 'none' ? '' : value }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">{copy.signoffList}</SelectItem>
+                      {signoffs.map((signoff) => <SelectItem key={signoff.id} value={signoff.id}>{signoff.title}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <SelectField label={copy.attachmentType} value={attachmentForm.attachmentType} onChange={(value) => setAttachmentForm((prev) => ({ ...prev, attachmentType: value }))} values={attachmentTypes} />
+                <Field label={copy.attachmentCaption}><Input value={attachmentForm.caption} onChange={(event) => setAttachmentForm((prev) => ({ ...prev, caption: event.target.value }))} /></Field>
+                <Field label={copy.files}>
+                  <Input type="file" multiple accept="image/*,video/*,application/pdf" onChange={(event) => setAttachmentFiles(event.target.files)} />
+                </Field>
+                <Button onClick={uploadAttachments} disabled={isSaving || !attachmentFiles?.length} className="w-full">
+                  <Upload className="mr-2 h-4 w-4" />
+                  {copy.uploadFiles}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-6">
@@ -1141,6 +1521,57 @@ export function ProviderCRMWorkspace() {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{copy.signoffList}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {signoffs.length === 0 ? <Empty text={copy.noSignoffs} /> : signoffs.slice(0, 10).map((signoff) => (
+                <div key={signoff.id} className="rounded-lg border p-3">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Badge>{signoff.signoff_type.replaceAll('_', ' ')}</Badge>
+                    <Badge variant={signoff.status === 'signed' ? 'default' : 'secondary'}>{signoff.status}</Badge>
+                  </div>
+                  <p className="font-semibold">{signoff.title}</p>
+                  <p className="text-sm text-muted-foreground">{signoff.signer_name || contactById.get(signoff.contact_id || '')?.full_name || copy.signerName}</p>
+                  {signoff.signature_data_url && (
+                    <img src={signoff.signature_data_url} alt={signoff.title} className="mt-3 max-h-20 rounded-md border bg-background object-contain" />
+                  )}
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {signoff.signed_at ? new Date(signoff.signed_at).toLocaleString() : new Date(signoff.created_at).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{copy.attachmentList}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {attachments.length === 0 ? <Empty text={copy.noAttachments} /> : attachments.slice(0, 10).map((attachment) => (
+                <div key={attachment.id} className="rounded-lg border p-3">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Badge>{attachment.attachment_type.replaceAll('_', ' ')}</Badge>
+                    {attachment.quote_id && <Badge variant="outline">{copy.quotes}</Badge>}
+                    {attachment.project_id && <Badge variant="outline">{copy.projects}</Badge>}
+                  </div>
+                  {attachment.signed_url && attachment.mime_type?.startsWith('image/') ? (
+                    <img src={attachment.signed_url} alt={attachment.caption || attachment.file_name} className="mb-3 h-28 w-full rounded-md object-cover" />
+                  ) : null}
+                  <p className="font-medium">{attachment.file_name}</p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{attachment.caption || contactById.get(attachment.contact_id || '')?.full_name || copy.attachmentCaption}</p>
+                  {attachment.signed_url && (
+                    <a href={attachment.signed_url} target="_blank" rel="noreferrer" className="mt-2 inline-flex text-sm font-medium text-primary underline-offset-4 hover:underline">
+                      {copy.files}
+                    </a>
+                  )}
+                </div>
+              ))}
             </CardContent>
           </Card>
 
