@@ -290,7 +290,7 @@ export default function Auth() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6 pb-8">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 pb-8">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mx-auto mb-4">

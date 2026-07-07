@@ -46,6 +46,14 @@ type PaymentPlanBody = {
   milestones?: MilestoneInput[];
 };
 
+const hashInviteToken = async (token: string) => {
+  const bytes = new TextEncoder().encode(token);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
 const addCadence = (date: Date, cadence: PaymentCadence, index: number) => {
   const next = new Date(date);
   if (cadence === "daily") next.setDate(next.getDate() + index);
@@ -209,6 +217,15 @@ serve(async (req) => {
 
     if (planError || !paymentPlan) throw planError;
 
+    await supabaseAdmin
+      .from("provider_invoices")
+      .update({
+        payment_plan_id: paymentPlan.id,
+        client_action_status: body.clientEmail ? "sent" : "not_sent",
+        last_sent_at: body.clientEmail ? new Date().toISOString() : null,
+      })
+      .eq("id", invoice.id);
+
     const itemInputs: Array<{ label: string; amount: number; dueAt: Date; releaseBenchmark?: string }> = [];
     if (Array.isArray(body.milestones) && body.milestones.length > 0) {
       for (const [index, milestone] of body.milestones.entries()) {
@@ -337,6 +354,48 @@ serve(async (req) => {
     });
 
     await supabaseAdmin.from("provider_communication_events").insert(communicationEvents);
+
+    if (body.clientEmail) {
+      const inviteToken = crypto.randomUUID();
+      const tokenHash = await hashInviteToken(inviteToken);
+
+      await supabaseAdmin.from("provider_client_portal_invites").insert({
+        provider_id: provider.id,
+        customer_id: customerId,
+        invited_by: user.id,
+        invite_type: "payment_request",
+        resource_type: "payment_plan",
+        resource_id: paymentPlan.id,
+        email: body.clientEmail.toLowerCase(),
+        token_hash: tokenHash,
+        metadata: {
+          account_required: true,
+          invoice_id: invoice.id,
+          invoice_number: invoice.invoice_number,
+          client_display_id: invoice.client_display_id,
+          sign_in_path: "/auth",
+          customer_dashboard_path: "/customer-dashboard",
+        },
+      });
+    }
+
+    await supabaseAdmin.rpc("log_provider_audit_event", {
+      target_provider_id: provider.id,
+      actor_id: user.id,
+      actor_kind: "owner",
+      event_action: "payment_plan.created",
+      event_resource_type: "provider_payment_plan",
+      event_resource_id: paymentPlan.id,
+      event_severity: "info",
+      event_metadata: {
+        invoice_id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        plan_type: planType,
+        cadence,
+        installment_count: items.length,
+        payment_method: paymentMethod,
+      },
+    });
 
     return new Response(
       JSON.stringify({

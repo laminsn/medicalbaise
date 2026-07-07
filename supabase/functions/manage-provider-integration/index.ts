@@ -204,6 +204,10 @@ serve(async (req) => {
             category,
             scopes,
             status: "disabled",
+            connection_health: "disabled",
+            sync_status: "idle",
+            next_sync_at: null,
+            last_error: null,
             config: body.config || {},
             metadata: {
               disconnected_at: new Date().toISOString(),
@@ -218,27 +222,64 @@ serve(async (req) => {
         .select("id, status")
         .single();
       if (error) throw error;
+
+      await supabaseAdmin.rpc("log_provider_audit_event", {
+        target_provider_id: provider.id,
+        actor_id: user.id,
+        actor_kind: "owner",
+        event_action: "integration.disabled",
+        event_resource_type: "provider_integration",
+        event_resource_id: data.id,
+        event_severity: "info",
+        event_metadata: {
+          integration_key: integrationKey,
+          display_name: displayName,
+        },
+      });
+
       return new Response(JSON.stringify({ integration: data }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     let syncMetadata: Record<string, unknown> = {};
+    let syncError: string | null = null;
     let nextStatus =
       body.action === "mark_connected"
         ? "connected"
         : isConfigured
           ? "pending"
           : "needs_attention";
+    let connectionHealth =
+      body.action === "mark_connected"
+        ? "healthy"
+        : isConfigured
+          ? "not_checked"
+          : "needs_auth";
+    let syncStatus =
+      body.action === "sync"
+        ? isConfigured
+          ? "queued"
+          : "needs_auth"
+        : "idle";
 
     if (integrationKey === "postiz" && body.action === "sync" && isConfigured) {
-      const channels = await fetchPostizChannels(Deno.env.get("POSTIZ_API_KEY") || "");
-      syncMetadata = {
-        api_url: getPostizApiUrl(),
-        channels_count: channels.length,
-        channels,
-      };
-      nextStatus = "connected";
+      try {
+        const channels = await fetchPostizChannels(Deno.env.get("POSTIZ_API_KEY") || "");
+        syncMetadata = {
+          api_url: getPostizApiUrl(),
+          channels_count: channels.length,
+          channels,
+        };
+        nextStatus = "connected";
+        connectionHealth = "healthy";
+        syncStatus = "succeeded";
+      } catch (error) {
+        syncError = error instanceof Error ? error.message : "Postiz sync failed";
+        nextStatus = "needs_attention";
+        connectionHealth = "failing";
+        syncStatus = "failed";
+      }
     }
 
     const { data, error } = await supabaseAdmin
@@ -252,6 +293,10 @@ serve(async (req) => {
           category,
           scopes,
           status: nextStatus,
+          connection_health: connectionHealth,
+          sync_status: syncStatus,
+          next_sync_at: isConfigured ? new Date(Date.now() + 60 * 60 * 1000).toISOString() : null,
+          last_error: syncError,
           last_sync_at: body.action === "sync" ? new Date().toISOString() : null,
           config: body.config || {},
           metadata: {
@@ -272,6 +317,46 @@ serve(async (req) => {
       .single();
 
     if (error) throw error;
+
+    if (body.action === "sync" || body.action === "connect" || body.action === "mark_connected") {
+      await supabaseAdmin.from("provider_integration_sync_jobs").insert({
+        provider_id: provider.id,
+        integration_id: data.id,
+        integration_key: integrationKey,
+        job_type: body.action === "sync" ? "sync" : "oauth_exchange",
+        scheduled_at: new Date().toISOString(),
+        started_at: body.action === "sync" && syncStatus !== "needs_auth" ? new Date().toISOString() : null,
+        completed_at: ["succeeded", "failed", "needs_auth"].includes(syncStatus) ? new Date().toISOString() : null,
+        status: syncStatus === "needs_auth" ? "needs_auth" : syncStatus === "succeeded" ? "succeeded" : syncStatus === "failed" ? "failed" : "queued",
+        attempt_count: body.action === "sync" ? 1 : 0,
+        error_message: syncError || (!isConfigured ? `Missing ${missingEnv.join(", ")}` : null),
+        metadata: {
+          integration_key: integrationKey,
+          required_env: requiredEnv,
+          missing_env: missingEnv,
+          configured: isConfigured,
+          ...syncMetadata,
+        },
+      });
+
+      await supabaseAdmin.rpc("log_provider_audit_event", {
+        target_provider_id: provider.id,
+        actor_id: user.id,
+        actor_kind: "owner",
+        event_action: body.action === "sync" ? "integration.sync_requested" : "integration.registered",
+        event_resource_type: "provider_integration",
+        event_resource_id: data.id,
+        event_severity: syncError ? "warning" : "info",
+        event_metadata: {
+          integration_key: integrationKey,
+          display_name: displayName,
+          connection_health: connectionHealth,
+          sync_status: syncStatus,
+          missing_env: missingEnv,
+          error: syncError,
+        },
+      });
+    }
 
     return new Response(
       JSON.stringify({

@@ -7,6 +7,7 @@ import {
   Mail,
   MessageSquare,
   Percent,
+  RefreshCcw,
   Send,
   Smartphone,
 } from 'lucide-react';
@@ -122,6 +123,8 @@ const MESSAGING_COPY = {
     create: 'Create portal-first campaign',
     queue: 'Campaign queue',
     queueDescription: 'Provider messages are kept in Baise first, with email and WhatsApp as fallback channels.',
+    dispatchDue: 'Send due messages',
+    dispatchSuccess: 'Due messages processed',
     empty: 'No campaigns yet.',
     manual: 'Manual',
     loadError: 'Unable to load provider messaging workspace.',
@@ -199,6 +202,8 @@ const MESSAGING_COPY = {
     create: 'Crear campana portal primero',
     queue: 'Cola de campanas',
     queueDescription: 'Los mensajes del proveedor se guardan primero en Baise, con email y WhatsApp como canales de apoyo.',
+    dispatchDue: 'Enviar mensajes vencidos',
+    dispatchSuccess: 'Mensajes vencidos procesados',
     empty: 'Aun no hay campanas.',
     manual: 'Manual',
     loadError: 'No se pudo cargar el centro de mensajes.',
@@ -276,6 +281,8 @@ const MESSAGING_COPY = {
     create: 'Criar campanha portal primeiro',
     queue: 'Fila de campanhas',
     queueDescription: 'As mensagens do prestador ficam primeiro no Baise, com email e WhatsApp como canais de apoio.',
+    dispatchDue: 'Enviar mensagens vencidas',
+    dispatchSuccess: 'Mensagens vencidas processadas',
     empty: 'Ainda nao ha campanhas.',
     manual: 'Manual',
     loadError: 'Nao foi possivel carregar a central de mensagens.',
@@ -307,6 +314,7 @@ export function ProviderMessagingCommandCenter() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isDispatching, setIsDispatching] = useState(false);
 
   const [name, setName] = useState('');
   const [campaignType, setCampaignType] = useState('booking_confirmation');
@@ -437,6 +445,26 @@ export function ProviderMessagingCommandCenter() {
     }
   };
 
+  const dispatchDueMessages = async () => {
+    setIsDispatching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('dispatch-provider-communication-events', {
+        body: { limit: 50 },
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        `${copy.dispatchSuccess}: ${data?.sent || 0} sent, ${data?.deferred || 0} deferred, ${data?.failed || 0} failed.`,
+      );
+      await loadCampaigns();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.recordsError);
+    } finally {
+      setIsDispatching(false);
+    }
+  };
+
   if (!providerId) {
     return (
       <Card>
@@ -556,8 +584,16 @@ export function ProviderMessagingCommandCenter() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{copy.queue}</CardTitle>
-          <CardDescription>{copy.queueDescription}</CardDescription>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>{copy.queue}</CardTitle>
+              <CardDescription>{copy.queueDescription}</CardDescription>
+            </div>
+            <Button variant="outline" onClick={dispatchDueMessages} disabled={isDispatching}>
+              {isDispatching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCcw className="mr-2 h-4 w-4" />}
+              {copy.dispatchDue}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-2">
           {isLoading ? (

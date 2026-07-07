@@ -33,6 +33,10 @@ type IntegrationRecord = {
   status: string;
   scopes: string[];
   last_sync_at: string | null;
+  connection_health?: string | null;
+  sync_status?: string | null;
+  next_sync_at?: string | null;
+  last_error?: string | null;
   metadata?: Record<string, unknown> | null;
 };
 
@@ -139,6 +143,9 @@ const INTEGRATION_COPY = {
     title: 'API integration hub',
     description: 'Connect outside tools only where they make the Baise portal stronger. The portal remains the primary workspace for bookings, files, messages, invoices, analytics, receipts, and campaigns.',
     credentialNeeded: 'Credential needed:',
+    health: 'Health:',
+    syncStatus: 'Sync:',
+    nextSync: 'Next sync:',
     lastSync: 'Last sync:',
     connect: 'Connect',
     disable: 'Disable',
@@ -189,6 +196,9 @@ const INTEGRATION_COPY = {
     title: 'Centro de integraciones API',
     description: 'Conecta herramientas externas solo cuando fortalecen el portal Baise. El portal sigue siendo el espacio principal para reservas, archivos, mensajes, facturas, analitica, recibos y campanas.',
     credentialNeeded: 'Credencial requerida:',
+    health: 'Salud:',
+    syncStatus: 'Sync:',
+    nextSync: 'Proxima sync:',
     lastSync: 'Ultima sincronizacion:',
     connect: 'Conectar',
     disable: 'Desactivar',
@@ -239,6 +249,9 @@ const INTEGRATION_COPY = {
     title: 'Central de integracoes API',
     description: 'Conecte ferramentas externas somente quando fortalecem o portal Baise. O portal continua sendo o espaco principal para reservas, arquivos, mensagens, faturas, analitica, recibos e campanhas.',
     credentialNeeded: 'Credencial necessaria:',
+    health: 'Saude:',
+    syncStatus: 'Sync:',
+    nextSync: 'Proxima sync:',
     lastSync: 'Ultima sincronizacao:',
     connect: 'Conectar',
     disable: 'Desativar',
@@ -320,7 +333,7 @@ export function ProviderIntegrationsManager() {
       const [{ data, error }, apiKeysRes] = await Promise.all([
         db
         .from('provider_integrations')
-        .select('id, integration_key, display_name, category, status, scopes, last_sync_at, metadata')
+        .select('id, integration_key, display_name, category, status, scopes, last_sync_at, connection_health, sync_status, next_sync_at, last_error, metadata')
         .eq('provider_id', nextProviderId)
         .order('display_name', { ascending: true }),
         db
@@ -464,8 +477,20 @@ export function ProviderIntegrationsManager() {
                     {copy.credentialNeeded} {String(record.metadata.env_hint)}
                   </p>
                 )}
+                {record && (
+                  <div className="mt-2 grid gap-1 text-xs text-muted-foreground">
+                    <p>{copy.health} {record.connection_health || 'not checked'}</p>
+                    <p>{copy.syncStatus} {record.sync_status || 'idle'}</p>
+                    {record.next_sync_at && <p>{copy.nextSync} {new Date(record.next_sync_at).toLocaleString()}</p>}
+                  </div>
+                )}
                 {record?.last_sync_at && (
                   <p className="mt-2 text-xs text-muted-foreground">{copy.lastSync} {new Date(record.last_sync_at).toLocaleString()}</p>
+                )}
+                {record?.last_error && (
+                  <p className="mt-2 rounded-md bg-destructive/10 px-2 py-1 text-xs text-destructive">
+                    {record.last_error}
+                  </p>
                 )}
                 {typeof record?.metadata?.channels_count === 'number' && (
                   <p className="mt-2 text-xs text-muted-foreground">

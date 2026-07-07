@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CalendarClock,
+  CreditCard,
   Download,
   FileText,
   Filter,
@@ -27,6 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/lib/currency';
+import { downloadReceiptInvoiceDocument } from '@/lib/providerDocuments';
 
 type ProviderInvoice = {
   id: string;
@@ -66,7 +68,27 @@ type PaymentPlan = {
   installment_count: number;
   status: string;
   start_date: string;
+  billing_mode?: string | null;
+  failure_count?: number | null;
+  last_payment_error?: string | null;
   metadata?: Record<string, unknown> | null;
+};
+
+type PaymentPlanItem = {
+  id: string;
+  payment_plan_id: string;
+  sequence_number: number;
+  label: string;
+  amount: number;
+  currency: string;
+  due_at: string;
+  status: string;
+  paid_at: string | null;
+  checkout_url?: string | null;
+  processor?: string | null;
+  attempt_count?: number | null;
+  last_payment_error?: string | null;
+  client_action_required?: boolean | null;
 };
 
 const db = supabase as any;
@@ -128,6 +150,7 @@ const PAYMENT_COPY = {
     historyTitle: 'Transaction history and exports',
     historyDescription: 'Filter receipts, invoices, credits, refunds, POS payments, and subcontractor releases for tax records.',
     exportCsv: 'Export CSV',
+    downloadReceipt: 'Download receipt',
     preset: 'Preset',
     mtd: 'MTD',
     last30: 'Last 30 days',
@@ -146,6 +169,14 @@ const PAYMENT_COPY = {
     activePlansTitle: 'Active flexible plans',
     activePlansDescriptionLong: 'Payment schedules are connected to invoices, calendar due dates, and portal reminders.',
     noPlans: 'No flexible payment plans yet.',
+    scheduledPayments: 'Scheduled payments',
+    due: 'Due',
+    paidAt: 'Paid',
+    collectPayment: 'Create checkout',
+    openCheckout: 'Open checkout',
+    checkoutCreated: 'Checkout created for',
+    checkoutError: 'Unable to create checkout for this scheduled payment.',
+    retryDue: 'Retry due',
     noClientId: 'No client ID',
     validAmount: 'Enter a valid total amount.',
     titleRequired: 'Add a payment plan title.',
@@ -208,6 +239,7 @@ const PAYMENT_COPY = {
     historyTitle: 'Historial de transacciones y exportaciones',
     historyDescription: 'Filtra recibos, facturas, creditos, reembolsos, pagos POS y liberaciones de subcontratistas para registros fiscales.',
     exportCsv: 'Exportar CSV',
+    downloadReceipt: 'Descargar recibo',
     preset: 'Periodo',
     mtd: 'Mes actual',
     last30: 'Ultimos 30 dias',
@@ -226,6 +258,14 @@ const PAYMENT_COPY = {
     activePlansTitle: 'Planes flexibles activos',
     activePlansDescriptionLong: 'Los calendarios de pago se conectan con facturas, vencimientos del calendario y recordatorios del portal.',
     noPlans: 'Aun no hay planes de pago flexibles.',
+    scheduledPayments: 'Pagos programados',
+    due: 'Vence',
+    paidAt: 'Pagado',
+    collectPayment: 'Crear checkout',
+    openCheckout: 'Abrir checkout',
+    checkoutCreated: 'Checkout creado para',
+    checkoutError: 'No se pudo crear el checkout para este pago programado.',
+    retryDue: 'Reintento pendiente',
     noClientId: 'Sin ID de cliente',
     validAmount: 'Ingresa un total valido.',
     titleRequired: 'Agrega un titulo para el plan de pago.',
@@ -288,6 +328,7 @@ const PAYMENT_COPY = {
     historyTitle: 'Historico de transacoes e exportacoes',
     historyDescription: 'Filtre recibos, faturas, creditos, reembolsos, pagamentos POS e liberacoes de subcontratados para registros fiscais.',
     exportCsv: 'Exportar CSV',
+    downloadReceipt: 'Baixar recibo',
     preset: 'Periodo',
     mtd: 'Mes atual',
     last30: 'Ultimos 30 dias',
@@ -306,6 +347,14 @@ const PAYMENT_COPY = {
     activePlansTitle: 'Planos flexiveis ativos',
     activePlansDescriptionLong: 'Os cronogramas de pagamento ficam conectados a faturas, vencimentos no calendario e lembretes do portal.',
     noPlans: 'Ainda nao ha planos de pagamento flexiveis.',
+    scheduledPayments: 'Pagamentos programados',
+    due: 'Vence',
+    paidAt: 'Pago',
+    collectPayment: 'Criar checkout',
+    openCheckout: 'Abrir checkout',
+    checkoutCreated: 'Checkout criado para',
+    checkoutError: 'Nao foi possivel criar checkout para este pagamento programado.',
+    retryDue: 'Nova tentativa pendente',
     noClientId: 'Sem ID do cliente',
     validAmount: 'Informe um total valido.',
     titleRequired: 'Adicione um titulo para o plano de pagamento.',
@@ -361,6 +410,12 @@ function downloadCsv(filename: string, rows: Array<Record<string, unknown>>) {
   URL.revokeObjectURL(url);
 }
 
+const getMetadataText = (metadata: Record<string, unknown> | null | undefined, key: string) => {
+  const value = metadata?.[key];
+  if (typeof value === 'string' || typeof value === 'number') return String(value);
+  return null;
+};
+
 export function ProviderPaymentsWorkspace() {
   const { user } = useAuth();
   const { i18n } = useTranslation();
@@ -371,7 +426,9 @@ export function ProviderPaymentsWorkspace() {
   const [invoices, setInvoices] = useState<ProviderInvoice[]>([]);
   const [transactions, setTransactions] = useState<ProviderTransaction[]>([]);
   const [plans, setPlans] = useState<PaymentPlan[]>([]);
+  const [paymentItems, setPaymentItems] = useState<PaymentPlanItem[]>([]);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [collectingItemId, setCollectingItemId] = useState<string | null>(null);
   const [datePreset, setDatePreset] = useState('mtd');
   const initialRange = useMemo(() => getDateRange('mtd'), []);
   const [dateFrom, setDateFrom] = useState(initialRange.from);
@@ -431,7 +488,7 @@ export function ProviderPaymentsWorkspace() {
 
       if (statusFilter !== 'all') invoiceQuery = invoiceQuery.eq('payment_status', statusFilter);
 
-      const [invoiceRes, transactionRes, planRes] = await Promise.all([
+      const [invoiceRes, transactionRes, planRes, itemRes] = await Promise.all([
         invoiceQuery,
         db
           .from('provider_payment_transactions')
@@ -443,19 +500,27 @@ export function ProviderPaymentsWorkspace() {
           .limit(75),
         db
           .from('provider_payment_plans')
-          .select('id, title, plan_type, cadence, total_amount, deposit_amount, installment_count, status, start_date, metadata')
+          .select('id, title, plan_type, cadence, total_amount, deposit_amount, installment_count, status, start_date, billing_mode, failure_count, last_payment_error, metadata')
           .eq('provider_id', nextProviderId)
           .order('created_at', { ascending: false })
           .limit(25),
+        db
+          .from('provider_payment_plan_items')
+          .select('id, payment_plan_id, sequence_number, label, amount, currency, due_at, status, paid_at, checkout_url, processor, attempt_count, last_payment_error, client_action_required')
+          .eq('provider_id', nextProviderId)
+          .order('due_at', { ascending: true })
+          .limit(200),
       ]);
 
       if (invoiceRes.error) throw invoiceRes.error;
       if (transactionRes.error) throw transactionRes.error;
       if (planRes.error) throw planRes.error;
+      if (itemRes.error) throw itemRes.error;
 
       setInvoices(invoiceRes.data || []);
       setTransactions(transactionRes.data || []);
       setPlans(planRes.data || []);
+      setPaymentItems(itemRes.data || []);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : copy.recordsError);
     } finally {
@@ -587,6 +652,58 @@ export function ProviderPaymentsWorkspace() {
       });
     }
   };
+
+  const handleDownloadReceipt = (transaction: ProviderTransaction, invoice?: ProviderInvoice) => {
+    downloadReceiptInvoiceDocument({
+      invoiceNumber: invoice?.invoice_number || getMetadataText(transaction.metadata, 'invoice_number') || transaction.id,
+      clientDisplayId: invoice?.client_display_id || getMetadataText(transaction.metadata, 'client_display_id'),
+      serviceDescription: invoice?.service_description || transaction.transaction_type,
+      invoiceType: invoice?.invoice_type,
+      paymentStatus: invoice?.payment_status || transaction.status,
+      totalAmount: transaction.amount,
+      currency: transaction.currency,
+      issuedAt: invoice?.issued_at || transaction.created_at,
+      paidAt: invoice?.paid_at,
+      transactionId: transaction.id,
+      transactionStatus: transaction.status,
+      transactionType: transaction.transaction_type,
+      paymentMethod: transaction.payment_method,
+      processedAt: transaction.processed_at,
+    });
+  };
+
+  const handleCollectScheduledPayment = async (item: PaymentPlanItem) => {
+    setCollectingItemId(item.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment-plan-item-checkout', {
+        body: { paymentPlanItemId: item.id },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        toast.success(`${copy.checkoutCreated} ${item.label}.`);
+        window.location.href = data.url;
+        return;
+      }
+
+      await loadRecords();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : copy.checkoutError);
+    } finally {
+      setCollectingItemId(null);
+    }
+  };
+
+  const itemsByPlan = useMemo(() => {
+    const grouped = new Map<string, PaymentPlanItem[]>();
+    for (const item of paymentItems) {
+      const group = grouped.get(item.payment_plan_id) || [];
+      group.push(item);
+      grouped.set(item.payment_plan_id, group);
+    }
+    return grouped;
+  }, [paymentItems]);
 
   if (!providerId) {
     return (
@@ -820,9 +937,13 @@ export function ProviderPaymentsWorkspace() {
                         {invoice?.service_description || transaction.transaction_type}
                       </p>
                     </div>
-                    <div className="text-left md:text-right">
+                    <div className="flex flex-col items-start gap-2 md:items-end">
                       <p className="font-bold">{formatPrice(Number(transaction.amount || 0))}</p>
                       <p className="text-xs text-muted-foreground">{invoice?.client_display_id || transaction.metadata?.client_display_id || copy.noClientId}</p>
+                      <Button variant="outline" size="sm" onClick={() => handleDownloadReceipt(transaction, invoice)}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {copy.downloadReceipt}
+                      </Button>
                     </div>
                   </div>
                 );
@@ -844,23 +965,84 @@ export function ProviderPaymentsWorkspace() {
           {plans.length === 0 ? (
             <p className="text-sm text-muted-foreground">{copy.noPlans}</p>
           ) : (
-            plans.map((plan) => (
-              <div key={plan.id} className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-medium">{plan.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {plan.plan_type} · {plan.cadence} · {plan.installment_count} payment{plan.installment_count === 1 ? '' : 's'}
-                  </p>
+            plans.map((plan) => {
+              const items = itemsByPlan.get(plan.id) || [];
+              return (
+                <div key={plan.id} className="space-y-3 rounded-lg border p-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-medium">{plan.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {plan.plan_type} · {plan.cadence} · {plan.installment_count} payment{plan.installment_count === 1 ? '' : 's'}
+                      </p>
+                      {plan.last_payment_error && (
+                        <p className="mt-1 text-xs text-destructive">{plan.last_payment_error}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge>{plan.status}</Badge>
+                      <span className="font-bold">{formatPrice(Number(plan.total_amount || 0))}</span>
+                      <Button variant="ghost" size="icon" onClick={() => loadRecords()}>
+                        <RefreshCcw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {items.length > 0 && (
+                    <div className="space-y-2 rounded-md bg-muted/40 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {copy.scheduledPayments}
+                      </p>
+                      {items.map((item) => {
+                        const canCollect = ['scheduled', 'pending', 'overdue', 'failed', 'retry_due'].includes(item.status);
+                        return (
+                          <div key={item.id} className="grid gap-2 rounded-md bg-background p-3 md:grid-cols-[1fr_auto] md:items-center">
+                            <div className="min-w-0">
+                              <div className="mb-1 flex flex-wrap items-center gap-2">
+                                <Badge variant={item.status === 'paid' ? 'default' : item.status === 'retry_due' ? 'destructive' : 'secondary'}>
+                                  {item.status === 'retry_due' ? copy.retryDue : item.status}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {copy.due} {new Date(item.due_at).toLocaleDateString()}
+                                </span>
+                                {item.paid_at && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {copy.paidAt} {new Date(item.paid_at).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="truncate text-sm font-medium">{item.label}</p>
+                              {item.last_payment_error && (
+                                <p className="truncate text-xs text-destructive">{item.last_payment_error}</p>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                              <span className="font-semibold">{formatPrice(Number(item.amount || 0))}</span>
+                              {item.checkout_url && item.status !== 'paid' && (
+                                <Button variant="outline" size="sm" onClick={() => { window.location.href = item.checkout_url || '#'; }}>
+                                  <CreditCard className="mr-2 h-4 w-4" />
+                                  {copy.openCheckout}
+                                </Button>
+                              )}
+                              {canCollect && (
+                                <Button size="sm" onClick={() => handleCollectScheduledPayment(item)} disabled={collectingItemId === item.id}>
+                                  {collectingItemId === item.id ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <CreditCard className="mr-2 h-4 w-4" />
+                                  )}
+                                  {copy.collectPayment}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge>{plan.status}</Badge>
-                  <span className="font-bold">{formatPrice(Number(plan.total_amount || 0))}</span>
-                  <Button variant="ghost" size="icon" onClick={() => loadRecords()}>
-                    <RefreshCcw className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </CardContent>
       </Card>

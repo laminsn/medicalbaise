@@ -11,6 +11,7 @@ import { CustomerWorkApprovals } from '@/components/dashboard/CustomerWorkApprov
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
+import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
 import JobLocationMap from '@/components/map/JobLocationMap';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -26,13 +27,15 @@ import {
   Clock,
   CheckCircle,
   Search,
-  MessageSquare
+  MessageSquare,
+  ReceiptText
 } from 'lucide-react';
 
 export default function CustomerDashboard() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('jobs');
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
   const { data: counts } = useQuery({
@@ -232,8 +235,8 @@ export default function CustomerDashboard() {
         />
 
         {/* Main Tabs */}
-        <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
             <TabsTrigger value="jobs" className="gap-2 py-3">
               <Briefcase className="h-4 w-4" />
               <span className="hidden sm:inline">{t('customerDashboard.tabs.jobs')}</span>
@@ -245,6 +248,10 @@ export default function CustomerDashboard() {
             <TabsTrigger value="approvals" className="gap-2 py-3">
               <Image className="h-4 w-4" />
               <span className="hidden sm:inline">{t('customerDashboard.tabs.approvals')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="gap-2 py-3">
+              <ReceiptText className="h-4 w-4" />
+              <span className="hidden sm:inline">Payments</span>
             </TabsTrigger>
             <TabsTrigger value="map" className="gap-2 py-3">
               <MapPin className="h-4 w-4" />
@@ -264,6 +271,10 @@ export default function CustomerDashboard() {
             <CustomerWorkApprovals />
           </TabsContent>
 
+          <TabsContent value="payments" className="space-y-6">
+            <ClientTransactionHistory />
+          </TabsContent>
+
           <TabsContent value="map" className="space-y-6">
             {selectedJobId ? (
               <JobLocationMap activeJobId={selectedJobId} />
@@ -278,10 +289,7 @@ export default function CustomerDashboard() {
                   <Button 
                     variant="outline" 
                     className="mt-4"
-                    onClick={() => {
-                      const tabsList = document.querySelector('[value="jobs"]');
-                      if (tabsList) (tabsList as HTMLElement).click();
-                    }}
+                    onClick={() => setActiveTab('jobs')}
                   >
                     {t('customerDashboard.map.viewJobs')}
                   </Button>

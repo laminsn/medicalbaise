@@ -86,6 +86,292 @@ async function markProviderPosPaid(
   });
 
   if (balanceError) throw balanceError;
+
+  await supabaseAdmin.rpc("log_provider_audit_event", {
+    target_provider_id: providerId,
+    actor_id: null,
+    actor_kind: "integration",
+    event_action: "pos_payment.succeeded",
+    event_resource_type: "provider_payment_transaction",
+    event_resource_id: transactionId,
+    event_severity: "info",
+    event_metadata: {
+      invoice_id: invoiceId,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+      balance_bucket: balanceBucket,
+    },
+  });
+}
+
+async function markProviderPaymentPlanItemPaid(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  session: Stripe.Checkout.Session,
+) {
+  const metadata = session.metadata || {};
+  if (metadata.type !== "provider_payment_plan_item") return;
+
+  const providerId = metadata.provider_id;
+  const planId = metadata.payment_plan_id;
+  const itemId = metadata.payment_plan_item_id;
+  const transactionId = metadata.transaction_id;
+  const invoiceId = metadata.invoice_id || null;
+
+  if (!providerId || !planId || !itemId || !transactionId) {
+    throw new Error("Payment plan checkout metadata is incomplete");
+  }
+
+  const paymentIntentId = asPaymentIntentId(session.payment_intent);
+  const amount = Number(session.amount_total || 0) / 100;
+  const currency = (session.currency || "brl").toLowerCase();
+  const releaseBenchmark = metadata.release_benchmark || "";
+  const balanceBucket = releaseBenchmark ? "pending" : "available";
+  const now = new Date().toISOString();
+
+  const { error: transactionError } = await supabaseAdmin
+    .from("provider_payment_transactions")
+    .update({
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+      status: "succeeded",
+      processed_at: now,
+      metadata: {
+        ...metadata,
+        checkout_completed: true,
+        balance_bucket: balanceBucket,
+      },
+    })
+    .eq("id", transactionId);
+
+  if (transactionError) throw transactionError;
+
+  const { error: itemError } = await supabaseAdmin
+    .from("provider_payment_plan_items")
+    .update({
+      payment_transaction_id: transactionId,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+      status: "paid",
+      paid_at: now,
+      client_action_required: false,
+      last_payment_error: null,
+    })
+    .eq("id", itemId);
+
+  if (itemError) throw itemError;
+
+  await supabaseAdmin
+    .from("provider_recurring_payment_runs")
+    .update({
+      transaction_id: transactionId,
+      status: "succeeded",
+      completed_at: now,
+      processor_reference: session.id,
+      metadata: {
+        stripe_payment_intent_id: paymentIntentId,
+        checkout_completed: true,
+      },
+    })
+    .eq("processor_reference", session.id);
+
+  await supabaseAdmin.from("provider_ledger_entries").insert({
+    provider_id: providerId,
+    related_transaction_id: transactionId,
+    invoice_id: invoiceId || null,
+    subcontractor_id: metadata.subcontractor_id || null,
+    entry_type: balanceBucket === "pending" ? "payment_pending" : "payment_available",
+    direction: "credit",
+    amount,
+    currency,
+    memo: releaseBenchmark
+      ? `Payment plan item paid and held until benchmark: ${releaseBenchmark}`
+      : `Payment plan item paid for invoice ${metadata.invoice_number || invoiceId || planId}`,
+    metadata: {
+      payment_plan_id: planId,
+      payment_plan_item_id: itemId,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+    },
+  });
+
+  const { error: balanceError } = await supabaseAdmin.rpc("apply_provider_balance_delta", {
+    target_provider_id: providerId,
+    balance_bucket: balanceBucket,
+    delta_amount: amount,
+    balance_currency: currency,
+  });
+
+  if (balanceError) throw balanceError;
+
+  const { data: remainingItems, error: remainingError } = await supabaseAdmin
+    .from("provider_payment_plan_items")
+    .select("id")
+    .eq("payment_plan_id", planId)
+    .not("status", "in", "(paid,released,cancelled)");
+
+  if (remainingError) throw remainingError;
+
+  const isPlanComplete = (remainingItems || []).length === 0;
+
+  await supabaseAdmin
+    .from("provider_payment_plans")
+    .update({
+      status: isPlanComplete ? "completed" : "active",
+      last_billed_at: now,
+      failure_count: 0,
+      last_payment_error: null,
+    })
+    .eq("id", planId);
+
+  if (invoiceId) {
+    await supabaseAdmin
+      .from("provider_invoices")
+      .update({
+        payment_status: isPlanComplete ? "paid" : "processing",
+        paid_at: isPlanComplete ? now : null,
+        client_action_status: isPlanComplete ? "paid" : "accepted",
+      })
+      .eq("id", invoiceId);
+  }
+
+  const { data: plan } = await supabaseAdmin
+    .from("provider_payment_plans")
+    .select("customer_id, created_by, title")
+    .eq("id", planId)
+    .maybeSingle();
+
+  if (plan?.customer_id) {
+    await supabaseAdmin.from("provider_communication_events").insert({
+      provider_id: providerId,
+      customer_id: plan.customer_id,
+      created_by: plan.created_by,
+      purpose: "receipt",
+      channel: "portal",
+      subject: "Payment received",
+      message_body: `Payment received for ${plan.title || metadata.invoice_number || "your Baise service"}. Your receipt and invoice history are available in the portal.`,
+      scheduled_at: now,
+      sent_at: now,
+      status: "sent",
+      delivered_via: "portal",
+      metadata: {
+        invoice_id: invoiceId,
+        payment_plan_id: planId,
+        payment_plan_item_id: itemId,
+        transaction_id: transactionId,
+        stripe_session_id: session.id,
+      },
+    });
+
+    await supabaseAdmin.from("notifications").insert({
+      user_id: plan.customer_id,
+      title: "Payment received",
+      message: `Your payment for ${plan.title || "Baise service"} was recorded.`,
+      type: "payment",
+      priority: "normal",
+      action_url: "/customer-dashboard",
+      metadata: {
+        invoice_id: invoiceId,
+        payment_plan_id: planId,
+        payment_plan_item_id: itemId,
+        transaction_id: transactionId,
+      },
+    });
+  }
+
+  await supabaseAdmin.rpc("log_provider_audit_event", {
+    target_provider_id: providerId,
+    actor_id: null,
+    actor_kind: "integration",
+    event_action: "payment_plan_item.succeeded",
+    event_resource_type: "provider_payment_plan_item",
+    event_resource_id: itemId,
+    event_severity: "info",
+    event_metadata: {
+      payment_plan_id: planId,
+      invoice_id: invoiceId,
+      transaction_id: transactionId,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+      balance_bucket: balanceBucket,
+      plan_completed: isPlanComplete,
+    },
+  });
+}
+
+async function markProviderPaymentPlanItemFailed(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  session: Stripe.Checkout.Session,
+  reason: string,
+) {
+  const metadata = session.metadata || {};
+  if (metadata.type !== "provider_payment_plan_item") return;
+
+  const providerId = metadata.provider_id;
+  const planId = metadata.payment_plan_id;
+  const itemId = metadata.payment_plan_item_id;
+  const transactionId = metadata.transaction_id;
+  if (!providerId || !planId || !itemId) return;
+
+  const now = new Date().toISOString();
+  const retryAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+  await supabaseAdmin
+    .from("provider_payment_plan_items")
+    .update({
+      status: "retry_due",
+      client_action_required: true,
+      next_attempt_at: retryAt,
+      last_payment_error: reason,
+    })
+    .eq("id", itemId);
+
+  await supabaseAdmin
+    .from("provider_payment_plans")
+    .update({
+      status: "past_due",
+      last_payment_error: reason,
+    })
+    .eq("id", planId);
+
+  if (transactionId) {
+    await supabaseAdmin
+      .from("provider_payment_transactions")
+      .update({
+        status: "failed",
+        processed_at: now,
+        metadata: {
+          ...metadata,
+          failure_reason: reason,
+        },
+      })
+      .eq("id", transactionId);
+  }
+
+  await supabaseAdmin
+    .from("provider_recurring_payment_runs")
+    .update({
+      status: "failed",
+      completed_at: now,
+      error_message: reason,
+      next_attempt_at: retryAt,
+    })
+    .eq("processor_reference", session.id);
+
+  await supabaseAdmin.rpc("log_provider_audit_event", {
+    target_provider_id: providerId,
+    actor_id: null,
+    actor_kind: "integration",
+    event_action: "payment_plan_item.failed",
+    event_resource_type: "provider_payment_plan_item",
+    event_resource_id: itemId,
+    event_severity: "warning",
+    event_metadata: {
+      payment_plan_id: planId,
+      transaction_id: transactionId || null,
+      stripe_session_id: session.id,
+      reason,
+    },
+  });
 }
 
 async function updateProviderSubscription(
@@ -160,7 +446,14 @@ serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         await markProviderPosPaid(supabaseAdmin, session);
+        await markProviderPaymentPlanItemPaid(supabaseAdmin, session);
         await updateProviderSubscription(supabaseAdmin, stripe, session);
+        break;
+      }
+
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await markProviderPaymentPlanItemFailed(supabaseAdmin, session, "Checkout session expired");
         break;
       }
 

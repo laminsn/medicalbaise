@@ -12,7 +12,6 @@ import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { AutoReplySettings } from '@/components/messaging/AutoReplySettings';
-import { CustomMessageTemplates } from '@/components/messaging/CustomMessageTemplates';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { MessageTemplatesPanel } from '@/components/dashboard/MessageTemplatesPanel';
 import { PixelTrackingSettings } from '@/components/dashboard/PixelTrackingSettings';
@@ -31,8 +30,6 @@ import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPayment
 import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
 import {
   BarChart3,
-  MessageSquare,
-  Mail,
   Calendar,
   Crown,
   ArrowUpRight,
@@ -46,8 +43,6 @@ import {
   Clock,
   Search,
   Settings,
-  CreditCard,
-  PlugZap,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -244,84 +239,55 @@ export default function ProviderDashboard() {
           ]}
         />
 
-        {/* KPI Overview */}
-        <DashboardOverview />
-
-        {/* Main Tabs */}
-        <Tabs defaultValue="jobs" className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-12">
-            <TabsTrigger value="jobs" className="gap-2 py-3">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.jobs', 'Jobs')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="crm" className="gap-2 py-3">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">CRM</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="gap-2 py-3">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Payments</span>
-            </TabsTrigger>
-            <TabsTrigger value="scheduled" className="gap-2 py-3">
-              <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.scheduled')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="campaigns" className="gap-2 py-3">
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">Campaigns</span>
-            </TabsTrigger>
-            <TabsTrigger value="integrations" className="gap-2 py-3">
-              <PlugZap className="h-4 w-4" />
-              <span className="hidden sm:inline">Integrations</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2 py-3">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.analytics')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="marketing" className="gap-2 py-3">
-              <Megaphone className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.marketing', 'Marketing')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="autoReply" className="gap-2 py-3" disabled={!isEliteOrAbove}>
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.autoReply')}</span>
-              {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="gap-2 py-3" disabled={!isEliteOrAbove}>
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.messages')}</span>
-              {!isEliteOrAbove && <Crown className="h-3 w-3 text-amber-400" />}
-            </TabsTrigger>
-            <TabsTrigger value="tracking" className="gap-2 py-3" disabled={!isEnterprise}>
+        <Tabs defaultValue="today" className="space-y-6">
+          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+            <TabsTrigger value="today" className="gap-2 py-3">
               <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('dashboard.tabs.tracking')}</span>
-              {!isEnterprise && <Crown className="h-3 w-3 text-purple-400" />}
+              <span>Today</span>
             </TabsTrigger>
-            <TabsTrigger value="bid-templates" className="gap-2 py-3">
-              <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">Bid Templates</span>
+            <TabsTrigger value="clients" className="gap-2 py-3">
+              <Users className="h-4 w-4" />
+              <span>Clients</span>
+            </TabsTrigger>
+            <TabsTrigger value="work" className="gap-2 py-3">
+              <Calendar className="h-4 w-4" />
+              <span>Work</span>
+            </TabsTrigger>
+            <TabsTrigger value="money" className="gap-2 py-3">
+              <Wallet className="h-4 w-4" />
+              <span>Money</span>
+            </TabsTrigger>
+            <TabsTrigger value="growth" className="gap-2 py-3">
+              <BarChart3 className="h-4 w-4" />
+              <span>Growth</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2 py-3">
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="jobs" className="space-y-6">
+          <TabsContent value="today" className="space-y-6">
+            <DashboardOverview />
             {currentProviderId && <UpcomingAppointments providerId={currentProviderId} />}
             <ProviderActiveJobs />
           </TabsContent>
 
-          <TabsContent value="crm" className="space-y-6">
+          <TabsContent value="clients" className="space-y-6">
             <ProviderCRMWorkspace />
           </TabsContent>
 
-          <TabsContent value="payments" className="space-y-6">
+          <TabsContent value="work" className="space-y-6">
+            <ProviderCalendarManager />
+            <ScheduledServicesSection />
+            <BidTemplates mode="manage" />
+          </TabsContent>
+
+          <TabsContent value="money" className="space-y-6">
             <ProviderPaymentsWorkspace />
           </TabsContent>
 
-          <TabsContent value="scheduled" className="space-y-6">
-            <ProviderCalendarManager />
-            <ScheduledServicesSection />
-          </TabsContent>
-
-          <TabsContent value="campaigns" className="space-y-6">
+          <TabsContent value="growth" className="space-y-6">
             <ProviderMessagingCommandCenter />
             {isPt || isEs ? (
               <TranslationPendingCard isEs={isEs} />
@@ -333,43 +299,23 @@ export default function ProviderDashboard() {
                 requiredTier="Elite"
               />
             )}
-          </TabsContent>
-
-          <TabsContent value="integrations" className="space-y-6">
-            <ProviderIntegrationsManager />
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
             <ProviderAnalytics />
-          </TabsContent>
-
-          <TabsContent value="marketing" className="space-y-6">
             <FollowerMarketingPanel />
           </TabsContent>
 
-          <TabsContent value="autoReply" className="space-y-6">
+          <TabsContent value="settings" className="space-y-6">
+            <ProviderIntegrationsManager />
             {isEliteOrAbove ? (
-              <AutoReplySettings providerTier={providerTier} />
+              <>
+                <AutoReplySettings providerTier={providerTier} />
+                <MessageTemplatesPanel providerTier={providerTier} />
+              </>
             ) : (
-              <UpgradePrompt 
-                feature={t('dashboard.features.autoReply')} 
+              <UpgradePrompt
+                feature="Automation settings and custom message templates"
                 requiredTier="Elite"
               />
             )}
-          </TabsContent>
-
-          <TabsContent value="messages" className="space-y-6">
-            {isEliteOrAbove ? (
-              <MessageTemplatesPanel providerTier={providerTier} />
-            ) : (
-              <UpgradePrompt 
-                feature={t('dashboard.features.customMessages')} 
-                requiredTier="Elite"
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="tracking" className="space-y-6">
             {isPt || isEs ? (
               <TranslationPendingCard isEs={isEs} />
             ) : isEnterprise ? (
@@ -383,10 +329,6 @@ export default function ProviderDashboard() {
                 requiredTier="Enterprise"
               />
             )}
-          </TabsContent>
-
-          <TabsContent value="bid-templates" className="space-y-6">
-            <BidTemplates mode="manage" />
           </TabsContent>
         </Tabs>
       </div>
