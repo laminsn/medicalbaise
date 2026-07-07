@@ -16,7 +16,7 @@ type PosCheckoutBody = {
   clientName?: string;
   clientEmail?: string;
   serviceDescription: string;
-  paymentMethod?: "hosted_checkout" | "card" | "wallet" | "pix" | "internal_balance";
+  paymentMethod?: "hosted_checkout" | "card" | "wallet" | "pix" | "internal_balance" | "superwall_stripe";
   activeJobId?: string;
   subcontractorId?: string;
   releaseBenchmark?: string;
@@ -61,6 +61,12 @@ serve(async (req) => {
       ? escapeHtml(body.releaseBenchmark).slice(0, 240)
       : null;
     const paymentMethod = body.paymentMethod || "hosted_checkout";
+    const storedPaymentMethod =
+      paymentMethod === "internal_balance"
+        ? "internal_balance"
+        : paymentMethod === "superwall_stripe"
+          ? "superwall_stripe"
+          : "hosted_checkout";
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -119,7 +125,7 @@ serve(async (req) => {
         currency,
         transaction_type:
           paymentMethod === "internal_balance" ? "internal_balance_payment" : "pos_payment",
-        payment_method: paymentMethod === "internal_balance" ? "internal_balance" : "hosted_checkout",
+        payment_method: storedPaymentMethod,
         status: paymentMethod === "internal_balance" ? "processing" : "pending",
         release_benchmark: safeReleaseBenchmark,
         collected_by_subcontractor: Boolean(body.collectedBySubcontractor),
@@ -127,6 +133,7 @@ serve(async (req) => {
           invoice_number: invoice.invoice_number,
           client_display_id: invoice.client_display_id,
           requested_payment_method: paymentMethod,
+          payment_route: paymentMethod === "superwall_stripe" ? "superwall_app_to_stripe" : storedPaymentMethod,
         },
       })
       .select("id")
@@ -158,6 +165,7 @@ serve(async (req) => {
             invoice_number: invoice.invoice_number,
             client_display_id: invoice.client_display_id,
             requested_payment_method: paymentMethod,
+            payment_route: storedPaymentMethod,
             balance_bucket: balanceBucket,
             internal_balance_recorded: true,
           },
@@ -244,6 +252,8 @@ serve(async (req) => {
         subcontractor_id: body.subcontractorId || "",
         collected_by_subcontractor: String(Boolean(body.collectedBySubcontractor)),
         release_benchmark: safeReleaseBenchmark || "",
+        requested_payment_method: paymentMethod,
+        payment_route: paymentMethod === "superwall_stripe" ? "superwall_app_to_stripe" : storedPaymentMethod,
       },
     });
 
@@ -255,6 +265,8 @@ serve(async (req) => {
           invoice_number: invoice.invoice_number,
           client_display_id: invoice.client_display_id,
           requested_payment_method: paymentMethod,
+          payment_route: paymentMethod === "superwall_stripe" ? "superwall_app_to_stripe" : storedPaymentMethod,
+          superwall_app_to_stripe: paymentMethod === "superwall_stripe",
           checkout_url_created: true,
         },
       })

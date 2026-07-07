@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Cloud,
   Copy,
+  CreditCard,
   KeyRound,
   Landmark,
   Loader2,
@@ -110,6 +111,12 @@ const CATALOG_META = [
     category: 'social',
     icon: Send,
   },
+  {
+    key: 'superwall_stripe',
+    name: 'Superwall + Stripe',
+    category: 'payments',
+    icon: CreditCard,
+  },
 ] as const;
 
 const INTEGRATION_COPY = {
@@ -125,6 +132,7 @@ const INTEGRATION_COPY = {
       plaid: 'Verify bank accounts, reconcile payouts, and enrich transaction visibility.',
       whatsapp_business: 'Send fallback reminders and campaign messages while keeping the portal as the source of truth.',
       postiz: 'Schedule and sync provider social content across connected Postiz channels while keeping campaigns tied to Baise records.',
+      superwall_stripe: 'Run in-app paywalls with Superwall while Stripe handles checkout, subscriptions, refunds, receipts, and revenue records.',
     },
     requiredTitle: 'API integrations',
     requiredDescription: 'Create a provider account to connect productivity, AI, accounting, banking, and messaging tools.',
@@ -174,6 +182,7 @@ const INTEGRATION_COPY = {
       plaid: 'Verifica cuentas bancarias, reconcilia pagos y mejora la visibilidad de transacciones.',
       whatsapp_business: 'Envia recordatorios y campanas de apoyo mientras el portal sigue siendo la fuente principal.',
       postiz: 'Programa y sincroniza contenido social del proveedor en canales conectados de Postiz manteniendo campanas ligadas a Baise.',
+      superwall_stripe: 'Usa paywalls dentro de la app con Superwall mientras Stripe gestiona checkout, suscripciones, reembolsos, recibos y registros de ingresos.',
     },
     requiredTitle: 'Integraciones API',
     requiredDescription: 'Crea una cuenta de proveedor para conectar herramientas de productividad, IA, contabilidad, banca y mensajes.',
@@ -223,6 +232,7 @@ const INTEGRATION_COPY = {
       plaid: 'Verifique contas bancarias, reconcilie repasses e melhore a visibilidade das transacoes.',
       whatsapp_business: 'Envie lembretes e campanhas de apoio mantendo o portal como fonte principal.',
       postiz: 'Agende e sincronize conteudo social do prestador nos canais conectados do Postiz mantendo campanhas ligadas ao Baise.',
+      superwall_stripe: 'Use paywalls dentro do app com Superwall enquanto a Stripe processa checkout, assinaturas, reembolsos, recibos e registros de receita.',
     },
     requiredTitle: 'Integracoes API',
     requiredDescription: 'Crie uma conta de prestador para conectar ferramentas de produtividade, IA, contabilidade, bancos e mensagens.',

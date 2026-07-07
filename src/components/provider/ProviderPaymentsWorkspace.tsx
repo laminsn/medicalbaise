@@ -117,6 +117,7 @@ const PAYMENT_COPY = {
     payments: 'Payments',
     paymentMethod: 'Payment method',
     hostedCheckout: 'Hosted checkout',
+    superwallStripe: 'Superwall + Stripe',
     pix: 'Pix',
     wallet: 'Wallet',
     internalBalance: 'Internal balance',
@@ -196,6 +197,7 @@ const PAYMENT_COPY = {
     payments: 'Pagos',
     paymentMethod: 'Metodo de pago',
     hostedCheckout: 'Checkout alojado',
+    superwallStripe: 'Superwall + Stripe',
     pix: 'Pix',
     wallet: 'Billetera',
     internalBalance: 'Saldo interno',
@@ -275,6 +277,7 @@ const PAYMENT_COPY = {
     payments: 'Pagamentos',
     paymentMethod: 'Metodo de pagamento',
     hostedCheckout: 'Checkout hospedado',
+    superwallStripe: 'Superwall + Stripe',
     pix: 'Pix',
     wallet: 'Carteira',
     internalBalance: 'Saldo interno',
@@ -712,6 +715,7 @@ export function ProviderPaymentsWorkspace() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="hosted_checkout">{copy.hostedCheckout}</SelectItem>
+                    <SelectItem value="superwall_stripe">{copy.superwallStripe}</SelectItem>
                     <SelectItem value="pix">{copy.pix}</SelectItem>
                     <SelectItem value="wallet">{copy.wallet}</SelectItem>
                     <SelectItem value="internal_balance">{copy.internalBalance}</SelectItem>

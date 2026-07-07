@@ -48,7 +48,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatPrice, getUserCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
 
-type PosPaymentMethod = 'hosted_checkout' | 'card' | 'wallet' | 'pix' | 'internal_balance';
+type PosPaymentMethod = 'hosted_checkout' | 'card' | 'wallet' | 'pix' | 'internal_balance' | 'superwall_stripe';
 type RefundDestination = 'original_payment_method' | 'service_credit' | 'internal_balance';
 
 const POS_PAYMENT_METHODS: { value: PosPaymentMethod; label: string; helper: string }[] = [
@@ -61,6 +61,11 @@ const POS_PAYMENT_METHODS: { value: PosPaymentMethod; label: string; helper: str
     value: 'wallet',
     label: 'Apple Pay / Google Pay',
     helper: 'Wallet-ready checkout when enabled for the payment account.',
+  },
+  {
+    value: 'superwall_stripe',
+    label: 'Superwall + Stripe',
+    helper: 'In-app paywall route powered by Superwall with Stripe checkout, receipts, refunds, and ledger records.',
   },
   {
     value: 'pix',
@@ -294,7 +299,7 @@ export default function Payments() {
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="gap-1">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Hosted checkout
+                Superwall + Stripe
               </Badge>
               <Badge variant="secondary" className="gap-1">
                 <Receipt className="h-3.5 w-3.5" />
@@ -332,12 +337,12 @@ export default function Payments() {
                     {t('payments.paymentMethods')}
                   </CardTitle>
                   <CardDescription>
-                    Card, Pix, Apple Pay, Google Pay, and internal balance workflows are handled through secure checkout rails.
+                    Card, Pix, Apple Pay, Google Pay, Superwall paywalls, and internal balance workflows are handled through secure checkout rails.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {['Visa', 'Mastercard', 'Apple Pay', 'Google Pay', 'Pix', 'Amex', 'Discover', 'Internal'].map((method) => (
+                    {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay', 'Pix', 'Superwall', 'Stripe', 'Internal'].map((method) => (
                       <div key={method} className="rounded-lg border border-border bg-muted/40 p-3 text-center text-xs font-bold">
                         {method}
                       </div>

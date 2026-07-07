@@ -41,7 +41,7 @@ type PaymentPlanBody = {
   clientEmail?: string;
   activeJobId?: string;
   subcontractorId?: string;
-  paymentMethod?: "hosted_checkout" | "card" | "wallet" | "pix" | "internal_balance" | "service_credit" | "manual";
+  paymentMethod?: "hosted_checkout" | "card" | "wallet" | "pix" | "internal_balance" | "service_credit" | "manual" | "superwall_stripe";
   autopayEnabled?: boolean;
   milestones?: MilestoneInput[];
 };
@@ -90,6 +90,7 @@ serve(async (req) => {
     const planType = body.planType || "one_time";
     const cadence = body.cadence || (planType === "one_time" ? "one_time" : "monthly");
     const paymentMethod = body.paymentMethod || "hosted_checkout";
+    const paymentRoute = paymentMethod === "superwall_stripe" ? "superwall_app_to_stripe" : paymentMethod;
     const startDate = parseStartDate(body.startDate);
 
     if (!title || title.length < 3) {
@@ -161,6 +162,8 @@ serve(async (req) => {
           client_email: body.clientEmail || null,
           payment_plan_type: planType,
           cadence,
+          requested_payment_method: paymentMethod,
+          payment_route: paymentRoute,
           baise_branding: "discreet_footer",
         },
       })
@@ -196,6 +199,9 @@ serve(async (req) => {
           client_display_id: invoice.client_display_id,
           client_name: body.clientName ? escapeHtml(body.clientName).slice(0, 120) : null,
           client_email: body.clientEmail || null,
+          requested_payment_method: paymentMethod,
+          payment_route: paymentRoute,
+          superwall_app_to_stripe: paymentMethod === "superwall_stripe",
         },
       })
       .select("id")
@@ -268,6 +274,8 @@ serve(async (req) => {
       metadata: {
         invoice_number: invoice.invoice_number,
         client_display_id: invoice.client_display_id,
+        requested_payment_method: paymentMethod,
+        payment_route: paymentRoute,
       },
     }));
 
@@ -296,6 +304,8 @@ serve(async (req) => {
         invoice_id: invoice.id,
         invoice_number: invoice.invoice_number,
         payment_plan_item_label: item.label,
+        requested_payment_method: paymentMethod,
+        payment_route: paymentRoute,
       },
     }));
 
@@ -319,6 +329,8 @@ serve(async (req) => {
           invoice_number: invoice.invoice_number,
           payment_plan_id: paymentPlan.id,
           portal_first: true,
+          requested_payment_method: paymentMethod,
+          payment_route: paymentRoute,
           fallback_channels: ["email", "whatsapp"],
         },
       };

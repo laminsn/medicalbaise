@@ -21,7 +21,14 @@ type IntegrationBody = {
 
 const INTEGRATION_CATALOG: Record<
   string,
-  { displayName: string; category: IntegrationBody["category"]; scopes: string[]; envHint: string; apiUrlEnv?: string }
+  {
+    displayName: string;
+    category: IntegrationBody["category"];
+    scopes: string[];
+    envHint: string;
+    apiUrlEnv?: string;
+    requiredEnv?: string[];
+  }
 > = {
   gmail: {
     displayName: "Gmail",
@@ -83,6 +90,14 @@ const INTEGRATION_CATALOG: Record<
     scopes: ["integrations.read", "posts.read", "posts.create", "posts.schedule"],
     envHint: "POSTIZ_API_KEY",
     apiUrlEnv: "POSTIZ_API_URL",
+  },
+  superwall_stripe: {
+    displayName: "Superwall + Stripe",
+    category: "payments",
+    scopes: ["paywall.present", "checkout.stripe", "subscriptions.entitlements", "webhooks.receive"],
+    envHint: "SUPERWALL_API_KEY",
+    apiUrlEnv: "SUPERWALL_API_URL",
+    requiredEnv: ["SUPERWALL_API_KEY", "STRIPE_SECRET_KEY"],
   },
 };
 
@@ -172,7 +187,9 @@ serve(async (req) => {
     const category = body.category || catalog?.category || "productivity";
     const scopes = body.scopes?.length ? body.scopes.map((scope) => escapeHtml(scope).slice(0, 80)) : catalog?.scopes || [];
     const envHint = catalog?.envHint;
-    const isConfigured = envHint ? Boolean(Deno.env.get(envHint)) : false;
+    const requiredEnv = catalog?.requiredEnv || (envHint ? [envHint] : []);
+    const missingEnv = requiredEnv.filter((name) => !Deno.env.get(name));
+    const isConfigured = requiredEnv.length > 0 ? missingEnv.length === 0 : false;
     const apiUrlHint = catalog?.apiUrlEnv;
 
     if (body.action === "disconnect") {
@@ -191,6 +208,8 @@ serve(async (req) => {
             metadata: {
               disconnected_at: new Date().toISOString(),
               env_hint: envHint || null,
+              required_env: requiredEnv,
+              missing_env: missingEnv,
               api_url_env: apiUrlHint || null,
             },
           },
@@ -237,6 +256,8 @@ serve(async (req) => {
           config: body.config || {},
           metadata: {
             env_hint: envHint || null,
+            required_env: requiredEnv,
+            missing_env: missingEnv,
             api_url_env: apiUrlHint || null,
             configured: isConfigured,
             ...syncMetadata,
@@ -256,7 +277,7 @@ serve(async (req) => {
       JSON.stringify({
         integration: data,
         requiresConfiguration: !isConfigured,
-        envHint,
+        envHint: missingEnv[0] || envHint,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
