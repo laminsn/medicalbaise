@@ -31,6 +31,7 @@ import { ProviderPaymentsWorkspace } from '@/components/provider/ProviderPayment
 import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace';
 import { ProviderWorkflowCommandCenter } from '@/components/provider/ProviderWorkflowCommandCenter';
 import { ProviderDeliveryCommandCenter } from '@/components/provider/ProviderDeliveryCommandCenter';
+import { ProviderFinanceCommandCenter } from '@/components/provider/ProviderFinanceCommandCenter';
 import {
   BarChart3,
   Calendar,
@@ -290,6 +291,7 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="money" className="space-y-6">
+            <ProviderFinanceCommandCenter />
             <ProviderPaymentsWorkspace />
           </TabsContent>
 
