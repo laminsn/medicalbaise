@@ -27,6 +27,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { recordProviderOperationSilently } from '@/lib/providerOperations';
 
 type Campaign = {
   id: string;
@@ -432,6 +433,19 @@ export function ProviderMessagingCommandCenter() {
         metadata: {
           fallback_channels: secondaryChannels,
           audience,
+          portal_first: true,
+        },
+      });
+
+      recordProviderOperationSilently({
+        action: 'communication_campaign.created',
+        resourceType: 'provider_communication_campaign',
+        resourceId: data.id,
+        metadata: {
+          campaign_type: campaignType,
+          audience,
+          primary_channel: primaryChannel,
+          scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
           portal_first: true,
         },
       });

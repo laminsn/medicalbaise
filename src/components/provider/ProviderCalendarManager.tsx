@@ -27,6 +27,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { recordProviderOperationSilently } from '@/lib/providerOperations';
 
 type CalendarEvent = {
   id: string;
@@ -310,7 +311,7 @@ export function ProviderCalendarManager() {
       const offsets = [Number(reminderOne), Number(reminderTwo)]
         .filter((value) => Number.isFinite(value) && value >= 0);
 
-      const { error } = await db.from('provider_calendar_events').insert({
+      const { data, error } = await db.from('provider_calendar_events').insert({
         provider_id: providerId,
         created_by: user.id,
         event_type: eventType,
@@ -325,12 +326,13 @@ export function ProviderCalendarManager() {
         metadata: {
           strategy: copy.strategy,
         },
-      });
+      }).select('id').single();
 
       if (error) throw error;
 
       await db.from('provider_communication_events').insert({
         provider_id: providerId,
+        provider_calendar_event_id: data.id,
         created_by: user.id,
         purpose:
           eventType === 'booking'
@@ -348,6 +350,19 @@ export function ProviderCalendarManager() {
         metadata: {
           event_type: eventType,
           fallback_channels: selectedChannels.filter((channel) => channel !== 'portal'),
+        },
+      });
+
+      recordProviderOperationSilently({
+        action: 'calendar_event.created',
+        resourceType: 'provider_calendar_event',
+        resourceId: data.id,
+        metadata: {
+          event_type: eventType,
+          title,
+          start_at: new Date(startAt).toISOString(),
+          channel_preferences: selectedChannels,
+          portal_first: true,
         },
       });
 
@@ -373,6 +388,12 @@ export function ProviderCalendarManager() {
       toast.error(copy.updateError);
       return;
     }
+    recordProviderOperationSilently({
+      action: `calendar_event.${status}`,
+      resourceType: 'provider_calendar_event',
+      resourceId: eventId,
+      metadata: { status },
+    });
     toast.success(copy.updated);
     await loadEvents();
   };

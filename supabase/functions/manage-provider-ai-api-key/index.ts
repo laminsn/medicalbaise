@@ -90,6 +90,19 @@ serve(async (req) => {
 
       if (error) throw error;
 
+      await supabaseAdmin.rpc("log_provider_audit_event", {
+        target_provider_id: provider.id,
+        actor_id: user.id,
+        actor_kind: "owner",
+        event_action: "ai_api_key.revoked",
+        event_resource_type: "provider_ai_api_key",
+        event_resource_id: data.id,
+        event_severity: "warning",
+        event_metadata: {
+          revoked_at: data.revoked_at,
+        },
+      });
+
       return new Response(JSON.stringify({ apiKey: data }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -126,6 +139,23 @@ serve(async (req) => {
       .single();
 
     if (error) throw error;
+
+    await supabaseAdmin.rpc("log_provider_audit_event", {
+      target_provider_id: provider.id,
+      actor_id: user.id,
+      actor_kind: "owner",
+      event_action: "ai_api_key.created",
+      event_resource_type: "provider_ai_api_key",
+      event_resource_id: data.id,
+      event_severity: "warning",
+      event_metadata: {
+        key_name: data.key_name,
+        key_last_four: data.key_last_four,
+        scopes: data.scopes,
+        expires_at: data.expires_at,
+        one_time_reveal: true,
+      },
+    });
 
     return new Response(JSON.stringify({ apiKey, record: data }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
