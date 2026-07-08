@@ -153,6 +153,34 @@ export function generateNonce(length = 32): string {
   return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+export function isSafeUrl(url: string): boolean {
+  try {
+    if (!url) return false;
+    if (url.startsWith('/')) return !url.startsWith('//') && !url.includes('\\');
+    const parsed = new URL(url);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+}
+
+export function sanitizeRedirectUrl(url: string, allowedOrigins: string[] = []): string {
+  if (!url || typeof url !== 'string') return '/';
+  if (url.startsWith('/') && !url.startsWith('//') && !url.includes('\\')) return url;
+
+  try {
+    const parsed = new URL(url);
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    if (parsed.origin === currentOrigin || allowedOrigins.includes(parsed.origin)) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+  } catch {
+    return '/';
+  }
+
+  return '/';
+}
+
 /**
  * Validate that a JWT token is not expired (client-side check only).
  * This does NOT validate the signature — that must be done server-side.

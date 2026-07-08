@@ -6,7 +6,7 @@ import {
   User, Settings, Heart, Clock, MessageSquare, Star, 
   CreditCard, Gift, HelpCircle, LogOut, ChevronRight, ChevronLeft,
   Briefcase, FileText, Crown,
-  Users, Plug, Wallet, AtSign, Shield, LayoutDashboard
+  Users, Plug, Wallet, AtSign, Shield, LayoutDashboard, Megaphone
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,7 @@ export default function Profile() {
     { icon: LayoutDashboard, label: t('dashboard.customerDashboard', 'Customer Dashboard'), path: '/customer-dashboard' },
     // Show Provider Dashboard if they're a provider
     ...(isProvider ? [{ icon: LayoutDashboard, label: t('dashboard.providerDashboard', 'Provider Dashboard'), path: '/provider-dashboard' }] : []),
+    { icon: Megaphone, label: t('partner.dashboardTitle', 'Partner Campaigns'), path: '/partner-dashboard' },
     { icon: Crown, label: t('profile.subscription'), path: '/subscription' },
     { icon: Settings, label: t('profile.settings'), path: '/settings' },
     { icon: CreditCard, label: t('profile.payments'), path: '/payments' },

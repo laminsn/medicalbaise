@@ -41,3 +41,4 @@ Desktop.ini
 *.cert
 credentials.json
 service-account.json
+.vercel

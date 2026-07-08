@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { getBaiseAppKey } from '@/lib/providerCommunication';
 
 interface Profile {
   id: string;
@@ -144,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, languages?: string[]) => {
     const redirectUrl = `${window.location.origin}/`;
+    const appKey = getBaiseAppKey();
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -154,6 +156,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           first_name: firstName,
           last_name: lastName,
           languages: languages || ['portuguese'],
+          app_key: appKey,
+          signup_app: appKey,
+          signup_url: window.location.origin,
+          signup_intent: 'client',
         },
       },
     });

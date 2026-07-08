@@ -2,8 +2,10 @@ import { formatPrice } from '@/lib/currency';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { getBaiseAppKey, getBaiseAppUrl, getLocaleKey } from '@/lib/providerCommunication';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -52,10 +54,12 @@ const PROVIDER_TIERS = [
 ];
 
 export function ReferralDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { profile, user } = useAuth();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const [referrals, setReferrals] = useState<ReferralItem[]>([]);
   const [loadingReferrals, setLoadingReferrals] = useState(true);
@@ -81,7 +85,8 @@ export function ReferralDashboard() {
   }, [user]);
 
   const referralCode = profile?.referral_code || 'LOADING';
-  const referralLink = `${window.location.origin}/auth?ref=${referralCode}`;
+  const referralUrl = `${getBaiseAppUrl()}/ref/${referralCode}`;
+  const referralLink = referralUrl.replace(/^https?:\/\//, '');
   
   const totalReferrals = referrals.length;
   const creditedReferrals = referrals.filter(r => r.status === 'credited');
@@ -143,17 +148,55 @@ export function ReferralDashboard() {
   const shareVia = (platform: string) => {
     const message = t('referral.shareMessage', { code: referralCode, link: referralLink });
     const encodedMessage = encodeURIComponent(message);
-    const encodedUrl = encodeURIComponent(`https://${referralLink}`);
+    const encodedUrl = encodeURIComponent(referralUrl);
     
     const urls: Record<string, string> = {
       whatsapp: `https://wa.me/?text=${encodedMessage}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedUrl}`,
-      email: `mailto:?subject=Convite Brasil Base&body=${encodedMessage}`,
     };
     
     if (urls[platform]) {
       window.open(urls[platform], '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const sendReferralEmail = async () => {
+    if (!recipientEmail.trim()) {
+      toast({
+        title: t('referral.emailRequired', 'Email required'),
+        description: t('referral.emailRequiredDescription', 'Enter the email address that should receive your referral link.'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-referral-email', {
+        body: {
+          recipientEmail: recipientEmail.trim(),
+          referralLink: referralUrl,
+          appKey: getBaiseAppKey(),
+          locale: getLocaleKey(i18n.resolvedLanguage || i18n.language),
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: t('referral.emailSent', 'Referral email sent'),
+        description: t('referral.emailSentDescription', 'Your branded referral email was sent and added to referral tracking.'),
+      });
+      setRecipientEmail('');
+    } catch (error) {
+      toast({
+        title: t('referral.emailSendError', 'Unable to send referral email'),
+        description: error instanceof Error ? error.message : t('errors.somethingWentWrong'),
+        variant: 'destructive',
+      });
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -236,9 +279,10 @@ export function ReferralDashboard() {
             <Button 
               variant="outline" 
               className="flex-col h-auto py-3"
-              onClick={() => shareVia('email')}
+              onClick={sendReferralEmail}
+              disabled={sendingEmail}
             >
-              <Mail className="h-5 w-5 mb-1 text-orange-600" />
+              {sendingEmail ? <Loader2 className="h-5 w-5 mb-1 animate-spin text-orange-600" /> : <Mail className="h-5 w-5 mb-1 text-orange-600" />}
               <span className="text-xs">Email</span>
             </Button>
             <Button 
@@ -266,7 +310,7 @@ export function ReferralDashboard() {
                 <div className="flex flex-col items-center gap-4 py-4">
                   <div ref={qrCodeRef} className="bg-white p-4 rounded-lg">
                     <QRCodeSVG 
-                      value={`https://${referralLink}`}
+                      value={referralUrl}
                       size={200}
                       level="H"
                       includeMargin
@@ -285,6 +329,20 @@ export function ReferralDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-2 rounded-lg border bg-background p-3 sm:flex-row">
+            <Input
+              type="email"
+              value={recipientEmail}
+              onChange={(event) => setRecipientEmail(event.target.value)}
+              placeholder={t('referral.emailPlaceholder', 'Send referral link by email')}
+              className="sm:flex-1"
+            />
+            <Button type="button" onClick={sendReferralEmail} disabled={sendingEmail}>
+              {sendingEmail ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+              {t('referral.sendEmail', 'Send email')}
+            </Button>
           </div>
         </CardContent>
       </Card>

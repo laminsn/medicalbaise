@@ -10,9 +10,9 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications, Notification, ScheduledReminder } from '@/hooks/useNotifications';
+import { sanitizeRedirectUrl } from '@/lib/security';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, format } from 'date-fns';
-import { enUS, es as esLocale, ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { CreateReminderDialog } from '@/components/notifications/CreateReminderDialog';
 
@@ -35,12 +35,34 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
+const getPriorityBadge = (priority: string) => {
+  switch (priority) {
+    case 'urgent':
+      return <Badge variant="destructive">Urgent</Badge>;
+    case 'high':
+      return <Badge className="bg-orange-500">High</Badge>;
+    default:
+      return null;
+  }
+};
+
+const getReminderTypeBadge = (type: string) => {
+  switch (type) {
+    case 'appointment':
+      return <Badge variant="secondary">Appointment</Badge>;
+    case 'maintenance':
+      return <Badge className="bg-blue-500 text-white">Maintenance</Badge>;
+    case 'follow_up':
+      return <Badge className="bg-purple-500 text-white">Follow-up</Badge>;
+    default:
+      return <Badge variant="outline">Custom</Badge>;
+  }
+};
+
 export default function Notifications() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
-  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
+  const { t } = useTranslation();
   const [showCreateReminder, setShowCreateReminder] = useState(false);
   const {
     notifications,
@@ -139,8 +161,6 @@ export default function Notifications() {
                     onMarkAsRead={() => markAsRead(notification.id)}
                     onDelete={() => deleteNotification(notification.id)}
                     onNavigate={(url) => navigate(url)}
-                    isPt={isPt}
-                    isEs={isEs}
                   />
                 ))}
               </div>
@@ -172,8 +192,6 @@ export default function Notifications() {
                     reminder={reminder}
                     onToggle={(active) => updateReminder(reminder.id, { is_active: active })}
                     onDelete={() => deleteReminder(reminder.id)}
-                    isPt={isPt}
-                    isEs={isEs}
                   />
                 ))}
               </div>
@@ -202,13 +220,33 @@ export default function Notifications() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="email">{t('notifications.emailNotifications')}</Label>
-                    <p className="text-sm text-muted-foreground">{t('notifications.emailDesc')}</p>
+                    <Label htmlFor="transactional-email">
+                      {t('notifications.transactionalEmail', 'Service and account email')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('notifications.transactionalEmailDesc', 'Required for invoices, requests, accepted jobs, links, receipts, security, and service updates.')}
+                    </p>
                   </div>
                   <Switch
-                    id="email"
-                    checked={preferences?.email_enabled ?? true}
-                    onCheckedChange={(checked) => updatePreferences({ email_enabled: checked })}
+                    id="transactional-email"
+                    checked
+                    disabled
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="marketing-email">
+                      {t('notifications.marketingEmail', 'Marketing email')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('notifications.marketingEmailDesc', 'Optional tips, promotions, referral campaigns, and growth emails.')}
+                    </p>
+                  </div>
+                  <Switch
+                    id="marketing-email"
+                    checked={preferences?.marketing_email_enabled ?? true}
+                    onCheckedChange={(checked) => updatePreferences({ marketing_email_enabled: checked })}
                   />
                 </div>
 
@@ -235,6 +273,22 @@ export default function Notifications() {
                     onCheckedChange={(checked) => updatePreferences({ sms_enabled: checked })}
                   />
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="whatsapp">
+                      {t('notifications.whatsappNotifications', 'WhatsApp messages')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {t('notifications.whatsappDesc', 'Receive portal reminders and service updates through WhatsApp.')}
+                    </p>
+                  </div>
+                  <Switch
+                    id="whatsapp"
+                    checked={preferences?.whatsapp_enabled ?? false}
+                    onCheckedChange={(checked) => updatePreferences({ whatsapp_enabled: checked })}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -253,33 +307,13 @@ function NotificationCard({
   notification, 
   onMarkAsRead, 
   onDelete,
-  onNavigate,
-  isPt,
-  isEs,
+  onNavigate
 }: { 
   notification: Notification;
   onMarkAsRead: () => void;
   onDelete: () => void;
   onNavigate: (url: string) => void;
-  isPt: boolean;
-  isEs: boolean;
 }) {
-  const { i18n } = useTranslation();
-  const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const isSpanishLang = isEs || i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const dateLocale = isPortuguese ? ptBR : isSpanishLang ? esLocale : enUS;
-
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case 'urgent':
-        return <Badge variant="destructive">{isPortuguese ? 'Urgente' : isSpanishLang ? 'Urgente' : 'Urgent'}</Badge>;
-      case 'high':
-        return <Badge className="bg-orange-500">{isPortuguese ? 'Alta' : isSpanishLang ? 'Alta' : 'High'}</Badge>;
-      default:
-        return null;
-    }
-  };
-
   return (
     <Card className={cn(!notification.is_read && "border-primary/50 bg-primary/5")}>
       <CardContent className="p-4">
@@ -312,11 +346,11 @@ function NotificationCard({
             <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: dateLocale })}
+                {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
               </span>
               {notification.action_url && (
-                <Button variant="link" size="sm" className="h-auto p-0" onClick={() => onNavigate(notification.action_url!)}>
-                  {isPortuguese ? 'Ver detalhes' : isSpanishLang ? 'Ver detalles' : 'View Details'} →
+                <Button variant="link" size="sm" className="h-auto p-0" onClick={() => onNavigate(sanitizeRedirectUrl(notification.action_url!))}>
+                  View Details →
                 </Button>
               )}
             </div>
@@ -331,63 +365,11 @@ function ReminderCard({
   reminder,
   onToggle,
   onDelete,
-  isPt,
-  isEs,
 }: {
   reminder: ScheduledReminder;
   onToggle: (active: boolean) => void;
   onDelete: () => void;
-  isPt: boolean;
-  isEs: boolean;
 }) {
-  const { i18n } = useTranslation();
-  const isPortuguese = isPt || i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const isSpanishLang = isEs || i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const dateLocale = isPortuguese ? ptBR : isSpanishLang ? esLocale : enUS;
-
-  const getReminderTypeBadge = (type: string) => {
-    switch (type) {
-      case 'appointment':
-        return <Badge variant="secondary">{isPortuguese ? 'Consulta' : isSpanishLang ? 'Cita' : 'Appointment'}</Badge>;
-      case 'maintenance':
-        return <Badge className="bg-blue-500 text-white">{isPortuguese ? 'Manutenção' : isSpanishLang ? 'Mantenimiento' : 'Maintenance'}</Badge>;
-      case 'follow_up':
-        return <Badge className="bg-purple-500 text-white">{isPortuguese ? 'Retorno' : isSpanishLang ? 'Seguimiento' : 'Follow-up'}</Badge>;
-      default:
-        return <Badge variant="outline">{isPortuguese ? 'Personalizado' : isSpanishLang ? 'Personalizado' : 'Custom'}</Badge>;
-    }
-  };
-
-  const repeatLabel = (interval: string) => {
-    const intervalLabel = isPortuguese
-      ? (
-        interval === 'daily'
-          ? 'diariamente'
-          : interval === 'weekly'
-            ? 'semanalmente'
-            : interval === 'monthly'
-              ? 'mensalmente'
-              : interval === 'yearly'
-                ? 'anualmente'
-                : interval
-      )
-      : isSpanishLang
-        ? (
-          interval === 'daily'
-            ? 'diariamente'
-            : interval === 'weekly'
-              ? 'semanalmente'
-              : interval === 'monthly'
-                ? 'mensualmente'
-                : interval === 'yearly'
-                  ? 'anualmente'
-                  : interval
-        )
-        : interval;
-
-    return `${isPortuguese ? 'Repete' : isSpanishLang ? 'Se repite' : 'Repeats'} ${intervalLabel}`;
-  };
-
   const isPast = new Date(reminder.scheduled_for) < new Date();
 
   return (
@@ -418,11 +400,11 @@ function ReminderCard({
             </div>
             <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
               <span className={cn(isPast && !reminder.repeat_interval && "text-destructive")}>
-                {format(new Date(reminder.scheduled_for), 'PPp', { locale: dateLocale })}
+                {format(new Date(reminder.scheduled_for), 'PPp')}
               </span>
               {reminder.repeat_interval && (
                 <Badge variant="outline" className="text-xs">
-                  {repeatLabel(reminder.repeat_interval)}
+                  Repeats {reminder.repeat_interval}
                 </Badge>
               )}
             </div>

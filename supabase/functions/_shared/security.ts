@@ -9,6 +9,14 @@ const ALLOWED_ORIGINS = [
   'https://casabaise.lovable.app',
   'https://casabaise.com',
   'https://www.casabaise.com',
+  'https://medicalbaise.lovable.app',
+  'https://medicalbaise.com',
+  'https://www.medicalbaise.com',
+  'https://mdbaise.com',
+  'https://www.mdbaise.com',
+  'https://legalbaise.lovable.app',
+  'https://legalbaise.com',
+  'https://www.legalbaise.com',
 ];
 
 // In development, also allow localhost
@@ -265,7 +273,20 @@ export function rejectNonPostMethod(req: Request, corsHeaders: Record<string, st
 
 // --- WebAuthn Domain Validation ---
 
-const ALLOWED_RP_DOMAINS = ['casabaise.lovable.app', 'casabaise.com', 'www.casabaise.com', 'localhost'];
+const ALLOWED_RP_DOMAINS = [
+  'casabaise.lovable.app',
+  'casabaise.com',
+  'www.casabaise.com',
+  'medicalbaise.lovable.app',
+  'medicalbaise.com',
+  'www.medicalbaise.com',
+  'mdbaise.com',
+  'www.mdbaise.com',
+  'legalbaise.lovable.app',
+  'legalbaise.com',
+  'www.legalbaise.com',
+  'localhost',
+];
 
 /**
  * Returns a validated rpId for WebAuthn. Only allows known production domains

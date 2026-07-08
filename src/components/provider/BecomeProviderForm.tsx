@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { queueProviderUpdateNotification } from '@/lib/providerCommunication';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -419,6 +420,31 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
       const { error: profileError } = await supabase.rpc('promote_current_user_to_provider');
 
       if (profileError) throw profileError;
+
+      try {
+        await queueProviderUpdateNotification({
+          providerId: providerData.id,
+          targetUserId: user.id,
+          actorId: user.id,
+          eventKey: 'provider_welcome',
+          subject: `${data.business_name} provider workspace is ready`,
+          message: 'Your provider workspace is ready. Manage requests, quotes, bookings, invoices, payments, signatures, campaigns, reviews, and client records from the portal.',
+          actionPath: '/provider-dashboard',
+          resourceKind: 'provider',
+          resourceId: providerData.id,
+          audience: 'provider',
+          locale: i18n.resolvedLanguage || i18n.language,
+          metadata: {
+            actor_role: 'owner',
+            business_name: data.business_name,
+            business_type: data.business_type,
+            selected_services: allServiceIds,
+            medical_specialty: data.medical_specialty,
+          },
+        });
+      } catch (notificationError) {
+        console.warn('Unable to queue provider welcome notification', notificationError);
+      }
 
       // Update local profile state after the database transition completes.
       await refreshProfile();

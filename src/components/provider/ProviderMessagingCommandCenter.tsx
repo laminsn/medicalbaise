@@ -101,7 +101,7 @@ const MESSAGING_COPY = {
     requiredTitle: 'Messaging command center',
     requiredDescription: 'Create a provider account to manage campaigns, confirmations, reminders, and notifications.',
     strategyTitle: 'Portal-first messaging strategy',
-    strategyDescription: 'Email and WhatsApp support reminders, confirmations, and campaigns, but the main relationship, records, files, receipts, and decisions stay inside the Baise portal.',
+    strategyDescription: 'Email, WhatsApp, and SMS support reminders, confirmations, and campaigns, but the main relationship, records, files, receipts, and decisions stay inside the Baise portal.',
     createTitle: 'Create campaign or timed message',
     createDescription: 'Build confirmations, reminders, follow-ups, review requests, coupons, winback messages, and payment nudges.',
     name: 'Name',
@@ -117,13 +117,14 @@ const MESSAGING_COPY = {
     portal: 'Portal',
     email: 'Email',
     whatsapp: 'WhatsApp',
+    sms: 'SMS',
     subject: 'Subject',
     scheduledTime: 'Scheduled time',
     portalMessage: 'Portal message',
     strategy: 'Suggested strategy:',
     create: 'Create portal-first campaign',
     queue: 'Campaign queue',
-    queueDescription: 'Provider messages are kept in Baise first, with email and WhatsApp as fallback channels.',
+    queueDescription: 'Provider messages are kept in Baise first, with email, WhatsApp, and SMS as fallback channels.',
     dispatchDue: 'Send due messages',
     dispatchSuccess: 'Due messages processed',
     empty: 'No campaigns yet.',
@@ -180,7 +181,7 @@ const MESSAGING_COPY = {
     requiredTitle: 'Centro de mensajes',
     requiredDescription: 'Crea una cuenta de proveedor para gestionar campanas, confirmaciones, recordatorios y notificaciones.',
     strategyTitle: 'Estrategia de mensajes con portal primero',
-    strategyDescription: 'Email y WhatsApp apoyan recordatorios, confirmaciones y campanas, pero la relacion, registros, archivos, recibos y decisiones permanecen en el portal Baise.',
+    strategyDescription: 'Email, WhatsApp y SMS apoyan recordatorios, confirmaciones y campanas, pero la relacion, registros, archivos, recibos y decisiones permanecen en el portal Baise.',
     createTitle: 'Crear campana o mensaje programado',
     createDescription: 'Crea confirmaciones, recordatorios, seguimientos, solicitudes de resena, cupones, reactivaciones y avisos de pago.',
     name: 'Nombre',
@@ -196,13 +197,14 @@ const MESSAGING_COPY = {
     portal: 'Portal',
     email: 'Email',
     whatsapp: 'WhatsApp',
+    sms: 'SMS',
     subject: 'Asunto',
     scheduledTime: 'Hora programada',
     portalMessage: 'Mensaje del portal',
     strategy: 'Estrategia sugerida:',
     create: 'Crear campana portal primero',
     queue: 'Cola de campanas',
-    queueDescription: 'Los mensajes del proveedor se guardan primero en Baise, con email y WhatsApp como canales de apoyo.',
+    queueDescription: 'Los mensajes del proveedor se guardan primero en Baise, con email, WhatsApp y SMS como canales de apoyo.',
     dispatchDue: 'Enviar mensajes vencidos',
     dispatchSuccess: 'Mensajes vencidos procesados',
     empty: 'Aun no hay campanas.',
@@ -259,7 +261,7 @@ const MESSAGING_COPY = {
     requiredTitle: 'Central de mensagens',
     requiredDescription: 'Crie uma conta de prestador para gerenciar campanhas, confirmacoes, lembretes e notificacoes.',
     strategyTitle: 'Estrategia de mensagens com portal primeiro',
-    strategyDescription: 'Email e WhatsApp apoiam lembretes, confirmacoes e campanhas, mas a relacao, registros, arquivos, recibos e decisoes ficam no portal Baise.',
+    strategyDescription: 'Email, WhatsApp e SMS apoiam lembretes, confirmacoes e campanhas, mas a relacao, registros, arquivos, recibos e decisoes ficam no portal Baise.',
     createTitle: 'Criar campanha ou mensagem agendada',
     createDescription: 'Crie confirmacoes, lembretes, acompanhamentos, pedidos de avaliacao, cupons, reativacoes e avisos de pagamento.',
     name: 'Nome',
@@ -275,13 +277,14 @@ const MESSAGING_COPY = {
     portal: 'Portal',
     email: 'Email',
     whatsapp: 'WhatsApp',
+    sms: 'SMS',
     subject: 'Assunto',
     scheduledTime: 'Horario agendado',
     portalMessage: 'Mensagem do portal',
     strategy: 'Estrategia sugerida:',
     create: 'Criar campanha portal primeiro',
     queue: 'Fila de campanhas',
-    queueDescription: 'As mensagens do prestador ficam primeiro no Baise, com email e WhatsApp como canais de apoio.',
+    queueDescription: 'As mensagens do prestador ficam primeiro no Baise, com email, WhatsApp e SMS como canais de apoio.',
     dispatchDue: 'Enviar mensagens vencidas',
     dispatchSuccess: 'Mensagens vencidas processadas',
     empty: 'Ainda nao ha campanhas.',
@@ -392,7 +395,7 @@ export function ProviderMessagingCommandCenter() {
 
     setIsCreating(true);
     try {
-      const secondaryChannels = primaryChannel === 'portal' ? ['email', 'whatsapp'] : ['portal'];
+      const secondaryChannels = primaryChannel === 'portal' ? ['email', 'whatsapp', 'sms'] : ['portal'];
       const { data, error } = await db
         .from('provider_communication_campaigns')
         .insert({
@@ -564,6 +567,7 @@ export function ProviderMessagingCommandCenter() {
                     <SelectItem value="portal">{copy.portal}</SelectItem>
                     <SelectItem value="email">{copy.email}</SelectItem>
                     <SelectItem value="whatsapp">{copy.whatsapp}</SelectItem>
+                    <SelectItem value="sms">{copy.sms}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

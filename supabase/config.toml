@@ -29,3 +29,18 @@ verify_jwt = true
 
 [functions.customer-portal]
 verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.create-provider-payment-plan]
+verify_jwt = true
+
+[functions.dispatch-provider-communication-events]
+verify_jwt = false
+
+[functions.send-referral-email]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false

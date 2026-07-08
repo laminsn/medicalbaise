@@ -276,6 +276,31 @@ async function markProviderPaymentPlanItemPaid(
         transaction_id: transactionId,
       },
     });
+
+    await supabaseAdmin.rpc("queue_provider_update_notifications", {
+      target_provider_id: providerId,
+      target_user_id: plan.customer_id,
+      actor_id: plan.created_by,
+      event_key: "payment_received",
+      event_subject: "Payment received",
+      event_message: `Your payment for ${plan.title || metadata.invoice_number || "your Baise service"} was recorded. Your receipt, invoice, and transaction history are available in the portal.`,
+      action_path: "/customer-dashboard",
+      resource_kind: "provider_payment_transaction",
+      resource_uuid: transactionId,
+      event_metadata: {
+        actor_role: "integration",
+        invoice_id: invoiceId,
+        payment_plan_id: planId,
+        payment_plan_item_id: itemId,
+        transaction_id: transactionId,
+        stripe_session_id: session.id,
+      },
+      target_email: null,
+      target_phone: null,
+      target_app_key: Deno.env.get("BAISE_APP_KEY") || "casa",
+      target_locale: "en",
+      target_audience: "client",
+    });
   }
 
   await supabaseAdmin.rpc("log_provider_audit_event", {

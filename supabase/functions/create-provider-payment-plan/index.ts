@@ -355,6 +355,32 @@ serve(async (req) => {
 
     await supabaseAdmin.from("provider_communication_events").insert(communicationEvents);
 
+    await supabaseAdmin.rpc("queue_provider_update_notifications", {
+      target_provider_id: provider.id,
+      target_user_id: customerId,
+      actor_id: user.id,
+      event_key: "invoice_created",
+      event_subject: `Invoice ${invoice.invoice_number} is ready`,
+      event_message: `${title} is ready for review. Open the portal to view the invoice, payment schedule, receipt history, and next steps.`,
+      action_path: "/customer-dashboard",
+      resource_kind: "provider_invoice",
+      resource_uuid: invoice.id,
+      event_metadata: {
+        actor_role: "owner",
+        invoice_id: invoice.id,
+        invoice_number: invoice.invoice_number,
+        payment_plan_id: paymentPlan.id,
+        client_display_id: invoice.client_display_id,
+        requested_payment_method: paymentMethod,
+        payment_route: paymentRoute,
+      },
+      target_email: body.clientEmail || null,
+      target_phone: null,
+      target_app_key: Deno.env.get("BAISE_APP_KEY") || "casa",
+      target_locale: "en",
+      target_audience: "client",
+    });
+
     if (body.clientEmail) {
       const inviteToken = crypto.randomUUID();
       const tokenHash = await hashInviteToken(inviteToken);

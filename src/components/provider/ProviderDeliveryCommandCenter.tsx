@@ -17,10 +17,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { queueProviderUpdateNotification } from '@/lib/providerCommunication';
 import { recordProviderOperationSilently } from '@/lib/providerOperations';
 
 type QuoteRecord = {
   id: string;
+  contact_id: string | null;
   quote_number: string | null;
   title: string;
   currency: string;
@@ -34,6 +36,7 @@ type QuoteRecord = {
 
 type ProjectRecord = {
   id: string;
+  contact_id: string | null;
   project_name: string;
   project_status: string;
   priority: string;
@@ -47,6 +50,7 @@ type ProjectRecord = {
 type ProjectTask = {
   id: string;
   project_id: string | null;
+  contact_id: string | null;
   title: string;
   task_status: string;
   priority: string;
@@ -55,12 +59,15 @@ type ProjectTask = {
 
 type WorkSignoff = {
   id: string;
+  contact_id: string | null;
   quote_id: string | null;
   project_id: string | null;
+  customer_id: string | null;
   title: string;
   signoff_type: string;
   status: string;
   signer_name: string | null;
+  signer_email: string | null;
   signed_at: string | null;
   created_at: string;
 };
@@ -87,6 +94,26 @@ type DeliveryAction = {
   priority: 'critical' | 'warning' | 'info';
   buttonLabel?: string;
   onAction?: () => void;
+};
+
+type ClientContact = {
+  id: string;
+  customer_id: string | null;
+  full_name: string;
+  email: string | null;
+  phone: string | null;
+};
+
+type DeliveryNotification = {
+  eventKey: 'new_link' | 'job_accepted' | 'service_provided' | 'signature_requested';
+  subject: string;
+  message: string;
+  resourceKind: string;
+  contactId?: string | null;
+  targetUserId?: string | null;
+  targetEmail?: string | null;
+  targetPhone?: string | null;
+  metadata?: Record<string, unknown>;
 };
 
 type SupabaseError = { message: string };
@@ -313,28 +340,28 @@ export function ProviderDeliveryCommandCenter() {
     const [quotesResult, projectsResult, tasksResult, signoffsResult, attachmentsResult] = await Promise.all([
       db
         .from<QuoteRecord>('provider_quote_records')
-        .select('id,quote_number,title,currency,total_amount,status,valid_until,sent_at,accepted_at,updated_at')
+        .select('id,contact_id,quote_number,title,currency,total_amount,status,valid_until,sent_at,accepted_at,updated_at')
         .eq('provider_id', providerId)
         .in('status', ['draft', 'sent', 'viewed', 'accepted'])
         .order('updated_at', { ascending: false })
         .limit(12),
       db
         .from<ProjectRecord>('provider_projects')
-        .select('id,project_name,project_status,priority,completion_percent,due_date,next_milestone,risk_level,updated_at')
+        .select('id,contact_id,project_name,project_status,priority,completion_percent,due_date,next_milestone,risk_level,updated_at')
         .eq('provider_id', providerId)
         .in('project_status', ['planning', 'scheduled', 'in_progress', 'waiting_client', 'on_hold'])
         .order('due_date', { ascending: true, nullsFirst: false })
         .limit(12),
       db
         .from<ProjectTask>('provider_project_tasks')
-        .select('id,project_id,title,task_status,priority,due_at')
+        .select('id,project_id,contact_id,title,task_status,priority,due_at')
         .eq('provider_id', providerId)
         .in('task_status', ['todo', 'in_progress', 'blocked'])
         .order('due_at', { ascending: true, nullsFirst: false })
         .limit(12),
       db
         .from<WorkSignoff>('provider_work_signoffs')
-        .select('id,quote_id,project_id,title,signoff_type,status,signer_name,signed_at,created_at')
+        .select('id,contact_id,quote_id,project_id,customer_id,title,signoff_type,status,signer_name,signer_email,signed_at,created_at')
         .eq('provider_id', providerId)
         .in('status', ['draft', 'requested', 'declined'])
         .order('created_at', { ascending: false })
@@ -368,6 +395,67 @@ export function ProviderDeliveryCommandCenter() {
     loadRecords();
   }, [loadRecords]);
 
+  const resolveClientContact = useCallback(
+    async (contactId?: string | null): Promise<ClientContact | null> => {
+      if (!contactId || !providerId) return null;
+
+      const { data, error } = await supabase
+        .from('provider_crm_contacts')
+        .select('id,customer_id,full_name,email,phone')
+        .eq('id', contactId)
+        .eq('provider_id', providerId)
+        .maybeSingle();
+
+      if (error) {
+        console.warn('Unable to resolve client contact for delivery notification', error);
+        return null;
+      }
+
+      return data as ClientContact | null;
+    },
+    [providerId],
+  );
+
+  const queueDeliveryNotification = useCallback(
+    async (resourceId: string, notification?: DeliveryNotification) => {
+      if (!providerId || !user || !notification) return;
+
+      try {
+        const contact = await resolveClientContact(notification.contactId);
+        const targetUserId = notification.targetUserId || contact?.customer_id || null;
+        const targetEmail = notification.targetEmail || contact?.email || null;
+        const targetPhone = notification.targetPhone || contact?.phone || null;
+
+        if (!targetUserId && !targetEmail) return;
+
+        await queueProviderUpdateNotification({
+          providerId,
+          targetUserId,
+          actorId: user.id,
+          eventKey: notification.eventKey,
+          subject: notification.subject,
+          message: notification.message,
+          actionPath: '/customer-dashboard',
+          resourceKind: notification.resourceKind,
+          resourceId,
+          targetEmail,
+          targetPhone,
+          audience: 'client',
+          locale: i18n.resolvedLanguage || i18n.language,
+          metadata: {
+            actor_role: 'owner',
+            contact_id: notification.contactId || null,
+            contact_name: contact?.full_name || null,
+            ...notification.metadata,
+          },
+        });
+      } catch (notificationError) {
+        console.warn('Unable to queue delivery notification', notificationError);
+      }
+    },
+    [i18n.language, i18n.resolvedLanguage, providerId, resolveClientContact, user],
+  );
+
   const updateDeliveryRecord = useCallback(
     async (
       table: string,
@@ -375,6 +463,7 @@ export function ProviderDeliveryCommandCenter() {
       values: Record<string, unknown>,
       action: string,
       resourceType: string,
+      notification?: DeliveryNotification,
     ) => {
       if (!providerId) return;
 
@@ -393,10 +482,11 @@ export function ProviderDeliveryCommandCenter() {
         resourceId: id,
         metadata: values,
       });
+      await queueDeliveryNotification(id, notification);
       toast.success(copy.updated);
       await loadRecords();
     },
-    [copy.updateError, copy.updated, loadRecords, providerId],
+    [copy.updateError, copy.updated, loadRecords, providerId, queueDeliveryNotification],
   );
 
   const nowTimestamp = Date.now();
@@ -427,6 +517,18 @@ export function ProviderDeliveryCommandCenter() {
                     { status: 'sent', sent_at: new Date().toISOString() },
                     'quote.sent',
                     'provider_quote_record',
+                    {
+                      eventKey: 'new_link',
+                      subject: `${quote.quote_number || 'Your quote'} is ready`,
+                      message: `${quote.title} is ready for review. Open your portal to view the quote, service details, approval options, and next steps.`,
+                      resourceKind: 'provider_quote_record',
+                      contactId: quote.contact_id,
+                      metadata: {
+                        quote_number: quote.quote_number,
+                        quote_total: quote.total_amount,
+                        quote_status: 'sent',
+                      },
+                    },
                   )
               : quote.status === 'accepted'
                 ? () =>
@@ -436,6 +538,18 @@ export function ProviderDeliveryCommandCenter() {
                       { status: 'converted' },
                       'quote.converted',
                       'provider_quote_record',
+                      {
+                        eventKey: 'job_accepted',
+                        subject: `${quote.title} is moving forward`,
+                        message: `${quote.title} has been accepted and moved into the next stage. Open your portal for schedule, payment, signature, and service records.`,
+                        resourceKind: 'provider_quote_record',
+                        contactId: quote.contact_id,
+                        metadata: {
+                          quote_number: quote.quote_number,
+                          quote_total: quote.total_amount,
+                          quote_status: 'converted',
+                        },
+                      },
                     )
                 : undefined,
         };
@@ -485,6 +599,17 @@ export function ProviderDeliveryCommandCenter() {
                     { task_status: 'done', completed_at: new Date().toISOString() },
                     'project_task.completed',
                     'provider_project_task',
+                    {
+                      eventKey: 'service_provided',
+                      subject: `${task.title} was completed`,
+                      message: `${task.title} has been marked complete. Open your portal to review proof, notes, receipts, and any next steps.`,
+                      resourceKind: 'provider_project_task',
+                      contactId: task.contact_id || (task.project_id ? activeProjectById.get(task.project_id)?.contact_id : null),
+                      metadata: {
+                        project_id: task.project_id,
+                        task_status: 'done',
+                      },
+                    },
                   )
               : undefined,
         })),
@@ -500,13 +625,28 @@ export function ProviderDeliveryCommandCenter() {
         onAction:
           signoff.status === 'draft'
             ? () =>
-                updateDeliveryRecord(
-                  'provider_work_signoffs',
-                  signoff.id,
-                  { status: 'requested' },
-                  'signoff.requested',
-                  'provider_work_signoff',
-                )
+                  updateDeliveryRecord(
+                    'provider_work_signoffs',
+                    signoff.id,
+                    { status: 'requested' },
+                    'signoff.requested',
+                    'provider_work_signoff',
+                    {
+                      eventKey: 'signature_requested',
+                      subject: `Signature requested: ${signoff.title}`,
+                      message: `${signoff.title} needs your review and signature before the next step. Open your portal to review the details and sign securely.`,
+                      resourceKind: 'provider_work_signoff',
+                      contactId: signoff.contact_id,
+                      targetUserId: signoff.customer_id,
+                      targetEmail: signoff.signer_email,
+                      metadata: {
+                        quote_id: signoff.quote_id,
+                        project_id: signoff.project_id,
+                        signoff_type: signoff.signoff_type,
+                        signoff_status: 'requested',
+                      },
+                    },
+                  )
             : undefined,
       })),
     ];

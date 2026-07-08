@@ -27,6 +27,10 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Payments = lazy(() => import("./pages/Payments"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Referral = lazy(() => import("./pages/Referral"));
+const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard"));
+const InfluencerPartners = lazy(() => import("./pages/InfluencerPartners"));
+const InfluencerApplication = lazy(() => import("./pages/InfluencerApplication"));
+const GiveMonthReferralCampaign = lazy(() => import("./pages/GiveMonthReferralCampaign"));
 const DoctorProfile = lazy(() => import("./pages/DoctorProfile"));
 const ProviderProfileRouter = lazy(() => import("./pages/ProviderProfileRouter"));
 const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
@@ -107,6 +111,11 @@ const App = () => (
                     <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                     <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                     <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
+                    <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
+                    <Route path="/influencer-partners" element={<InfluencerPartners />} />
+                    <Route path="/influencer-application" element={<InfluencerApplication />} />
+                    <Route path="/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="en" />} />
+                    <Route path="/pt/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="pt" />} />
                     <Route path="/doctor/:id" element={<DoctorProfile />} />
                     <Route path="/provider/:id" element={<ProviderProfileRouter />} />
                     <Route path="/provider-dashboard" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />

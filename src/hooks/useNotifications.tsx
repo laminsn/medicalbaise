@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
-import { useTranslation } from 'react-i18next';
 import { useBrowserNotifications } from '@/hooks/useBrowserNotifications';
 
 export interface Notification {
@@ -46,6 +45,9 @@ export interface NotificationPreferences {
   email_enabled: boolean;
   sms_enabled: boolean;
   push_enabled: boolean;
+  transactional_email_required?: boolean;
+  marketing_email_enabled?: boolean;
+  whatsapp_enabled?: boolean;
   reminder_lead_time: number;
   quiet_hours_start: string | null;
   quiet_hours_end: string | null;
@@ -54,9 +56,6 @@ export interface NotificationPreferences {
 export function useNotifications() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { i18n } = useTranslation();
-  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { isGranted, sendNotification } = useBrowserNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [reminders, setReminders] = useState<ScheduledReminder[]>([]);
@@ -76,7 +75,6 @@ export function useNotifications() {
       .limit(50);
 
     if (error) {
-
       return;
     }
 
@@ -95,7 +93,6 @@ export function useNotifications() {
       .order('scheduled_for', { ascending: true });
 
     if (error) {
-
       return;
     }
 
@@ -113,7 +110,6 @@ export function useNotifications() {
       .maybeSingle();
 
     if (error) {
-
       return;
     }
 
@@ -123,7 +119,11 @@ export function useNotifications() {
       // Create default preferences
       const { data: newPrefs, error: createError } = await supabase
         .from('notification_preferences')
-        .insert({ user_id: user.id })
+        .insert({
+          user_id: user.id,
+          email_enabled: true,
+          transactional_email_required: true,
+        })
         .select()
         .single();
 
@@ -133,9 +133,10 @@ export function useNotifications() {
     }
   };
 
-  // Mark notification as read — scoped to current user
+  // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     if (!user) return;
+
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true, read_at: new Date().toISOString() })
@@ -143,7 +144,6 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-
       return;
     }
 
@@ -164,7 +164,6 @@ export function useNotifications() {
       .eq('is_read', false);
 
     if (error) {
-
       return;
     }
 
@@ -172,9 +171,10 @@ export function useNotifications() {
     setUnreadCount(0);
   };
 
-  // Delete notification — scoped to current user
+  // Delete notification
   const deleteNotification = async (notificationId: string) => {
     if (!user) return;
+
     const { error } = await supabase
       .from('notifications')
       .delete()
@@ -182,7 +182,6 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-
       return;
     }
 
@@ -222,10 +221,9 @@ export function useNotifications() {
       .single();
 
     if (error) {
-
       toast({
-        title: isPt ? 'Erro' : isEs ? 'Error' : 'Error',
-        description: isPt ? 'Falha ao criar lembrete' : isEs ? 'No se pudo crear el recordatorio' : 'Failed to create reminder',
+        title: 'Error',
+        description: 'Failed to create reminder',
         variant: 'destructive',
       });
       return null;
@@ -233,15 +231,16 @@ export function useNotifications() {
 
     setReminders(prev => [...prev, data as ScheduledReminder]);
     toast({
-      title: isPt ? 'Lembrete criado' : isEs ? 'Recordatorio creado' : 'Reminder Created',
-      description: isPt ? 'Seu lembrete foi agendado' : isEs ? 'Tu recordatorio fue programado' : 'Your reminder has been scheduled',
+      title: 'Reminder Created',
+      description: 'Your reminder has been scheduled',
     });
     return data;
   };
 
-  // Update reminder — scoped to current user
+  // Update reminder
   const updateReminder = async (reminderId: string, updates: { is_active?: boolean }) => {
     if (!user) return false;
+
     const { error } = await supabase
       .from('scheduled_reminders')
       .update(updates)
@@ -249,7 +248,6 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-
       return false;
     }
 
@@ -259,9 +257,10 @@ export function useNotifications() {
     return true;
   };
 
-  // Delete reminder — scoped to current user
+  // Delete reminder
   const deleteReminder = async (reminderId: string) => {
     if (!user) return false;
+
     const { error } = await supabase
       .from('scheduled_reminders')
       .delete()
@@ -269,7 +268,6 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (error) {
-
       return false;
     }
 
@@ -280,18 +278,22 @@ export function useNotifications() {
   // Update preferences
   const updatePreferences = async (updates: Partial<NotificationPreferences>) => {
     if (!user || !preferences) return false;
+    const safeUpdates = {
+      ...updates,
+      email_enabled: true,
+      transactional_email_required: true,
+    };
 
     const { error } = await supabase
       .from('notification_preferences')
-      .update(updates)
+      .update(safeUpdates)
       .eq('user_id', user.id);
 
     if (error) {
-
       return false;
     }
 
-    setPreferences(prev => prev ? { ...prev, ...updates } : null);
+    setPreferences(prev => prev ? { ...prev, ...safeUpdates } : null);
     return true;
   };
 
@@ -309,6 +311,7 @@ export function useNotifications() {
     setIsLoading(true);
     
     Promise.all([fetchNotifications(), fetchReminders(), fetchPreferences()])
+      .catch(() => { /* Notification load failure is handled by individual fetch functions */ })
       .finally(() => setIsLoading(false));
 
     // Subscribe to realtime notifications (wrapped in try-catch to prevent crash)
@@ -344,11 +347,9 @@ export function useNotifications() {
         )
         .subscribe((status, err) => {
           if (err) {
-
           }
         });
     } catch (err) {
-
     }
 
     return () => {

@@ -35,6 +35,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { queueProviderUpdateNotification } from '@/lib/providerCommunication';
 
 const quoteRequestSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(100),
@@ -65,7 +66,7 @@ export function QuoteRequestForm({
   isOpen,
   onClose,
 }: QuoteRequestFormProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -101,7 +102,7 @@ export function QuoteRequestForm({
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('quote_requests').insert({
+      const { data: quoteRequest, error } = await supabase.from('quote_requests').insert({
         customer_id: user.id,
         provider_id: providerId || null,
         category_id: categoryId || null,
@@ -116,9 +117,45 @@ export function QuoteRequestForm({
         customer_phone: data.customer_phone || null,
         customer_email: data.customer_email || profile?.email || null,
         status: 'pending',
-      });
+      }).select('id').single();
 
       if (error) throw error;
+
+      if (providerId && quoteRequest?.id) {
+        try {
+          const { data: provider } = await supabase
+            .from('providers')
+            .select('user_id, business_name')
+            .eq('id', providerId)
+            .maybeSingle();
+
+          if (provider?.user_id) {
+            await queueProviderUpdateNotification({
+              providerId,
+              targetUserId: provider.user_id,
+              actorId: user.id,
+              eventKey: 'request_received',
+              subject: `New request: ${data.title}`,
+              message: `${profile?.first_name || 'A client'} sent a new request for ${data.title}. Review the scope, timeline, and client details in your provider portal.`,
+              actionPath: '/provider-dashboard',
+              resourceKind: 'quote_request',
+              resourceId: quoteRequest.id,
+              audience: 'provider',
+              locale: i18n.resolvedLanguage || i18n.language,
+              metadata: {
+                actor_role: 'client',
+                provider_name: provider.business_name || providerName || null,
+                category_id: categoryId || null,
+                category_name: categoryName || null,
+                urgency,
+                preferred_start_date: preferredDate ? format(preferredDate, 'yyyy-MM-dd') : null,
+              },
+            });
+          }
+        } catch (notificationError) {
+          console.warn('Unable to queue provider request notification', notificationError);
+        }
+      }
 
       toast({
         title: t('quote.requestSent'),

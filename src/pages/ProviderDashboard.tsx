@@ -32,6 +32,9 @@ import { ProviderCRMWorkspace } from '@/components/provider/ProviderCRMWorkspace
 import { ProviderWorkflowCommandCenter } from '@/components/provider/ProviderWorkflowCommandCenter';
 import { ProviderDeliveryCommandCenter } from '@/components/provider/ProviderDeliveryCommandCenter';
 import { ProviderFinanceCommandCenter } from '@/components/provider/ProviderFinanceCommandCenter';
+import { ProviderRetentionCommandCenter } from '@/components/provider/ProviderRetentionCommandCenter';
+import { ProviderActivationCommandCenter } from '@/components/provider/ProviderActivationCommandCenter';
+import { PartnerCampaignCommandCenter } from '@/components/partner/PartnerCampaignCommandCenter';
 import {
   BarChart3,
   Calendar,
@@ -48,6 +51,7 @@ import {
   Clock,
   Search,
   Settings,
+  Handshake,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -245,7 +249,7 @@ export default function ProviderDashboard() {
         />
 
         <Tabs defaultValue="today" className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7">
             <TabsTrigger value="today" className="gap-2 py-3">
               <Target className="h-4 w-4" />
               <span>Today</span>
@@ -270,6 +274,10 @@ export default function ProviderDashboard() {
               <Settings className="h-4 w-4" />
               <span>Settings</span>
             </TabsTrigger>
+            <TabsTrigger value="partner" className="gap-2 py-3">
+              <Handshake className="h-4 w-4" />
+              <span>Partner</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="today" className="space-y-6">
@@ -280,6 +288,8 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-6">
+            <ProviderRetentionCommandCenter />
+            <ProviderActivationCommandCenter />
             <ProviderCRMWorkspace />
           </TabsContent>
 
@@ -338,6 +348,10 @@ export default function ProviderDashboard() {
                 requiredTier="Enterprise"
               />
             )}
+          </TabsContent>
+
+          <TabsContent value="partner" className="space-y-6">
+            <PartnerCampaignCommandCenter />
           </TabsContent>
         </Tabs>
       </div>
