@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CallProvider } from "@/contexts/CallContext";
@@ -84,6 +84,19 @@ const PageLoader = () => (
   </div>
 );
 
+const campaignLandingPaths = new Set([
+  "/influencer-partners",
+  "/influencer-application",
+  "/give-a-month-get-a-month",
+  "/pt/give-a-month-get-a-month",
+]);
+
+const CampaignAwareHIPAADisclaimer = () => {
+  const { pathname } = useLocation();
+  if (campaignLandingPaths.has(pathname)) return null;
+  return <HIPAADisclaimer />;
+};
+
 const App = () => (
   <ErrorBoundary>
   <HelmetProvider>
@@ -93,8 +106,8 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <HIPAADisclaimer />
             <BrowserRouter>
+              <CampaignAwareHIPAADisclaimer />
               <MessageNotificationProvider>
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
