@@ -13,6 +13,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { AttributionTracker } from "@/components/analytics/AttributionTracker";
 const BaiseHubLanding = lazy(() => import("./components/hub/BaiseHubLanding"));
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -27,10 +28,13 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Payments = lazy(() => import("./pages/Payments"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Referral = lazy(() => import("./pages/Referral"));
+const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard"));
+const PartnerReview = lazy(() => import("./pages/PartnerReview"));
 const InfluencerPartners = lazy(() => import("./pages/InfluencerPartners"));
 const InfluencerApplication = lazy(() => import("./pages/InfluencerApplication"));
 const GiveMonthReferralCampaign = lazy(() => import("./pages/GiveMonthReferralCampaign"));
+const TestimonialRequest = lazy(() => import("./pages/TestimonialRequest"));
 const DoctorProfile = lazy(() => import("./pages/DoctorProfile"));
 const ProviderProfileRouter = lazy(() => import("./pages/ProviderProfileRouter"));
 const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
@@ -89,12 +93,21 @@ const campaignLandingPaths = new Set([
   "/influencer-application",
   "/give-a-month-get-a-month",
   "/pt/give-a-month-get-a-month",
+  "/testimonial-request",
+  "/pt/testimonial-request",
+  "/es/testimonial-request",
 ]);
 
 const CampaignAwareHIPAADisclaimer = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname)) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/")) return null;
   return <HIPAADisclaimer />;
+};
+
+const CampaignAwareNotificationPermissionBanner = () => {
+  const { pathname } = useLocation();
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/")) return null;
+  return <NotificationPermissionBanner />;
 };
 
 const App = () => (
@@ -107,6 +120,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <AttributionTracker />
               <CampaignAwareHIPAADisclaimer />
               <MessageNotificationProvider>
                 <Suspense fallback={<PageLoader />}>
@@ -124,11 +138,16 @@ const App = () => (
                     <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                     <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                     <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
+                    <Route path="/ref/:code" element={<ReferralLanding />} />
                     <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
+                    <Route path="/partner-review" element={<ProtectedRoute><PartnerReview /></ProtectedRoute>} />
                     <Route path="/influencer-partners" element={<InfluencerPartners />} />
                     <Route path="/influencer-application" element={<InfluencerApplication />} />
                     <Route path="/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="en" />} />
                     <Route path="/pt/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="pt" />} />
+                    <Route path="/testimonial-request" element={<TestimonialRequest defaultLocale="en" />} />
+                    <Route path="/pt/testimonial-request" element={<TestimonialRequest defaultLocale="pt" />} />
+                    <Route path="/es/testimonial-request" element={<TestimonialRequest defaultLocale="es" />} />
                     <Route path="/doctor/:id" element={<DoctorProfile />} />
                     <Route path="/provider/:id" element={<ProviderProfileRouter />} />
                     <Route path="/provider-dashboard" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />
@@ -164,7 +183,7 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
-                <NotificationPermissionBanner />
+                <CampaignAwareNotificationPermissionBanner />
               </MessageNotificationProvider>
             </BrowserRouter>
           </TooltipProvider>

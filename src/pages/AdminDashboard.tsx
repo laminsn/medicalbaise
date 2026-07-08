@@ -12,6 +12,7 @@ import { AdminPromoManager } from '@/components/admin/AdminPromoManager';
 import { AdminOverview } from '@/components/admin/AdminOverview';
 import { AdminAllUsers } from '@/components/admin/AdminAllUsers';
 import { AdminEmailCampaigns } from '@/components/admin/AdminEmailCampaigns';
+import { AdminPartnerApplications } from '@/components/admin/AdminPartnerApplications';
 import { Shield, Loader2 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -69,6 +70,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="credits" className="flex-1">{t('admin.credits')}</TabsTrigger>
               <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>
               <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : isEs ? 'Campañas' : 'Campaigns'}</TabsTrigger>
+              <TabsTrigger value="partners" className="flex-1">{isPt ? 'Parceiros' : isEs ? 'Socios' : 'Partners'}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -101,6 +103,10 @@ export default function AdminDashboard() {
               ) : (
                 <AdminEmailCampaigns />
               )}
+            </TabsContent>
+
+            <TabsContent value="partners">
+              <AdminPartnerApplications />
             </TabsContent>
           </Tabs>
         </div>

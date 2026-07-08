@@ -90,6 +90,19 @@ type PartnerReceipt = {
   generated_at: string;
 };
 
+type PartnerApplication = {
+  id: string;
+  status: string;
+  full_name: string;
+  email: string;
+  total_followers: number;
+  campaign_interests: string[] | null;
+  review_due_at: string | null;
+  application_submitted_at: string | null;
+  created_at: string;
+  partner_campaigns?: Pick<Campaign, 'name'> | Pick<Campaign, 'name'>[] | null;
+};
+
 type EventMetrics = {
   visitors: number;
   conversions: number;
@@ -160,6 +173,10 @@ const COPY = {
     receiptError: 'Unable to generate receipt',
     loadError: 'Partner dashboard data is not available yet.',
     noDate: 'Not yet',
+    applicationsTitle: 'Application status',
+    applicationsDescription: 'Applications submitted from partner and influencer pages stay connected to this portal.',
+    applicationReview: 'Review due',
+    completeApplication: 'Complete application',
   },
   es: {
     eyebrow: 'Portal de socios',
@@ -222,6 +239,10 @@ const COPY = {
     receiptError: 'No se pudo generar el recibo',
     loadError: 'Los datos del portal de socios aun no estan disponibles.',
     noDate: 'Aun no',
+    applicationsTitle: 'Estado de solicitud',
+    applicationsDescription: 'Las solicitudes de paginas de socios e influencers quedan conectadas a este portal.',
+    applicationReview: 'Revision antes de',
+    completeApplication: 'Completar solicitud',
   },
   pt: {
     eyebrow: 'Portal de parceiros',
@@ -284,6 +305,10 @@ const COPY = {
     receiptError: 'Nao foi possivel gerar o recibo',
     loadError: 'Os dados do portal de parceiros ainda nao estao disponiveis.',
     noDate: 'Ainda nao',
+    applicationsTitle: 'Status da inscricao',
+    applicationsDescription: 'Inscricoes feitas nas paginas de parceiros e influenciadores ficam conectadas a este portal.',
+    applicationReview: 'Revisao ate',
+    completeApplication: 'Completar inscricao',
   },
 } as const;
 
@@ -292,6 +317,11 @@ type ReceiptPeriod = PartnerReceipt['period_type'];
 
 const campaignStatusTone: Record<string, string> = {
   approved: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-700',
+  lead: 'border-sky-500/25 bg-sky-500/10 text-sky-700',
+  submitted: 'border-amber-500/25 bg-amber-500/10 text-amber-700',
+  under_review: 'border-amber-500/25 bg-amber-500/10 text-amber-700',
+  waitlist: 'border-slate-500/25 bg-slate-500/10 text-slate-700',
+  declined: 'border-destructive/25 bg-destructive/10 text-destructive',
   pending: 'border-amber-500/25 bg-amber-500/10 text-amber-700',
   paused: 'border-slate-500/25 bg-slate-500/10 text-slate-700',
   completed: 'border-sky-500/25 bg-sky-500/10 text-sky-700',
@@ -434,6 +464,7 @@ export function PartnerCampaignCommandCenter() {
   const brandName = appKey === 'medical' ? 'Medical Baise' : appKey === 'legal' ? 'Legal Baise' : 'Casa Baise';
   const qrRef = useRef<HTMLDivElement>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const [applications, setApplications] = useState<PartnerApplication[]>([]);
   const [payouts, setPayouts] = useState<PartnerPayout[]>([]);
   const [receipts, setReceipts] = useState<PartnerReceipt[]>([]);
   const [eventMetrics, setEventMetrics] = useState<EventMetrics>({ visitors: 0, conversions: 0, monthlyEarnings: 0 });
@@ -521,7 +552,7 @@ export function PartnerCampaignCommandCenter() {
       setSelectedId((current) => (current && records.some((membership) => membership.id === current) ? current : records[0]?.id || null));
 
       const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-      const [visitorResult, conversionResult, earningEventsResult, payoutResult, receiptResult] = await Promise.all([
+      const [visitorResult, conversionResult, earningEventsResult, payoutResult, receiptResult, applicationResult] = await Promise.all([
         db
           .from('partner_campaign_events')
           .select('id', { count: 'exact', head: true })
@@ -563,6 +594,23 @@ export function PartnerCampaignCommandCenter() {
           .eq('partner_user_id', user.id)
           .order('generated_at', { ascending: false })
           .limit(8),
+        db
+          .from('partner_influencer_applications')
+          .select(`
+            id,
+            status,
+            full_name,
+            email,
+            total_followers,
+            campaign_interests,
+            review_due_at,
+            application_submitted_at,
+            created_at,
+            partner_campaigns ( name )
+          `)
+          .eq('app_key', appKey)
+          .order('created_at', { ascending: false })
+          .limit(10),
       ]);
 
       if (visitorResult.error) throw visitorResult.error;
@@ -570,6 +618,7 @@ export function PartnerCampaignCommandCenter() {
       if (earningEventsResult.error) throw earningEventsResult.error;
       if (payoutResult.error) throw payoutResult.error;
       if (receiptResult.error) throw receiptResult.error;
+      if (applicationResult.error) throw applicationResult.error;
 
       const monthlyEarnings = (earningEventsResult.data || []).reduce(
         (total: number, event: { profit_amount?: number }) => total + (event.profit_amount || 0),
@@ -583,6 +632,7 @@ export function PartnerCampaignCommandCenter() {
       });
       setPayouts((payoutResult.data || []) as PartnerPayout[]);
       setReceipts((receiptResult.data || []) as PartnerReceipt[]);
+      setApplications((applicationResult.data || []) as PartnerApplication[]);
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : copy.loadError);
     } finally {
@@ -738,6 +788,10 @@ export function PartnerCampaignCommandCenter() {
           <p className="text-sm font-medium text-amber-800">{copy.loadError}</p>
           <p className="mt-1 text-xs text-amber-800/80">{loadError}</p>
         </section>
+      )}
+
+      {applications.length > 0 && (
+        <ApplicationStatusPanel applications={applications} copy={copy} />
       )}
 
       {memberships.length === 0 ? (
@@ -1042,6 +1096,55 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
       <span className="block truncate font-semibold tabular-nums">{value}</span>
       <span className="mt-0.5 block truncate text-muted-foreground">{label}</span>
     </span>
+  );
+}
+
+function ApplicationStatusPanel({
+  applications,
+  copy,
+}: {
+  applications: PartnerApplication[];
+  copy: PartnerCopy;
+}) {
+  return (
+    <section className="rounded-lg border bg-card shadow-sm">
+      <div className="flex flex-col gap-2 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div>
+          <h2 className="font-semibold">{copy.applicationsTitle}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{copy.applicationsDescription}</p>
+        </div>
+        <FileText className="hidden h-5 w-5 text-muted-foreground sm:block" />
+      </div>
+      <div className="divide-y">
+        {applications.map((application) => {
+          const campaign = getPayoutCampaign({ partner_campaigns: application.partner_campaigns } as PartnerPayout);
+          const needsFullApplication = application.status === 'lead';
+          return (
+            <div key={application.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium">{campaign?.name || copy.apply}</p>
+                  <Badge variant="outline" className={campaignStatusTone[application.status] || ''}>
+                    {getStatusLabel(copy, application.status)}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {copy.applicationReview}: {formatDate(application.review_due_at, copy.noDate)}
+                </p>
+              </div>
+              {needsFullApplication ? (
+                <Button asChild size="sm" className="gap-2 sm:self-center">
+                  <Link to="/influencer-application">
+                    {copy.completeApplication}
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

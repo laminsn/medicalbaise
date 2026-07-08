@@ -15,6 +15,9 @@ interface Profile {
   city: string | null;
   state: string | null;
   referral_code: string | null;
+  referral_slug?: string | null;
+  client_id?: string | null;
+  signup_app_key?: 'casa' | 'medical' | 'legal' | null;
   credits_balance: number;
   status: string | null;
   bio: string | null;
@@ -35,6 +38,27 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const db = supabase as any;
+
+function getStoredAttribution() {
+  if (typeof window === 'undefined') return {};
+
+  return {
+    inbound_referral_code: localStorage.getItem('baise_referral_code') || undefined,
+    inbound_referral_landing: localStorage.getItem('baise_referral_landing') || undefined,
+    inbound_partner_code: localStorage.getItem('baise_partner_code') || undefined,
+    inbound_partner_landing: localStorage.getItem('baise_partner_landing') || undefined,
+  };
+}
+
+function clearSignupAttribution() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('baise_referral_code');
+  localStorage.removeItem('baise_referral_landing');
+  localStorage.removeItem('baise_partner_code');
+  localStorage.removeItem('baise_partner_landing');
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -90,6 +114,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const syncReferralIdentity = async (userId: string, email?: string | null) => {
+    const appKey = getBaiseAppKey();
+    const attribution = getStoredAttribution();
+
+    await db.rpc('ensure_profile_referral_identity', {
+      target_user_id: userId,
+      target_app_key: appKey,
+    }).catch(() => null);
+
+    await db.rpc('activate_partner_applications_for_user', {
+      target_user_id: userId,
+      target_email: email || null,
+    }).catch(() => null);
+
+    if (attribution.inbound_referral_code) {
+      await db.rpc('track_referral_event', {
+        target_code: attribution.inbound_referral_code,
+        target_event_type: 'signup',
+        target_app_key: appKey,
+        event_metadata: {
+          source: 'client_auth_sync',
+          landing: attribution.inbound_referral_landing || null,
+        },
+      }).catch(() => null);
+    }
+
+    if (attribution.inbound_partner_code) {
+      await db.rpc('track_partner_campaign_click', {
+        target_tracking_code: attribution.inbound_partner_code,
+        target_event_type: 'lead',
+        event_metadata: {
+          source: 'client_auth_sync',
+          landing: attribution.inbound_partner_landing || null,
+          app_key: appKey,
+        },
+      }).catch(() => null);
+    }
+
+    if (attribution.inbound_referral_code || attribution.inbound_partner_code) {
+      clearSignupAttribution();
+    }
+
+    const { data: refreshedProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (refreshedProfile) setProfile(refreshedProfile as Profile);
+  };
+
   const ensureProfile = async (userId: string, userData?: { email?: string; full_name?: string; avatar_url?: string; first_name?: string; last_name?: string }) => {
     // First try to fetch existing profile
     const { data: existingProfile } = await supabase
@@ -100,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (existingProfile) {
       setProfile(existingProfile as Profile);
+      void syncReferralIdentity(userId, existingProfile.email);
       return;
     }
 
@@ -132,6 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!error && newProfile) {
       setProfile(newProfile as Profile);
+      await syncReferralIdentity(userId, userData?.email || null);
     } else if (error?.code === '23505') {
       // Duplicate key — profile was created by trigger between our check and insert
       const { data: retryProfile } = await supabase
@@ -139,13 +216,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
-      if (retryProfile) setProfile(retryProfile as Profile);
+      if (retryProfile) {
+        setProfile(retryProfile as Profile);
+        await syncReferralIdentity(userId, retryProfile.email);
+      }
     }
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, languages?: string[]) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/auth/callback`;
     const appKey = getBaiseAppKey();
+    const attribution = getStoredAttribution();
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -160,6 +241,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           signup_app: appKey,
           signup_url: window.location.origin,
           signup_intent: 'client',
+          inbound_referral_code: attribution.inbound_referral_code,
+          inbound_referral_landing: attribution.inbound_referral_landing,
+          inbound_partner_code: attribution.inbound_partner_code,
+          inbound_partner_landing: attribution.inbound_partner_landing,
         },
       },
     });

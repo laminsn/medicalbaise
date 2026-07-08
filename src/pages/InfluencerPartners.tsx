@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowRight,
@@ -299,6 +299,9 @@ export default function InfluencerPartners() {
               <p className="mt-4 text-center text-xs leading-5 text-black/48">
                 The full influencer application follows next. Minimum 5,000 followers required for approval.
               </p>
+              <Button asChild type="button" variant="ghost" className="mt-3 w-full text-[#101114] hover:bg-black/5">
+                <Link to="/partner-dashboard">Already approved? Open partner portal</Link>
+              </Button>
             </form>
           </aside>
         </section>

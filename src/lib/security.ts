@@ -181,6 +181,97 @@ export function sanitizeRedirectUrl(url: string, allowedOrigins: string[] = []):
   return '/';
 }
 
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+]);
+
+const ALLOWED_VIDEO_TYPES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+]);
+
+const DANGEROUS_EXTENSIONS = new Set([
+  'exe', 'bat', 'cmd', 'com', 'msi', 'scr', 'pif',
+  'js', 'vbs', 'wsf', 'wsh', 'ps1', 'sh', 'bash',
+  'html', 'htm', 'svg', 'php', 'asp', 'jsp', 'py',
+]);
+
+export interface FileValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+export function validateFileUpload(
+  file: File,
+  options: {
+    allowedTypes?: Set<string>;
+    maxSizeMB?: number;
+    allowImages?: boolean;
+    allowVideos?: boolean;
+  } = {}
+): FileValidationResult {
+  const {
+    allowedTypes,
+    maxSizeMB = 10,
+    allowImages = true,
+    allowVideos = false,
+  } = options;
+
+  if (file.size > maxSizeMB * 1024 * 1024) {
+    return { valid: false, error: `File exceeds maximum size of ${maxSizeMB}MB` };
+  }
+
+  if (file.size === 0) {
+    return { valid: false, error: 'File is empty' };
+  }
+
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  if (DANGEROUS_EXTENSIONS.has(extension)) {
+    return { valid: false, error: 'File type not allowed for security reasons' };
+  }
+
+  if (allowedTypes) {
+    if (!allowedTypes.has(file.type)) {
+      return { valid: false, error: `File type ${file.type} is not allowed` };
+    }
+  } else {
+    const isAllowedImage = allowImages && ALLOWED_IMAGE_TYPES.has(file.type);
+    const isAllowedVideo = allowVideos && ALLOWED_VIDEO_TYPES.has(file.type);
+    if (!isAllowedImage && !isAllowedVideo) {
+      return { valid: false, error: `File type ${file.type} is not allowed` };
+    }
+  }
+
+  const expectedExtensions: Record<string, string[]> = {
+    'image/jpeg': ['jpg', 'jpeg'],
+    'image/png': ['png'],
+    'image/webp': ['webp'],
+    'image/gif': ['gif'],
+    'video/mp4': ['mp4'],
+    'video/webm': ['webm'],
+    'video/quicktime': ['mov'],
+  };
+
+  const validExtensions = expectedExtensions[file.type];
+  if (validExtensions && !validExtensions.includes(extension)) {
+    return { valid: false, error: 'File extension does not match file type' };
+  }
+
+  return { valid: true };
+}
+
+export function generateSafeFileName(userId: string, originalName: string): string {
+  const ext = originalName.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 10);
+  const safeUserId = userId.replace(/[^a-zA-Z0-9-]/g, '');
+  return `${safeUserId}/${timestamp}-${random}.${ext}`;
+}
+
 /**
  * Validate that a JWT token is not expired (client-side check only).
  * This does NOT validate the signature — that must be done server-side.

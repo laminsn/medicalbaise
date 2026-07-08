@@ -6,7 +6,7 @@ import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 export function useJobStatusUpdate() {
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
-  const { notifyJobStatusChanged } = useEmailNotifications();
+  const { notifyJobStatusChanged, notifyTestimonialRequest } = useEmailNotifications();
 
   const getJobParticipants = async (activeJobId: string) => {
     const { data: activeJob } = await supabase
@@ -14,13 +14,18 @@ export function useJobStatusUpdate() {
       .select(`
         customer_id,
         provider_id,
-        jobs_posted:job_id (id, title),
-        providers:provider_id (business_name, contact_email, user_id)
+        jobs_posted:job_id (id, title)
       `)
       .eq('id', activeJobId)
       .single();
 
     if (!activeJob) return null;
+
+    const { data: providerProfile } = await supabase
+      .from('providers')
+      .select('id, business_name, contact_email, user_id')
+      .or(`id.eq.${activeJob.provider_id},user_id.eq.${activeJob.provider_id}`)
+      .maybeSingle();
 
     const { data: customerProfile } = await supabase
       .from('profiles')
@@ -31,14 +36,14 @@ export function useJobStatusUpdate() {
     return {
       jobTitle: (activeJob.jobs_posted as any)?.title || 'Job',
       jobId: (activeJob.jobs_posted as any)?.id,
-      providerName: (activeJob.providers as any)?.business_name || 'Provider',
-      providerEmail: (activeJob.providers as any)?.contact_email,
+      providerName: providerProfile?.business_name || 'Provider',
+      providerEmail: providerProfile?.contact_email,
       customerName: customerProfile 
         ? `${customerProfile.first_name || ''} ${customerProfile.last_name || ''}`.trim() || 'Customer' 
         : 'Customer',
       customerEmail: customerProfile?.email,
       customerId: activeJob.customer_id,
-      providerId: activeJob.provider_id,
+      providerId: providerProfile?.id || activeJob.provider_id,
     };
   };
 
@@ -62,12 +67,15 @@ export function useJobStatusUpdate() {
       if (!jobCheck) throw new Error('Job not found');
 
       // Check if user is the customer or provider for this job
-      const { data: userProvider } = await supabase
-        .from('providers')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('id', jobCheck.provider_id)
-        .maybeSingle();
+      const isProviderUserId = jobCheck.provider_id === user.id;
+      const { data: userProvider } = isProviderUserId
+        ? { data: { id: jobCheck.provider_id } }
+        : await supabase
+          .from('providers')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('id', jobCheck.provider_id)
+          .maybeSingle();
 
       const isCustomer = jobCheck.customer_id === user.id;
       const isProvider = !!userProvider;
@@ -119,6 +127,18 @@ export function useJobStatusUpdate() {
               newStatus,
               activeJobId
             );
+
+            if (newStatus === 'completed' && participants.providerId) {
+              await notifyTestimonialRequest(
+                participants.customerEmail,
+                participants.customerName,
+                participants.providerName,
+                participants.jobTitle,
+                participants.providerId,
+                participants.jobId,
+                activeJobId
+              );
+            }
           }
 
           // If job is completed, also notify provider

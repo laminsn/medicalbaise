@@ -1,7 +1,11 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getBaiseAppKey, getBaiseAppUrl, getLocaleKey } from '@/lib/providerCommunication';
+import { useTranslation } from 'react-i18next';
+
+type LocaleKey = 'en' | 'es' | 'pt';
 
 interface SendNotificationParams {
-  type: "work_submitted" | "work_approved" | "work_rejected" | "job_status_changed";
+  type: "work_submitted" | "work_approved" | "work_rejected" | "job_status_changed" | "testimonial_request";
   recipientEmail: string;
   recipientName: string;
   jobTitle: string;
@@ -10,9 +14,17 @@ interface SendNotificationParams {
   newStatus?: string;
   feedback?: string;
   actionUrl?: string;
+  appKey?: "casa" | "medical" | "legal";
+  locale?: LocaleKey;
+  providerId?: string;
+  jobId?: string;
+  activeJobId?: string;
+  googleReviewUrl?: string;
 }
 
 export const useEmailNotifications = () => {
+  const { i18n } = useTranslation();
+
   const sendNotificationEmail = async (params: SendNotificationParams) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-notification-email', {
@@ -99,11 +111,48 @@ export const useEmailNotifications = () => {
     });
   };
 
+  const notifyTestimonialRequest = async (
+    recipientEmail: string,
+    recipientName: string,
+    providerName: string,
+    jobTitle: string,
+    providerId: string,
+    jobId?: string,
+    activeJobId?: string,
+    googleReviewUrl?: string,
+    localeOverride?: LocaleKey
+  ) => {
+    const locale = localeOverride || getLocaleKey(i18n.resolvedLanguage || i18n.language);
+    const requestPath = locale === 'en' ? '/testimonial-request' : `/${locale}/testimonial-request`;
+    const requestUrl = new URL(requestPath, getBaiseAppUrl());
+    requestUrl.searchParams.set('providerId', providerId);
+    requestUrl.searchParams.set('providerName', providerName);
+    if (jobId) requestUrl.searchParams.set('jobId', jobId);
+    if (activeJobId) requestUrl.searchParams.set('activeJobId', activeJobId);
+    if (googleReviewUrl) requestUrl.searchParams.set('googleReviewUrl', googleReviewUrl);
+
+    return sendNotificationEmail({
+      type: 'testimonial_request',
+      recipientEmail,
+      recipientName,
+      providerName,
+      jobTitle,
+      appKey: getBaiseAppKey(),
+      locale,
+      providerId,
+      jobId,
+      activeJobId,
+      googleReviewUrl,
+      actionUrl: requestUrl.toString(),
+    });
+  };
+
   return {
     sendNotificationEmail,
     notifyWorkSubmitted,
     notifyWorkApproved,
     notifyWorkRejected,
     notifyJobStatusChanged,
+    notifyTestimonialRequest,
   };
 };

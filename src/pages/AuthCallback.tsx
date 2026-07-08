@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { getBaiseAppKey } from '@/lib/providerCommunication';
+
+const db = supabase as any;
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -16,18 +19,23 @@ export default function AuthCallback() {
       const providerErrorDescription =
         url.searchParams.get('error_description') || url.searchParams.get('error_code');
 
+      // Provider-side failure (user denied, misconfigured client, etc.) — surface it.
       if (providerError) {
         const message = providerErrorDescription || providerError;
         navigate(`/auth?error=${encodeURIComponent(message)}`, { replace: true });
         return;
       }
 
+      // PKCE flow: convert ?code=... into a session before anything else.
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
           window.location.href,
         );
         if (exchangeError) {
-          navigate(`/auth?error=${encodeURIComponent(exchangeError.message)}`, { replace: true });
+          navigate(
+            `/auth?error=${encodeURIComponent(exchangeError.message)}`,
+            { replace: true },
+          );
           return;
         }
       }
@@ -40,6 +48,12 @@ export default function AuthCallback() {
       }
 
       if (session?.user) {
+        const appKey = getBaiseAppKey();
+        const inboundReferralCode = localStorage.getItem('baise_referral_code');
+        const inboundReferralLanding = localStorage.getItem('baise_referral_landing');
+        const inboundPartnerCode = localStorage.getItem('baise_partner_code');
+        const inboundPartnerLanding = localStorage.getItem('baise_partner_landing');
+
         // Ensure profile exists for OAuth users
         const { data: profile } = await supabase
           .from('profiles')
@@ -69,10 +83,52 @@ export default function AuthCallback() {
           });
         }
 
+        await db.rpc('ensure_profile_referral_identity', {
+          target_user_id: session.user.id,
+          target_app_key: appKey,
+        }).catch(() => null);
+
+        await db.rpc('activate_partner_applications_for_user', {
+          target_user_id: session.user.id,
+          target_email: session.user.email || null,
+        }).catch(() => null);
+
+        if (inboundReferralCode) {
+          await db.rpc('track_referral_event', {
+            target_code: inboundReferralCode,
+            target_event_type: 'signup',
+            target_app_key: appKey,
+            event_metadata: {
+              source: 'auth_callback',
+              landing: inboundReferralLanding || null,
+            },
+          }).catch(() => null);
+        }
+
+        if (inboundPartnerCode) {
+          await db.rpc('track_partner_campaign_click', {
+            target_tracking_code: inboundPartnerCode,
+            target_event_type: 'lead',
+            event_metadata: {
+              source: 'auth_callback',
+              landing: inboundPartnerLanding || null,
+              app_key: appKey,
+            },
+          }).catch(() => null);
+        }
+
+        if (inboundReferralCode || inboundPartnerCode) {
+          localStorage.removeItem('baise_referral_code');
+          localStorage.removeItem('baise_referral_landing');
+          localStorage.removeItem('baise_partner_code');
+          localStorage.removeItem('baise_partner_landing');
+        }
+
         navigate('/', { replace: true });
         return;
       }
 
+      // No session and no code — the user landed here without completing OAuth.
       navigate(
         `/auth?error=${encodeURIComponent('No authentication code received. Please try signing in again.')}`,
         { replace: true },

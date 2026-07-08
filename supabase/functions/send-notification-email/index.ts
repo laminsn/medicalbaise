@@ -1,57 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { getCorsHeaders, authenticateRequest, createErrorResponse, escapeHtml, isSafeUrl, rejectNonPostMethod } from "../_shared/security.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-const ALLOWED_ORIGINS = [
-  "https://medicalbaise.lovable.app",
-  "https://mdbaise.com",
-  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
-];
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("Origin") || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  };
-}
-
-/** Escape HTML entities to prevent XSS in email templates */
-function escapeHtml(str: string | undefined | null): string {
-  if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-/** Validate that a URL is safe for use in email links (https only) */
-function sanitizeUrl(url: string | undefined): string {
-  if (!url) return '';
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== 'https:') return '';
-    // Only allow our own domains
-    const allowedHosts = ['medicalbaise.lovable.app', 'mdbaise.com'];
-    if (!allowedHosts.some(h => parsed.hostname === h || parsed.hostname.endsWith('.' + h))) {
-      return '';
-    }
-    return parsed.href;
-  } catch {
-    return '';
-  }
-}
-
-const VALID_EMAIL_TYPES = ["work_submitted", "work_approved", "work_rejected", "job_status_changed"];
+type AppKey = "casa" | "medical" | "legal";
+type LocaleKey = "en" | "es" | "pt";
 
 interface NotificationEmailRequest {
-  type: "work_submitted" | "work_approved" | "work_rejected" | "job_status_changed";
+  type: "work_submitted" | "work_approved" | "work_rejected" | "job_status_changed" | "testimonial_request";
   recipientEmail: string;
   recipientName: string;
   jobTitle: string;
@@ -60,20 +17,118 @@ interface NotificationEmailRequest {
   newStatus?: string;
   feedback?: string;
   actionUrl?: string;
+  appKey?: AppKey;
+  locale?: LocaleKey;
+  providerId?: string;
+  jobId?: string;
+  activeJobId?: string;
+  googleReviewUrl?: string;
 }
 
+const VALID_TYPES = ["work_submitted", "work_approved", "work_rejected", "job_status_changed", "testimonial_request"];
+
+const APP_BRANDS = {
+  casa: {
+    name: "Casa Baise",
+    domain: "casabaise.com",
+    url: "https://casabaise.com",
+    color: "#047857",
+    from: "Casa Baise <support@support.casabaise.com>",
+  },
+  medical: {
+    name: "Medical Baise",
+    domain: "mdbaise.com",
+    url: "https://mdbaise.com",
+    color: "#00b8d4",
+    from: "Medical Baise <support@support.mdbaise.com>",
+  },
+  legal: {
+    name: "Legal Baise",
+    domain: "legalbaise.com",
+    url: "https://legalbaise.com",
+    color: "#7c3aed",
+    from: "Legal Baise <support@legalbaise.com>",
+  },
+} as const;
+
+const getAppKey = (appKey?: string): AppKey => {
+  if (appKey === "medical" || appKey === "legal" || appKey === "casa") return appKey;
+  const envKey = String(Deno.env.get("BAISE_APP_KEY") || "casa").toLowerCase();
+  if (envKey === "medical" || envKey === "legal" || envKey === "casa") return envKey;
+  return "casa";
+};
+
+const getBrand = (appKey?: string) => APP_BRANDS[getAppKey(appKey)];
+
+const getLocale = (locale?: string): LocaleKey => {
+  const normalized = String(locale || "").toLowerCase();
+  if (normalized.startsWith("pt")) return "pt";
+  if (normalized.startsWith("es")) return "es";
+  return "en";
+};
+
+const isUuid = (value?: string) =>
+  Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value));
+
+const TESTIMONIAL_EMAIL_COPY = {
+  en: {
+    heading: "Share your experience",
+    subject: (provider: string) => `How was your service with ${provider}?`,
+    greeting: "Hello",
+    completed: (job: string, provider: string) =>
+      `Your service <strong>${job}</strong>${provider ? ` with <strong>${provider}</strong>` : ""} has been completed.`,
+    intro: "If you had a good experience, you can help future clients choose with confidence and earn future service credit once approved.",
+    google: "<strong>Google review:</strong> R$50 future service credit after approval.",
+    video: "<strong>Video testimonial:</strong> R$100 future service credit after approval.",
+    maximum: "Maximum testimonial credit: R$150 per client.",
+    cta: "Submit testimonial",
+    finePrint: "Each client may receive one Google review credit and one video testimonial credit. Credits are reviewed before being applied to future services.",
+    thanks: "Thank you for using",
+  },
+  es: {
+    heading: "Comparte tu experiencia",
+    subject: (provider: string) => `¿Cómo fue tu servicio con ${provider}?`,
+    greeting: "Hola",
+    completed: (job: string, provider: string) =>
+      `Tu servicio <strong>${job}</strong>${provider ? ` con <strong>${provider}</strong>` : ""} fue completado.`,
+    intro: "Si tuviste una buena experiencia, puedes ayudar a futuros clientes a elegir con confianza y ganar crédito para servicios futuros después de la aprobación.",
+    google: "<strong>Reseña de Google:</strong> R$50 de crédito para servicios futuros después de la aprobación.",
+    video: "<strong>Vídeo testimonial:</strong> R$100 de crédito para servicios futuros después de la aprobación.",
+    maximum: "Crédito máximo por testimonios: R$150 por cliente.",
+    cta: "Enviar testimonio",
+    finePrint: "Cada cliente puede recibir un crédito por reseña de Google y un crédito por vídeo testimonial. Los créditos se revisan antes de aplicarse a servicios futuros.",
+    thanks: "Gracias por usar",
+  },
+  pt: {
+    heading: "Compartilhe sua experiência",
+    subject: (provider: string) => `Como foi seu serviço com ${provider}?`,
+    greeting: "Olá",
+    completed: (job: string, provider: string) =>
+      `Seu serviço <strong>${job}</strong>${provider ? ` com <strong>${provider}</strong>` : ""} foi concluído.`,
+    intro: "Se você teve uma boa experiência, pode ajudar futuros clientes a escolher com confiança e ganhar crédito para serviços futuros após a aprovação.",
+    google: "<strong>Avaliação no Google:</strong> R$50 de crédito para serviços futuros após aprovação.",
+    video: "<strong>Vídeo depoimento:</strong> R$100 de crédito para serviços futuros após aprovação.",
+    maximum: "Crédito máximo por depoimentos: R$150 por cliente.",
+    cta: "Enviar depoimento",
+    finePrint: "Cada cliente pode receber um crédito por avaliação no Google e um crédito por vídeo depoimento. Os créditos são analisados antes de serem aplicados a serviços futuros.",
+    thanks: "Obrigado por usar",
+  },
+} as const;
+
 const getEmailContent = (request: NotificationEmailRequest) => {
-  // Escape ALL user-provided values to prevent XSS in email HTML
+  const brand = getBrand(request.appKey);
+  // Escape ALL user-provided data before inserting into HTML to prevent injection
   const recipientName = escapeHtml(request.recipientName);
   const jobTitle = escapeHtml(request.jobTitle);
   const providerName = escapeHtml(request.providerName);
   const customerName = escapeHtml(request.customerName);
   const feedback = escapeHtml(request.feedback);
-  const actionUrl = sanitizeUrl(request.actionUrl);
+  // Validate actionUrl is a safe URL
+  const actionUrl = request.actionUrl && isSafeUrl(request.actionUrl) ? request.actionUrl : '';
   const newStatus = escapeHtml(request.newStatus);
-  const type = request.type;
+  const testimonialUrl = actionUrl || `${brand.url}/testimonial-request`;
 
-  switch (type) {
+  switch (request.type) {
     case "work_submitted":
       return {
         subject: `Work Submitted for Approval - ${jobTitle}`,
@@ -84,7 +139,7 @@ const getEmailContent = (request: NotificationEmailRequest) => {
             <p><strong>${providerName}</strong> has submitted work for your approval on the job: <strong>${jobTitle}</strong></p>
             <p>Please review the submitted work and provide your feedback.</p>
             ${actionUrl ? `<a href="${actionUrl}" style="display: inline-block; background-color: #047857; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">Review Work</a>` : ''}
-            <p style="margin-top: 24px; color: #666;">Thank you for using Brasil Base!</p>
+            <p style="margin-top: 24px; color: #666;">Thank you for using ${brand.name}!</p>
           </div>
         `,
       };
@@ -136,7 +191,41 @@ const getEmailContent = (request: NotificationEmailRequest) => {
             <p>Hello ${recipientName},</p>
             <p>The status of <strong>${jobTitle}</strong> has been updated to: <strong style="color: ${statusColor};">${newStatus?.replace('_', ' ').toUpperCase()}</strong></p>
             ${actionUrl ? `<a href="${actionUrl}" style="display: inline-block; background-color: #047857; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">View Job</a>` : ''}
-            <p style="margin-top: 24px; color: #666;">Thank you for using Brasil Base!</p>
+            <p style="margin-top: 24px; color: #666;">Thank you for using ${brand.name}!</p>
+          </div>
+        `,
+      };
+    }
+
+    case "testimonial_request": {
+      const testimonialCopy = TESTIMONIAL_EMAIL_COPY[getLocale(request.locale)];
+      return {
+        subject: testimonialCopy.subject(providerName || brand.name),
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+            <div style="background: ${brand.color}; color: white; padding: 24px 28px; border-radius: 12px 12px 0 0;">
+              <h1 style="margin: 0; font-size: 24px;">${testimonialCopy.heading}</h1>
+              <p style="margin: 6px 0 0; opacity: 0.9;">${brand.name}</p>
+            </div>
+            <div style="padding: 28px; border: 1px solid #eeeeee; border-top: 0; border-radius: 0 0 12px 12px;">
+              <p>${testimonialCopy.greeting} ${recipientName},</p>
+              <p>${testimonialCopy.completed(jobTitle, providerName || "")}</p>
+              <p>${testimonialCopy.intro}</p>
+              <div style="display: grid; gap: 12px; margin: 22px 0;">
+                <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px;">
+                  ${testimonialCopy.google}
+                </div>
+                <div style="border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px;">
+                  ${testimonialCopy.video}
+                </div>
+              </div>
+              <p style="font-weight: 700;">${testimonialCopy.maximum}</p>
+              <div style="text-align: center; margin: 28px 0;">
+                <a href="${testimonialUrl}" style="display: inline-block; background-color: ${brand.color}; color: white; padding: 14px 24px; text-decoration: none; border-radius: 8px; font-weight: 700;">${testimonialCopy.cta}</a>
+              </div>
+              <p style="font-size: 13px; color: #667085;">${testimonialCopy.finePrint}</p>
+              <p style="margin-top: 24px; color: #666;">${testimonialCopy.thanks} ${brand.name}.</p>
+            </div>
           </div>
         `,
       };
@@ -157,38 +246,28 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const methodError = rejectNonPostMethod(req, corsHeaders);
+  if (methodError) return methodError;
+
   try {
-    // Verify the user is authenticated
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
+    // Authenticate user
+    const { user } = await authenticateRequest(req);
 
-    // Validate the JWT token
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
+    if (!RESEND_API_KEY) {
+      throw new Error("Email service not configured");
     }
 
     const request: NotificationEmailRequest = await req.json();
 
-    // Validate required fields and type
-    if (!request.type || !VALID_EMAIL_TYPES.includes(request.type)) {
+    // Validate request type
+    if (!request.type || !VALID_TYPES.includes(request.type)) {
       return new Response(JSON.stringify({ error: "Invalid notification type" }), {
         status: 400,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
+
+    // Validate required fields
     if (!request.recipientEmail || !request.recipientName || !request.jobTitle) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
@@ -199,17 +278,80 @@ const handler = async (req: Request): Promise<Response> => {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(request.recipientEmail)) {
-      return new Response(JSON.stringify({ error: "Invalid email format" }), {
+      return new Response(JSON.stringify({ error: "Invalid recipient email" }), {
         status: 400,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("Sending notification email:", {
-      type: request.type,
-      job: request.jobTitle,
-      requestedBy: user.id,
-    });
+    // Verify recipient email belongs to a platform user to prevent email relay abuse
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+
+    const { data: recipientProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("user_id")
+      .eq("email", request.recipientEmail)
+      .maybeSingle();
+
+    if (!recipientProfile) {
+      return new Response(JSON.stringify({ error: "Recipient not found on platform" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    if (request.type === "testimonial_request" && isUuid(request.providerId)) {
+      const appKey = getAppKey(request.appKey);
+      const requestRecord = {
+        app_key: appKey,
+        provider_id: request.providerId,
+        customer_id: recipientProfile.user_id,
+        job_id: isUuid(request.jobId) ? request.jobId : null,
+        active_job_id: isUuid(request.activeJobId) ? request.activeJobId : null,
+        recipient_email: request.recipientEmail,
+        recipient_name: request.recipientName,
+        request_source: "service_completion",
+        google_review_url: request.googleReviewUrl || null,
+        status: "sent",
+        last_sent_at: new Date().toISOString(),
+        metadata: {
+          job_title: request.jobTitle,
+          provider_name: request.providerName || null,
+        },
+      };
+
+      if (requestRecord.job_id) {
+        const { data: existingRequest } = await supabaseAdmin
+          .from("client_testimonial_requests")
+          .select("id, monthly_reminder_count")
+          .eq("app_key", appKey)
+          .eq("customer_id", recipientProfile.user_id)
+          .eq("provider_id", request.providerId)
+          .eq("job_id", requestRecord.job_id)
+          .maybeSingle();
+
+        if (existingRequest?.id) {
+          await supabaseAdmin
+            .from("client_testimonial_requests")
+            .update({
+              last_sent_at: requestRecord.last_sent_at,
+              monthly_reminder_count: Number(existingRequest.monthly_reminder_count || 0) + 1,
+              status: "sent",
+              metadata: requestRecord.metadata,
+            })
+            .eq("id", existingRequest.id);
+        } else {
+          await supabaseAdmin.from("client_testimonial_requests").insert(requestRecord);
+        }
+      } else {
+        await supabaseAdmin.from("client_testimonial_requests").insert(requestRecord);
+      }
+    }
+
+    const emailContent = getEmailContent(request);
+    const brand = getBrand(request.appKey);
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -218,35 +360,26 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Brasil Base <onboarding@resend.dev>",
+        from: brand.from,
         to: [request.recipientEmail],
-        subject: getEmailContent(request).subject,
-        html: getEmailContent(request).html,
+        subject: emailContent.subject,
+        html: emailContent.html,
       }),
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Resend API error:", errorText);
-      throw new Error(`Resend API error: ${errorText}`);
+      console.error("[SEND-NOTIFICATION] Resend API error:", res.status);
+      throw new Error("Failed to send email");
     }
 
     const data = await res.json();
-    console.log("Email sent successfully:", data);
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: unknown) {
-    console.error("Error sending notification email:", error);
-    return new Response(
-      JSON.stringify({ error: "Failed to send notification" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+  } catch (error) {
+    return createErrorResponse(error, corsHeaders, "SEND-NOTIFICATION");
   }
 };
 
