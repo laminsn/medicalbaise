@@ -14,6 +14,7 @@ import {
   Loader2,
   Mail,
   Megaphone,
+  PackagePlus,
   RefreshCcw,
   Star,
   Users,
@@ -27,6 +28,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import { AdminActionQueue, AdminRelationshipOS } from '@/components/admin/AdminRelationshipOS';
+import { AdminProductIntelligence } from '@/components/admin/AdminProductIntelligence';
 
 const db = supabase as any;
 
@@ -101,6 +103,7 @@ type MessageTemplate = {
 const tabConfig = [
   { value: 'relationship-360', label: 'Relationship 360', icon: Users, types: [] },
   { value: 'action-queue', label: 'Action Queue', icon: ListTodo, types: [] },
+  { value: 'products', label: 'Products', icon: PackagePlus, types: [] },
   { value: 'campaigns', label: 'Campaigns', icon: Megaphone, types: ['promotion', 'partner_campaign'] },
   { value: 'partners', label: 'Partners', icon: Handshake, types: ['partner_application'] },
   { value: 'referrals', label: 'Referrals', icon: Gift, types: ['referral'] },
@@ -359,7 +362,7 @@ export function AdminGrowthHub() {
 
       <Tabs defaultValue="relationship-360" className="w-full">
         <div className="overflow-x-auto pb-2">
-          <TabsList className="inline-grid min-w-max grid-cols-10">
+          <TabsList className="inline-grid min-w-max grid-cols-11">
             {tabConfig.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -373,7 +376,7 @@ export function AdminGrowthHub() {
         </div>
 
         {tabConfig
-          .filter((tab) => !['relationship-360', 'action-queue', 'email-sequences', 'analytics'].includes(tab.value))
+          .filter((tab) => !['relationship-360', 'action-queue', 'products', 'email-sequences', 'analytics'].includes(tab.value))
           .map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-2">
               <IntakeList
@@ -389,6 +392,10 @@ export function AdminGrowthHub() {
 
         <TabsContent value="action-queue" className="mt-2">
           <AdminActionQueue />
+        </TabsContent>
+
+        <TabsContent value="products" className="mt-2">
+          <AdminProductIntelligence />
         </TabsContent>
 
         <TabsContent value="email-sequences" className="mt-2">
