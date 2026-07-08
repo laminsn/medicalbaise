@@ -12,6 +12,7 @@ import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandC
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
+import { ClientInsightSurvey } from '@/components/products/ClientInsightSurvey';
 import { ClientProductAddOns } from '@/components/products/ClientProductAddOns';
 import JobLocationMap from '@/components/map/JobLocationMap';
 import { useAuth } from '@/hooks/useAuth';
@@ -234,6 +235,8 @@ export default function CustomerDashboard() {
             },
           ]}
         />
+
+        <ClientInsightSurvey />
 
         <ClientProductAddOns />
 

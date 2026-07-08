@@ -24,6 +24,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { AdminClientInsightCampaigns } from '@/components/admin/AdminClientInsightCampaigns';
 import { AdminProductRevenueAutomation } from '@/components/admin/AdminProductRevenueAutomation';
 
 const db = supabase as any;
@@ -577,6 +578,8 @@ export function AdminProductIntelligence() {
       </div>
 
       <AdminProductRevenueAutomation />
+
+      <AdminClientInsightCampaigns />
 
       <Card>
         <CardHeader>
