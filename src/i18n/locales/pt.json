@@ -198,6 +198,11 @@
     "footer": {
       "label": "Rodapé",
       "discover": "Descobrir",
+      "blog": "Blog",
+      "partners": "Parceiros",
+      "referrals": "Indicações",
+      "testimonials": "Depoimentos",
+      "specialOffers": "Ofertas especiais",
       "terms": "Termos",
       "privacy": "Privacidade"
     },
@@ -320,7 +325,8 @@
       },
       "referrals": {
         "title": "Crescimento por indicações",
-        "body": "Transforme clientes satisfeitos em trabalho recorrente e novas apresentações."
+        "body": "Transforme clientes satisfeitos em trabalho recorrente e novas apresentações.",
+        "cta": "Ver programas de parceiros"
       },
       "records": {
         "title": "Recibos e registros",
@@ -1130,6 +1136,11 @@
     "about": "Sobre",
     "privacy": "Privacidade",
     "terms": "Termos",
+    "blog": "Blog",
+    "partners": "Parceiros",
+    "referrals": "Indicações",
+    "testimonials": "Depoimentos",
+    "specialOffers": "Ofertas especiais",
     "contact": "Contato",
     "copyright": "© 2024 MD Baise. Todos os direitos reservados.",
     "rights": "Todos os direitos reservados."

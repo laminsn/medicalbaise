@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   BadgeCheck,
   BarChart3,
+  BookOpen,
   Clock3,
   DollarSign,
   FileText,
@@ -29,6 +30,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import { AdminActionQueue, AdminRelationshipOS } from '@/components/admin/AdminRelationshipOS';
+import { AdminBlogAnalytics } from '@/components/admin/AdminBlogAnalytics';
 import { AdminMarketingIntelligence } from '@/components/admin/AdminMarketingIntelligence';
 import { AdminProductIntelligence } from '@/components/admin/AdminProductIntelligence';
 
@@ -107,6 +109,7 @@ const tabConfig = [
   { value: 'action-queue', label: 'Action Queue', icon: ListTodo, types: [] },
   { value: 'products', label: 'Products', icon: PackagePlus, types: [] },
   { value: 'marketing', label: 'Marketing Intel', icon: Target, types: [] },
+  { value: 'blog-analytics', label: 'Blog Analytics', icon: BookOpen, types: [] },
   { value: 'campaigns', label: 'Campaigns', icon: Megaphone, types: ['promotion', 'partner_campaign'] },
   { value: 'partners', label: 'Partners', icon: Handshake, types: ['partner_application'] },
   { value: 'referrals', label: 'Referrals', icon: Gift, types: ['referral'] },
@@ -365,7 +368,7 @@ export function AdminGrowthHub() {
 
       <Tabs defaultValue="relationship-360" className="w-full">
         <div className="overflow-x-auto pb-2">
-          <TabsList className="inline-grid min-w-max grid-cols-12">
+          <TabsList className="inline-flex min-w-max">
             {tabConfig.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -379,7 +382,7 @@ export function AdminGrowthHub() {
         </div>
 
         {tabConfig
-          .filter((tab) => !['relationship-360', 'action-queue', 'products', 'marketing', 'email-sequences', 'analytics'].includes(tab.value))
+          .filter((tab) => !['relationship-360', 'action-queue', 'products', 'marketing', 'blog-analytics', 'email-sequences', 'analytics'].includes(tab.value))
           .map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-2">
               <IntakeList
@@ -403,6 +406,10 @@ export function AdminGrowthHub() {
 
         <TabsContent value="marketing" className="mt-2">
           <AdminMarketingIntelligence />
+        </TabsContent>
+
+        <TabsContent value="blog-analytics" className="mt-2">
+          <AdminBlogAnalytics />
         </TabsContent>
 
         <TabsContent value="email-sequences" className="mt-2">

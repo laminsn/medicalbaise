@@ -198,6 +198,11 @@
     "footer": {
       "label": "Footer",
       "discover": "Discover",
+      "blog": "Blog",
+      "partners": "Partners",
+      "referrals": "Referrals",
+      "testimonials": "Testimonials",
+      "specialOffers": "Special Offers",
       "terms": "Terms",
       "privacy": "Privacy"
     },
@@ -320,7 +325,8 @@
       },
       "referrals": {
         "title": "Referral growth",
-        "body": "Turn happy clients into repeat work and introductions."
+        "body": "Turn happy clients into repeat work and introductions.",
+        "cta": "Explore partner programs"
       },
       "records": {
         "title": "Receipts and records",
@@ -1130,6 +1136,11 @@
     "about": "About",
     "privacy": "Privacy",
     "terms": "Terms",
+    "blog": "Blog",
+    "partners": "Partners",
+    "referrals": "Referrals",
+    "testimonials": "Testimonials",
+    "specialOffers": "Special Offers",
     "contact": "Contact",
     "copyright": "© 2024 MD Baise. All rights reserved.",
     "rights": "All rights reserved."

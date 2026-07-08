@@ -66,6 +66,14 @@ const PAYMENT_LOGOS = [
   { src: '/payment-logos/swift-payment.png', alt: 'Swift payment' },
 ];
 
+type LandingFeature = {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  titleKey: string;
+  bodyKey: string;
+  to?: string;
+  ctaKey?: string;
+};
+
 const REVIEW_CARDS = [
   {
     name: 'Mariana Costa',
@@ -116,7 +124,7 @@ const PLATFORM_SCREENSHOTS = [
   },
 ];
 
-const BUSINESS_FEATURES = [
+const BUSINESS_FEATURES: LandingFeature[] = [
   {
     icon: Users,
     titleKey: 'hub.providerFeatures.clientAcquisition.title',
@@ -161,6 +169,8 @@ const BUSINESS_FEATURES = [
     icon: Handshake,
     titleKey: 'hub.providerFeatures.referrals.title',
     bodyKey: 'hub.providerFeatures.referrals.body',
+    to: '/influencer-partners',
+    ctaKey: 'hub.providerFeatures.referrals.cta',
   },
   {
     icon: ReceiptText,
@@ -174,7 +184,7 @@ const BUSINESS_FEATURES = [
   },
 ];
 
-const UPGRADE_FEATURES = [
+const UPGRADE_FEATURES: LandingFeature[] = [
   {
     icon: TrendingUp,
     titleKey: 'hub.providerFeatures.socialAnalytics.title',
@@ -190,6 +200,17 @@ const UPGRADE_FEATURES = [
     titleKey: 'hub.providerFeatures.performance.title',
     bodyKey: 'hub.providerFeatures.performance.body',
   },
+];
+
+const HUB_FOOTER_LINKS = [
+  { to: '/discover', labelKey: 'hub.footer.discover', fallback: 'Discover' },
+  { to: '/blog', labelKey: 'hub.footer.blog', fallback: 'Blog' },
+  { to: '/influencer-partners', labelKey: 'hub.footer.partners', fallback: 'Partners' },
+  { to: '/give-a-month-get-a-month', labelKey: 'hub.footer.referrals', fallback: 'Referrals' },
+  { to: '/testimonial-request', labelKey: 'hub.footer.testimonials', fallback: 'Testimonials' },
+  { to: '/pricing', labelKey: 'hub.footer.specialOffers', fallback: 'Special Offers' },
+  { to: '/terms', labelKey: 'hub.footer.terms', fallback: 'Terms' },
+  { to: '/privacy', labelKey: 'hub.footer.privacy', fallback: 'Privacy' },
 ];
 
 const FAQ_ITEMS = [
@@ -385,21 +406,14 @@ export default function BaiseHubLanding() {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/50">
             <p className="text-white/40">© {new Date().getFullYear()} Baise Group</p>
             <nav
-              className="flex items-center gap-5"
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
               aria-label={t('hub.footer.label')}
             >
-              <Link
-                to="/discover"
-                className="hover:text-white transition-colors"
-              >
-                {t('hub.footer.discover')}
-              </Link>
-              <Link to="/terms" className="hover:text-white transition-colors">
-                {t('hub.footer.terms')}
-              </Link>
-              <Link to="/privacy" className="hover:text-white transition-colors">
-                {t('hub.footer.privacy')}
-              </Link>
+              {HUB_FOOTER_LINKS.map((link) => (
+                <Link key={link.to} to={link.to} className="hover:text-white transition-colors">
+                  {t(link.labelKey, link.fallback)}
+                </Link>
+              ))}
             </nav>
           </div>
         </footer>
@@ -725,6 +739,16 @@ function BusinessOperatingSection() {
                   <p className="line-clamp-3 text-[12px] leading-relaxed text-white/55">
                     {t(feature.bodyKey)}
                   </p>
+                  {feature.to ? (
+                    <Link
+                      to={feature.to}
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold transition-colors hover:text-white"
+                      style={{ color: CURRENT_ACCENT }}
+                    >
+                      {t(feature.ctaKey || 'hub.providerFeatures.learnMore', 'Explore partner programs')}
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </Link>
+                  ) : null}
                 </article>
               );
             })}

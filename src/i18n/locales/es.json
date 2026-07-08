@@ -198,6 +198,11 @@
     "footer": {
       "label": "Pie de página",
       "discover": "Descubrir",
+      "blog": "Blog",
+      "partners": "Socios",
+      "referrals": "Referidos",
+      "testimonials": "Testimonios",
+      "specialOffers": "Ofertas especiales",
       "terms": "Términos",
       "privacy": "Privacidad"
     },
@@ -320,7 +325,8 @@
       },
       "referrals": {
         "title": "Crecimiento por referidos",
-        "body": "Convierte clientes satisfechos en trabajo recurrente e introducciones."
+        "body": "Convierte clientes satisfechos en trabajo recurrente e introducciones.",
+        "cta": "Ver programas de socios"
       },
       "records": {
         "title": "Recibos y registros",
@@ -1130,6 +1136,11 @@
     "about": "Acerca de",
     "privacy": "Privacidad",
     "terms": "Términos",
+    "blog": "Blog",
+    "partners": "Socios",
+    "referrals": "Referidos",
+    "testimonials": "Testimonios",
+    "specialOffers": "Ofertas especiales",
     "contact": "Contacto",
     "copyright": "© 2024 MD Baise. Todos los derechos reservados.",
     "rights": "Todos los derechos reservados."
