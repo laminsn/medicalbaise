@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, BadgeCheck, Gift, QrCode, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { InfluencerCampaignShell } from '@/components/partner/InfluencerCampaignShell';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { SeoLocale, normalizeSeoLocale } from '@/lib/publicPageSeo';
 
 type ReferralIdentity = {
   referrer_id: string;
@@ -48,19 +50,33 @@ const brandCopy = {
   },
 } as const;
 
-export default function ReferralLanding() {
+type ReferralLandingProps = {
+  defaultLocale?: SeoLocale;
+};
+
+export default function ReferralLanding({ defaultLocale }: ReferralLandingProps) {
+  const { i18n } = useTranslation();
   const { code = '' } = useParams();
   const appKey = getBaiseAppKey();
   const brand = brandName[appKey];
   const copy = brandCopy[appKey];
+  const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
   const [identity, setIdentity] = useState<ReferralIdentity | null>(null);
 
   const cleanCode = useMemo(() => decodeURIComponent(code).trim(), [code]);
 
   useEffect(() => {
+    if (!defaultLocale) return;
+    const current = (i18n.resolvedLanguage || i18n.language || '').toLowerCase();
+    if (!current.startsWith(defaultLocale)) {
+      void i18n.changeLanguage(defaultLocale);
+    }
+  }, [defaultLocale, i18n]);
+
+  useEffect(() => {
     if (!cleanCode) return;
     localStorage.setItem('baise_referral_code', cleanCode);
-    localStorage.setItem('baise_referral_landing', `/ref/${cleanCode}`);
+    localStorage.setItem('baise_referral_landing', `${window.location.pathname}${window.location.search}`);
 
     const loadReferral = async () => {
       const { data } = await db.rpc('resolve_referral_identity', { target_code: cleanCode });
@@ -78,13 +94,7 @@ export default function ReferralLanding() {
 
   return (
     <InfluencerCampaignShell brand={brand}>
-      <Helmet>
-        <title>Referral Invitation | {brand}</title>
-        <meta
-          name="description"
-          content={`Accept a ${brand} referral invitation and create one account for trusted services, records, payments, and support.`}
-        />
-      </Helmet>
+      <PageMetadata page="referral" locale={locale} path={window.location.pathname} />
 
       <main className="mx-auto grid max-w-6xl gap-8 px-4 pb-12 pt-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
         <section className="min-w-0 space-y-6">

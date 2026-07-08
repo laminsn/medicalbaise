@@ -90,9 +90,14 @@ const PageLoader = () => (
 
 const campaignLandingPaths = new Set([
   "/influencer-partners",
+  "/pt/influencer-partners",
+  "/es/influencer-partners",
   "/influencer-application",
+  "/pt/influencer-application",
+  "/es/influencer-application",
   "/give-a-month-get-a-month",
   "/pt/give-a-month-get-a-month",
+  "/es/give-a-month-get-a-month",
   "/testimonial-request",
   "/pt/testimonial-request",
   "/es/testimonial-request",
@@ -100,13 +105,13 @@ const campaignLandingPaths = new Set([
 
 const CampaignAwareHIPAADisclaimer = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/")) return null;
   return <HIPAADisclaimer />;
 };
 
 const CampaignAwareNotificationPermissionBanner = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/")) return null;
   return <NotificationPermissionBanner />;
 };
 
@@ -139,12 +144,19 @@ const App = () => (
                     <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                     <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
                     <Route path="/ref/:code" element={<ReferralLanding />} />
+                    <Route path="/pt/ref/:code" element={<ReferralLanding defaultLocale="pt" />} />
+                    <Route path="/es/ref/:code" element={<ReferralLanding defaultLocale="es" />} />
                     <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
                     <Route path="/partner-review" element={<ProtectedRoute><PartnerReview /></ProtectedRoute>} />
-                    <Route path="/influencer-partners" element={<InfluencerPartners />} />
-                    <Route path="/influencer-application" element={<InfluencerApplication />} />
+                    <Route path="/influencer-partners" element={<InfluencerPartners defaultLocale="en" />} />
+                    <Route path="/pt/influencer-partners" element={<InfluencerPartners defaultLocale="pt" />} />
+                    <Route path="/es/influencer-partners" element={<InfluencerPartners defaultLocale="es" />} />
+                    <Route path="/influencer-application" element={<InfluencerApplication defaultLocale="en" />} />
+                    <Route path="/pt/influencer-application" element={<InfluencerApplication defaultLocale="pt" />} />
+                    <Route path="/es/influencer-application" element={<InfluencerApplication defaultLocale="es" />} />
                     <Route path="/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="en" />} />
                     <Route path="/pt/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="pt" />} />
+                    <Route path="/es/give-a-month-get-a-month" element={<GiveMonthReferralCampaign defaultLocale="es" />} />
                     <Route path="/testimonial-request" element={<TestimonialRequest defaultLocale="en" />} />
                     <Route path="/pt/testimonial-request" element={<TestimonialRequest defaultLocale="pt" />} />
                     <Route path="/es/testimonial-request" element={<TestimonialRequest defaultLocale="es" />} />

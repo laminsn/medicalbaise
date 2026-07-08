@@ -11,7 +11,7 @@ export function AttributionTracker() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const partnerCode = params.get('partner') || params.get('campaign') || params.get('partner_code');
-    const referralMatch = location.pathname.match(/^\/ref\/([^/]+)/);
+    const referralMatch = location.pathname.match(/^\/(?:pt\/|es\/)?ref\/([^/]+)/);
     const referralCode = referralMatch?.[1] || params.get('ref') || params.get('referral');
     const appKey = getBaiseAppKey();
 

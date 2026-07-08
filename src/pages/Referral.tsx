@@ -1,7 +1,7 @@
-import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { ReferralDashboard } from '@/components/referral/ReferralDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -10,14 +10,12 @@ import { Gift, ArrowLeft } from 'lucide-react';
 export default function Referral() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   if (!user) {
     return (
       <>
-        <Helmet>
-          <title>{t('referral.pageTitle')}</title>
-        </Helmet>
+        <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" />
         <AppLayout>
           <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -38,10 +36,7 @@ export default function Referral() {
 
   return (
     <>
-      <Helmet>
-        <title>{t('referral.pageTitle')}</title>
-        <meta name="description" content={t('referral.pageDescription')} />
-      </Helmet>
+      <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" />
       <AppLayout>
         <div className="px-4 py-6 pb-24">
           <Button

@@ -1,5 +1,4 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { InfluencerCampaignShell } from '@/components/partner/InfluencerCampaignShell';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +26,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { generateSafeFileName, validateFileUpload } from '@/lib/security';
 import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
+import { localizedPublicPath } from '@/lib/publicPageSeo';
 
 type LocaleKey = 'en' | 'es' | 'pt';
 type RewardType = 'google_review' | 'video_testimonial';
@@ -198,7 +199,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
   const fileInputRef = useRef<HTMLInputElement>(null);
   const appKey = getBaiseAppKey();
   const brand = brandName[appKey];
-  const locale = normalizeLocale(i18n.resolvedLanguage || i18n.language || defaultLocale || 'en');
+  const locale = defaultLocale || normalizeLocale(i18n.resolvedLanguage || i18n.language || 'en');
   const copy = COPY[locale];
 
   const providerId = searchParams.get('providerId') || searchParams.get('provider_id') || '';
@@ -422,11 +423,11 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
 
   return (
     <InfluencerCampaignShell brand={brand}>
-      <Helmet>
-        <html lang={locale === 'pt' ? 'pt-BR' : locale} />
-        <title>{copy.title} | {brand}</title>
-        <meta name="description" content={copy.description} />
-      </Helmet>
+      <PageMetadata
+        page="testimonial"
+        locale={locale}
+        path={localizedPublicPath('/testimonial-request', locale)}
+      />
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">
         <div className="min-w-0 space-y-7 lg:py-6">

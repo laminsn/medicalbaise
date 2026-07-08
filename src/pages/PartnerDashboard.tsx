@@ -1,6 +1,7 @@
-import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LogOut, Megaphone, ReceiptText, Share2, WalletCards } from 'lucide-react';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Button } from '@/components/ui/button';
 import { PartnerCampaignCommandCenter } from '@/components/partner/PartnerCampaignCommandCenter';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +22,7 @@ const partnerNav = [
 
 export default function PartnerDashboard() {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const { signOut } = useAuth();
   const appKey = getBaiseAppKey();
   const brand = brandTitle[appKey];
@@ -32,13 +34,7 @@ export default function PartnerDashboard() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <Helmet>
-        <title>Partner Portal | {brand}</title>
-        <meta
-          name="description"
-          content="Partner portal for approved campaigns, tracked visitors, customer conversions, partner earnings, payouts, and receipts."
-        />
-      </Helmet>
+      <PageMetadata page="partner-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/partner-dashboard" noIndex />
 
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex min-h-16 max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">

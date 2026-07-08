@@ -43,8 +43,8 @@ export const getBaiseAppKey = (): AppKey => {
 export const getBaiseAppUrl = () => {
   const key = getBaiseAppKey();
   if (key === 'medical') return 'https://www.mdbaise.com';
-  if (key === 'legal') return 'https://legalbaise.com';
-  return 'https://casabaise.com';
+  if (key === 'legal') return 'https://www.legalbaise.com';
+  return 'https://www.casabaise.com';
 };
 
 export const getLocaleKey = (language?: string): LocaleKey => {

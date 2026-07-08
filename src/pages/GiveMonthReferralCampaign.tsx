@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
@@ -14,9 +13,11 @@ import {
   Users,
 } from 'lucide-react';
 import { InfluencerCampaignShell } from '@/components/partner/InfluencerCampaignShell';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/publicPageSeo';
 
 const brandName = {
   casa: 'Casa Baise',
@@ -24,10 +25,8 @@ const brandName = {
   legal: 'Legal Baise',
 } as const;
 
-type LocaleKey = 'en' | 'pt';
-
 type GiveMonthReferralCampaignProps = {
-  defaultLocale?: LocaleKey;
+  defaultLocale?: SeoLocale;
 };
 
 const COPY = {
@@ -159,14 +158,77 @@ const COPY = {
       'Os créditos se aplicam ao serviço premium elegível da conta que fez a indicação.',
     ],
   },
+  es: {
+    title: 'Regala un Mes, Gana un Mes',
+    description: 'Los miembros premium de Baise pueden ganar un mes gratis por cada amigo, familiar, cliente o proveedor que se registre en un servicio premium mediante su enlace de referido.',
+    badge: 'Campaña de referidos',
+    dateWindow: '1 de julio - 31 de agosto de 2026',
+    eyebrow: 'Comparte Baise. Gana meses premium.',
+    headline: 'Regala un mes, gana un mes.',
+    intro: 'Los clientes premium de Baise pueden invitar amigos, familiares, clientes y contactos de confianza. Cada registro premium calificado da valor a la persona invitada y te devuelve un mes gratis.',
+    proofStats: [
+      { label: 'Créditos máximos anuales', value: '12 meses' },
+      { label: 'Periodo de campaña', value: 'Jul + Ago' },
+      { label: 'Recompensa por referido premium', value: '1 mes' },
+    ],
+    benefits: [
+      {
+        icon: Gift,
+        title: 'Un referido premium. Un mes gratis.',
+        body: 'Cuando alguien entra a un servicio premium con tu enlace, código o QR de referido, ganas un mes gratis.',
+      },
+      {
+        icon: Repeat2,
+        title: 'Acumula hasta un año completo',
+        body: 'Gana hasta 12 meses gratis en un año calendario, para que los referidores activos puedan cubrir un año de servicio premium elegible.',
+      },
+      {
+        icon: Users,
+        title: 'Para proveedores y clientes',
+        body: 'Los proveedores premium y los clientes premium pueden compartir su código de referido con amigos, familiares, clientes y contactos de confianza.',
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Solo registros premium',
+        body: 'Los créditos aplican cuando la persona referida se registra en un servicio premium y el referido queda rastreado a tu cuenta.',
+      },
+    ],
+    howTitle: 'Cómo funciona la campaña de referidos',
+    steps: [
+      'Regístrate o mantén activo un servicio premium de Baise.',
+      'Abre tu panel de referidos y comparte tu enlace, código QR o código de referido.',
+      'Tu amigo, familiar, cliente o proveedor entra a un servicio premium.',
+      'Baise acredita un mes gratis en tu cuenta por cada referido premium calificado.',
+    ],
+    trackedTitle: 'Rastreado por Baise',
+    trackedBody: 'Cada miembro elegible puede compartir un enlace, código QR o código de referido.',
+    rewardLabel: 'Recompensa de referido',
+    rewardTitle: 'Gana un mes gratis por cada registro premium calificado.',
+    rewardBody: 'Gana hasta 12 meses gratis en un año calendario cuando tus referidos se registren en un servicio premium.',
+    audienceTitle: 'Para quién es esta campaña',
+    audienceBody: 'Esta campaña es para clientes actuales de Baise con servicio premium, incluidos proveedores de servicios y personas que contratan servicios. Comparte Baise con quienes necesitan proveedores confiables, apoyo legal, apoyo médico o una mejor forma de gestionar relaciones de servicio.',
+    audienceLanes: ['Proveedores de servicios', 'Clientes', 'Familias', 'Amigos', 'Contactos comerciales', 'Referidos premium'],
+    cardEyebrow: 'Campaña para clientes actuales',
+    cardTitle: 'Empieza a ganar meses gratis',
+    cardBody: 'Los miembros premium pueden compartir desde el panel de referidos. ¿Aún no eres premium? Elige primero un servicio premium y luego empieza a compartir.',
+    referralCta: 'Abrir panel de referidos',
+    premiumCta: 'Ver servicios premium',
+    termsTitle: 'Términos de la campaña',
+    terms: [
+      'La campaña se realiza del 1 de julio al 31 de agosto de 2026.',
+      'Se gana un mes gratis por cada registro premium calificado.',
+      'La recompensa máxima es de 12 meses gratis por año calendario.',
+      'El referido debe rastrearse por tu enlace, código QR o código de referido de Baise.',
+      'Los créditos aplican al servicio premium elegible de la cuenta que hizo el referido.',
+    ],
+  },
 } as const;
 
 export default function GiveMonthReferralCampaign({ defaultLocale }: GiveMonthReferralCampaignProps) {
   const { i18n } = useTranslation();
   const appKey = getBaiseAppKey();
   const brand = brandName[appKey];
-  const resolved = (i18n.resolvedLanguage || i18n.language || '').toLowerCase();
-  const locale: LocaleKey = resolved.startsWith('pt') ? 'pt' : 'en';
+  const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
   const copy = COPY[locale];
 
   useEffect(() => {
@@ -179,14 +241,11 @@ export default function GiveMonthReferralCampaign({ defaultLocale }: GiveMonthRe
 
   return (
     <InfluencerCampaignShell brand={brand}>
-      <Helmet>
-        <html lang={locale === 'pt' ? 'pt-BR' : 'en'} />
-        <title>{copy.title} | {brand}</title>
-        <meta
-          name="description"
-          content={copy.description}
-        />
-      </Helmet>
+      <PageMetadata
+        page="give-month"
+        locale={locale}
+        path={localizedPublicPath('/give-a-month-get-a-month', locale)}
+      />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">
         <div className="min-w-0 space-y-8 lg:py-6">

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -12,6 +12,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { InfluencerCampaignShell } from '@/components/partner/InfluencerCampaignShell';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -27,6 +28,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/publicPageSeo';
 
 type PlatformRow = {
   platform: string;
@@ -103,10 +105,18 @@ const initialForm = {
   why_baise: '',
 };
 
-export default function InfluencerApplication() {
+type InfluencerApplicationProps = {
+  defaultLocale?: SeoLocale;
+};
+
+export default function InfluencerApplication({ defaultLocale }: InfluencerApplicationProps) {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const [searchParams] = useSearchParams();
   const appKey = getBaiseAppKey();
+  const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
+  const campaignPath = localizedPublicPath('/influencer-partners', locale);
+  const applicationPath = localizedPublicPath('/influencer-application', locale);
   const [form, setForm] = useState(initialForm);
   const [platforms, setPlatforms] = useState<PlatformRow[]>([{ ...emptyPlatform }]);
   const [campaignInterests, setCampaignInterests] = useState<string[]>(['brazil_influencer']);
@@ -117,6 +127,14 @@ export default function InfluencerApplication() {
   const [submittedReviewDue, setSubmittedReviewDue] = useState<string | null>(null);
   const [applicationId, setApplicationId] = useState<string | null>(searchParams.get('application'));
   const [applicationToken, setApplicationToken] = useState<string | null>(searchParams.get('token'));
+
+  useEffect(() => {
+    if (!defaultLocale) return;
+    const current = (i18n.resolvedLanguage || i18n.language || '').toLowerCase();
+    if (!current.startsWith(defaultLocale)) {
+      void i18n.changeLanguage(defaultLocale);
+    }
+  }, [defaultLocale, i18n]);
 
   useEffect(() => {
     const storedRaw = sessionStorage.getItem('baise_influencer_application');
@@ -266,9 +284,7 @@ export default function InfluencerApplication() {
   if (submittedReviewDue) {
     return (
       <InfluencerCampaignShell brand={brandName[appKey]}>
-        <Helmet>
-          <title>Influencer application submitted | {brandName[appKey]}</title>
-        </Helmet>
+        <PageMetadata page="influencer-application" locale={locale} path={applicationPath} />
         <div className="px-4 py-12">
           <div className="mx-auto max-w-2xl rounded-lg border border-white/12 bg-white/[0.06] p-6 text-center shadow-2xl">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/12 text-emerald-300">
@@ -299,14 +315,11 @@ export default function InfluencerApplication() {
 
   return (
     <InfluencerCampaignShell brand={brandName[appKey]}>
-      <Helmet>
-        <title>Influencer partner application | {brandName[appKey]}</title>
-        <meta name="description" content="Complete your Baise influencer partner application with audience, platform, and creator performance details." />
-      </Helmet>
+      <PageMetadata page="influencer-application" locale={locale} path={applicationPath} />
 
         <form onSubmit={submitApplication} className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8">
           <main className="space-y-6">
-            <Button type="button" variant="ghost" className="-ml-3 gap-2 text-white hover:bg-white/10 hover:text-white" onClick={() => navigate('/influencer-partners')}>
+            <Button type="button" variant="ghost" className="-ml-3 gap-2 text-white hover:bg-white/10 hover:text-white" onClick={() => navigate(campaignPath)}>
               <ArrowLeft className="h-4 w-4" />
               Back to campaign
             </Button>

@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { AdminPartnerApplications } from '@/components/admin/AdminPartnerApplications';
 import { supabase } from '@/integrations/supabase/client';
 
 const db = supabase as any;
 
 export default function PartnerReview() {
+  const { i18n } = useTranslation();
   const [allowed, setAllowed] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -47,9 +49,7 @@ export default function PartnerReview() {
 
   return (
     <>
-      <Helmet>
-        <title>Partner Review | Baise</title>
-      </Helmet>
+      <PageMetadata page="partner-review" locale={i18n.resolvedLanguage || i18n.language} path="/partner-review" noIndex />
       <AppLayout>
         <div className="mx-auto max-w-4xl px-4 py-6 pb-24">
           <AdminPartnerApplications />

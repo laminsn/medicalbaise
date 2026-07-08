@@ -1,5 +1,5 @@
-import { FormEvent, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -15,12 +15,14 @@ import {
   Users,
 } from 'lucide-react';
 import { InfluencerCampaignShell } from '@/components/partner/InfluencerCampaignShell';
+import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/publicPageSeo';
 
 type OptInResult = {
   application_id: string;
@@ -102,13 +104,28 @@ const initialForm = {
 
 const optInInputClass = 'border-black/10 bg-[#101114] text-white placeholder:text-white/45';
 
-export default function InfluencerPartners() {
+type InfluencerPartnersProps = {
+  defaultLocale?: SeoLocale;
+};
+
+export default function InfluencerPartners({ defaultLocale }: InfluencerPartnersProps) {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
   const appKey = getBaiseAppKey();
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const brand = brandName[appKey];
+  const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
+  const applicationPath = localizedPublicPath('/influencer-application', locale);
+
+  useEffect(() => {
+    if (!defaultLocale) return;
+    const current = (i18n.resolvedLanguage || i18n.language || '').toLowerCase();
+    if (!current.startsWith(defaultLocale)) {
+      void i18n.changeLanguage(defaultLocale);
+    }
+  }, [defaultLocale, i18n]);
 
   const updateForm = (key: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -153,9 +170,9 @@ export default function InfluencerPartners() {
       const result = (Array.isArray(data) ? data[0] : data) as OptInResult | undefined;
       if (result) {
         sessionStorage.setItem('baise_influencer_application', JSON.stringify({ ...result, payload }));
-        navigate(`/influencer-application?application=${result.application_id}&token=${result.application_token}`);
+        navigate(`${applicationPath}?application=${result.application_id}&token=${result.application_token}`);
       } else {
-        navigate('/influencer-application');
+        navigate(applicationPath);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Unable to start the influencer application.');
@@ -166,13 +183,7 @@ export default function InfluencerPartners() {
 
   return (
     <InfluencerCampaignShell brand={brand}>
-      <Helmet>
-        <title>Brazil Influencer Campaign | {brand}</title>
-        <meta
-          name="description"
-          content="Apply to the Baise Brazil Influencer Campaign for R$150 approved posts, viral bonuses, free-month audience offers, and tracked commissions."
-        />
-      </Helmet>
+      <PageMetadata page="influencer" locale={locale} path={localizedPublicPath('/influencer-partners', locale)} />
 
         <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">
           <div className="min-w-0 space-y-8 lg:py-6">

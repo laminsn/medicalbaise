@@ -20,6 +20,96 @@
     }
   ],
   "rewrites": [
-    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+    {
+      "source": "/give-a-month-get-a-month",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/give-month-en.html"
+    },
+    {
+      "source": "/pt/give-a-month-get-a-month",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/give-month-pt.html"
+    },
+    {
+      "source": "/es/give-a-month-get-a-month",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/give-month-es.html"
+    },
+    {
+      "source": "/influencer-partners",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-en.html"
+    },
+    {
+      "source": "/pt/influencer-partners",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-pt.html"
+    },
+    {
+      "source": "/es/influencer-partners",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-es.html"
+    },
+    {
+      "source": "/influencer-application",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-application-en.html"
+    },
+    {
+      "source": "/pt/influencer-application",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-application-pt.html"
+    },
+    {
+      "source": "/es/influencer-application",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/influencer-application-es.html"
+    },
+    {
+      "source": "/testimonial-request",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/testimonial-en.html"
+    },
+    {
+      "source": "/pt/testimonial-request",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/testimonial-pt.html"
+    },
+    {
+      "source": "/es/testimonial-request",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/testimonial-es.html"
+    },
+    {
+      "source": "/ref/:code",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/referral-en.html"
+    },
+    {
+      "source": "/pt/ref/:code",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/referral-pt.html"
+    },
+    {
+      "source": "/es/ref/:code",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/referral-es.html"
+    },
+    {
+      "source": "/referral",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/referral-dashboard-en.html"
+    },
+    {
+      "source": "/partner-dashboard",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/partner-dashboard-en.html"
+    },
+    {
+      "source": "/partner-review",
+      "has": [{ "type": "header", "key": "user-agent", "value": ".*(WhatsApp|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Discordbot|TelegramBot|SkypeUriPreview|Applebot|Messages|iMessage).*" }],
+      "destination": "/share/partner-review-en.html"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
