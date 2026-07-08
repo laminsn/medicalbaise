@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -13,12 +11,12 @@ import { AdminOverview } from '@/components/admin/AdminOverview';
 import { AdminAllUsers } from '@/components/admin/AdminAllUsers';
 import { AdminEmailCampaigns } from '@/components/admin/AdminEmailCampaigns';
 import { AdminPartnerApplications } from '@/components/admin/AdminPartnerApplications';
-import { Shield, Loader2 } from 'lucide-react';
+import { AdminGrowthHub } from '@/components/admin/AdminGrowthHub';
+import { BarChart3, Loader2, Shield } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
   const { isAdmin, loading } = useAdmin();
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
@@ -51,7 +49,7 @@ export default function AdminDashboard() {
         <title>{t('admin.title')} | MDBaise</title>
       </Helmet>
       <AppLayout>
-        <div className="px-4 py-6 pb-24 max-w-4xl mx-auto">
+        <div className="px-4 py-6 pb-24 max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-full bg-destructive/10">
               <Shield className="h-6 w-6 text-destructive" />
@@ -62,8 +60,12 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="w-full overflow-x-auto flex">
+          <Tabs defaultValue="growth" className="space-y-6">
+            <TabsList className="flex h-auto w-full flex-wrap overflow-x-auto">
+              <TabsTrigger value="growth" className="flex-1 gap-1.5">
+                <BarChart3 className="h-4 w-4" />
+                Growth Hub
+              </TabsTrigger>
               <TabsTrigger value="overview" className="flex-1">{t('admin.overview')}</TabsTrigger>
               <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : isEs ? 'Todos los usuarios' : 'All Users'}</TabsTrigger>
               <TabsTrigger value="users" className="flex-1">{t('admin.users')}</TabsTrigger>
@@ -72,6 +74,10 @@ export default function AdminDashboard() {
               <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : isEs ? 'Campañas' : 'Campaigns'}</TabsTrigger>
               <TabsTrigger value="partners" className="flex-1">{isPt ? 'Parceiros' : isEs ? 'Socios' : 'Partners'}</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="growth">
+              <AdminGrowthHub />
+            </TabsContent>
 
             <TabsContent value="overview">
               <AdminOverview />
