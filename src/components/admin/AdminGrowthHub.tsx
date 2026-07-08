@@ -10,6 +10,7 @@ import {
   FileText,
   Gift,
   Handshake,
+  ListTodo,
   Loader2,
   Mail,
   Megaphone,
@@ -25,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { AdminActionQueue, AdminRelationshipOS } from '@/components/admin/AdminRelationshipOS';
 
 const db = supabase as any;
 
@@ -97,6 +99,8 @@ type MessageTemplate = {
 };
 
 const tabConfig = [
+  { value: 'relationship-360', label: 'Relationship 360', icon: Users, types: [] },
+  { value: 'action-queue', label: 'Action Queue', icon: ListTodo, types: [] },
   { value: 'campaigns', label: 'Campaigns', icon: Megaphone, types: ['promotion', 'partner_campaign'] },
   { value: 'partners', label: 'Partners', icon: Handshake, types: ['partner_application'] },
   { value: 'referrals', label: 'Referrals', icon: Gift, types: ['referral'] },
@@ -353,9 +357,9 @@ export function AdminGrowthHub() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="campaigns" className="w-full">
+      <Tabs defaultValue="relationship-360" className="w-full">
         <div className="overflow-x-auto pb-2">
-          <TabsList className="inline-grid min-w-max grid-cols-8">
+          <TabsList className="inline-grid min-w-max grid-cols-10">
             {tabConfig.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -369,7 +373,7 @@ export function AdminGrowthHub() {
         </div>
 
         {tabConfig
-          .filter((tab) => !['email-sequences', 'analytics'].includes(tab.value))
+          .filter((tab) => !['relationship-360', 'action-queue', 'email-sequences', 'analytics'].includes(tab.value))
           .map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-2">
               <IntakeList
@@ -378,6 +382,14 @@ export function AdminGrowthHub() {
               />
             </TabsContent>
           ))}
+
+        <TabsContent value="relationship-360" className="mt-2">
+          <AdminRelationshipOS />
+        </TabsContent>
+
+        <TabsContent value="action-queue" className="mt-2">
+          <AdminActionQueue />
+        </TabsContent>
 
         <TabsContent value="email-sequences" className="mt-2">
           <EmailSequences groupedTemplates={groupedTemplates} />
