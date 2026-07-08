@@ -12,6 +12,7 @@ import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandC
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
+import { ClientProductAddOns } from '@/components/products/ClientProductAddOns';
 import JobLocationMap from '@/components/map/JobLocationMap';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -233,6 +234,8 @@ export default function CustomerDashboard() {
             },
           ]}
         />
+
+        <ClientProductAddOns />
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

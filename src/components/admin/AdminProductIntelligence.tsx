@@ -24,6 +24,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { AdminProductRevenueAutomation } from '@/components/admin/AdminProductRevenueAutomation';
 
 const db = supabase as any;
 
@@ -100,6 +101,11 @@ type OfferRule = {
   value_message: string;
 };
 
+type ProviderOption = {
+  id: string;
+  business_name: string | null;
+};
+
 const productFamilies = ['core', 'premium', 'provider_growth', 'payments', 'operations', 'marketing', 'verification', 'partner', 'legal', 'medical', 'custom'];
 const audiences = ['all', 'client', 'provider', 'partner', 'staff'];
 const tiers = ['free', 'entry', 'growth', 'premium', 'advanced', 'enterprise'];
@@ -140,6 +146,7 @@ export function AdminProductIntelligence() {
   const appKey = getBaiseAppKey();
   const queryClient = useQueryClient();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [actionRecommendation, setActionRecommendation] = useState<Recommendation | null>(null);
   const [form, setForm] = useState({
     name: '',
     product_key: '',
@@ -220,6 +227,19 @@ export function AdminProductIntelligence() {
 
       if (error) throw error;
       return (data || []) as OfferRule[];
+    },
+  });
+
+  const providersQuery = useQuery({
+    queryKey: ['product-revenue-provider-options', appKey],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from('providers')
+        .select('id, business_name')
+        .order('business_name')
+        .limit(120);
+      if (error) throw error;
+      return (data || []) as ProviderOption[];
     },
   });
 
@@ -337,6 +357,42 @@ export function AdminProductIntelligence() {
       toast.success('Product request registered');
     },
     onError: (error: Error) => toast.error(error.message || 'Unable to register product request'),
+  });
+
+  const revenueActionMutation = useMutation({
+    mutationFn: async ({
+      recommendation,
+      actionType,
+      providerId,
+      amount,
+      metadata,
+    }: {
+      recommendation: Recommendation;
+      actionType: string;
+      providerId: string | null;
+      amount: number;
+      metadata: Record<string, unknown>;
+    }) => {
+      const { error } = await db.rpc('create_product_revenue_action', {
+        target_recommendation_id: recommendation.id,
+        target_action_type: actionType,
+        target_provider_id: providerId,
+        target_amount: amount,
+        target_metadata: metadata,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['product-recommendations', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['product-intelligence-summary', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['product-revenue-actions', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['product-revenue-metrics', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['product-revenue-attribution', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['product-fit-scores', appKey] });
+      setActionRecommendation(null);
+      toast.success('Revenue action created');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Unable to create revenue action'),
   });
 
   const recommendations = recommendationsQuery.data || [];
@@ -509,6 +565,7 @@ export function AdminProductIntelligence() {
                       onSent={() => updateRecommendationMutation.mutate({ recommendation, status: 'sent', channel: 'email' })}
                       onRegister={() => registerProductMutation.mutate(recommendation)}
                       onDismiss={() => updateRecommendationMutation.mutate({ recommendation, status: 'dismissed', channel: 'staff' })}
+                      onRevenueAction={() => setActionRecommendation(recommendation)}
                       busy={updateRecommendationMutation.isPending || registerProductMutation.isPending}
                     />
                   ))}
@@ -518,6 +575,8 @@ export function AdminProductIntelligence() {
           </CardContent>
         </Card>
       </div>
+
+      <AdminProductRevenueAutomation />
 
       <Card>
         <CardHeader>
@@ -563,6 +622,19 @@ export function AdminProductIntelligence() {
         onSubmit={() => createProductMutation.mutate()}
         isPending={createProductMutation.isPending}
       />
+
+      <RevenueActionDialog
+        key={actionRecommendation?.id || 'closed'}
+        recommendation={actionRecommendation}
+        providers={providersQuery.data || []}
+        open={Boolean(actionRecommendation)}
+        onOpenChange={(open) => !open && setActionRecommendation(null)}
+        isPending={revenueActionMutation.isPending}
+        onSubmit={(payload) => {
+          if (!actionRecommendation) return;
+          revenueActionMutation.mutate({ recommendation: actionRecommendation, ...payload });
+        }}
+      />
     </div>
   );
 }
@@ -585,6 +657,7 @@ function RecommendationCard({
   onSent,
   onRegister,
   onDismiss,
+  onRevenueAction,
   busy,
 }: {
   recommendation: Recommendation;
@@ -592,6 +665,7 @@ function RecommendationCard({
   onSent: () => void;
   onRegister: () => void;
   onDismiss: () => void;
+  onRevenueAction: () => void;
   busy: boolean;
 }) {
   const person = getRelationship(recommendation.growth_people);
@@ -632,12 +706,151 @@ function RecommendationCard({
             <CheckCircle2 className="h-4 w-4" />
             Register Request
           </Button>
+          <Button type="button" size="sm" variant="outline" className="gap-2" disabled={busy} onClick={onRevenueAction}>
+            <BadgeDollarSign className="h-4 w-4" />
+            Revenue Action
+          </Button>
           <Button type="button" size="sm" variant="ghost" disabled={busy} onClick={onDismiss}>
             Dismiss
           </Button>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function RevenueActionDialog({
+  recommendation,
+  providers,
+  open,
+  onOpenChange,
+  onSubmit,
+  isPending,
+}: {
+  recommendation: Recommendation | null;
+  providers: ProviderOption[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (payload: { actionType: string; providerId: string | null; amount: number; metadata: Record<string, unknown> }) => void;
+  isPending: boolean;
+}) {
+  const [form, setForm] = useState({
+    action_type: 'proposal_draft',
+    provider_id: 'none',
+    amount: '',
+    scheduled_for: '',
+    subject: '',
+    message_body: '',
+    internal_notes: '',
+  });
+
+  const submit = () => {
+    onSubmit({
+      actionType: form.action_type,
+      providerId: form.provider_id === 'none' ? null : form.provider_id,
+      amount: Number(form.amount) || 0,
+      metadata: {
+        scheduled_for: form.scheduled_for || null,
+        subject: form.subject || recommendation?.recommendation_title,
+        message_body: form.message_body || recommendation?.value_message,
+        internal_notes: form.internal_notes || null,
+        client_safe_message: recommendation?.value_message,
+      },
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Create revenue action</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="rounded-md bg-muted/60 p-3 text-sm leading-6 text-muted-foreground">
+            <span className="font-medium text-foreground">{recommendation?.recommendation_title || 'Recommendation'}</span>
+            <br />
+            {recommendation?.value_message || 'Create the next clean action from this recommendation.'}
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Action">
+              <Select value={form.action_type} onValueChange={(value) => setForm((current) => ({ ...current, action_type: value }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="proposal_draft">Create proposal draft</SelectItem>
+                  <SelectItem value="quote_line">Create invoice / quote line</SelectItem>
+                  <SelectItem value="call_scheduled">Schedule consultation</SelectItem>
+                  <SelectItem value="value_email">Send value email</SelectItem>
+                  <SelectItem value="not_now">Mark not now</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Provider">
+              <Select value={form.provider_id} onValueChange={(value) => setForm((current) => ({ ...current, provider_id: value }))}>
+                <SelectTrigger><SelectValue placeholder="Queue only" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Queue only</SelectItem>
+                  {providers.map((provider) => (
+                    <SelectItem key={provider.id} value={provider.id}>
+                      {provider.business_name || provider.id}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Amount">
+              <Input
+                type="number"
+                min="0"
+                value={form.amount}
+                onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="Scheduled time">
+              <Input
+                type="datetime-local"
+                value={form.scheduled_for}
+                onChange={(event) => setForm((current) => ({ ...current, scheduled_for: event.target.value }))}
+              />
+            </Field>
+            <Field label="Subject">
+              <Input
+                value={form.subject}
+                onChange={(event) => setForm((current) => ({ ...current, subject: event.target.value }))}
+                placeholder={recommendation?.recommendation_title || 'Value recommendation'}
+              />
+            </Field>
+            <div className="md:col-span-2">
+              <Field label="Message">
+                <Textarea
+                  rows={4}
+                  value={form.message_body}
+                  onChange={(event) => setForm((current) => ({ ...current, message_body: event.target.value }))}
+                  placeholder={recommendation?.value_message || 'Client-safe value message'}
+                />
+              </Field>
+            </div>
+            <div className="md:col-span-2">
+              <Field label="Internal notes">
+                <Textarea
+                  rows={3}
+                  value={form.internal_notes}
+                  onChange={(event) => setForm((current) => ({ ...current, internal_notes: event.target.value }))}
+                  placeholder="Staff-only context, timing, or next step."
+                />
+              </Field>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button type="button" disabled={isPending} onClick={submit}>
+            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BadgeDollarSign className="mr-2 h-4 w-4" />}
+            Create Action
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
