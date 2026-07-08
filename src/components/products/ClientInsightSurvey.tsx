@@ -21,6 +21,10 @@ type ClientInsightProfile = {
   id: string;
   occupation: string | null;
   revenue_range: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  region: string | null;
   lifestyle_tags: string[] | null;
   family_size: number | null;
   life_goals: unknown;
@@ -40,6 +44,9 @@ const surveyCopy = {
     occupation: 'Occupation',
     occupationPlaceholder: 'Attorney, founder, parent, designer...',
     revenue: 'Revenue or income range',
+    country: 'Country',
+    state: 'State or region',
+    city: 'City',
     lifestyle: 'Lifestyle notes',
     familySize: 'Household size',
     lifeGoals: 'Life or business goals',
@@ -60,6 +67,9 @@ const surveyCopy = {
     occupation: 'Ocupacao',
     occupationPlaceholder: 'Advogado, fundador, responsavel pela familia, designer...',
     revenue: 'Faixa de renda ou faturamento',
+    country: 'Pais',
+    state: 'Estado ou regiao',
+    city: 'Cidade',
     lifestyle: 'Notas de estilo de vida',
     familySize: 'Tamanho da casa',
     lifeGoals: 'Objetivos de vida ou negocio',
@@ -80,6 +90,9 @@ const surveyCopy = {
     occupation: 'Ocupacion',
     occupationPlaceholder: 'Abogado, fundador, cuidador familiar, disenador...',
     revenue: 'Rango de ingresos',
+    country: 'Pais',
+    state: 'Estado o region',
+    city: 'Ciudad',
     lifestyle: 'Notas de estilo de vida',
     familySize: 'Tamano del hogar',
     lifeGoals: 'Metas de vida o negocio',
@@ -135,6 +148,9 @@ export function ClientInsightSurvey() {
   const [showForm, setShowForm] = useState(false);
   const [occupation, setOccupation] = useState('');
   const [revenueRange, setRevenueRange] = useState('');
+  const [country, setCountry] = useState('');
+  const [stateRegion, setStateRegion] = useState('');
+  const [city, setCity] = useState('');
   const [selectedLifestyle, setSelectedLifestyle] = useState<string[]>([]);
   const [familySize, setFamilySize] = useState('');
   const [lifeGoals, setLifeGoals] = useState('');
@@ -147,7 +163,7 @@ export function ClientInsightSurvey() {
     queryFn: async () => {
       const { data, error } = await db
         .from('client_insight_profiles')
-        .select('id, occupation, revenue_range, lifestyle_tags, family_size, life_goals, education_level, confidence_score, last_surveyed_at, next_survey_due_at')
+        .select('id, occupation, revenue_range, city, state, country, region, lifestyle_tags, family_size, life_goals, education_level, confidence_score, last_surveyed_at, next_survey_due_at')
         .eq('app_key', appKey)
         .eq('user_id', user!.id)
         .maybeSingle();
@@ -166,6 +182,7 @@ export function ClientInsightSurvey() {
     return [
       profile.occupation,
       profile.revenue_range,
+      [profile.city, profile.state || profile.region, profile.country].filter(Boolean).join(', '),
       ...(profile.lifestyle_tags || []).slice(0, 2),
       getGoalText(profile.life_goals),
     ].filter(Boolean).slice(0, 4) as string[];
@@ -176,6 +193,10 @@ export function ClientInsightSurvey() {
       const responses = {
         occupation: occupation.trim(),
         revenue_range: revenueRange,
+        country: country.trim(),
+        state: stateRegion.trim(),
+        city: city.trim(),
+        region: stateRegion.trim() || city.trim() || country.trim(),
         lifestyle_tags: selectedLifestyle,
         family_size: familySize,
         life_goals: lifeGoals
@@ -185,13 +206,28 @@ export function ClientInsightSurvey() {
         education_level: educationLevel,
       };
 
-      const { error } = await db.rpc('upsert_client_insight_profile', {
+      const { data: profileId, error } = await db.rpc('upsert_client_insight_profile', {
         target_app_key: appKey,
         target_responses: responses,
         target_survey_stage: profile ? 'manual_update' : 'intake',
         target_locale: locale,
       });
       if (error) throw error;
+
+      const locationPayload = {
+        country: country.trim() || null,
+        state: stateRegion.trim() || null,
+        city: city.trim() || null,
+        region: stateRegion.trim() || city.trim() || country.trim() || null,
+      };
+
+      if (profileId && Object.values(locationPayload).some(Boolean)) {
+        const { error: locationError } = await db
+          .from('client_insight_profiles')
+          .update(locationPayload)
+          .eq('id', profileId);
+        if (locationError) throw locationError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['client-insight-profile', appKey, user?.id] });
@@ -316,6 +352,36 @@ export function ClientInsightSurvey() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="client-insight-country">{copy.country}</Label>
+            <Input
+              id="client-insight-country"
+              value={country}
+              placeholder={profile?.country || 'Brazil'}
+              onChange={(event) => setCountry(event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="client-insight-state">{copy.state}</Label>
+            <Input
+              id="client-insight-state"
+              value={stateRegion}
+              placeholder={profile?.state || profile?.region || 'Sao Paulo'}
+              onChange={(event) => setStateRegion(event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2 lg:col-span-2">
+            <Label htmlFor="client-insight-city">{copy.city}</Label>
+            <Input
+              id="client-insight-city"
+              value={city}
+              placeholder={profile?.city || 'Sao Paulo'}
+              onChange={(event) => setCity(event.target.value)}
+            />
           </div>
 
           <div className="space-y-3 lg:col-span-2">
