@@ -3,13 +3,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   AlertTriangle,
+  Archive,
+  Ban,
   CheckCircle2,
   Clock3,
   FileText,
+  Flag,
   ListTodo,
   Loader2,
   MessageSquareText,
+  RefreshCcw,
   Search,
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
   UserRound,
@@ -18,9 +23,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
@@ -41,6 +48,10 @@ type RelationshipPerson = {
   lead_source: string | null;
   campaign_key: string | null;
   duplicate_warning: boolean;
+  governance_status?: string | null;
+  governance_reason?: string | null;
+  governance_notes?: string | null;
+  governance_updated_at?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -91,11 +102,121 @@ type SavedView = {
   filters: Record<string, unknown>;
 };
 
+type GovernanceActionType = 'flag' | 'refund_review' | 'terminate' | 'archive';
+
+type GovernanceForm = {
+  actionType: GovernanceActionType;
+  targetKind: string;
+  reason: string;
+  notes: string;
+  refundAmount: string;
+  currency: string;
+  terminationScope: string;
+  archiveScope: string;
+};
+
+type GovernanceAction = {
+  id: string;
+  action_type: GovernanceActionType;
+  target_kind: string;
+  target_id: string | null;
+  reason: string;
+  notes: string;
+  refund_amount: number | null;
+  currency: string;
+  termination_scope: string | null;
+  archive_scope: string | null;
+  status: string;
+  created_at: string;
+};
+
 const priorityTone: Record<string, string> = {
   urgent: 'border-destructive/30 bg-destructive/10 text-destructive',
   high: 'border-amber-500/30 bg-amber-500/10 text-amber-700',
   normal: 'border-sky-500/30 bg-sky-500/10 text-sky-700',
   low: 'border-muted bg-muted text-muted-foreground',
+};
+
+const governanceReasons: Record<GovernanceActionType, Array<{ value: string; label: string }>> = {
+  flag: [
+    { value: 'unethical', label: 'Unethical' },
+    { value: 'disrespectful', label: 'Disrespectful' },
+    { value: 'fraud', label: 'Fraud' },
+    { value: 'dishonesty', label: 'Dishonesty' },
+    { value: 'criminal_background', label: 'Criminal background' },
+    { value: 'owner_discretion', label: 'Owner discretion' },
+  ],
+  refund_review: [
+    { value: 'billing_error', label: 'Billing error' },
+    { value: 'client_request', label: 'Client request' },
+    { value: 'duplicate_payment', label: 'Duplicate payment' },
+    { value: 'service_not_delivered', label: 'Service not delivered' },
+    { value: 'partial_service', label: 'Partial service' },
+    { value: 'chargeback_risk', label: 'Chargeback risk' },
+    { value: 'owner_discretion', label: 'Owner discretion' },
+    { value: 'fraud', label: 'Fraud' },
+  ],
+  terminate: [
+    { value: 'unethical', label: 'Unethical' },
+    { value: 'disrespectful', label: 'Disrespectful' },
+    { value: 'fraud', label: 'Fraud' },
+    { value: 'dishonesty', label: 'Dishonesty' },
+    { value: 'criminal_background', label: 'Criminal background' },
+    { value: 'nonpayment', label: 'Nonpayment' },
+    { value: 'client_request', label: 'Client request' },
+    { value: 'owner_discretion', label: 'Owner discretion' },
+  ],
+  archive: [
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'duplicate_record', label: 'Duplicate record' },
+    { value: 'client_request', label: 'Client request' },
+    { value: 'owner_discretion', label: 'Owner discretion' },
+    { value: 'migrated', label: 'Migrated' },
+    { value: 'resolved', label: 'Resolved' },
+  ],
+};
+
+const governanceTargetKinds = [
+  { value: 'profile', label: 'Profile' },
+  { value: 'member', label: 'Member' },
+  { value: 'client', label: 'Client' },
+  { value: 'partner', label: 'Partner' },
+  { value: 'retainer', label: 'Retainer' },
+  { value: 'partnership', label: 'Partnership' },
+  { value: 'client_engagement', label: 'Client engagement' },
+  { value: 'membership', label: 'Membership' },
+  { value: 'account', label: 'Account' },
+  { value: 'related_record', label: 'Related record' },
+  { value: 'all', label: 'All related access' },
+];
+
+const terminationScopes = [
+  { value: 'retainer', label: 'Retainer' },
+  { value: 'partnership', label: 'Partnership' },
+  { value: 'client_engagement', label: 'Client engagement' },
+  { value: 'membership', label: 'Membership' },
+  { value: 'account', label: 'Account' },
+  { value: 'all', label: 'All' },
+];
+
+const archiveScopes = [
+  { value: 'profile', label: 'Profile' },
+  { value: 'membership', label: 'Membership' },
+  { value: 'partnership', label: 'Partnership' },
+  { value: 'client_engagement', label: 'Client engagement' },
+  { value: 'account', label: 'Account' },
+  { value: 'all', label: 'All' },
+];
+
+const defaultGovernanceForm: GovernanceForm = {
+  actionType: 'flag',
+  targetKind: 'profile',
+  reason: 'owner_discretion',
+  notes: '',
+  refundAmount: '',
+  currency: 'BRL',
+  terminationScope: 'account',
+  archiveScope: 'profile',
 };
 
 function humanize(value?: string | null) {
@@ -154,13 +275,14 @@ export function AdminRelationshipOS() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [noteBody, setNoteBody] = useState('');
+  const [governanceForm, setGovernanceForm] = useState<GovernanceForm>(defaultGovernanceForm);
 
   const peopleQuery = useQuery({
     queryKey: ['relationship-people', appKey],
     queryFn: async () => {
       const { data, error } = await db
         .from('growth_people')
-        .select('id, app_key, person_type, full_name, email, phone, preferred_locale, client_id, referral_code, partner_code, lead_source, campaign_key, duplicate_warning, created_at, updated_at')
+        .select('id, app_key, person_type, full_name, email, phone, preferred_locale, client_id, referral_code, partner_code, lead_source, campaign_key, duplicate_warning, governance_status, governance_reason, governance_notes, governance_updated_at, created_at, updated_at')
         .eq('app_key', appKey)
         .order('updated_at', { ascending: false })
         .limit(80);
@@ -230,6 +352,23 @@ export function AdminRelationshipOS() {
 
   const actionsQuery = useRelationshipActions(appKey, selectedPersonId);
 
+  const governanceActionsQuery = useQuery({
+    queryKey: ['relationship-governance-actions', appKey, selectedPersonId],
+    enabled: Boolean(selectedPersonId),
+    queryFn: async () => {
+      const { data, error } = await db
+        .from('cqa_governance_actions')
+        .select('id, action_type, target_kind, target_id, reason, notes, refund_amount, currency, termination_scope, archive_scope, status, created_at')
+        .eq('app_key', appKey)
+        .eq('person_id', selectedPersonId)
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      if (error) throw error;
+      return (data || []) as GovernanceAction[];
+    },
+  });
+
   const addNoteMutation = useMutation({
     mutationFn: async () => {
       if (!selectedPersonId || !noteBody.trim()) return;
@@ -253,6 +392,49 @@ export function AdminRelationshipOS() {
   });
 
   const actionMutation = useRelationshipActionMutations(appKey);
+
+  const governanceMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedPerson) throw new Error('Select a relationship first.');
+      if (!governanceForm.reason) throw new Error('A governance reason is required.');
+      if (governanceForm.notes.trim().length < 8) throw new Error('Notes are required and must explain the decision.');
+      if (governanceForm.actionType === 'refund_review') {
+        const amount = Number(governanceForm.refundAmount);
+        if (!amount || Number.isNaN(amount) || amount <= 0) {
+          throw new Error('Refund review actions require a valid refund amount.');
+        }
+      }
+
+      const { data, error } = await supabase.functions.invoke('governance-action', {
+        body: {
+          appKey,
+          personId: selectedPerson.id,
+          personType: selectedPerson.person_type,
+          targetKind: governanceForm.targetKind,
+          actionType: governanceForm.actionType,
+          reason: governanceForm.reason,
+          notes: governanceForm.notes.trim(),
+          refundAmount: governanceForm.actionType === 'refund_review' ? Number(governanceForm.refundAmount) : null,
+          currency: governanceForm.currency || 'BRL',
+          terminationScope: governanceForm.actionType === 'terminate' ? governanceForm.terminationScope : null,
+          archiveScope: governanceForm.actionType === 'archive' ? governanceForm.archiveScope : null,
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      setGovernanceForm(defaultGovernanceForm);
+      queryClient.invalidateQueries({ queryKey: ['relationship-people', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['relationship-governance-actions', appKey, selectedPersonId] });
+      queryClient.invalidateQueries({ queryKey: ['relationship-timeline', appKey, selectedPersonId] });
+      queryClient.invalidateQueries({ queryKey: ['relationship-next-actions', appKey] });
+      queryClient.invalidateQueries({ queryKey: ['growth-hub-events', appKey] });
+      toast.success('Governance action recorded');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Unable to record governance action'),
+  });
 
   if (peopleQuery.isLoading) {
     return (
@@ -330,6 +512,11 @@ export function AdminRelationshipOS() {
                   <div className="mt-2 flex flex-wrap gap-1">
                     {person.campaign_key ? <Badge variant="secondary" className="text-[10px]">{person.campaign_key}</Badge> : null}
                     {person.duplicate_warning ? <Badge variant="destructive" className="text-[10px]">Duplicate</Badge> : null}
+                    {person.governance_status && person.governance_status !== 'clear' ? (
+                      <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-[10px] text-destructive">
+                        {humanize(person.governance_status)}
+                      </Badge>
+                    ) : null}
                   </div>
                 </button>
               ))}
@@ -353,6 +540,17 @@ export function AdminRelationshipOS() {
           onComplete={(action) => actionMutation.completeTask.mutate(action)}
           onCreateTask={(action) => actionMutation.createTask.mutate(action)}
           busy={actionMutation.completeTask.isPending || actionMutation.createTask.isPending}
+        />
+
+        <GovernanceControls
+          person={selectedPerson}
+          form={governanceForm}
+          setForm={setGovernanceForm}
+          actions={governanceActionsQuery.data || []}
+          loading={governanceActionsQuery.isLoading}
+          error={governanceActionsQuery.error}
+          onSubmit={() => governanceMutation.mutate()}
+          busy={governanceMutation.isPending}
         />
 
         <Card>
@@ -549,6 +747,11 @@ function RelationshipProfile({
           <Badge variant="outline" className={person.duplicate_warning ? 'border-destructive/30 bg-destructive/10 text-destructive' : ''}>
             {person.duplicate_warning ? 'Duplicate warning' : 'Clear'}
           </Badge>
+          {person.governance_status && person.governance_status !== 'clear' ? (
+            <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive">
+              Governance: {humanize(person.governance_status)}
+            </Badge>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -558,6 +761,18 @@ function RelationshipProfile({
           <Info label="Partner Code" value={person.partner_code || 'Not set'} />
           <Info label="Language" value={(person.preferred_locale || 'en').toUpperCase()} />
         </div>
+
+        {person.governance_status && person.governance_status !== 'clear' ? (
+          <div className="rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm">
+            <p className="font-medium text-destructive">
+              {humanize(person.governance_status)} - {humanize(person.governance_reason)}
+            </p>
+            <p className="mt-1 leading-6 text-muted-foreground">{person.governance_notes || 'No notes available.'}</p>
+            {person.governance_updated_at ? (
+              <p className="mt-2 text-xs text-muted-foreground">Updated {formatDate(person.governance_updated_at)}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         <Separator />
 
@@ -620,6 +835,247 @@ function RelationshipTimeline({ items, loading }: { items: RelationshipTimelineI
             </div>
           </ScrollArea>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function GovernanceControls({
+  person,
+  form,
+  setForm,
+  actions,
+  loading,
+  error,
+  onSubmit,
+  busy,
+}: {
+  person: RelationshipPerson | null;
+  form: GovernanceForm;
+  setForm: (value: GovernanceForm | ((previous: GovernanceForm) => GovernanceForm)) => void;
+  actions: GovernanceAction[];
+  loading: boolean;
+  error: unknown;
+  onSubmit: () => void;
+  busy: boolean;
+}) {
+  const reasonOptions = governanceReasons[form.actionType];
+  const submitIcon =
+    form.actionType === 'archive'
+      ? Archive
+      : form.actionType === 'terminate'
+        ? Ban
+        : form.actionType === 'refund_review'
+          ? RefreshCcw
+          : Flag;
+  const SubmitIcon = submitIcon;
+  const canSubmit =
+    Boolean(person) &&
+    Boolean(form.reason) &&
+    form.notes.trim().length >= 8 &&
+    (form.actionType !== 'refund_review' || Number(form.refundAmount) > 0);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ShieldAlert className="h-4 w-4 text-primary" />
+          Governance Controls
+        </CardTitle>
+        <CardDescription>
+          Flag, refund-review, terminate, or archive members, clients, partners, and related records with required notes.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {!person ? (
+          <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">Select a relationship before recording governance actions.</p>
+        ) : (
+          <>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Action</Label>
+                <Select
+                  value={form.actionType}
+                  onValueChange={(value) =>
+                    setForm((previous) => ({
+                      ...previous,
+                      actionType: value as GovernanceActionType,
+                      reason: governanceReasons[value as GovernanceActionType][0]?.value || '',
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="flag">Flag relationship</SelectItem>
+                    <SelectItem value="refund_review">Refund review</SelectItem>
+                    <SelectItem value="terminate">Terminate</SelectItem>
+                    <SelectItem value="archive">Archive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Target</Label>
+                <Select value={form.targetKind} onValueChange={(value) => setForm((previous) => ({ ...previous, targetKind: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {governanceTargetKinds.map((target) => (
+                      <SelectItem key={target.value} value={target.value}>
+                        {target.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Required reason</Label>
+              <Select value={form.reason} onValueChange={(value) => setForm((previous) => ({ ...previous, reason: value }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {reasonOptions.map((reason) => (
+                    <SelectItem key={reason.value} value={reason.value}>
+                      {reason.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {form.actionType === 'refund_review' ? (
+              <div className="grid gap-3 md:grid-cols-[1fr_0.45fr]">
+                <div className="space-y-2">
+                  <Label htmlFor="governance-refund-amount">Required refund amount</Label>
+                  <Input
+                    id="governance-refund-amount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.refundAmount}
+                    onChange={(event) => setForm((previous) => ({ ...previous, refundAmount: event.target.value }))}
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Currency</Label>
+                  <Select value={form.currency} onValueChange={(value) => setForm((previous) => ({ ...previous, currency: value }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="BRL">BRL</SelectItem>
+                      <SelectItem value="USD">USD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ) : null}
+
+            {form.actionType === 'terminate' ? (
+              <div className="space-y-2">
+                <Label>Termination scope</Label>
+                <Select value={form.terminationScope} onValueChange={(value) => setForm((previous) => ({ ...previous, terminationScope: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {terminationScopes.map((scope) => (
+                      <SelectItem key={scope.value} value={scope.value}>
+                        {scope.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+
+            {form.actionType === 'archive' ? (
+              <div className="space-y-2">
+                <Label>Archive scope</Label>
+                <Select value={form.archiveScope} onValueChange={(value) => setForm((previous) => ({ ...previous, archiveScope: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {archiveScopes.map((scope) => (
+                      <SelectItem key={scope.value} value={scope.value}>
+                        {scope.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
+
+            <div className="space-y-2">
+              <Label htmlFor="governance-notes">Required notes</Label>
+              <Textarea
+                id="governance-notes"
+                value={form.notes}
+                onChange={(event) => setForm((previous) => ({ ...previous, notes: event.target.value }))}
+                placeholder="Document exactly why this action is being taken, what was reviewed, and who approved it."
+                className="min-h-28"
+              />
+            </div>
+
+            <Button type="button" className="w-full gap-2" disabled={!canSubmit || busy} onClick={onSubmit}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <SubmitIcon className="h-4 w-4" />}
+              Record Governance Action
+            </Button>
+          </>
+        )}
+
+        <Separator />
+
+        <div>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">Recent governance ledger</p>
+            <Badge variant="outline">{actions.length}</Badge>
+          </div>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            </div>
+          ) : error ? (
+            <p className="rounded-md bg-muted p-3 text-xs leading-5 text-muted-foreground">
+              Apply the governance migration to enable the recent governance ledger.
+            </p>
+          ) : actions.length === 0 ? (
+            <p className="rounded-md bg-muted p-3 text-xs text-muted-foreground">No governance actions have been recorded for this relationship.</p>
+          ) : (
+            <ScrollArea className="h-[240px] pr-3">
+              <div className="space-y-2">
+                {actions.map((action) => (
+                  <div key={action.id} className="rounded-md border p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">
+                          {humanize(action.action_type)} - {humanize(action.reason)}
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-muted-foreground">{action.notes}</p>
+                      </div>
+                      <Badge variant="outline">{humanize(action.status)}</Badge>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <span>{humanize(action.target_kind)}</span>
+                      {action.refund_amount ? <span>{formatAmount(action.refund_amount, action.currency) || action.refund_amount}</span> : null}
+                      {action.termination_scope ? <span>Terminate: {humanize(action.termination_scope)}</span> : null}
+                      {action.archive_scope ? <span>Archive: {humanize(action.archive_scope)}</span> : null}
+                      <span>{formatDate(action.created_at)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
