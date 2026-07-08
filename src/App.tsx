@@ -35,6 +35,8 @@ const InfluencerPartners = lazy(() => import("./pages/InfluencerPartners"));
 const InfluencerApplication = lazy(() => import("./pages/InfluencerApplication"));
 const GiveMonthReferralCampaign = lazy(() => import("./pages/GiveMonthReferralCampaign"));
 const TestimonialRequest = lazy(() => import("./pages/TestimonialRequest"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 const DoctorProfile = lazy(() => import("./pages/DoctorProfile"));
 const ProviderProfileRouter = lazy(() => import("./pages/ProviderProfileRouter"));
 const ProviderDashboard = lazy(() => import("./pages/ProviderDashboard"));
@@ -105,13 +107,13 @@ const campaignLandingPaths = new Set([
 
 const CampaignAwareHIPAADisclaimer = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <HIPAADisclaimer />;
 };
 
 const CampaignAwareNotificationPermissionBanner = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <NotificationPermissionBanner />;
 };
 
@@ -160,6 +162,12 @@ const App = () => (
                     <Route path="/testimonial-request" element={<TestimonialRequest defaultLocale="en" />} />
                     <Route path="/pt/testimonial-request" element={<TestimonialRequest defaultLocale="pt" />} />
                     <Route path="/es/testimonial-request" element={<TestimonialRequest defaultLocale="es" />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
+                    <Route path="/pt/blog" element={<Blog />} />
+                    <Route path="/pt/blog/:slug" element={<BlogPost />} />
+                    <Route path="/es/blog" element={<Blog />} />
+                    <Route path="/es/blog/:slug" element={<BlogPost />} />
                     <Route path="/doctor/:id" element={<DoctorProfile />} />
                     <Route path="/provider/:id" element={<ProviderProfileRouter />} />
                     <Route path="/provider-dashboard" element={<ProtectedRoute><ProviderDashboard /></ProtectedRoute>} />

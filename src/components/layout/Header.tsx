@@ -50,6 +50,9 @@ export function Header() {
           <Link to="/browse" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             {t('nav.explore')}
           </Link>
+          <Link to="/blog" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {t('nav.blog', 'Blog')}
+          </Link>
           <Link to="/map" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
             <MapPin className="w-4 h-4" />
             {t('nav.map')}
@@ -160,6 +163,13 @@ export function Header() {
                   className="text-lg font-medium text-foreground hover:text-primary transition-colors"
                 >
                   {t('nav.explore')}
+                </Link>
+                <Link
+                  to="/blog"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  {t('nav.blog', 'Blog')}
                 </Link>
                 <Link
                   to="/map"
