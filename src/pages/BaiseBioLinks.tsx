@@ -5,17 +5,19 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpenText,
-  CalendarCheck,
+  BriefcaseBusiness,
   Gift,
   Globe2,
   Handshake,
-  MessageCircle,
+  HeartPulse,
+  Home,
+  LogIn,
   PlayCircle,
+  Scale,
   ShieldCheck,
-  Sparkles,
   Star,
-  TrendingUp,
   UserRoundCheck,
+  UsersRound,
   Youtube,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -27,189 +29,181 @@ type AppKey = "casa" | "medical" | "legal";
 type LocaleKey = "en" | "pt";
 type BioEventType = "page_view" | "cta_click" | "language_change";
 
-type BioLink = {
+type BioRpcClient = {
+  rpc: (fn: "track_bio_link_event", args: Record<string, unknown>) => Promise<{ data: string | null; error: unknown }>;
+};
+
+type AppLane = {
+  key: AppKey;
+  name: string;
+  label: Record<LocaleKey, string>;
+  description: Record<LocaleKey, string>;
+  forProviders: Record<LocaleKey, string>;
+  color: string;
+  domain: string;
+  icon: LucideIcon;
+};
+
+type SupportLink = {
   key: string;
   label: string;
   description: string;
   href: string;
   icon: LucideIcon;
   section: string;
-  intent: "primary" | "promo" | "watch" | "quiet";
 };
 
 type BaiseBioLinksProps = {
   defaultLocale?: LocaleKey;
 };
 
-type BioRpcClient = {
-  rpc: (fn: "track_bio_link_event", args: Record<string, unknown>) => Promise<{ data: string | null; error: unknown }>;
-};
+const BAISE_BLACK = "#050505";
+const PANEL_BLACK = "#111111";
+const BORDER = "rgba(255,255,255,0.12)";
+const SHARED_YOUTUBE_URL = "https://www.youtube.com/@Baise";
 
-const brandProfiles: Record<AppKey, {
-  name: string;
-  shortName: string;
-  domain: string;
-  youtubeUrl: string;
-  accent: string;
-  ring: string;
-  heroGradient: string;
-  description: Record<LocaleKey, string>;
-  promise: Record<LocaleKey, string>;
-}> = {
-  casa: {
+const appLanes: AppLane[] = [
+  {
+    key: "casa",
     name: "Casa Baise",
-    shortName: "Casa",
+    label: {
+      en: "Find or offer trusted local services",
+      pt: "Encontre ou ofereca servicos locais confiaveis",
+    },
+    description: {
+      en: "Home, business, repairs, cleaning, inspections, projects, and everyday trusted help.",
+      pt: "Casa, negocios, reparos, limpeza, vistorias, projetos e ajuda confiavel no dia a dia.",
+    },
+    forProviders: {
+      en: "Register to get discovered, manage requests, collect payments, and build proof.",
+      pt: "Cadastre-se para ser encontrado, gerenciar pedidos, receber pagamentos e criar prova.",
+    },
+    color: "#1dbf73",
     domain: "https://www.casabaise.com",
-    youtubeUrl: "https://www.youtube.com/@CasaBaise",
-    accent: "text-emerald-200",
-    ring: "ring-emerald-300/35",
-    heroGradient: "from-emerald-400 via-teal-300 to-sky-400",
-    description: {
-      en: "Trusted pros for home, business, and everyday service needs in Brazil.",
-      pt: "Profissionais confiaveis para casa, negocios e servicos do dia a dia no Brasil.",
-    },
-    promise: {
-      en: "Find reliable help without guessing who to trust.",
-      pt: "Encontre ajuda confiavel sem precisar adivinhar em quem confiar.",
-    },
+    icon: Home,
   },
-  medical: {
+  {
+    key: "medical",
     name: "Medical Baise",
-    shortName: "Medical",
+    label: {
+      en: "Find or offer trusted medical support",
+      pt: "Encontre ou ofereca suporte medico confiavel",
+    },
+    description: {
+      en: "Medical professionals, care navigation, appointment records, follow-ups, and secure history.",
+      pt: "Profissionais medicos, orientacao de cuidado, registros, acompanhamentos e historico seguro.",
+    },
+    forProviders: {
+      en: "Register to support patients with clearer communication, records, and follow-up workflows.",
+      pt: "Cadastre-se para apoiar pacientes com comunicacao, registros e acompanhamentos claros.",
+    },
+    color: "#00b8d4",
     domain: "https://www.mdbaise.com",
-    youtubeUrl: "https://www.youtube.com/@MDBaise",
-    accent: "text-cyan-200",
-    ring: "ring-cyan-300/35",
-    heroGradient: "from-cyan-300 via-blue-300 to-emerald-300",
-    description: {
-      en: "Clearer access to trusted medical support, records, and next steps.",
-      pt: "Acesso mais claro a apoio medico confiavel, registros e proximos passos.",
-    },
-    promise: {
-      en: "Book care with more clarity, proof, and confidence.",
-      pt: "Agende cuidados com mais clareza, prova e confianca.",
-    },
+    icon: HeartPulse,
   },
-  legal: {
+  {
+    key: "legal",
     name: "Legal Baise",
-    shortName: "Legal",
-    domain: "https://www.legalbaise.com",
-    youtubeUrl: "https://www.youtube.com/@LegalBaise",
-    accent: "text-amber-200",
-    ring: "ring-amber-300/35",
-    heroGradient: "from-amber-300 via-yellow-200 to-emerald-300",
+    label: {
+      en: "Find or offer trusted legal support",
+      pt: "Encontre ou ofereca suporte juridico confiavel",
+    },
     description: {
-      en: "A calmer path to trusted legal support, documents, and consultations.",
-      pt: "Um caminho mais claro para suporte juridico confiavel, documentos e consultas.",
+      en: "Lawyers, documents, consultations, service records, client history, and organized next steps.",
+      pt: "Advogados, documentos, consultas, registros de servico, historico e proximos passos organizados.",
     },
-    promise: {
-      en: "Get organized before money, documents, or decisions move.",
-      pt: "Organize-se antes que dinheiro, documentos ou decisoes avancem.",
+    forProviders: {
+      en: "Register to receive qualified requests and keep consultations, invoices, and documents clean.",
+      pt: "Cadastre-se para receber pedidos qualificados e organizar consultas, faturas e documentos.",
     },
+    color: "#7c3aed",
+    domain: "https://www.legalbaise.com",
+    icon: Scale,
   },
-};
+];
 
 const copy = {
   en: {
     languageLabel: "Language",
-    eyebrow: "Baise quick links",
-    title: "Book trusted help, claim offers, and learn what to do next.",
+    eyebrow: "Baise social hub",
+    title: "Choose the right Baise app and register where trust matters.",
     subtitle:
-      "One focused place for calls, current promotions, practical videos, new guides, and client support.",
-    trusted: "Trusted marketplace for Casa, Legal, and Medical support in Brazil.",
-    topChoice: "Start with the best next step",
-    moreWays: "More ways to move forward",
-    chooseBrand: "Choose your Baise path",
-    latestLearning: "Latest guides and videos",
-    clientProof: "Trust signals",
-    videoTitle: "New videos for smarter decisions",
-    blogTitle: "Fresh blog guides",
-    primaryCta: "Book a call or get matched",
-    primaryDescription: "Tell us what you need and we will point you to the right Baise path.",
-    promoCta: "Claim Give a Month, Get a Month",
-    promoDescription: "Premium users can refer someone and earn up to 12 free months in a calendar year.",
-    youtubeCta: "Watch latest YouTube content",
-    youtubeDescription: "Short, practical guidance before you book, hire, refer, or grow.",
-    portalCta: "Open the client portal",
-    portalDescription: "Access messages, receipts, documents, bookings, and your service history.",
-    blogCta: "Read the newest guides",
-    blogDescription: "Helpful articles for choosing, booking, paying, and keeping clean records.",
-    providerCta: "Grow as a service provider",
-    providerDescription: "Create your provider account and manage leads, payments, reviews, and campaigns.",
-    partnerCta: "Become a partner or influencer",
-    partnerDescription: "Apply for approved campaigns with tracked links, codes, payouts, and rules.",
-    referralCta: "Share your referral link",
-    referralDescription: "Give a month, get a month when eligible premium referrals convert.",
-    testimonialCta: "Send a testimonial",
-    testimonialDescription: "Submit a Google review or video testimonial for future service credit.",
-    successCta: "Talk to Client Success",
-    successDescription: "Need help choosing the right next step? Start here.",
-    brandLabels: {
-      casa: "Home and local services",
-      medical: "Medical support",
-      legal: "Legal support",
-    },
+      "One link for Casa, Medical, and Legal Baise. Service users find trusted support. Service providers register to grow with better tools, records, and visibility.",
+    trustLine: "Three apps. One Baise standard for trust, proof, payments, records, and support.",
+    chooseApp: "Register in the right app",
+    providers: "Resources for service providers",
+    users: "Solutions for service users",
+    latestLearning: "Learn before you choose",
+    support: "More Baise links",
+    register: "Register",
+    providerResourceTitle: "Provider growth resources",
+    providerResourceDescription: "Marketing, invoicing, reviews, campaigns, payments, and client operations.",
+    userResourceTitle: "Service user guides",
+    userResourceDescription: "How to choose, verify, pay, keep records, and avoid messy service experiences.",
+    promotionTitle: "Current premium promotion",
+    promotionDescription: "Give a month, get a month for eligible premium referrals.",
+    videoTitle: "Latest Baise videos",
+    videoDescription: "Practical short-form guidance from the shared Baise social channel.",
+    portalTitle: "Sign in to your portal",
+    portalDescription: "Messages, receipts, transaction history, documents, referrals, and service records.",
+    partnerTitle: "Partner and influencer programs",
+    partnerDescription: "Apply for approved campaigns with tracked links, codes, QR, rules, and payouts.",
+    testimonialTitle: "Leave a testimonial",
+    testimonialDescription: "Submit approved Google or video testimonials for future service credit.",
+    referralTitle: "Referral rewards",
+    referralDescription: "Share your link and track eligible premium referrals.",
+    blogTitle: "Fresh practical guides",
     videoCards: [
-      "How to choose trusted help in Brazil",
-      "What to keep in your service records",
-      "How providers can turn trust into booked work",
+      "How Baise helps you choose the right provider",
+      "What service providers should document from day one",
+      "How trusted records protect both sides of a service",
     ],
-    metaTitle: "Baise Links | Book trusted help, offers, videos and guides",
+    metaTitle: "Baise Links | Casa, Medical and Legal registration hub",
     metaDescription:
-      "Start with Baise quick links for booking calls, promotions, YouTube content, latest blog posts, referrals, testimonials, and client support.",
+      "Register for Casa Baise, Medical Baise, or Legal Baise from one shared social bio hub with resources for service providers and solutions for service users.",
   },
   pt: {
     languageLabel: "Idioma",
-    eyebrow: "Links rapidos Baise",
-    title: "Agende ajuda confiavel, resgate ofertas e saiba o proximo passo.",
+    eyebrow: "Hub social Baise",
+    title: "Escolha o app Baise certo e cadastre-se onde confianca importa.",
     subtitle:
-      "Um lugar direto para chamadas, promocoes atuais, videos praticos, novos guias e suporte ao cliente.",
-    trusted: "Marketplace confiavel para suporte Casa, Legal e Medical no Brasil.",
-    topChoice: "Comece pelo melhor proximo passo",
-    moreWays: "Mais formas de avancar",
-    chooseBrand: "Escolha seu caminho Baise",
-    latestLearning: "Guias e videos recentes",
-    clientProof: "Sinais de confianca",
-    videoTitle: "Novos videos para decisoes melhores",
-    blogTitle: "Guias recentes no blog",
-    primaryCta: "Agendar ou encontrar ajuda",
-    primaryDescription: "Diga o que voce precisa e apontamos o melhor caminho Baise.",
-    promoCta: "Resgatar Give a Month, Get a Month",
-    promoDescription: "Usuarios premium podem indicar alguem e ganhar ate 12 meses gratis por ano.",
-    youtubeCta: "Assistir conteudo no YouTube",
-    youtubeDescription: "Orientacao curta e pratica antes de agendar, contratar, indicar ou crescer.",
-    portalCta: "Abrir portal do cliente",
-    portalDescription: "Acesse mensagens, recibos, documentos, agendamentos e historico de servicos.",
-    blogCta: "Ler os guias mais recentes",
-    blogDescription: "Artigos uteis para escolher, agendar, pagar e manter registros limpos.",
-    providerCta: "Crescer como prestador",
-    providerDescription: "Crie sua conta e gerencie leads, pagamentos, avaliacoes e campanhas.",
-    partnerCta: "Ser parceiro ou influenciador",
-    partnerDescription: "Inscreva-se em campanhas aprovadas com links, codigos, pagamentos e regras.",
-    referralCta: "Compartilhar seu link de indicacao",
-    referralDescription: "Indique premium e ganhe um mes quando a indicacao elegivel converter.",
-    testimonialCta: "Enviar depoimento",
-    testimonialDescription: "Envie avaliacao Google ou video e receba credito futuro quando aprovado.",
-    successCta: "Falar com Client Success",
-    successDescription: "Precisa escolher o melhor proximo passo? Comece aqui.",
-    brandLabels: {
-      casa: "Servicos locais e para casa",
-      medical: "Suporte medico",
-      legal: "Suporte juridico",
-    },
+      "Um link para Casa, Medical e Legal Baise. Quem precisa de servicos encontra suporte confiavel. Prestadores se cadastram para crescer com ferramentas, registros e visibilidade.",
+    trustLine: "Tres apps. Um padrao Baise para confianca, prova, pagamentos, registros e suporte.",
+    chooseApp: "Cadastre-se no app certo",
+    providers: "Recursos para prestadores",
+    users: "Solucoes para quem precisa de servicos",
+    latestLearning: "Aprenda antes de escolher",
+    support: "Mais links Baise",
+    register: "Cadastrar",
+    providerResourceTitle: "Recursos de crescimento para prestadores",
+    providerResourceDescription: "Marketing, faturas, avaliacoes, campanhas, pagamentos e operacao de clientes.",
+    userResourceTitle: "Guias para usuarios de servicos",
+    userResourceDescription: "Como escolher, verificar, pagar, guardar registros e evitar experiencias confusas.",
+    promotionTitle: "Promocao premium atual",
+    promotionDescription: "Give a month, get a month para indicacoes premium elegiveis.",
+    videoTitle: "Videos recentes Baise",
+    videoDescription: "Orientacao pratica do canal social compartilhado da Baise.",
+    portalTitle: "Entrar no portal",
+    portalDescription: "Mensagens, recibos, historico, documentos, indicacoes e registros de servico.",
+    partnerTitle: "Programas de parceiros e influenciadores",
+    partnerDescription: "Inscreva-se em campanhas aprovadas com links, codigos, QR, regras e pagamentos.",
+    testimonialTitle: "Enviar depoimento",
+    testimonialDescription: "Envie avaliacao Google ou video aprovado para credito futuro em servicos.",
+    referralTitle: "Recompensas por indicacao",
+    referralDescription: "Compartilhe seu link e acompanhe indicacoes premium elegiveis.",
+    blogTitle: "Guias praticos recentes",
     videoCards: [
-      "Como escolher ajuda confiavel no Brasil",
-      "O que guardar nos seus registros de servico",
-      "Como prestadores transformam confianca em trabalho",
+      "Como a Baise ajuda voce a escolher o prestador certo",
+      "O que prestadores devem documentar desde o primeiro dia",
+      "Como registros confiaveis protegem os dois lados do servico",
     ],
-    metaTitle: "Links Baise | Agendamentos, ofertas, videos e guias",
+    metaTitle: "Links Baise | Hub Casa, Medical e Legal",
     metaDescription:
-      "Comece pelos links rapidos Baise para agendar chamadas, ver promocoes, YouTube, blog, indicacoes, depoimentos e suporte.",
+      "Cadastre-se no Casa Baise, Medical Baise ou Legal Baise por um unico hub social com recursos para prestadores e solucoes para usuarios.",
   },
 } as const;
 
 const supportedLocales: LocaleKey[] = ["pt", "en"];
-type BrandProfile = (typeof brandProfiles)[AppKey];
 
 const getSessionId = () => {
   if (typeof window === "undefined") return "server";
@@ -222,87 +216,134 @@ const getSessionId = () => {
 };
 
 const appendTrackingParams = (href: string, ctaKey: string) => {
-  if (href.startsWith("mailto:") || href.startsWith("tel:")) return href;
   if (typeof window === "undefined") return href;
-
   const url = new URL(href, window.location.origin);
   const current = new URLSearchParams(window.location.search);
   url.searchParams.set("source", current.get("source") || current.get("utm_source") || "social_bio");
-  url.searchParams.set("campaign", current.get("campaign") || current.get("utm_campaign") || "bio_link_hub");
+  url.searchParams.set("campaign", current.get("campaign") || current.get("utm_campaign") || "shared_baise_social_hub");
   url.searchParams.set("cta", ctaKey);
 
   if (!href.startsWith("http")) return `${url.pathname}${url.search}${url.hash}`;
   return url.toString();
 };
 
-const LinkMascot = ({ brand }: { brand: BrandProfile }) => (
-  <div className={`relative mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] bg-gradient-to-br ${brand.heroGradient} p-[2px] shadow-2xl shadow-black/35`}>
-    <div className="flex h-full w-full items-center justify-center rounded-[1.85rem] bg-slate-950/88">
+const registerUrl = (lane: AppLane, locale: LocaleKey) =>
+  `${lane.domain}${locale === "pt" ? "/pt" : ""}/auth?mode=signup&source=social_bio&intent=register&app=${lane.key}`;
+
+const blogUrl = (audience: "provider" | "client", locale: LocaleKey) =>
+  `${locale === "pt" ? "/pt" : ""}/blog?audience=${audience}&source=social_bio`;
+
+const SectionTitle = ({ children }: { children: ReactNode }) => (
+  <h2 className="px-1 text-xs font-black uppercase tracking-[0.18em] text-white/50">{children}</h2>
+);
+
+const BaiseMark = () => (
+  <div className="relative mx-auto flex h-28 w-28 items-center justify-center rounded-[2rem] bg-black p-[2px] shadow-2xl shadow-black/60">
+    <div
+      className="absolute inset-0 rounded-[2rem]"
+      style={{
+        background: "linear-gradient(135deg, #1dbf73 0%, #00b8d4 50%, #7c3aed 100%)",
+      }}
+      aria-hidden="true"
+    />
+    <div className="relative flex h-full w-full items-center justify-center rounded-[1.85rem] border border-white/10 bg-black">
       <img src="/baise-logo.svg" alt="Baise" className="h-14 w-14 object-contain" />
     </div>
-    <div className="absolute -right-3 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-white text-slate-950 shadow-lg">
-      <Sparkles className="h-4 w-4" aria-hidden="true" />
-    </div>
-    <div className="absolute -bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-slate-950 px-3 py-1 text-[11px] font-semibold text-white shadow-lg">
-      <Star className="h-3 w-3 fill-amber-300 text-amber-300" aria-hidden="true" />
+    <div className="absolute -bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-black px-3 py-1 text-[11px] font-semibold text-white shadow-lg">
+      <Star className="h-3 w-3 fill-[#ffc107] text-[#ffc107]" aria-hidden="true" />
       4.8
     </div>
   </div>
 );
 
-const BioButton = ({
-  link,
-  brand,
+const AppRegistrationCard = ({
+  lane,
+  locale,
   onClick,
 }: {
-  link: BioLink;
-  brand: BrandProfile;
-  onClick: (link: BioLink) => void;
+  lane: AppLane;
+  locale: LocaleKey;
+  onClick: (payload: Record<string, unknown>) => void;
 }) => {
+  const Icon = lane.icon;
+  const href = appendTrackingParams(registerUrl(lane, locale), `register_${lane.key}`);
+
+  return (
+    <a
+      href={href}
+      onClick={() =>
+        onClick({
+          section: "app_registration",
+          ctaKey: `register_${lane.key}`,
+          label: lane.name,
+          href,
+          app_lane: lane.key,
+        })
+      }
+      className="group block rounded-2xl border bg-black p-[1px] shadow-xl shadow-black/35 outline-none transition-[transform,border-color,box-shadow] duration-150 ease-out active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/70"
+      style={{ borderColor: `${lane.color}66`, boxShadow: `0 18px 42px ${lane.color}18` }}
+    >
+      <span className="block rounded-[0.95rem] bg-[#0b0b0b] p-4">
+        <span className="flex items-start gap-3">
+          <span
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-black"
+            style={{ backgroundColor: lane.color }}
+          >
+            <Icon className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-black leading-tight text-white">{lane.name}</span>
+            <span className="mt-1 block text-sm font-bold leading-snug" style={{ color: lane.color }}>
+              {lane.label[locale]}
+            </span>
+            <span className="mt-2 block text-xs leading-5 text-white/62">{lane.description[locale]}</span>
+          </span>
+        </span>
+        <span className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-3">
+          <span className="text-xs leading-5 text-white/68">{lane.forProviders[locale]}</span>
+          <span
+            className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-black text-black"
+            style={{ backgroundColor: lane.color }}
+          >
+            {copy[locale].register}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5" aria-hidden="true" />
+          </span>
+        </span>
+      </span>
+    </a>
+  );
+};
+
+const SupportButton = ({ link, onClick }: { link: SupportLink; onClick: (link: SupportLink) => void }) => {
   const Icon = link.icon;
   const href = appendTrackingParams(link.href, link.key);
   const isExternal = href.startsWith("http");
-  const gradient =
-    link.intent === "primary"
-      ? brand.heroGradient
-      : link.intent === "promo"
-        ? "from-amber-300 via-yellow-200 to-emerald-300"
-        : link.intent === "watch"
-          ? "from-red-400 via-rose-300 to-orange-300"
-          : "from-white/12 via-white/8 to-white/12";
-  const textColor = link.intent === "quiet" ? "text-white" : "text-slate-950";
 
   return (
     <a
       href={href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noreferrer" : undefined}
-      onClick={() => onClick(link)}
-      className={`group flex min-h-[76px] w-full items-center gap-3 rounded-2xl border border-white/12 bg-gradient-to-r ${gradient} p-[2px] shadow-lg shadow-black/25 outline-none transition-[transform,box-shadow,border-color] duration-150 ease-out active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/70`}
+      onClick={() => onClick({ ...link, href })}
+      className="group flex min-h-[74px] w-full items-center gap-3 rounded-2xl border border-white/12 bg-[#0b0b0b] px-4 py-3 shadow-lg shadow-black/25 outline-none transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/24 hover:bg-[#111111] focus-visible:ring-2 focus-visible:ring-white/70"
     >
-      <span className="flex h-full min-h-[72px] w-full items-center gap-3 rounded-[0.9rem] bg-slate-950/10 px-4 py-3 backdrop-blur-sm">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/92 text-slate-950 shadow-sm">
-          <Icon className="h-5 w-5" aria-hidden="true" />
-        </span>
-        <span className={`min-w-0 flex-1 ${textColor}`}>
-          <span className="block text-sm font-black leading-tight sm:text-base">{link.label}</span>
-          <span className={`mt-1 block text-xs leading-snug ${link.intent === "quiet" ? "text-white/70" : "text-slate-900/72"}`}>
-            {link.description}
-          </span>
-        </span>
-        <ArrowRight className={`h-5 w-5 shrink-0 transition-transform duration-150 ease-out group-hover:translate-x-0.5 ${textColor}`} aria-hidden="true" />
+      <span
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-black"
+        style={{ background: "linear-gradient(135deg, #1dbf73, #00b8d4, #7c3aed)" }}
+      >
+        <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-black leading-tight text-white sm:text-base">{link.label}</span>
+        <span className="mt-1 block text-xs leading-snug text-white/62">{link.description}</span>
+      </span>
+      <ArrowRight className="h-5 w-5 shrink-0 text-white/62 transition-transform duration-150 ease-out group-hover:translate-x-0.5" aria-hidden="true" />
     </a>
   );
 };
 
-const SectionTitle = ({ children }: { children: ReactNode }) => (
-  <h2 className="px-1 text-xs font-black uppercase tracking-[0.18em] text-white/48">{children}</h2>
-);
-
 const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
   const appKey = getBaiseAppKey();
-  const brand = brandProfiles[appKey];
   const appUrl = getBaiseAppUrl();
   const [locale, setLocale] = useState<LocaleKey>(defaultLocale);
   const [sessionId] = useState(getSessionId);
@@ -322,14 +363,15 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
         event_cta_key: payload.ctaKey || null,
         event_cta_label: payload.label || null,
         event_destination_url: payload.href || null,
-        event_source: params.get("source") || params.get("utm_source") || "social_bio",
-        event_campaign: params.get("campaign") || params.get("utm_campaign") || "bio_link_hub",
+        event_source: params.get("source") || params.get("utm_source") || "shared_social_bio",
+        event_campaign: params.get("campaign") || params.get("utm_campaign") || "shared_baise_social_hub",
         event_path: window.location.pathname,
         event_referrer: document.referrer || null,
         event_metadata: {
           ...payload,
           session_id: sessionId,
           utm_medium: params.get("utm_medium"),
+          shared_social_hub: true,
           viewport_width: window.innerWidth,
           viewport_height: window.innerHeight,
         },
@@ -351,126 +393,93 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
   useEffect(() => {
     if (pageViewTracked.current) return;
     pageViewTracked.current = true;
-    track("page_view", { section: "page", label: brand.name });
-  }, [brand.name, track]);
+    track("page_view", { section: "page", label: "Baise shared social hub" });
+  }, [track]);
 
-  const primaryLinks = useMemo<BioLink[]>(
+  const audienceLinks = useMemo<SupportLink[]>(
     () => [
       {
-        key: "book_call_or_match",
-        label: text.primaryCta,
-        description: text.primaryDescription,
-        href: "/auth?mode=signup&intent=book_call",
-        icon: CalendarCheck,
-        section: "primary",
-        intent: "primary",
+        key: "provider_resources",
+        label: text.providerResourceTitle,
+        description: text.providerResourceDescription,
+        href: blogUrl("provider", locale),
+        icon: BriefcaseBusiness,
+        section: "provider_resources",
       },
       {
-        key: "give_month_offer",
-        label: text.promoCta,
-        description: text.promoDescription,
+        key: "service_user_resources",
+        label: text.userResourceTitle,
+        description: text.userResourceDescription,
+        href: blogUrl("client", locale),
+        icon: UsersRound,
+        section: "service_user_resources",
+      },
+    ],
+    [locale, text],
+  );
+
+  const supportLinks = useMemo<SupportLink[]>(
+    () => [
+      {
+        key: "premium_promotion",
+        label: text.promotionTitle,
+        description: text.promotionDescription,
         href: `${localizedPrefix}/give-a-month-get-a-month`,
         icon: Gift,
         section: "promotion",
-        intent: "promo",
       },
       {
-        key: "youtube_latest",
-        label: text.youtubeCta,
-        description: text.youtubeDescription,
-        href: brand.youtubeUrl,
+        key: "shared_youtube",
+        label: text.videoTitle,
+        description: text.videoDescription,
+        href: SHARED_YOUTUBE_URL,
         icon: Youtube,
         section: "youtube",
-        intent: "watch",
       },
-    ],
-    [brand.youtubeUrl, localizedPrefix, text],
-  );
-
-  const secondaryLinks = useMemo<BioLink[]>(
-    () => [
       {
-        key: "client_portal",
-        label: text.portalCta,
+        key: "portal_signin",
+        label: text.portalTitle,
         description: text.portalDescription,
-        href: "/auth?mode=signin&redirect=/customer-dashboard",
-        icon: ShieldCheck,
+        href: "/auth?mode=signin",
+        icon: LogIn,
         section: "portal",
-        intent: "quiet",
       },
       {
-        key: "blog_index",
-        label: text.blogCta,
-        description: text.blogDescription,
-        href: `${localizedPrefix}/blog`,
-        icon: BookOpenText,
-        section: "blog",
-        intent: "quiet",
-      },
-      {
-        key: "provider_signup",
-        label: text.providerCta,
-        description: text.providerDescription,
-        href: "/auth?mode=signup&role=provider",
-        icon: TrendingUp,
-        section: "provider",
-        intent: "quiet",
-      },
-      {
-        key: "partner_influencer",
-        label: text.partnerCta,
+        key: "partner_programs",
+        label: text.partnerTitle,
         description: text.partnerDescription,
         href: `${localizedPrefix}/influencer-partners`,
         icon: Handshake,
         section: "partner",
-        intent: "quiet",
       },
       {
-        key: "referral_offer",
-        label: text.referralCta,
+        key: "referral_rewards",
+        label: text.referralTitle,
         description: text.referralDescription,
         href: `${localizedPrefix}/give-a-month-get-a-month`,
         icon: UserRoundCheck,
         section: "referral",
-        intent: "quiet",
       },
       {
-        key: "testimonial_request",
-        label: text.testimonialCta,
+        key: "testimonial",
+        label: text.testimonialTitle,
         description: text.testimonialDescription,
         href: `${localizedPrefix}/testimonial-request`,
         icon: BadgeCheck,
         section: "testimonial",
-        intent: "quiet",
-      },
-      {
-        key: "client_success",
-        label: text.successCta,
-        description: text.successDescription,
-        href: "/auth?mode=signup&intent=client_success",
-        icon: MessageCircle,
-        section: "support",
-        intent: "quiet",
       },
     ],
     [localizedPrefix, text],
   );
 
-  const blogPosts = useMemo(() => {
-    const preferred = BAISE_BLOG_POSTS.filter(
-      (post) => post.audience === "client" && (post.niche === appKey || post.niche === "cross-platform"),
-    );
-    return (preferred.length ? preferred : BAISE_BLOG_POSTS).slice(0, 3);
-  }, [appKey]);
+  const blogPosts = useMemo(() => BAISE_BLOG_POSTS.filter((post) => post.niche === "cross-platform").slice(0, 3), []);
 
-  const handleBioClick = (link: BioLink) => {
+  const handleSupportClick = (link: SupportLink) => {
     track("cta_click", {
       section: link.section,
       ctaKey: link.key,
       label: link.label,
       href: link.href,
-      destination: appendTrackingParams(link.href, link.key),
-      intent: link.intent,
     });
   };
 
@@ -487,7 +496,7 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(145deg,#020617_0%,#07111f_40%,#042f2e_100%)] px-4 py-5 text-white sm:px-6">
+    <main className="min-h-screen px-4 py-5 text-white sm:px-6" style={{ backgroundColor: BAISE_BLACK }}>
       <Helmet>
         <html lang={locale === "pt" ? "pt-BR" : "en"} />
         <title>{text.metaTitle}</title>
@@ -498,19 +507,20 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={`${appUrl}${locale === "pt" ? "/pt" : ""}/links`} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="theme-color" content={BAISE_BLACK} />
       </Helmet>
 
-      <div className="mx-auto flex w-full max-w-[480px] flex-col gap-5">
+      <div className="mx-auto flex w-full max-w-[500px] flex-col gap-5">
         <div className="flex items-center justify-between gap-3">
           <a
             href={appendTrackingParams("/", "logo_home")}
-            onClick={() => track("cta_click", { section: "brand", ctaKey: "logo_home", label: brand.name, href: "/" })}
-            className="flex min-w-0 items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3 py-2 shadow-lg shadow-black/20 backdrop-blur-md transition-[transform,border-color] duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            onClick={() => track("cta_click", { section: "brand", ctaKey: "logo_home", label: "Baise", href: "/" })}
+            className="flex min-w-0 items-center gap-2 rounded-full border border-white/12 bg-[#111111] px-3 py-2 shadow-lg shadow-black/35 transition-[transform,border-color] duration-150 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
           >
-            <img src="/baise-logo.svg" alt={brand.name} className="h-7 w-7 shrink-0" />
-            <span className="truncate text-sm font-black">{brand.name}</span>
+            <img src="/baise-logo.svg" alt="Baise" className="h-7 w-7 shrink-0" />
+            <span className="truncate text-sm font-black">Baise</span>
           </a>
-          <div className="flex shrink-0 items-center gap-1 rounded-full border border-white/12 bg-white/8 p-1 text-xs font-bold backdrop-blur-md" aria-label={text.languageLabel}>
+          <div className="flex shrink-0 items-center gap-1 rounded-full border border-white/12 bg-[#111111] p-1 text-xs font-bold" aria-label={text.languageLabel}>
             <Globe2 className="ml-1 h-3.5 w-3.5 text-white/65" aria-hidden="true" />
             {supportedLocales.map((language) => (
               <button
@@ -519,7 +529,7 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
                 aria-pressed={locale === language}
                 onClick={() => handleLocaleChange(language)}
                 className={`min-w-9 rounded-full px-2.5 py-1 text-center transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.97] ${
-                  locale === language ? "bg-white !text-slate-950" : "text-white/70 hover:bg-white/10 hover:text-white"
+                  locale === language ? "bg-white !text-black" : "text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {language.toUpperCase()}
@@ -528,77 +538,75 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
           </div>
         </div>
 
-        <section className={`rounded-[1.75rem] border border-white/12 bg-white/[0.07] p-5 shadow-2xl shadow-black/35 ring-1 ${brand.ring} backdrop-blur-xl`}>
-          <LinkMascot brand={brand} />
+        <section className="rounded-[1.75rem] border p-5 shadow-2xl shadow-black/50" style={{ backgroundColor: PANEL_BLACK, borderColor: BORDER }}>
+          <BaiseMark />
           <div className="mt-5 text-center">
-            <p className={`text-xs font-black uppercase tracking-[0.22em] ${brand.accent}`}>{text.eyebrow}</p>
-            <h1 className="mt-3 text-balance text-3xl font-black leading-[1.02] text-white sm:text-4xl">
-              {text.title}
-            </h1>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-white/50">{text.eyebrow}</p>
+            <h1 className="mt-3 text-balance text-3xl font-black leading-[1.02] text-white sm:text-4xl">{text.title}</h1>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-white/72">{text.subtitle}</p>
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold text-white/78">
-            <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1.5">{text.trusted}</span>
-            <span className="rounded-full border border-white/12 bg-black/20 px-3 py-1.5">{brand.promise[locale]}</span>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black px-4 py-3 text-center text-xs font-bold leading-5 text-white/72">
+            <ShieldCheck className="mr-1 inline h-4 w-4 text-white/60" aria-hidden="true" />
+            {text.trustLine}
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2" aria-hidden="true">
+            {appLanes.map((lane) => (
+              <span key={lane.key} className="h-1.5 rounded-full" style={{ backgroundColor: lane.color }} />
+            ))}
           </div>
         </section>
 
         <section className="space-y-3">
-          <SectionTitle>{text.topChoice}</SectionTitle>
-          {primaryLinks.map((link) => (
-            <BioButton key={link.key} link={link} brand={brand} onClick={handleBioClick} />
+          <SectionTitle>{text.chooseApp}</SectionTitle>
+          {appLanes.map((lane) => (
+            <AppRegistrationCard
+              key={lane.key}
+              lane={lane}
+              locale={locale}
+              onClick={(payload) => track("cta_click", payload)}
+            />
           ))}
         </section>
 
         <section className="space-y-3">
-          <SectionTitle>{text.chooseBrand}</SectionTitle>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {(Object.keys(brandProfiles) as AppKey[]).map((key) => {
-              const item = brandProfiles[key];
-              const href = appendTrackingParams(`${item.domain}${locale === "pt" ? "/pt" : ""}/links`, `brand_${key}`);
-              return (
-                <a
-                  key={key}
-                  href={href}
-                  onClick={() => track("cta_click", { section: "brand_picker", ctaKey: `brand_${key}`, label: item.name, href })}
-                  className={`rounded-2xl border border-white/12 bg-white/[0.08] p-3 shadow-lg shadow-black/20 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/28 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${key === appKey ? `ring-1 ${item.ring}` : ""}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full bg-gradient-to-r ${item.heroGradient}`} aria-hidden="true" />
-                    <span className="text-sm font-black">{item.shortName}</span>
-                  </div>
-                  <p className="mt-2 text-xs leading-snug text-white/62">{text.brandLabels[key]}</p>
-                </a>
-              );
-            })}
-          </div>
+          <SectionTitle>{text.providers}</SectionTitle>
+          {audienceLinks.slice(0, 1).map((link) => (
+            <SupportButton key={link.key} link={link} onClick={handleSupportClick} />
+          ))}
         </section>
 
         <section className="space-y-3">
-          <SectionTitle>{text.moreWays}</SectionTitle>
-          {secondaryLinks.map((link) => (
-            <BioButton key={link.key} link={link} brand={brand} onClick={handleBioClick} />
+          <SectionTitle>{text.users}</SectionTitle>
+          {audienceLinks.slice(1).map((link) => (
+            <SupportButton key={link.key} link={link} onClick={handleSupportClick} />
+          ))}
+        </section>
+
+        <section className="space-y-3">
+          <SectionTitle>{text.support}</SectionTitle>
+          {supportLinks.map((link) => (
+            <SupportButton key={link.key} link={link} onClick={handleSupportClick} />
           ))}
         </section>
 
         <section className="space-y-3 pb-5">
           <SectionTitle>{text.latestLearning}</SectionTitle>
-          <div className="rounded-[1.5rem] border border-white/12 bg-white/[0.07] p-4 shadow-xl shadow-black/20 backdrop-blur-lg">
+          <div className="rounded-[1.5rem] border border-white/12 bg-[#111111] p-4 shadow-xl shadow-black/35">
             <div className="flex items-center gap-2">
-              <PlayCircle className="h-5 w-5 text-red-200" aria-hidden="true" />
+              <PlayCircle className="h-5 w-5 text-white/70" aria-hidden="true" />
               <h2 className="text-base font-black">{text.videoTitle}</h2>
             </div>
             <div className="mt-3 space-y-2">
               {text.videoCards.map((title, index) => (
                 <a
                   key={title}
-                  href={appendTrackingParams(brand.youtubeUrl, `video_${index + 1}`)}
+                  href={appendTrackingParams(SHARED_YOUTUBE_URL, `video_${index + 1}`)}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={() => track("cta_click", { section: "youtube_cards", ctaKey: `video_${index + 1}`, label: title, href: brand.youtubeUrl })}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/25 hover:bg-black/28"
+                  onClick={() => track("cta_click", { section: "youtube_cards", ctaKey: `video_${index + 1}`, label: title, href: SHARED_YOUTUBE_URL })}
+                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black px-3 py-3 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/25 hover:bg-[#0b0b0b]"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-400/18 text-red-100">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-black">
                     <Youtube className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <span className="min-w-0 flex-1 text-sm font-bold leading-snug">{title}</span>
@@ -608,9 +616,9 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-white/12 bg-white/[0.07] p-4 shadow-xl shadow-black/20 backdrop-blur-lg">
+          <div className="rounded-[1.5rem] border border-white/12 bg-[#111111] p-4 shadow-xl shadow-black/35">
             <div className="flex items-center gap-2">
-              <BookOpenText className="h-5 w-5 text-emerald-200" aria-hidden="true" />
+              <BookOpenText className="h-5 w-5 text-white/70" aria-hidden="true" />
               <h2 className="text-base font-black">{text.blogTitle}</h2>
             </div>
             <div className="mt-3 space-y-2">
@@ -621,7 +629,7 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
                     key={post.id}
                     href={appendTrackingParams(href, `blog_${post.slug}`)}
                     onClick={() => track("cta_click", { section: "blog_cards", ctaKey: `blog_${post.slug}`, label: post.title, href })}
-                    className="block rounded-2xl border border-white/10 bg-black/20 px-3 py-3 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/25 hover:bg-black/28"
+                    className="block rounded-2xl border border-white/10 bg-black px-3 py-3 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/25 hover:bg-[#0b0b0b]"
                   >
                     <span className="block text-sm font-black leading-snug">{post.title}</span>
                     <span className="mt-1 block text-xs leading-snug text-white/60">{post.deck}</span>
