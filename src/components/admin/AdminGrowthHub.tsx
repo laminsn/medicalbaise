@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   BarChart3,
   BookOpen,
+  CalendarDays,
   Clock3,
   DollarSign,
   FileText,
@@ -31,6 +32,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import { AdminActionQueue, AdminRelationshipOS } from '@/components/admin/AdminRelationshipOS';
 import { AdminBlogAnalytics } from '@/components/admin/AdminBlogAnalytics';
+import { AdminContentCampaignCalendar } from '@/components/admin/AdminContentCampaignCalendar';
 import { AdminMarketingIntelligence } from '@/components/admin/AdminMarketingIntelligence';
 import { AdminProductIntelligence } from '@/components/admin/AdminProductIntelligence';
 
@@ -110,6 +112,7 @@ const tabConfig = [
   { value: 'products', label: 'Products', icon: PackagePlus, types: [] },
   { value: 'marketing', label: 'Marketing Intel', icon: Target, types: [] },
   { value: 'blog-analytics', label: 'Blog Analytics', icon: BookOpen, types: [] },
+  { value: 'content-campaigns', label: 'Content Campaigns', icon: CalendarDays, types: [] },
   { value: 'campaigns', label: 'Campaigns', icon: Megaphone, types: ['promotion', 'partner_campaign'] },
   { value: 'partners', label: 'Partners', icon: Handshake, types: ['partner_application'] },
   { value: 'referrals', label: 'Referrals', icon: Gift, types: ['referral'] },
@@ -382,7 +385,7 @@ export function AdminGrowthHub() {
         </div>
 
         {tabConfig
-          .filter((tab) => !['relationship-360', 'action-queue', 'products', 'marketing', 'blog-analytics', 'email-sequences', 'analytics'].includes(tab.value))
+          .filter((tab) => !['relationship-360', 'action-queue', 'products', 'marketing', 'blog-analytics', 'content-campaigns', 'email-sequences', 'analytics'].includes(tab.value))
           .map((tab) => (
             <TabsContent key={tab.value} value={tab.value} className="mt-2">
               <IntakeList
@@ -410,6 +413,10 @@ export function AdminGrowthHub() {
 
         <TabsContent value="blog-analytics" className="mt-2">
           <AdminBlogAnalytics />
+        </TabsContent>
+
+        <TabsContent value="content-campaigns" className="mt-2">
+          <AdminContentCampaignCalendar />
         </TabsContent>
 
         <TabsContent value="email-sequences" className="mt-2">
