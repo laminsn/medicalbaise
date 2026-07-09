@@ -31,6 +31,7 @@ const Referral = lazy(() => import("./pages/Referral"));
 const ReferralLanding = lazy(() => import("./pages/ReferralLanding"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard"));
 const PartnerReview = lazy(() => import("./pages/PartnerReview"));
+const BaiseBioLinks = lazy(() => import("./pages/BaiseBioLinks"));
 const InfluencerPartners = lazy(() => import("./pages/InfluencerPartners"));
 const InfluencerApplication = lazy(() => import("./pages/InfluencerApplication"));
 const GiveMonthReferralCampaign = lazy(() => import("./pages/GiveMonthReferralCampaign"));
@@ -103,6 +104,10 @@ const campaignLandingPaths = new Set([
   "/testimonial-request",
   "/pt/testimonial-request",
   "/es/testimonial-request",
+  "/links",
+  "/pt/links",
+  "/bio",
+  "/pt/bio",
 ]);
 
 const CampaignAwareHIPAADisclaimer = () => {
@@ -150,6 +155,10 @@ const App = () => (
                     <Route path="/es/ref/:code" element={<ReferralLanding defaultLocale="es" />} />
                     <Route path="/partner-dashboard" element={<ProtectedRoute><PartnerDashboard /></ProtectedRoute>} />
                     <Route path="/partner-review" element={<ProtectedRoute><PartnerReview /></ProtectedRoute>} />
+                    <Route path="/links" element={<BaiseBioLinks defaultLocale="en" />} />
+                    <Route path="/pt/links" element={<BaiseBioLinks defaultLocale="pt" />} />
+                    <Route path="/bio" element={<BaiseBioLinks defaultLocale="en" />} />
+                    <Route path="/pt/bio" element={<BaiseBioLinks defaultLocale="pt" />} />
                     <Route path="/influencer-partners" element={<InfluencerPartners defaultLocale="en" />} />
                     <Route path="/pt/influencer-partners" element={<InfluencerPartners defaultLocale="pt" />} />
                     <Route path="/es/influencer-partners" element={<InfluencerPartners defaultLocale="es" />} />
