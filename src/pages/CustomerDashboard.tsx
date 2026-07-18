@@ -10,6 +10,7 @@ import { ActiveJobsSection } from '@/components/dashboard/ActiveJobsSection';
 import { CustomerWorkApprovals } from '@/components/dashboard/CustomerWorkApprovals';
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
+import { PrintableDashboard } from '@/components/dashboard/PrintableDashboard';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
 import { ClientInsightSurvey } from '@/components/products/ClientInsightSurvey';
@@ -233,6 +234,66 @@ export default function CustomerDashboard() {
               value: counts?.jobs || counts?.scheduled ? 82 : 58,
               detail: 'Use requests, messages, and provider search to keep care moving.',
             },
+          ]}
+        />
+
+        <PrintableDashboard
+          brandName="Medical Baise"
+          audience="client"
+          title="Printable patient dashboard"
+          subtitle="A clean client report for healthcare service tracking: active requests, scheduled visits, approvals, receipts, follow-up, and records in one printable view."
+          accountLabel="Patient workspace"
+          generatedFor={user?.email}
+          metrics={[
+            {
+              label: 'Active requests',
+              value: counts?.jobs || 0,
+              detail: 'Open healthcare requests and active care services currently in motion.',
+            },
+            {
+              label: 'Scheduled',
+              value: counts?.scheduled || 0,
+              detail: 'Upcoming visits or recurring services.',
+            },
+            {
+              label: 'Pending approvals',
+              value: counts?.approvals || 0,
+              detail: 'Care updates, work media, or sign-offs waiting for review.',
+            },
+            {
+              label: 'Workspace',
+              value: 'Patient',
+              detail: 'Built for booking, tracking, approving, and saving care records.',
+            },
+          ]}
+          sections={[
+            {
+              title: 'Care tracking summary',
+              items: [
+                'Open requests, scheduled visits, provider messages, and approvals are managed in the portal.',
+                'Each service can keep its quote, invoice, payment status, follow-up notes, and activity history together.',
+                'Approvals and sign-offs help keep care moving while preserving proof of what happened.',
+              ],
+            },
+            {
+              title: 'Patient records summary',
+              items: [
+                'Receipts, invoices, service history, and provider details remain available through transaction history.',
+                'Monthly, month-to-date, annual, and custom transaction filters support proof and tax records.',
+                'Messages, signatures, files, and decisions should stay inside the portal whenever the record matters.',
+              ],
+            },
+          ]}
+          nextSteps={[
+            counts?.approvals ? 'Review pending approvals so your care request can continue.' : 'Start a new care request or browse providers when you need support.',
+            'Download or print receipts and invoices for any service that may matter later.',
+            'Keep messages, files, signatures, and service decisions inside the portal for a clean history.',
+          ]}
+          recordsChecklist={[
+            'Invoices, receipts, transaction history, and payment status.',
+            'Provider name, service description, timestamps, and care details.',
+            'Uploaded files, work approvals, notes, and signed records.',
+            'Monthly, quarterly, annual, and custom transaction exports when needed.',
           ]}
         />
 

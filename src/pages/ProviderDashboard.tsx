@@ -11,6 +11,7 @@ import { ProviderActiveJobs } from '@/components/dashboard/ProviderActiveJobs';
 import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
 import { DashboardCommandCenter } from '@/components/dashboard/DashboardCommandCenter';
 import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis';
+import { PrintableDashboard } from '@/components/dashboard/PrintableDashboard';
 import { AutoReplySettings } from '@/components/messaging/AutoReplySettings';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { MessageTemplatesPanel } from '@/components/dashboard/MessageTemplatesPanel';
@@ -245,6 +246,66 @@ export default function ProviderDashboard() {
               value: tierMeter,
               detail: 'How much of the growth toolkit is available on this plan.',
             },
+          ]}
+        />
+
+        <PrintableDashboard
+          brandName="Medical Baise"
+          audience="provider"
+          title="Printable provider dashboard"
+          subtitle="A concise healthcare operations report: appointment activity, revenue visibility, patient follow-up, records, and growth readiness in one printable view."
+          accountLabel={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
+          generatedFor={user?.email}
+          metrics={[
+            {
+              label: 'Provider tier',
+              value: tierLabel(providerTier),
+              detail: isEliteOrAbove ? 'Advanced automation and campaign tools are available.' : 'Core tools are active; upgrade when automation is needed.',
+            },
+            {
+              label: 'Completed care requests',
+              value: analytics?.totalJobs || 0,
+              detail: 'Completed healthcare work tracked in the provider workspace.',
+            },
+            {
+              label: 'Revenue generated',
+              value: formatPrice(analytics?.totalRevenue || 0),
+              detail: 'Tracked from completed care requests and payment records.',
+            },
+            {
+              label: 'Average rating',
+              value: analytics?.avgRating ? `${analytics.avgRating.toFixed(1)} / 5` : 'New',
+              detail: `${analytics?.totalReviews || 0} review${analytics?.totalReviews === 1 ? '' : 's'} currently support patient trust.`,
+            },
+          ]}
+          sections={[
+            {
+              title: 'Provider operating summary',
+              items: [
+                'Appointments, care requests, patient messages, and approvals stay connected inside the portal.',
+                'Invoices, payment plans, POS payments, receipts, and client IDs support cleaner accounting.',
+                'Calendar tasks, follow-ups, signatures, notes, and delivery records help document each interaction.',
+              ],
+            },
+            {
+              title: 'Growth and reputation summary',
+              items: [
+                'Reviews, ratings, and profile quality help patients choose with more confidence.',
+                'Campaigns, referrals, social analytics, and service updates support consistent patient acquisition.',
+                'Monthly, quarterly, annual, and custom records support reporting, taxes, and client proof.',
+              ],
+            },
+          ]}
+          nextSteps={[
+            'Review active care requests, scheduled visits, and follow-ups before the next appointment window.',
+            'Confirm every paid service has an invoice, payment status, receipt, and client record.',
+            'Update specialties, pricing, availability, and proof before promoting services.',
+          ]}
+          recordsChecklist={[
+            'Unique invoice and client ID for each paid healthcare service.',
+            'Payment, refund, service credit, and receipt records.',
+            'Signatures, approval notes, service descriptions, and timestamps.',
+            'Monthly, quarterly, annual, and custom financial exports.',
           ]}
         />
 
