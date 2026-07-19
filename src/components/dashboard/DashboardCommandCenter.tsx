@@ -15,6 +15,7 @@ export interface DashboardAction {
   description: string;
   icon: LucideIcon;
   onClick: () => void;
+  onboardingTarget?: string;
 }
 
 export interface DashboardFocus {
@@ -35,6 +36,7 @@ interface DashboardCommandCenterProps {
   focus?: DashboardFocus;
   metrics: DashboardMetric[];
   actions: DashboardAction[];
+  onboardingTarget?: string;
 }
 
 const toneClass = {
@@ -52,6 +54,7 @@ export function DashboardCommandCenter({
   focus,
   metrics,
   actions,
+  onboardingTarget,
 }: DashboardCommandCenterProps) {
   const primaryAction = actions[0];
   const secondaryActions = actions.slice(1);
@@ -60,7 +63,7 @@ export function DashboardCommandCenter({
   const focusTone = toneClass[focus?.tone || 'blue'];
 
   return (
-    <section className="overflow-hidden rounded-lg border bg-card shadow-sm">
+    <section className="overflow-hidden rounded-lg border bg-card shadow-sm" data-onboarding-target={onboardingTarget}>
       <div className="border-b bg-gradient-to-b from-muted/40 via-card to-card px-4 py-5 sm:px-5">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="min-w-0 lg:pt-1">
@@ -160,6 +163,7 @@ export function DashboardCommandCenter({
                   key={action.label}
                   type="button"
                   onClick={action.onClick}
+                  data-onboarding-target={action.onboardingTarget}
                   className="group flex min-h-[92px] items-start gap-3 bg-card p-4 text-left transition-[background-color,transform] duration-150 ease-out hover:bg-muted/40 active:scale-[0.99]"
                 >
                   <span className="rounded-md bg-muted p-2 text-muted-foreground">

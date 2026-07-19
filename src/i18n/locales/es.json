@@ -131,7 +131,7 @@
       "ctaProvider": "Haz crecer tu negocio de servicios"
     },
     "casa": {
-      "title": "Casa Baise",
+      "title": "Medical Baise",
       "blurb": "Tu hogar en manos de confianza. Desde un caño que gotea hasta una renovación completa, encuentra al profesional que realmente recomendarías.",
       "cta": "Encontrar un profesional",
       "bullets": [
@@ -2491,6 +2491,55 @@
     "otolaryngology": {
       "name": "ORL (Otorrinolaringología)",
       "description": "Especialistas en oído, nariz y garganta"
+    }
+  },
+  "onboarding": {
+    "back": "Atrás",
+    "close": "Cerrar",
+    "error": "No pudimos cargar o guardar tu progreso de configuración. Inténtalo de nuevo.",
+    "finish": "Finalizar",
+    "markDone": "Marcar como listo",
+    "next": "Siguiente",
+    "open": "Abrir",
+    "skipNow": "Omitir por ahora",
+    "checklist": {
+      "availabilityDetected": "Detectamos tu disponibilidad. Confirma también los cobros antes de marcar esta etapa.",
+      "progress": "{{percent}}% completado",
+      "title": "Primeros pasos"
+    },
+    "step": {
+      "availabilityPayout": "Configura disponibilidad y cobros",
+      "availabilityPayoutDesc": "Indica cuándo trabajas y cómo quieres recibir los pagos de tus servicios.",
+      "profile": "Completa tu perfil profesional",
+      "profileDesc": "Añade los datos esenciales que dan confianza a tus clientes.",
+      "preview": "Previsualiza tu anuncio público",
+      "previewDesc": "Comprueba cómo ven los clientes tu perfil y tus servicios.",
+      "publish": "Publica y ponte en línea",
+      "publishDesc": "Activa tu perfil con al menos un servicio para que los clientes te encuentren.",
+      "service": "Añade tu primer servicio",
+      "serviceDesc": "Crea la primera oferta que podrán encontrar los clientes."
+    },
+    "tour": {
+      "analyticsBody": "Consulta reseñas, trabajos y resultados para mejorar tu anuncio.",
+      "analyticsTitle": "Entiende tus resultados",
+      "availabilityBody": "Organiza tu calendario y los horarios en los que puedes trabajar.",
+      "availabilityTitle": "Define tu disponibilidad",
+      "dashboardBody": "Consulta trabajos, ingresos y próximas acciones en un solo lugar.",
+      "dashboardTitle": "Tu panel profesional",
+      "dismiss": "Salir del tour",
+      "label": "Tour del panel del prestador",
+      "payoutsBody": "Abre el área financiera para configurar y seguir tus cobros.",
+      "payoutsTitle": "Prepara tus cobros",
+      "progress": "Paso {{current}} de {{total}}",
+      "servicesBody": "Usa este acceso para crear y mantener los servicios que ven los clientes.",
+      "servicesTitle": "Edita tus servicios",
+      "start": "Ver tour"
+    },
+    "welcome": {
+      "body": "Empieza con una oferta clara. Después revisa su vista pública y publícala cuando esté lista.",
+      "cta": "Añadir primer servicio",
+      "eyebrow": "Bienvenido a Medical Baise",
+      "outcome": "Consigue tus primeros clientes — publica tus servicios."
     }
   },
   "legal": {

@@ -131,7 +131,7 @@
       "ctaProvider": "Crescer meu negócio de serviços"
     },
     "casa": {
-      "title": "Casa Baise",
+      "title": "Medical Baise",
       "blurb": "Sua casa em mãos de confiança. De um cano vazando a uma reforma completa, encontre o profissional que você realmente recomendaria.",
       "cta": "Encontrar profissional",
       "bullets": [
@@ -2491,6 +2491,55 @@
     "otolaryngology": {
       "name": "Otorrinolaringologia",
       "description": "Especialistas em ouvido, nariz e garganta"
+    }
+  },
+  "onboarding": {
+    "back": "Voltar",
+    "close": "Fechar",
+    "error": "Não foi possível carregar ou salvar seu progresso de configuração. Tente novamente.",
+    "finish": "Concluir",
+    "markDone": "Marcar como concluído",
+    "next": "Próximo",
+    "open": "Abrir",
+    "skipNow": "Pular por enquanto",
+    "checklist": {
+      "availabilityDetected": "Sua disponibilidade foi detectada. Confirme também o recebimento antes de marcar esta etapa.",
+      "progress": "{{percent}}% concluído",
+      "title": "Primeiros passos"
+    },
+    "step": {
+      "availabilityPayout": "Defina disponibilidade e recebimento",
+      "availabilityPayoutDesc": "Informe quando você atende e como deseja receber pelos serviços.",
+      "profile": "Complete seu perfil profissional",
+      "profileDesc": "Adicione seus dados essenciais para transmitir confiança aos clientes.",
+      "preview": "Visualize seu anúncio público",
+      "previewDesc": "Confira como seu perfil e seus serviços aparecem para os clientes.",
+      "publish": "Publique e fique disponível",
+      "publishDesc": "Ative seu perfil com pelo menos um serviço para começar a receber clientes.",
+      "service": "Adicione seu primeiro serviço",
+      "serviceDesc": "Crie a primeira oferta que os clientes poderão encontrar."
+    },
+    "tour": {
+      "analyticsBody": "Acompanhe avaliações, trabalhos e resultados para melhorar seu anúncio.",
+      "analyticsTitle": "Entenda seus resultados",
+      "availabilityBody": "Organize sua agenda e os horários em que pode atender.",
+      "availabilityTitle": "Defina sua disponibilidade",
+      "dashboardBody": "Veja trabalhos, receita e próximas ações em um só lugar.",
+      "dashboardTitle": "Seu painel profissional",
+      "dismiss": "Sair do tour",
+      "label": "Tour do painel do prestador",
+      "payoutsBody": "Acesse a área financeira para configurar e acompanhar recebimentos.",
+      "payoutsTitle": "Prepare seus recebimentos",
+      "progress": "Etapa {{current}} de {{total}}",
+      "servicesBody": "Use este atalho para criar e manter os serviços exibidos aos clientes.",
+      "servicesTitle": "Edite seus serviços",
+      "start": "Ver tour"
+    },
+    "welcome": {
+      "body": "Comece com uma oferta clara. Depois, confira a visualização pública e publique quando estiver pronto.",
+      "cta": "Adicionar primeiro serviço",
+      "eyebrow": "Bem-vindo à Medical Baise",
+      "outcome": "Conquiste seus primeiros clientes — publique seus serviços."
     }
   },
   "legal": {

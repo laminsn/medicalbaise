@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -36,6 +36,11 @@ import { ProviderFinanceCommandCenter } from '@/components/provider/ProviderFina
 import { ProviderRetentionCommandCenter } from '@/components/provider/ProviderRetentionCommandCenter';
 import { ProviderActivationCommandCenter } from '@/components/provider/ProviderActivationCommandCenter';
 import { PartnerCampaignCommandCenter } from '@/components/partner/PartnerCampaignCommandCenter';
+import { ActivationChecklist } from '@/components/onboarding/ActivationChecklist';
+import { GuidedTour } from '@/components/onboarding/GuidedTour';
+import { WelcomeFirstRun } from '@/components/onboarding/WelcomeFirstRun';
+import { useOnboarding } from '@/components/onboarding/useOnboarding';
+import type { ProviderTourSection } from '@/components/onboarding/onboardingConfig';
 import {
   BarChart3,
   Calendar,
@@ -62,13 +67,22 @@ export default function ProviderDashboard() {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [providerTier, setProviderTier] = useState<SubscriptionTier>('free');
   const [isLoading, setIsLoading] = useState(true);
   const [isProvider, setIsProvider] = useState(false);
+  const [activeTab, setActiveTab] = useState('today');
+  const [tourOpen, setTourOpen] = useState(false);
+  const [onboardingSignals, setOnboardingSignals] = useState({
+    hasService: false,
+    hasAvailability: false,
+    hasPublishedListing: false,
+  });
   const { analytics } = useProviderAnalytics();
   const [currentProviderId, setCurrentProviderId] = useState<string | null>(null);
+  const authenticatedProviderId = user && isProvider ? user.id : null;
+  const onboarding = useOnboarding(authenticatedProviderId);
 
   useEffect(() => {
     if (!user) {
@@ -79,7 +93,7 @@ export default function ProviderDashboard() {
     const fetchProviderData = async () => {
       const { data, error } = await supabase
         .from('providers')
-        .select('id, subscription_tier')
+        .select('id, subscription_tier, is_active')
         .eq('user_id', user.id)
         .single();
 
@@ -89,6 +103,15 @@ export default function ProviderDashboard() {
         setIsProvider(true);
         setCurrentProviderId(data.id);
         setProviderTier((data.subscription_tier as SubscriptionTier) || 'free');
+        const [servicesResult, availabilityResult] = await Promise.all([
+          supabase.from('provider_services').select('id', { count: 'exact', head: true }).eq('provider_id', data.id),
+          supabase.from('provider_availability').select('id', { count: 'exact', head: true }).eq('provider_id', data.id),
+        ]);
+        setOnboardingSignals({
+          hasService: !servicesResult.error && (servicesResult.count ?? 0) > 0,
+          hasAvailability: !availabilityResult.error && (availabilityResult.count ?? 0) > 0,
+          hasPublishedListing: !servicesResult.error && (servicesResult.count ?? 0) > 0 && Boolean(data.is_active),
+        });
       }
       setIsLoading(false);
     };
@@ -107,6 +130,10 @@ export default function ProviderDashboard() {
     if (tier === 'elite') return 'elite';
     return isEs ? 'empresarial' : 'enterprise';
   };
+  const profileComplete = Boolean(profile?.first_name && profile.last_name && profile.bio && profile.city && profile.state);
+  const handleTourNavigate = useCallback((section: ProviderTourSection) => {
+    setActiveTab(section === 'services' ? 'today' : section);
+  }, []);
 
   if (isLoading) {
     return (
@@ -149,7 +176,26 @@ export default function ProviderDashboard() {
       </Helmet>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
+        {onboarding.error && (
+          <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {t('onboarding.error')}
+          </p>
+        )}
+        {onboarding.progress && (
+          <ActivationChecklist
+            progress={onboarding.progress}
+            percent={onboarding.percent}
+            profileComplete={profileComplete}
+            hasService={onboardingSignals.hasService}
+            hasAvailability={onboardingSignals.hasAvailability}
+            hasPublishedListing={onboardingSignals.hasPublishedListing}
+            onNavigate={navigate}
+            onTour={() => setTourOpen(true)}
+            onMarkStep={onboarding.markStep}
+          />
+        )}
         <DashboardCommandCenter
+          onboardingTarget="provider-dashboard"
           eyebrow="Medical Baise"
           title={t('dashboard.title', 'My Dashboard')}
           description={t('dashboard.subtitle', 'Run your healthcare practice workspace: appointments, patient requests, services, messaging, and growth tools.')}
@@ -207,6 +253,7 @@ export default function ProviderDashboard() {
               description: 'Update specialties, pricing, add-ons, and availability.',
               icon: Settings,
               onClick: () => navigate('/services'),
+              onboardingTarget: 'provider-services',
             },
             {
               label: 'Payments',
@@ -309,7 +356,7 @@ export default function ProviderDashboard() {
           ]}
         />
 
-        <Tabs defaultValue="today" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7">
             <TabsTrigger value="today" className="gap-2 py-3">
               <Target className="h-4 w-4" />
@@ -319,15 +366,15 @@ export default function ProviderDashboard() {
               <Users className="h-4 w-4" />
               <span>Clients</span>
             </TabsTrigger>
-            <TabsTrigger value="work" className="gap-2 py-3">
+            <TabsTrigger value="work" className="gap-2 py-3" data-onboarding-target="provider-availability">
               <Calendar className="h-4 w-4" />
               <span>Work</span>
             </TabsTrigger>
-            <TabsTrigger value="money" className="gap-2 py-3">
+            <TabsTrigger value="money" className="gap-2 py-3" data-onboarding-target="provider-payouts">
               <Wallet className="h-4 w-4" />
               <span>Money</span>
             </TabsTrigger>
-            <TabsTrigger value="growth" className="gap-2 py-3">
+            <TabsTrigger value="growth" className="gap-2 py-3" data-onboarding-target="provider-analytics">
               <BarChart3 className="h-4 w-4" />
               <span>Growth</span>
             </TabsTrigger>
@@ -416,6 +463,24 @@ export default function ProviderDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+      {onboarding.progress && (
+        <>
+          <WelcomeFirstRun
+            open={!onboarding.progress.welcome_dismissed_at}
+            onStart={() => {
+              navigate('/services/new');
+              void onboarding.dismissWelcome().catch(() => undefined);
+            }}
+            onDismiss={onboarding.dismissWelcome}
+          />
+          <GuidedTour
+            open={tourOpen}
+            onClose={() => setTourOpen(false)}
+            onComplete={onboarding.completeTour}
+            onNavigate={handleTourNavigate}
+          />
+        </>
+      )}
     </AppLayout>
   );
 }
