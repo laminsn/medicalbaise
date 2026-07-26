@@ -355,14 +355,41 @@ serve(async (req) => {
 
     await supabaseAdmin.from("provider_communication_events").insert(communicationEvents);
 
-    await supabaseAdmin.rpc("queue_provider_update_notifications", {
+    let invoiceActionPath = "/customer-dashboard";
+    if (body.clientEmail) {
+      const inviteToken = crypto.randomUUID();
+      const tokenHash = await hashInviteToken(inviteToken);
+      invoiceActionPath = `/invoice/${inviteToken}`;
+
+      const { error: inviteError } = await supabaseAdmin.from("provider_client_portal_invites").insert({
+        provider_id: provider.id,
+        customer_id: customerId,
+        invited_by: user.id,
+        invite_type: "payment_request",
+        resource_type: "payment_plan",
+        resource_id: paymentPlan.id,
+        email: body.clientEmail.trim().toLowerCase(),
+        token_hash: tokenHash,
+        metadata: {
+          account_required: true,
+          invoice_id: invoice.id,
+          invoice_number: invoice.invoice_number,
+          client_display_id: invoice.client_display_id,
+          sign_in_path: "/auth",
+          customer_dashboard_path: "/customer-dashboard",
+        },
+      });
+      if (inviteError) throw inviteError;
+    }
+
+    const { error: notificationError } = await supabaseAdmin.rpc("queue_provider_update_notifications", {
       target_provider_id: provider.id,
       target_user_id: customerId,
       actor_id: user.id,
       event_key: "invoice_created",
       event_subject: `Invoice ${invoice.invoice_number} is ready`,
       event_message: `${title} is ready for review. Open the portal to view the invoice, payment schedule, receipt history, and next steps.`,
-      action_path: "/customer-dashboard",
+      action_path: invoiceActionPath,
       resource_kind: "provider_invoice",
       resource_uuid: invoice.id,
       event_metadata: {
@@ -380,30 +407,7 @@ serve(async (req) => {
       target_locale: "en",
       target_audience: "client",
     });
-
-    if (body.clientEmail) {
-      const inviteToken = crypto.randomUUID();
-      const tokenHash = await hashInviteToken(inviteToken);
-
-      await supabaseAdmin.from("provider_client_portal_invites").insert({
-        provider_id: provider.id,
-        customer_id: customerId,
-        invited_by: user.id,
-        invite_type: "payment_request",
-        resource_type: "payment_plan",
-        resource_id: paymentPlan.id,
-        email: body.clientEmail.toLowerCase(),
-        token_hash: tokenHash,
-        metadata: {
-          account_required: true,
-          invoice_id: invoice.id,
-          invoice_number: invoice.invoice_number,
-          client_display_id: invoice.client_display_id,
-          sign_in_path: "/auth",
-          customer_dashboard_path: "/customer-dashboard",
-        },
-      });
-    }
+    if (notificationError) throw notificationError;
 
     await supabaseAdmin.rpc("log_provider_audit_event", {
       target_provider_id: provider.id,

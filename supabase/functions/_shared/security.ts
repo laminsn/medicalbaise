@@ -6,15 +6,12 @@
 // --- CORS Configuration ---
 
 const ALLOWED_ORIGINS = [
-  'https://casabaise.lovable.app',
   'https://casabaise.com',
   'https://www.casabaise.com',
-  'https://medicalbaise.lovable.app',
   'https://medicalbaise.com',
   'https://www.medicalbaise.com',
   'https://mdbaise.com',
   'https://www.mdbaise.com',
-  'https://legalbaise.lovable.app',
   'https://legalbaise.com',
   'https://www.legalbaise.com',
 ];
@@ -201,7 +198,7 @@ export function isSafeUrl(url: string): boolean {
 /**
  * Validates and restricts the origin header to allowed domains for redirect URLs.
  */
-export function getSafeOrigin(req: Request, fallback: string = 'https://casabaise.lovable.app'): string {
+export function getSafeOrigin(req: Request, fallback: string = 'https://www.casabaise.com'): string {
   const origin = req.headers.get('origin') || '';
   if (ALLOWED_ORIGINS.includes(origin)) {
     return origin;
@@ -274,15 +271,12 @@ export function rejectNonPostMethod(req: Request, corsHeaders: Record<string, st
 // --- WebAuthn Domain Validation ---
 
 const ALLOWED_RP_DOMAINS = [
-  'casabaise.lovable.app',
   'casabaise.com',
   'www.casabaise.com',
-  'medicalbaise.lovable.app',
   'medicalbaise.com',
   'www.medicalbaise.com',
   'mdbaise.com',
   'www.mdbaise.com',
-  'legalbaise.lovable.app',
   'legalbaise.com',
   'www.legalbaise.com',
   'localhost',

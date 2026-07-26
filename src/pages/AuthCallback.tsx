@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { sanitizeRedirectUrl } from '@/lib/security';
 
-const db = supabase as any;
+const db = supabase;
 
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -14,36 +15,18 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
       const providerError = url.searchParams.get('error');
-      const providerErrorDescription =
-        url.searchParams.get('error_description') || url.searchParams.get('error_code');
 
-      // Provider-side failure (user denied, misconfigured client, etc.) — surface it.
+      // The shared client performs the single PKCE exchange via detectSessionInUrl.
       if (providerError) {
-        const message = providerErrorDescription || providerError;
-        navigate(`/auth?error=${encodeURIComponent(message)}`, { replace: true });
+        navigate('/auth?error=oauth_failed', { replace: true });
         return;
-      }
-
-      // PKCE flow: convert ?code=... into a session before anything else.
-      if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
-          window.location.href,
-        );
-        if (exchangeError) {
-          navigate(
-            `/auth?error=${encodeURIComponent(exchangeError.message)}`,
-            { replace: true },
-          );
-          return;
-        }
       }
 
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
-        navigate(`/auth?error=${encodeURIComponent(error.message)}`, { replace: true });
+        navigate('/auth?error=oauth_failed', { replace: true });
         return;
       }
 
@@ -55,11 +38,16 @@ export default function AuthCallback() {
         const inboundPartnerLanding = localStorage.getItem('baise_partner_landing');
 
         // Ensure profile exists for OAuth users
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('user_id', session.user.id)
           .maybeSingle();
+
+        if (profileError) {
+          navigate('/auth?error=oauth_failed', { replace: true });
+          return;
+        }
 
         if (!profile) {
           // Profile missing — create one from OAuth metadata
@@ -68,7 +56,7 @@ export default function AuthCallback() {
           const firstName = meta.first_name || fullName.split(' ')[0] || '';
           const lastName = meta.last_name || fullName.split(' ').slice(1).join(' ') || '';
 
-          await supabase.from('profiles').insert({
+          const { error: profileInsertError } = await supabase.from('profiles').insert({
             user_id: session.user.id,
             email: session.user.email,
             first_name: firstName || null,
@@ -81,6 +69,10 @@ export default function AuthCallback() {
             status: 'active',
             languages: ['portuguese'],
           });
+          if (profileInsertError && profileInsertError.code !== '23505') {
+            navigate('/auth?error=oauth_failed', { replace: true });
+            return;
+          }
         }
 
         await db.rpc('ensure_profile_referral_identity', {
@@ -124,15 +116,18 @@ export default function AuthCallback() {
           localStorage.removeItem('baise_partner_landing');
         }
 
-        navigate('/', { replace: true });
+        let returnTo = '/';
+        try {
+          returnTo = sanitizeRedirectUrl(sessionStorage.getItem('baise_auth_return_to') || '/');
+          sessionStorage.removeItem('baise_auth_return_to');
+        } catch {
+          // Storage can be unavailable in strict privacy modes.
+        }
+        navigate(returnTo, { replace: true });
         return;
       }
 
-      // No session and no code — the user landed here without completing OAuth.
-      navigate(
-        `/auth?error=${encodeURIComponent('No authentication code received. Please try signing in again.')}`,
-        { replace: true },
-      );
+      navigate('/auth?error=oauth_failed', { replace: true });
     };
 
     handleAuthCallback();

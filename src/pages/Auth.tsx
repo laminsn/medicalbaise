@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera, ScanFace } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,15 +30,18 @@ import {
   clearLoginAttempts,
   getRemainingAttempts,
   formatLockoutTime,
+  sanitizeRedirectUrl,
 } from '@/lib/security';
 
 const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
 
 export default function Auth() {
   const { t, i18n } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const returnTo = sanitizeRedirectUrl(searchParams.get('redirect') || '/');
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(searchParams.get('mode') === 'signup');
   const [showPassword, setShowPassword] = useState(false);
   const [showFaceAuth, setShowFaceAuth] = useState(false);
   const [showFaceLoginInfo, setShowFaceLoginInfo] = useState(false);
@@ -102,6 +105,11 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      sessionStorage.setItem('baise_auth_return_to', returnTo);
+    } catch {
+      // OAuth can still continue when storage is blocked by a strict browser mode.
+    }
+    try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -115,14 +123,14 @@ export default function Auth() {
       if (error) {
         toast({
           title: t('auth.errorSigningIn'),
-          description: error.message,
+          description: t('auth.genericSignInError', 'We could not complete sign-in. Please try again.'),
           variant: 'destructive',
         });
       }
-    } catch (err) {
+    } catch {
       toast({
         title: t('auth.errorSigningIn'),
-        description: err instanceof Error ? err.message : isPt ? 'Erro desconhecido' : isEs ? 'Error desconocido' : 'Unknown error',
+        description: t('auth.genericSignInError', 'We could not complete sign-in. Please try again.'),
         variant: 'destructive',
       });
     } finally {
@@ -132,7 +140,7 @@ export default function Auth() {
 
   const handleFaceAuthSuccess = () => {
     toast({ title: t('auth.welcomeBack') + '!' });
-    navigate('/');
+    navigate(returnTo);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -172,23 +180,18 @@ export default function Auth() {
         );
 
         if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: t('auth.emailAlreadyRegistered'),
-              description: t('auth.tryLoginOrUseAnotherEmail'),
-              variant: 'destructive',
-            });
+          if (error.message.includes('Invalid email')) {
+            setErrors({ email: t('auth.invalidEmail') });
           } else {
             toast({
-              title: t('auth.errorCreatingAccount'),
-              description: error.message,
-              variant: 'destructive',
+              title: t('auth.checkEmailToVerify', 'Check your email'),
+              description: t('auth.genericSignupResult', 'If the address can be used, we sent the next step. You can also try signing in or resetting your password.'),
             });
           }
         } else {
           toast({
-            title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
-            description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
+            title: t('auth.checkEmailToVerify', 'Check your email'),
+            description: t('auth.genericSignupResult', 'If the address can be used, we sent the next step. You can also try signing in or resetting your password.'),
             duration: 10000,
           });
           setIsSignUp(false);
@@ -237,7 +240,7 @@ export default function Auth() {
           toast({
             title: t('auth.welcomeBack') + '!',
           });
-          navigate('/');
+          navigate(returnTo);
         }
       }
     } finally {
@@ -476,14 +479,17 @@ export default function Auth() {
                       toast({ title: t('auth.enterEmailFirst', 'Please enter your email first'), variant: 'destructive' });
                       return;
                     }
-                    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-                      redirectTo: `${window.location.origin}/reset-password`,
-                    });
-                    if (error) {
-                      toast({ title: t('auth.resetError', 'Error sending reset email'), variant: 'destructive' });
-                    } else {
-                      toast({ title: t('auth.resetSent', 'Password reset email sent. Check your inbox.') });
+                    try {
+                      await supabase.auth.resetPasswordForEmail(formData.email.trim().toLowerCase(), {
+                        redirectTo: 'https://www.mdbaise.com/reset-password',
+                      });
+                    } catch {
+                      // Keep recovery responses identical to prevent account enumeration.
                     }
+                    toast({
+                      title: t('auth.resetSent', 'Check your email'),
+                      description: t('auth.resetSentDescription', 'If an account matches that email, a secure reset link will arrive shortly.'),
+                    });
                   }}
                 >
                   {t('auth.forgotPassword', 'Forgot password?')}

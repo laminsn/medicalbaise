@@ -68,6 +68,8 @@ const BookAppointment = lazy(() => import("./pages/BookAppointment"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const InvoiceAccess = lazy(() => import("./pages/InvoiceAccess"));
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -112,13 +114,13 @@ const campaignLandingPaths = new Set([
 
 const CampaignAwareHIPAADisclaimer = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname === "/auth" || pathname === "/auth/callback" || pathname === "/reset-password" || pathname.startsWith("/invoice/") || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <HIPAADisclaimer />;
 };
 
 const CampaignAwareNotificationPermissionBanner = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname === "/auth" || pathname === "/auth/callback" || pathname === "/reset-password" || pathname.startsWith("/invoice/") || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <NotificationPermissionBanner />;
 };
 
@@ -141,6 +143,8 @@ const App = () => (
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/invoice/:token" element={<InvoiceAccess />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/categories" element={<Categories />} />
                     <Route path="/categories/:categoryId" element={<CategoryDetail />} />
