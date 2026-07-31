@@ -32,7 +32,7 @@ type PageMetadataProps = {
 };
 
 // Bump together with the ?v= in index.html whenever an icon file changes.
-const ICON_VERSION = '20260731';
+const ICON_VERSION = '20260731b';
 
 const ALTERNATE_LOCALES: SeoLocale[] = ['en', 'pt', 'es'];
 const HREFLANG: Record<SeoLocale, string> = { en: 'en', pt: 'pt-BR', es: 'es' };
