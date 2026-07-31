@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { AccountRecoveryGate } from '@/components/account/AccountDeletion';
 
 interface Profile {
   id: string;
@@ -20,6 +21,7 @@ interface Profile {
   signup_app_key?: 'casa' | 'medical' | 'legal' | null;
   credits_balance: number;
   status: string | null;
+  deletion_state?: 'active' | 'pending_deletion' | 'purged' | null;
   bio: string | null;
   languages: string[] | null;
   handle: string | null;
@@ -318,7 +320,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updateProfile,
       refreshProfile
     }}>
-      {children}
+      {profile?.deletion_state && profile.deletion_state !== 'active'
+        ? <AccountRecoveryGate onRecovered={refreshProfile} closed={profile.deletion_state === 'purged'} />
+        : children}
     </AuthContext.Provider>
   );
 }

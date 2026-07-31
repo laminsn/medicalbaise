@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -24,6 +24,9 @@ import {
   Lock,
   Crown,
   ArrowLeft,
+  RefreshCw,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
@@ -47,6 +50,14 @@ interface Job {
   bid_count?: number;
 }
 
+interface ProviderSummary {
+  id: string;
+  subscription_tier: string | null;
+  bids_remaining_this_month: number | null;
+}
+
+type OpportunityFilter = 'all' | 'matches' | 'today' | 'low_bids' | 'urgent';
+
 export default function JobsMarketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -56,66 +67,108 @@ export default function JobsMarketplace() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
-  const [provider, setProvider] = useState<any>(null);
+  const [opportunityFilter, setOpportunityFilter] = useState<OpportunityFilter>('all');
+  const [provider, setProvider] = useState<ProviderSummary | null>(null);
+  const [providerCategoryIds, setProviderCategoryIds] = useState<string[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   const dateLocale = getDateFnsLocale(i18n);
 
+  const fetchJobs = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    setLoadError(null);
+
+    const { data: jobsData, error } = await supabase
+      .from('jobs_marketplace_public')
+      .select('*')
+      .eq('status', 'accepting_bids')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      setLoadError(t('jobs.loadError', 'We could not load client opportunities. Please try again.'));
+      setLoading(false);
+      return;
+    }
+
+    if (jobsData && jobsData.length > 0) {
+      const jobIds = jobsData.map((job) => job.id);
+      const { data: bidsData } = await supabase
+        .from('bids')
+        .select('job_id')
+        .in('job_id', jobIds);
+
+      const bidCounts: Record<string, number> = {};
+      bidsData?.forEach((bid) => {
+        bidCounts[bid.job_id] = (bidCounts[bid.job_id] || 0) + 1;
+      });
+
+      setJobs(jobsData.map((job) => ({
+        ...job,
+        bid_count: bidCounts[job.id] || 0,
+      })));
+    } else {
+      setJobs([]);
+    }
+
+    setLoading(false);
+  }, [t]);
+
   useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-      
-      // Fetch jobs that are accepting bids
-      const { data: jobsData, error } = await supabase
-        .from('jobs_posted')
-        .select('*')
-        .eq('status', 'accepting_bids')
-        .order('created_at', { ascending: false });
+    void fetchJobs();
+  }, [fetchJobs]);
 
-      if (error) {
+  useEffect(() => {
+    if (!user) {
+      setProvider(null);
+      setProviderCategoryIds([]);
+      return;
+    }
 
-        setLoading(false);
+    const fetchProvider = async () => {
+      const { data } = await supabase
+        .from('providers')
+        .select('id, subscription_tier, bids_remaining_this_month')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      setProvider(data);
+      if (!data?.id) {
+        setProviderCategoryIds([]);
         return;
       }
 
-      // Fetch bid counts for each job
-      if (jobsData && jobsData.length > 0) {
-        const jobIds = jobsData.map(j => j.id);
-        const { data: bidsData } = await supabase
-          .from('bids')
-          .select('job_id')
-          .in('job_id', jobIds);
+      const { data: services } = await supabase
+        .from('provider_services')
+        .select('category_id')
+        .eq('provider_id', data.id);
 
-        const bidCounts: Record<string, number> = {};
-        bidsData?.forEach(bid => {
-          bidCounts[bid.job_id] = (bidCounts[bid.job_id] || 0) + 1;
-        });
-
-        const jobsWithCounts = jobsData.map(job => ({
-          ...job,
-          bid_count: bidCounts[job.id] || 0
-        }));
-
-        setJobs(jobsWithCounts);
-      } else {
-        setJobs([]);
-      }
-
-      setLoading(false);
+      setProviderCategoryIds([
+        ...new Set(
+          (services || [])
+            .map((service) => service.category_id)
+            .filter((categoryId): categoryId is string => Boolean(categoryId)),
+        ),
+      ]);
     };
 
-    const fetchProvider = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from('providers')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      setProvider(data);
-    };
-
-    fetchJobs();
-    fetchProvider();
+    void fetchProvider();
   }, [user]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('jobs-marketplace-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'jobs_posted' },
+        () => void fetchJobs(false),
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [fetchJobs]);
 
   const canBid = provider && provider.subscription_tier !== 'free';
   const bidsRemaining = provider?.bids_remaining_this_month;
@@ -127,11 +180,11 @@ export default function JobsMarketplace() {
     return null;
   };
 
-  const getCategoryName = (categoryId: string | null) => {
+  const getCategoryName = useCallback((categoryId: string | null) => {
     if (!categoryId) return '';
     const cat = SERVICE_CATEGORIES.find(c => c.id === categoryId);
     return cat ? getLocalizedCategoryName(cat, i18n, t) : categoryId;
-  };
+  }, [i18n, t]);
 
   const formatBudget = (min: number | null, max: number | null, disclosed: boolean | null) => {
     if (!disclosed) return t('jobs.budgetToDiscuss');
@@ -142,18 +195,44 @@ export default function JobsMarketplace() {
     return t('jobs.budgetToDiscuss');
   };
 
-  const filteredJobs = jobs.filter(job => {
-    if (searchQuery && !job.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
+  const filteredJobs = useMemo(() => jobs.filter((job) => {
+    if (searchQuery) {
+      const query = searchQuery.trim().toLocaleLowerCase();
+      const searchable = [
+        job.title,
+        job.description,
+        getCategoryName(job.category_id),
+        job.location_address,
+      ].filter(Boolean).join(' ').toLocaleLowerCase();
+      if (!searchable.includes(query)) return false;
     }
-    if (selectedCategory !== 'all' && job.category_id !== selectedCategory) {
-      return false;
-    }
+
+    if (selectedCategory !== 'all' && job.category_id !== selectedCategory) return false;
+
+    const createdAt = new Date(job.created_at || 0).getTime();
+    const isToday = Date.now() - createdAt <= 24 * 60 * 60 * 1000;
+    const isLowCompetition = (job.bid_count || 0) <= 1;
+    const isUrgent = Boolean(job.is_urgent || job.urgency === 'emergency');
+    const isServiceMatch = providerCategoryIds.length === 0
+      || Boolean(job.category_id && providerCategoryIds.includes(job.category_id));
+
+    if (opportunityFilter === 'matches' && !isServiceMatch) return false;
+    if (opportunityFilter === 'today' && !isToday) return false;
+    if (opportunityFilter === 'low_bids' && !isLowCompetition) return false;
+    if (opportunityFilter === 'urgent' && !isUrgent) return false;
+
     return true;
-  });
+  }), [
+    jobs,
+    opportunityFilter,
+    providerCategoryIds,
+    searchQuery,
+    selectedCategory,
+    getCategoryName,
+  ]);
 
   // Sort jobs
-  const sortedJobs = [...filteredJobs].sort((a, b) => {
+  const sortedJobs = useMemo(() => [...filteredJobs].sort((a, b) => {
     switch (sortBy) {
       case 'budget_high':
         return (b.budget_max || 0) - (a.budget_max || 0);
@@ -166,13 +245,31 @@ export default function JobsMarketplace() {
       default:
         return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
     }
-  });
+  }), [filteredJobs, sortBy]);
+
+  const opportunityStats = useMemo(() => {
+    const now = Date.now();
+    const matched = jobs.filter((job) => (
+      providerCategoryIds.length === 0
+      || Boolean(job.category_id && providerCategoryIds.includes(job.category_id))
+    )).length;
+    const newToday = jobs.filter((job) => (
+      now - new Date(job.created_at || 0).getTime() <= 24 * 60 * 60 * 1000
+    )).length;
+    const lowCompetition = jobs.filter((job) => (job.bid_count || 0) <= 1).length;
+    const pipelineValue = jobs.reduce((total, job) => {
+      if (!job.budget_disclosed) return total;
+      return total + (job.budget_max || job.budget_min || 0);
+    }, 0);
+
+    return { matched, newToday, lowCompetition, pipelineValue };
+  }, [jobs, providerCategoryIds]);
 
   if (!user) {
     return (
       <>
         <Helmet>
-          <title>{t('jobs.jobMarketplace')} - Brasil Base</title>
+          <title>{t('jobs.jobMarketplace')} - Medical Baise</title>
         </Helmet>
         <AppLayout>
           <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
@@ -195,21 +292,47 @@ export default function JobsMarketplace() {
   return (
     <>
       <Helmet>
-        <title>{t('jobs.jobMarketplace')} - Brasil Base</title>
+        <title>{t('jobs.jobMarketplace')} - Medical Baise</title>
         <meta name="description" content={t('jobs.findOpportunities')} />
       </Helmet>
       <AppLayout>
-        <div className="px-4 py-6 pb-24">
+        <div className="mx-auto max-w-6xl px-4 py-6 pb-24">
           {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">{t('jobs.availableJobs')}</h1>
-              <p className="text-muted-foreground">{t('jobs.findOpportunities')}</p>
+          <section className="relative mb-6 overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-background to-emerald-500/10 p-5 shadow-sm sm:p-7">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
+            <div className="relative flex items-start gap-3">
+              <Button variant="secondary" size="icon" onClick={() => navigate(-1)} className="mt-0.5 rounded-full">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="min-w-0 flex-1">
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  <Target className="h-4 w-4" />
+                  {t('jobs.clientOpportunityCenter', 'Client Opportunity Center')}
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                  {t('jobs.findNextClient', 'Find your next client')}
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+                  {t('jobs.findOpportunities')}
+                </p>
+              </div>
             </div>
-          </div>
+
+            <div className="relative mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {[
+                { label: t('jobs.bestMatches', 'Best matches'), value: opportunityStats.matched, icon: Target },
+                { label: t('jobs.newToday', 'New today'), value: opportunityStats.newToday, icon: Zap },
+                { label: t('jobs.lowCompetition', 'Low competition'), value: opportunityStats.lowCompetition, icon: Users },
+                { label: t('jobs.pipelineValue', 'Open value'), value: formatPrice(opportunityStats.pipelineValue), icon: TrendingUp },
+              ].map((metric) => (
+                <div key={metric.label} className="rounded-2xl border border-border/70 bg-background/85 p-3 backdrop-blur">
+                  <metric.icon className="mb-2 h-4 w-4 text-primary" />
+                  <div className="truncate text-xl font-bold tabular-nums">{metric.value}</div>
+                  <div className="mt-0.5 truncate text-xs text-muted-foreground">{metric.label}</div>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Tier Warning */}
           {provider && !canBid && (
@@ -285,6 +408,27 @@ export default function JobsMarketplace() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" aria-label={t('jobs.quickFilters', 'Quick opportunity filters')}>
+              {([
+                ['all', t('common.all', 'All')],
+                ['matches', t('jobs.bestMatches', 'Best matches')],
+                ['today', t('jobs.newToday', 'New today')],
+                ['low_bids', t('jobs.lowCompetition', 'Low competition')],
+                ['urgent', t('jobs.urgent', 'Urgent')],
+              ] as Array<[OpportunityFilter, string]>).map(([value, label]) => (
+                <Button
+                  key={value}
+                  type="button"
+                  size="sm"
+                  variant={opportunityFilter === value ? 'default' : 'outline'}
+                  onClick={() => setOpportunityFilter(value)}
+                  className="shrink-0 rounded-full active:scale-[0.97]"
+                  aria-pressed={opportunityFilter === value}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Loading */}
@@ -294,14 +438,32 @@ export default function JobsMarketplace() {
             </div>
           )}
 
+          {!loading && loadError && (
+            <Card className="border-destructive/30">
+              <CardContent className="flex flex-col items-center p-8 text-center">
+                <RefreshCw className="mb-3 h-8 w-8 text-destructive" />
+                <p className="max-w-md text-sm text-muted-foreground">{loadError}</p>
+                <Button className="mt-4" onClick={() => void fetchJobs()}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  {t('common.retry', 'Try again')}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Jobs List */}
-          {!loading && (
+          {!loading && !loadError && (
             <div className="space-y-4">
               {sortedJobs.map((job) => (
                 <Card 
                   key={job.id} 
-                  className={`cursor-pointer transition-shadow hover:shadow-md ${job.is_featured ? 'border-primary/50 bg-primary/5' : ''}`}
+                  className={`cursor-pointer transition-[transform,box-shadow,border-color] duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md active:scale-[0.995] ${job.is_featured ? 'border-primary/50 bg-primary/5' : ''}`}
                   onClick={() => navigate(`/job/${job.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') navigate(`/job/${job.id}`);
+                  }}
+                  role="link"
+                  tabIndex={0}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
@@ -329,12 +491,7 @@ export default function JobsMarketplace() {
                     </p>
 
                     <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-3">
-                      {job.location_address && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {job.location_address}
-                        </span>
-                      )}
+                      {/* Address hidden for privacy - only shown to job participants */}
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {job.created_at && formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: dateLocale })}

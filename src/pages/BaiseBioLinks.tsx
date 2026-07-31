@@ -12,18 +12,22 @@ import {
   HeartPulse,
   Home,
   LogIn,
-  PlayCircle,
   Scale,
   ShieldCheck,
   Star,
   UserRoundCheck,
   UsersRound,
-  Youtube,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BAISE_BLOG_POSTS } from "@/content/baiseBlogPosts";
 import { getBaiseAppKey, getBaiseAppUrl } from "@/lib/providerCommunication";
 import { supabase } from "@/integrations/supabase/client";
+import contentLinks from "@/lib/content-links.json";
+import platforms from "@/lib/platforms.json";
+// @ts-expect-error Shared JavaScript modules intentionally ship without declarations.
+import { attemptNative, resolveDeepLink } from "@/lib/deep-links.mjs";
+// @ts-expect-error Shared JavaScript modules intentionally ship without declarations.
+import { renderContentHub } from "@/lib/content-hub.mjs";
 
 type AppKey = "casa" | "medical" | "legal";
 type LocaleKey = "en" | "pt";
@@ -60,7 +64,11 @@ type BaiseBioLinksProps = {
 const BAISE_BLACK = "#050505";
 const PANEL_BLACK = "#111111";
 const BORDER = "rgba(255,255,255,0.12)";
-const SHARED_YOUTUBE_URL = "https://www.youtube.com/@Baise";
+const contentDeepLinks = {
+  resolve: (platform: string, entry: Record<string, unknown>, opts: Record<string, unknown>) =>
+    resolveDeepLink(platform, entry, platforms, opts),
+  attemptNative,
+};
 
 const appLanes: AppLane[] = [
   {
@@ -142,22 +150,15 @@ const copy = {
     userResourceDescription: "How to choose, verify, pay, keep records, and avoid messy service experiences.",
     promotionTitle: "Current premium promotion",
     promotionDescription: "Give a month, get a month for eligible premium referrals.",
-    videoTitle: "Latest Baise videos",
-    videoDescription: "Practical short-form guidance from the shared Baise social channel.",
     portalTitle: "Sign in to your portal",
     portalDescription: "Messages, receipts, transaction history, documents, referrals, and service records.",
     partnerTitle: "Partner and influencer programs",
     partnerDescription: "Apply for approved campaigns with tracked links, codes, QR, rules, and payouts.",
     testimonialTitle: "Leave a testimonial",
-    testimonialDescription: "Submit approved Google or video testimonials for future service credit.",
+    testimonialDescription: "Share optional, honest feedback without payment, credit, discount, or benefit.",
     referralTitle: "Referral rewards",
     referralDescription: "Share your link and track eligible premium referrals.",
     blogTitle: "Fresh practical guides",
-    videoCards: [
-      "How Baise helps you choose the right provider",
-      "What service providers should document from day one",
-      "How trusted records protect both sides of a service",
-    ],
     metaTitle: "Baise Links | Casa, Medical and Legal registration hub",
     metaDescription:
       "Register for Casa Baise, Medical Baise, or Legal Baise from one shared social bio hub with resources for service providers and solutions for service users.",
@@ -181,22 +182,15 @@ const copy = {
     userResourceDescription: "Como escolher, verificar, pagar, guardar registros e evitar experiencias confusas.",
     promotionTitle: "Promocao premium atual",
     promotionDescription: "Give a month, get a month para indicacoes premium elegiveis.",
-    videoTitle: "Videos recentes Baise",
-    videoDescription: "Orientacao pratica do canal social compartilhado da Baise.",
     portalTitle: "Entrar no portal",
     portalDescription: "Mensagens, recibos, historico, documentos, indicacoes e registros de servico.",
     partnerTitle: "Programas de parceiros e influenciadores",
     partnerDescription: "Inscreva-se em campanhas aprovadas com links, codigos, QR, regras e pagamentos.",
     testimonialTitle: "Enviar depoimento",
-    testimonialDescription: "Envie avaliacao Google ou video aprovado para credito futuro em servicos.",
+    testimonialDescription: "Compartilhe feedback opcional e honesto, sem pagamento, crédito, desconto ou benefício.",
     referralTitle: "Recompensas por indicacao",
     referralDescription: "Compartilhe seu link e acompanhe indicacoes premium elegiveis.",
     blogTitle: "Guias praticos recentes",
-    videoCards: [
-      "Como a Baise ajuda voce a escolher o prestador certo",
-      "O que prestadores devem documentar desde o primeiro dia",
-      "Como registros confiaveis protegem os dois lados do servico",
-    ],
     metaTitle: "Links Baise | Hub Casa, Medical e Legal",
     metaDescription:
       "Cadastre-se no Casa Baise, Medical Baise ou Legal Baise por um unico hub social com recursos para prestadores e solucoes para usuarios.",
@@ -346,8 +340,10 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
   const appKey = getBaiseAppKey();
   const appUrl = getBaiseAppUrl();
   const [locale, setLocale] = useState<LocaleKey>(defaultLocale);
+  const [copied, setCopied] = useState(false);
   const [sessionId] = useState(getSessionId);
   const pageViewTracked = useRef(false);
+  const contentHubRef = useRef<HTMLDivElement>(null);
   const text = copy[locale];
   const localizedPrefix = locale === "pt" ? "/pt" : "";
 
@@ -379,6 +375,12 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
 
       const analytics = (window as unknown as { analytics?: { track?: (event: string, data: Record<string, unknown>) => void } }).analytics;
       analytics?.track?.("baise_bio_link_event", body);
+      if (eventType === "cta_click" && navigator.sendBeacon) {
+        navigator.sendBeacon(
+          "/api/link-analytics",
+          new Blob([JSON.stringify(body)], { type: "application/json" }),
+        );
+      }
       void (async () => {
         try {
           await (supabase as unknown as BioRpcClient).rpc("track_bio_link_event", body);
@@ -395,6 +397,31 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
     pageViewTracked.current = true;
     track("page_view", { section: "page", label: "Baise shared social hub" });
   }, [track]);
+
+  useEffect(() => {
+    const mount = contentHubRef.current;
+    if (!mount) return;
+    mount.replaceChildren();
+    renderContentHub(mount, contentLinks["baise-group"], {
+      DL: contentDeepLinks,
+      tracking: { source: "bio-baise" },
+      labels: locale === "pt"
+        ? { latestKicker: "Último episódio", watch: "Assistir no YouTube", youtube: "YouTube", youtubeSub: "Assista e inscreva-se", listen: "Ouça", resources: "Recursos" }
+        : { latestKicker: "Latest episode", watch: "Watch on YouTube", youtube: "YouTube", youtubeSub: "Watch & subscribe", listen: "Listen", resources: "Resources" },
+      classMap: {
+        section: "grid gap-3",
+        kicker: "px-1 text-xs font-black uppercase tracking-[0.18em] text-white/50",
+        card: "group flex min-h-[74px] w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-white/12 bg-[#0b0b0b] px-4 py-3 shadow-lg shadow-black/25 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/24 hover:bg-[#111111]",
+        latestCard: "group flex min-h-[84px] w-full items-stretch gap-3 overflow-hidden rounded-2xl border border-white/12 bg-[#0b0b0b] shadow-lg shadow-black/25 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/24 hover:bg-[#111111]",
+        primary: "group flex min-h-[74px] w-full items-center justify-between gap-3 rounded-2xl border border-white/12 bg-[#0b0b0b] px-4 py-3 shadow-lg shadow-black/25 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/24 hover:bg-[#111111]",
+        resourceCard: "group flex min-h-[74px] w-full items-center justify-between gap-3 rounded-2xl border border-white/12 bg-[#0b0b0b] px-4 py-3 shadow-lg shadow-black/25 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/24 hover:bg-[#111111]",
+        cardTitle: "block text-sm font-black leading-tight text-white sm:text-base",
+        cardSub: "mt-1 block text-xs leading-snug text-white/62",
+        listenChip: "rounded-full border border-white/12 bg-[#111111] px-3 py-2 text-xs font-black text-white",
+      },
+    });
+    return () => mount.replaceChildren();
+  }, [locale]);
 
   const audienceLinks = useMemo<SupportLink[]>(
     () => [
@@ -427,14 +454,6 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
         href: `${localizedPrefix}/give-a-month-get-a-month`,
         icon: Gift,
         section: "promotion",
-      },
-      {
-        key: "shared_youtube",
-        label: text.videoTitle,
-        description: text.videoDescription,
-        href: SHARED_YOUTUBE_URL,
-        icon: Youtube,
-        section: "youtube",
       },
       {
         key: "portal_signin",
@@ -556,6 +575,12 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
           </div>
         </section>
 
+        <div
+          ref={contentHubRef}
+          id="content-hub"
+          className="grid gap-3 empty:hidden [&_.ch-chips]:flex [&_.ch-chips]:flex-wrap [&_.ch-chips]:gap-2 [&_.ch-latest-copy]:grid [&_.ch-latest-copy]:flex-1 [&_.ch-latest-copy]:content-center [&_.ch-latest-copy]:gap-1 [&_.ch-latest-copy]:py-3 [&_.ch-latest-copy]:pr-4 [&_.ch-thumb]:w-28 [&_.ch-thumb]:object-cover"
+        />
+
         <section className="space-y-3">
           <SectionTitle>{text.chooseApp}</SectionTitle>
           {appLanes.map((lane) => (
@@ -587,35 +612,28 @@ const BaiseBioLinks = ({ defaultLocale = "en" }: BaiseBioLinksProps) => {
           {supportLinks.map((link) => (
             <SupportButton key={link.key} link={link} onClick={handleSupportClick} />
           ))}
+          <div className="grid grid-cols-2 gap-2">
+            <a
+              href={typeof window === "undefined" ? appUrl : window.location.href}
+              className="rounded-2xl border border-white/12 bg-[#111111] px-3 py-3 text-center text-sm font-black text-white"
+            >
+              {locale === "pt" ? "Abrir no navegador" : "Open in browser"}
+            </a>
+            <button
+              type="button"
+              onClick={async () => {
+                await navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+              }}
+              className="rounded-2xl border border-white/12 bg-[#111111] px-3 py-3 text-sm font-black text-white"
+            >
+              {copied ? (locale === "pt" ? "Link copiado" : "Link copied") : locale === "pt" ? "Copiar link" : "Copy link"}
+            </button>
+          </div>
         </section>
 
         <section className="space-y-3 pb-5">
           <SectionTitle>{text.latestLearning}</SectionTitle>
-          <div className="rounded-[1.5rem] border border-white/12 bg-[#111111] p-4 shadow-xl shadow-black/35">
-            <div className="flex items-center gap-2">
-              <PlayCircle className="h-5 w-5 text-white/70" aria-hidden="true" />
-              <h2 className="text-base font-black">{text.videoTitle}</h2>
-            </div>
-            <div className="mt-3 space-y-2">
-              {text.videoCards.map((title, index) => (
-                <a
-                  key={title}
-                  href={appendTrackingParams(SHARED_YOUTUBE_URL, `video_${index + 1}`)}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => track("cta_click", { section: "youtube_cards", ctaKey: `video_${index + 1}`, label: title, href: SHARED_YOUTUBE_URL })}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black px-3 py-3 transition-[transform,border-color,background-color] duration-150 ease-out active:scale-[0.98] hover:border-white/25 hover:bg-[#0b0b0b]"
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-black">
-                    <Youtube className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0 flex-1 text-sm font-bold leading-snug">{title}</span>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-white/60" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-          </div>
-
           <div className="rounded-[1.5rem] border border-white/12 bg-[#111111] p-4 shadow-xl shadow-black/35">
             <div className="flex items-center gap-2">
               <BookOpenText className="h-5 w-5 text-white/70" aria-hidden="true" />

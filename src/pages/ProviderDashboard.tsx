@@ -368,9 +368,7 @@ export default function ProviderDashboard() {
 
           <TabsContent value="growth" className="space-y-6">
             <ProviderMessagingCommandCenter />
-            {isPt || isEs ? (
-              <TranslationPendingCard isEs={isEs} />
-            ) : isEliteOrAbove ? (
+            {isEliteOrAbove ? (
               <ProviderEmailCampaigns />
             ) : (
               <UpgradePrompt
@@ -396,9 +394,7 @@ export default function ProviderDashboard() {
                 requiredTier="Elite"
               />
             )}
-            {isPt || isEs ? (
-              <TranslationPendingCard isEs={isEs} />
-            ) : isEnterprise ? (
+            {isEnterprise ? (
               <div className="space-y-6">
                 <PixelTrackingSettings />
                 <ConversionAnalyticsDashboard />
@@ -583,17 +579,6 @@ function UpcomingAppointments({ providerId }: { providerId: string }) {
   );
 }
 
-function TranslationPendingCard({ isEs = false }: { isEs?: boolean }) {
-  return (
-    <Card className="border-dashed">
-      <CardContent className="py-10 text-center text-muted-foreground">
-        {isEs
-          ? 'Contenido de esta sección en traducción al español.'
-          : 'Conteúdo desta seção em tradução para português.'}
-      </CardContent>
-    </Card>
-  );
-}
 
 function UpgradePrompt({ feature, requiredTier }: { feature: string; requiredTier: string }) {
   const { t } = useTranslation();

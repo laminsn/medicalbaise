@@ -19,7 +19,6 @@ interface SendNotificationParams {
   providerId?: string;
   jobId?: string;
   activeJobId?: string;
-  googleReviewUrl?: string;
 }
 
 export const useEmailNotifications = () => {
@@ -119,7 +118,6 @@ export const useEmailNotifications = () => {
     providerId: string,
     jobId?: string,
     activeJobId?: string,
-    googleReviewUrl?: string,
     localeOverride?: LocaleKey
   ) => {
     const locale = localeOverride || getLocaleKey(i18n.resolvedLanguage || i18n.language);
@@ -129,8 +127,6 @@ export const useEmailNotifications = () => {
     requestUrl.searchParams.set('providerName', providerName);
     if (jobId) requestUrl.searchParams.set('jobId', jobId);
     if (activeJobId) requestUrl.searchParams.set('activeJobId', activeJobId);
-    if (googleReviewUrl) requestUrl.searchParams.set('googleReviewUrl', googleReviewUrl);
-
     return sendNotificationEmail({
       type: 'testimonial_request',
       recipientEmail,
@@ -142,7 +138,6 @@ export const useEmailNotifications = () => {
       providerId,
       jobId,
       activeJobId,
-      googleReviewUrl,
       actionUrl: requestUrl.toString(),
     });
   };

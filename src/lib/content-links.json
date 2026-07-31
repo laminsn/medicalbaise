@@ -1,0 +1,120 @@
+{
+  "_meta": {
+    "updated": "2026-07-23",
+    "purpose": "The content-funnel config for every empire link-in-bio hub: where each hub sends people. Consumed by the shared content-hub renderer (BUSINESSES/empire-shared/content-hub).",
+    "strategy": "Priority ladder, in render order: (1) LATEST EPISODE — auto-fetched from the YouTube channel's public RSS via /api/latest-episode; (2) YOUTUBE — the loudest slot, because that is where the view credit + algorithm live; (3) LISTEN — the streaming/monetized-listening row; (4) RESOURCES — blog / guides / lead magnets.",
+    "contract": {
+      "verified": "true ONLY when the URL/channel was resolved live and confirmed ours. The renderer emits NOTHING for verified:false — never a dead or fabricated destination.",
+      "channel_id": "A real YouTube channel id (UC + 22 chars). Required for latest-episode auto-fetch. The RSS feed does NOT accept @handles. If only a handle is known, the /api/latest-episode function resolves it, but a stored channel_id is faster and more reliable.",
+      "listen platforms": "Keys must match the resolver matrix in ../deep-links/platforms.json: spotify, apple_podcasts, youtube_music, amazon_music, deezer. Each ships its plain web URL always; native-app handoff fires only inside a detected in-app browser and only for VERIFIED/PARTIAL platforms."
+    },
+    "open": "Every field below is a PLACEHOLDER awaiting Lamin. Fill channel_id + channel_url + the listen URLs + resources; flip verified:true only after confirming each live. Nothing renders until then."
+  },
+
+  "_schema": {
+    "youtube": { "channel_id": "UC…", "channel_url": "https://www.youtube.com/@handle", "verified": false },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": "https://open.spotify.com/show/…",        "verified": false },
+      "apple_podcasts": { "url": "https://podcasts.apple.com/…/id…",       "verified": false },
+      "youtube_music":  { "url": "https://music.youtube.com/channel/UC…",  "verified": false },
+      "amazon_music":   { "url": "https://music.amazon.com/podcasts/…",    "verified": false },
+      "deezer":         { "url": "https://www.deezer.com/show/…",          "verified": false }
+    },
+    "resources": [ { "label": "…", "sub": "…", "url": "/…?source=bio", "external": false } ]
+  },
+
+  "fica-com-deus": {
+    "_business": "Fica com Deus (podcast) — promos are all about YouTube + streaming",
+    "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "@ficacomdeus exists but is NOT ours (Lamin 2026-07-23). AWAITING real channel." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false, "note": "Deezer is meaningful for the Rio audience — prioritize." }
+    },
+    "resources": [
+      { "label": "Conheça o Fica com Deus", "sub": "O podcast, a missão e quem está por trás.", "url": "/sobre?source=bio-fcd", "external": false }
+    ]
+  },
+
+  "lamin-personal": {
+    "_business": "Brainwash / Lamin personal — promos are all about YouTube + listening",
+    "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "@fatha_time YouTube 404s. AWAITING real channel." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false }
+    },
+    "resources": [
+      { "label": "The 7 Codes", "sub": "The operator playbook.", "url": "/blog/", "external": false }
+    ]
+  },
+
+  "your-wise-advisor": {
+    "_business": "Your Wise Advisor",
+    "youtube":        { "channel_id": null, "channel_url": "https://www.youtube.com/@yourwiseadvisor", "verified": true, "note": "Channel VERIFIED live. Provide the UC channel_id to enable latest-episode auto-fetch (the fetcher can also resolve the handle)." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false }
+    },
+    "resources": [
+      { "label": "Blog", "sub": "Financial-literacy library.", "url": "/blog?source=bio-ywa", "external": false }
+    ]
+  },
+
+  "brazil-escrow-title": {
+    "_business": "BETS — Brasil Escrow & Title",
+    "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "@brasilescrow YouTube 404s (dead link was live in prod, now removed). AWAITING real channel." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false }
+    },
+    "resources": [
+      { "label": "Webinar + free resources", "sub": "What to check before you buy in Brazil.", "url": "/#resources?source=bio-bets", "external": false }
+    ]
+  },
+
+  "carolina-law-firm": {
+    "_business": "Dr. Carolina Quintaes Alves",
+    "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "No verified channel. AWAITING." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false }
+    },
+    "resources": [
+      { "label": "Biblioteca", "sub": "Artigos e conteúdo.", "url": "/blog/?source=bio-carolina", "external": false }
+    ]
+  },
+
+  "baise-group": {
+    "_business": "Casa / Legal / Medical Baise (shared)",
+    "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "@Baise resolves but is NOT ours (Lamin 2026-07-23). AWAITING real channel." },
+    "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
+    "listen": {
+      "spotify":        { "url": null, "verified": false },
+      "apple_podcasts": { "url": null, "verified": false },
+      "youtube_music":  { "url": null, "verified": false },
+      "amazon_music":   { "url": null, "verified": false },
+      "deezer":         { "url": null, "verified": false }
+    },
+    "resources": []
+  }
+}

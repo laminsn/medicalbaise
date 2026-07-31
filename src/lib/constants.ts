@@ -816,6 +816,15 @@ export const MEDICAL_CATEGORIES: MedicalCategory[] = [
     description_en: 'Medical records coding and insurance billing',
     description_pt: 'Codificação de prontuários e faturamento de seguros',
   },
+  {
+    id: 'medical-testimony',
+    name_en: 'Medical Testimony & Expert Witness',
+    name_pt: 'Perícia Médica e Testemunho Especializado',
+    icon: FileHeart,
+    color: '#0F766E',
+    description_en: 'Independent medical review, expert reports, depositions, and court testimony within professional scope',
+    description_pt: 'Revisão médica independente, laudos periciais, depoimentos e testemunho judicial dentro da competência profissional',
+  },
 ];
 
 // Popular specialties shown in hero

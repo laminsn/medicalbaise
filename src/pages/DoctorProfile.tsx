@@ -44,8 +44,6 @@ import {
   Building2,
   ShieldCheck,
 } from 'lucide-react';
-import { VideoTestimonialList } from '@/components/testimonials/VideoTestimonialList';
-import { UploadTestimonialDialog } from '@/components/testimonials/UploadTestimonialDialog';
 import { useStartConversation } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrackProfileView } from '@/hooks/useProfileViews';
@@ -72,12 +70,10 @@ export default function DoctorProfile() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isPt = isPortuguese(i18n);
-  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { user } = useAuth();
   const { startConversation } = useStartConversation();
   const { isFavorited, toggleFavorite } = useFavorites();
   
-  const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
 
   useTrackProfileView(id, 'doctor_profile');
@@ -336,26 +332,6 @@ export default function DoctorProfile() {
     );
   }
 
-  if (isEs) {
-    return (
-      <AppLayout>
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Card className="border-dashed">
-            <CardContent className="py-10 text-center space-y-3">
-              <h2 className="text-xl font-semibold">Perfil en traducción</h2>
-              <p className="text-muted-foreground">
-                Esta página de perfil médico aún se está adaptando completamente al español.
-                Puedes ver la versión completa en inglés mientras finalizamos la traducción.
-              </p>
-              <Button onClick={() => i18n.changeLanguage('en')}>
-                Ver versión completa en inglés
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </AppLayout>
-    );
-  }
 
   return (
     <>
@@ -934,29 +910,21 @@ export default function DoctorProfile() {
               </Card>
             </TabsContent>
 
-            {/* Video Testimonials Tab */}
+            {/* Medical feedback is private by default and never published here. */}
             <TabsContent value="videos" className="space-y-4 mt-4">
               <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold">{t('videoTestimonials.title')}</h3>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => {
-                        if (!user) {
-                          toast.error(t('auth.loginRequired'));
-                          navigate('/auth');
-                          return;
-                        }
-                        setIsTestimonialDialogOpen(true);
-                      }}
-                    >
-                      <Video className="h-4 w-4 mr-2" />
-                      {t('videoTestimonials.leaveTestimonial')}
-                    </Button>
-                  </div>
-                  <VideoTestimonialList providerId={id || doctor.id} />
+                <CardContent className="space-y-3 p-5">
+                  <h3 className="font-semibold">{isPt ? 'Feedback privado' : 'Private feedback'}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {isPt
+                      ? 'Por privacidade médica, o feedback enviado por esta página não é publicado no perfil.'
+                      : 'For medical privacy, feedback submitted through this page is not published on the profile.'}
+                  </p>
+                  <Button
+                    onClick={() => navigate(`/testimonial-request?providerId=${encodeURIComponent(id || doctor.id)}&providerName=${encodeURIComponent(doctor.business_name)}`)}
+                  >
+                    {isPt ? 'Enviar feedback privado' : 'Send private feedback'}
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -1082,13 +1050,6 @@ export default function DoctorProfile() {
             </TabsContent>
           </Tabs>
         </div>
-
-        <UploadTestimonialDialog
-          open={isTestimonialDialogOpen}
-          onOpenChange={setIsTestimonialDialogOpen}
-          providerId={doctor.id}
-          providerName={`Dr. ${doctor.business_name}`}
-        />
       </AppLayout>
     </>
   );

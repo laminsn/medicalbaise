@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getCameraVideoConstraints, normalizeCameraTrack } from '@/lib/camera';
 
 export interface LiveStream {
   id: string;
@@ -48,14 +49,18 @@ export function useLiveStream() {
     try {
       setError(null);
       
-      // Get camera access
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 1280, height: 720, facingMode: 'user' },
-        audio: true
-      });
+      // Reuse the preview stream so going live does not reopen or change cameras.
+      let stream = videoElement.srcObject as MediaStream | null;
+      if (!stream) {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: getCameraVideoConstraints('user'),
+          audio: true
+        });
+        await Promise.all(stream.getVideoTracks().map((track) => normalizeCameraTrack(track, 'motion')));
+        videoElement.srcObject = stream;
+      }
       
       streamRef.current = stream;
-      videoElement.srcObject = stream;
       localVideoRef.current = videoElement;
       
       // Generate stream ID

@@ -47,7 +47,7 @@ interface JobDetails {
   created_at: string | null;
   category_id: string | null;
   max_bids: number | null;
-  customer_id: string;
+  customer_id: string | null;
   status: string | null;
   preferred_start_date: string | null;
   preferred_end_date: string | null;
@@ -93,7 +93,7 @@ export default function JobDetails() {
       
       // Fetch job details
       const { data: jobData, error: jobError } = await supabase
-        .from('jobs_posted')
+        .from('jobs_marketplace_public')
         .select('*')
         .eq('id', id)
         .maybeSingle();

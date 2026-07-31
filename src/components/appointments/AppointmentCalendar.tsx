@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Calendar,
   Video,
@@ -54,6 +56,10 @@ interface ConfirmedBooking {
   doctorName: string;
   fee: number | null;
 }
+
+// Generated Supabase types are regenerated only after the lifecycle migration is applied.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const appointmentDb = supabase as any;
 
 /** Convert a JS Date weekday (0=Sunday) to DB day_of_week (Mon=1…Sun=0). */
 function jsDayToDbDay(jsDay: number): number {
@@ -106,6 +112,7 @@ export function AppointmentCalendar({
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState<ConfirmedBooking | null>(null);
+  const [appointmentCommunications, setAppointmentCommunications] = useState(false);
 
   const [dateOffset, setDateOffset] = useState(0); // page index for date strip
 
@@ -126,6 +133,22 @@ export function AppointmentCalendar({
   }, []);
 
   const visibleDates = allDates.slice(dateOffset, dateOffset + DAYS_VISIBLE);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    void appointmentDb
+      .from('medical_appointment_patient_preferences')
+      .select('communications_enabled')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }: { data: { communications_enabled?: boolean } | null }) => {
+        if (active) setAppointmentCommunications(data?.communications_enabled === true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   // Load availability from DB
   useEffect(() => {
@@ -188,7 +211,6 @@ export function AppointmentCalendar({
     };
 
     load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doctorId]);
 
   // Compute available slots for selectedDate
@@ -223,27 +245,66 @@ export function AppointmentCalendar({
     setSubmitting(true);
 
     try {
+      const [hours, minutes] = selectedSlot.split(':').map(Number);
+      const scheduledAt = new Date(selectedDate);
+      scheduledAt.setHours(hours, minutes, 0, 0);
+      if (Number.isNaN(scheduledAt.getTime())) throw new Error('Invalid appointment time');
+
       const conversationId = await startConversation(doctorId);
       if (!conversationId) throw new Error('Failed to start conversation');
 
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo';
+      const language = navigator.language.toLowerCase();
+      const locale = language.startsWith('en') ? 'en' : language.startsWith('es') ? 'es' : 'pt';
+      const { error: preferenceError } = await appointmentDb
+        .from('medical_appointment_patient_preferences')
+        .upsert({
+          user_id: user.id,
+          communications_enabled: appointmentCommunications,
+          in_app_enabled: true,
+          email_enabled: true,
+          reminders_enabled: true,
+          follow_up_enabled: true,
+          thank_you_enabled: true,
+          review_requests_enabled: false,
+          timezone,
+          locale,
+          consent_version: appointmentCommunications ? 'medical-appointments-v1' : null,
+        }, { onConflict: 'user_id' });
+      if (preferenceError) throw new Error('Unable to save appointment communication choice');
+
+      const { data: appointment, error: appointmentError } = await appointmentDb
+        .from('appointments')
+        .insert({
+          user_id: user.id,
+          provider_id: doctorId,
+          title: 'Private medical appointment',
+          category_id: 'medical-care',
+          status: 'scheduled',
+          preferred_datetime: scheduledAt.toISOString(),
+          appointment_timezone: timezone,
+          appointment_type: appointmentType,
+          chief_complaint: notes.trim().slice(0, 2000) || null,
+          confirmation_status: 'pending',
+        })
+        .select('id')
+        .single();
+      if (appointmentError || !appointment) throw new Error('Unable to reserve appointment slot');
+
       const bookingPayload = {
         __type: 'appointment_booking',
+        appointment_id: appointment.id,
         slot_date: toDateString(selectedDate),
         slot_time: selectedSlot,
         appointment_type: appointmentType,
-        status: 'confirmed',
-        notes: notes.trim(),
-        doctor_name: doctorName,
-        fee: consultationFee,
+        status: 'scheduled',
       };
 
-      const { error } = await supabase.from('messages').insert({
+      await supabase.from('messages').insert({
         conversation_id: conversationId,
         sender_id: user.id,
         content: JSON.stringify(bookingPayload),
       });
-
-      if (error) throw error;
 
       setConfirmed({
         conversationId,
@@ -487,6 +548,29 @@ export function AppointmentCalendar({
               placeholder="Describe your symptoms or reason for the visit…"
               rows={3}
             />
+          </div>
+
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+            <div className="flex items-start justify-between gap-4">
+              <Label htmlFor="booking-appointment-communications" className="cursor-pointer">
+                <span className="block text-sm font-medium">
+                  Appointment confirmations and reminders
+                </span>
+                <span className="mt-1 block text-xs font-normal leading-relaxed text-muted-foreground">
+                  I agree to receive generic appointment confirmations, the default 24-hour and
+                  1-hour reminders, follow-ups, and thank-you messages. Medical details stay in
+                  the secure portal, and I can opt out in Settings.
+                </span>
+              </Label>
+              <Switch
+                id="booking-appointment-communications"
+                checked={appointmentCommunications}
+                onCheckedChange={setAppointmentCommunications}
+              />
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              Review requests remain off unless you separately enable optional reviews in Settings.
+            </p>
           </div>
 
           {/* Summary */}

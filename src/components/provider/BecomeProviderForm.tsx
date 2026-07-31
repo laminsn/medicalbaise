@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, PLATFORM } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { queueProviderUpdateNotification } from '@/lib/providerCommunication';
 import { toast } from 'sonner';
@@ -38,6 +38,14 @@ import { Label } from '@/components/ui/label';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { isPortuguese, isSpanish } from '@/lib/i18n-utils';
 import { MEDICAL_CATEGORIES, INSURANCE_PROVIDERS } from '@/lib/constants/medical';
+import { SERVICE_CATEGORIES as MEDICAL_SERVICE_CATEGORIES } from '@/lib/constants';
+import {
+  PROVIDER_ID_TYPES,
+  filterAllowedServiceIds,
+  filterProviderServiceCategories,
+  isBrazilTaxIdType,
+  isValidProviderIdNumber,
+} from '@/lib/providerOnboarding';
 
 const CONSULTATION_DURATIONS = [
   { value: 15, label: '15 min' },
@@ -64,7 +72,7 @@ const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
   address: z.string().min(5, isPt ? 'Informe um endereço válido' : isEs ? 'Ingresa una dirección válida' : 'Please enter a valid address'),
   service_radius_km: z.coerce.number().min(1).max(100),
   // Identity verification
-  id_type: z.enum(['cpf_cnpj', 'alternative']),
+  id_type: z.enum(PROVIDER_ID_TYPES),
   cpf_cnpj: z.string().optional(),
   passport_number: z.string().optional(),
   contact_phone: z.string().optional(),
@@ -90,23 +98,23 @@ const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
   }),
   credential_documents: z.any().optional(),
 }).refine((data) => {
-  if (data.id_type === 'cpf_cnpj') {
-    return data.cpf_cnpj && data.cpf_cnpj.length >= 11;
+  if (isBrazilTaxIdType(data.id_type)) {
+    return isValidProviderIdNumber(data.id_type, data.cpf_cnpj);
   }
   return true;
 }, {
-  message: isPt ? 'CPF/CNPJ é obrigatório' : isEs ? 'El CPF/CNPJ es obligatorio' : 'CPF/CNPJ is required',
+  message: isPt ? 'Informe um CPF ou CNPJ válido' : isEs ? 'Ingresa un CPF o CNPJ válido' : 'Enter a valid CPF or CNPJ number',
   path: ['cpf_cnpj'],
 }).refine((data) => {
-  if (data.id_type === 'alternative') {
-    return data.passport_number && data.passport_number.length >= 5;
+  if (!isBrazilTaxIdType(data.id_type)) {
+    return isValidProviderIdNumber(data.id_type, data.passport_number);
   }
   return true;
 }, {
-  message: isPt ? 'Número do passaporte é obrigatório' : isEs ? 'El número de pasaporte es obligatorio' : 'Passport number is required',
+  message: isPt ? 'Informe um número de identificação válido' : isEs ? 'Ingresa un número de identificación válido' : 'Enter a valid identification number',
   path: ['passport_number'],
 }).refine((data) => {
-  if (data.id_type === 'alternative') {
+  if (!isBrazilTaxIdType(data.id_type)) {
     return data.contact_phone && data.contact_phone.length >= 10;
   }
   return true;
@@ -114,7 +122,7 @@ const createFormSchema = (isPt: boolean, isEs: boolean) => z.object({
   message: isPt ? 'Telefone é obrigatório' : isEs ? 'El teléfono es obligatorio' : 'Phone number is required',
   path: ['contact_phone'],
 }).refine((data) => {
-  if (data.id_type === 'alternative') {
+  if (!isBrazilTaxIdType(data.id_type)) {
     return data.contact_email && data.contact_email.length > 0;
   }
   return true;
@@ -160,7 +168,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
       years_experience: 0,
       address: '',
       service_radius_km: 20,
-      id_type: 'cpf_cnpj',
+      id_type: 'cpf',
       cpf_cnpj: '',
       passport_number: '',
       contact_phone: '',
@@ -193,6 +201,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
   };
 
   const idType = form.watch('id_type');
+  const usesBrazilTaxId = isBrazilTaxIdType(idType);
 
   // Fetch service categories
   useEffect(() => {
@@ -203,7 +212,14 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
         .order('order_index');
       
       if (!error && data) {
-        setServiceCategories(data);
+        const medicalCategories = filterProviderServiceCategories(
+          data,
+          MEDICAL_SERVICE_CATEGORIES,
+        );
+        setServiceCategories(medicalCategories);
+        setSelectedServices((current) =>
+          filterAllowedServiceIds(current, medicalCategories),
+        );
       }
     };
     
@@ -306,6 +322,12 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
     setIsSubmitting(true);
 
     try {
+      const allowedSelectedServices = filterAllowedServiceIds(
+        selectedServices,
+        serviceCategories,
+      );
+      const usesBrazilTaxId = isBrazilTaxIdType(data.id_type);
+
       // Parse hospital affiliations from comma-separated text
       const hospitalAffiliations = data.hospital_affiliations_text
         ? data.hospital_affiliations_text.split(',').map((s) => s.trim()).filter(Boolean)
@@ -316,6 +338,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
         .from('providers')
         .insert({
           user_id: user.id,
+          platform: PLATFORM,
           business_name: data.business_name,
           business_type: data.business_type,
           tagline: data.tagline || null,
@@ -324,11 +347,11 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
           address: data.address,
           service_radius_km: data.service_radius_km,
           id_type: data.id_type,
-          cpf_cnpj: data.id_type === 'cpf_cnpj' ? data.cpf_cnpj : null,
-          passport_number: data.id_type === 'alternative' ? data.passport_number : null,
-          contact_phone: data.id_type === 'alternative' ? data.contact_phone : null,
-          contact_email: data.id_type === 'alternative' ? data.contact_email : null,
-          requires_background_check: data.id_type === 'alternative',
+          cpf_cnpj: usesBrazilTaxId ? data.cpf_cnpj : null,
+          passport_number: usesBrazilTaxId ? null : data.passport_number,
+          contact_phone: usesBrazilTaxId ? null : data.contact_phone,
+          contact_email: usesBrazilTaxId ? null : data.contact_email,
+          requires_background_check: !usesBrazilTaxId,
           languages: selectedLanguages,
           // Medical credentials
           crm_number: data.crm_number,
@@ -402,8 +425,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
 
       // Save selected services
       const allServiceIds = Array.from(new Set([
-        ...selectedServices,
-        ...(data.medical_specialty ? [data.medical_specialty] : []),
+        ...allowedSelectedServices,
       ]));
 
       if (allServiceIds.length > 0 && providerData) {
@@ -520,32 +542,40 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
-                        </SelectTrigger>
+                      </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="cpf_cnpj">{t('provider.cpfCnpj')}</SelectItem>
-                        <SelectItem value="alternative">{t('provider.alternativeId')}</SelectItem>
+                        <SelectItem value="cpf">{t('provider.idCpf')}</SelectItem>
+                        <SelectItem value="cnpj">{t('provider.idCnpj')}</SelectItem>
+                        <SelectItem value="ssn">{t('provider.idSsn')}</SelectItem>
+                        <SelectItem value="drivers_license">{t('provider.idDriversLicense')}</SelectItem>
+                        <SelectItem value="passport">{t('provider.idPassport')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      {idType === 'cpf_cnpj' 
-                        ? t('provider.cpfCnpjDescription') 
-                        : t('provider.alternativeIdDescription')}
+                      {t('provider.idTypeDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {idType === 'cpf_cnpj' ? (
+              {usesBrazilTaxId ? (
                 <FormField
                   control={form.control}
                   name="cpf_cnpj"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('provider.cpfCnpjNumber')}</FormLabel>
+                      <FormLabel>
+                        {idType === 'cpf' ? t('provider.idCpfNumber') : t('provider.idCnpjNumber')}
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="000.000.000-00" {...field} />
+                        <Input
+                          inputMode="numeric"
+                          autoComplete="off"
+                          placeholder={idType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -558,9 +588,14 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                     name="passport_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('provider.passportNumber')}</FormLabel>
+                        <FormLabel>{t(`provider.idNumberLabels.${idType}`)}</FormLabel>
                         <FormControl>
-                          <Input placeholder={t('provider.passportPlaceholder')} {...field} />
+                          <Input
+                            inputMode={idType === 'ssn' ? 'numeric' : 'text'}
+                            autoComplete="off"
+                            placeholder={t(`provider.idNumberPlaceholders.${idType}`)}
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

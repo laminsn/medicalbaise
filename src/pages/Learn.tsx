@@ -78,60 +78,46 @@ export default function Learn() {
 
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 py-12">
-          {isPt || isEs ? (
-            <div className="bg-card/50 border border-border/50 rounded-xl p-6 md:p-8 text-center">
-              <h2 className="text-xl font-semibold mb-2">{isPt ? 'Conteúdo em tradução' : 'Contenido en traducción'}</h2>
-              <p className="text-muted-foreground mb-4">
-                {isPt
-                  ? 'A Central de Aprendizado está sendo totalmente traduzida para português. Enquanto finalizamos essa etapa, você pode acessar a versão completa em inglês.'
-                  : 'El Centro de aprendizaje está siendo traducido completamente al español. Mientras finalizamos esta etapa, puedes acceder a la versión completa en inglés.'}
-              </p>
-              <Button onClick={() => i18n.changeLanguage('en')}>
-                {isPt ? 'Ver conteúdo completo em inglês' : 'Ver contenido completo en inglés'}
-              </Button>
-            </div>
-          ) : (
-            <Tabs defaultValue="getting-started" className="w-full">
-              <TabsList className="w-full justify-start bg-card/50 border border-border/50 rounded-xl p-1 mb-8 overflow-x-auto flex-nowrap">
-                <TabsTrigger value="getting-started" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
-                  <GraduationCap className="w-4 h-4 mr-2" />
-                  {isPt ? 'Primeiros passos' : isEs ? 'Primeros pasos' : 'Getting Started'}
-                </TabsTrigger>
-                <TabsTrigger value="faqs" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  FAQs
-                </TabsTrigger>
-                <TabsTrigger value="tutorials" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  {isPt ? 'Tutoriais' : isEs ? 'Tutoriales' : 'Tutorials'}
-                </TabsTrigger>
-                <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
-                  <PlayCircle className="w-4 h-4 mr-2" />
-                  {isPt ? 'Guias em vídeo' : isEs ? 'Guías en video' : 'Video Guides'}
-                </TabsTrigger>
-                <TabsTrigger value="sops" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
-                  <FileText className="w-4 h-4 mr-2" />
-                  {isPt ? 'POPs' : isEs ? 'POE' : 'SOPs'}
-                </TabsTrigger>
-              </TabsList>
+          <Tabs defaultValue="getting-started" className="w-full">
+            <TabsList className="w-full justify-start bg-card/50 border border-border/50 rounded-xl p-1 mb-8 overflow-x-auto flex-nowrap">
+              <TabsTrigger value="getting-started" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
+                <GraduationCap className="w-4 h-4 mr-2" />
+                {isPt ? 'Primeiros passos' : isEs ? 'Primeros pasos' : 'Getting Started'}
+              </TabsTrigger>
+              <TabsTrigger value="faqs" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
+                <HelpCircle className="w-4 h-4 mr-2" />
+                FAQs
+              </TabsTrigger>
+              <TabsTrigger value="tutorials" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
+                <BookOpen className="w-4 h-4 mr-2" />
+                {isPt ? 'Tutoriais' : isEs ? 'Tutoriales' : 'Tutorials'}
+              </TabsTrigger>
+              <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
+                <PlayCircle className="w-4 h-4 mr-2" />
+                {isPt ? 'Guias em vídeo' : isEs ? 'Guías en video' : 'Video Guides'}
+              </TabsTrigger>
+              <TabsTrigger value="sops" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-4">
+                <FileText className="w-4 h-4 mr-2" />
+                {isPt ? 'POPs' : isEs ? 'POE' : 'SOPs'}
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="getting-started">
-                <GettingStartedSection searchQuery={searchQuery} />
-              </TabsContent>
-              <TabsContent value="faqs">
-                <FAQSection searchQuery={searchQuery} />
-              </TabsContent>
-              <TabsContent value="tutorials">
-                <TutorialsSection searchQuery={searchQuery} />
-              </TabsContent>
-              <TabsContent value="videos">
-                <VideoTutorialsSection searchQuery={searchQuery} />
-              </TabsContent>
-              <TabsContent value="sops">
-                <SOPSection searchQuery={searchQuery} />
-              </TabsContent>
-            </Tabs>
-          )}
+            <TabsContent value="getting-started">
+              <GettingStartedSection searchQuery={searchQuery} />
+            </TabsContent>
+            <TabsContent value="faqs">
+              <FAQSection searchQuery={searchQuery} />
+            </TabsContent>
+            <TabsContent value="tutorials">
+              <TutorialsSection searchQuery={searchQuery} />
+            </TabsContent>
+            <TabsContent value="videos">
+              <VideoTutorialsSection searchQuery={searchQuery} />
+            </TabsContent>
+            <TabsContent value="sops">
+              <SOPSection searchQuery={searchQuery} />
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Version Info Footer */}

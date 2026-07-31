@@ -254,7 +254,7 @@ export function ConversionAnalyticsDashboard() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Conversion Analytics Report</title>
+        <title>{t('medicalGated.mgConversionAnalyticsReport', "Conversion Analytics Report")}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
           h1 { color: #047857; }
@@ -268,37 +268,37 @@ export function ConversionAnalyticsDashboard() {
         </style>
       </head>
       <body>
-        <h1>Conversion Analytics Report</h1>
+        <h1>{t('medicalGated.mgConversionAnalyticsReport', "Conversion Analytics Report")}</h1>
         <p>Period: ${dateRangeLabel}</p>
         <p>Generated: ${format(new Date(), 'MMMM d, yyyy HH:mm')}</p>
         
         <div class="metrics">
           <div class="metric">
             <div class="metric-value">${conversionRate}%</div>
-            <div class="metric-label">Conversion Rate</div>
+            <div class="metric-label">{t('medicalGated.mgConversionRate', "Conversion Rate")}</div>
           </div>
           <div class="metric">
             <div class="metric-value">${totalViews}</div>
-            <div class="metric-label">Total Visitors</div>
+            <div class="metric-label">{t('medicalGated.mgTotalVisitors', "Total Visitors")}</div>
           </div>
           <div class="metric">
             <div class="metric-value">${totalLeads}</div>
-            <div class="metric-label">Total Leads</div>
+            <div class="metric-label">{t('medicalGated.mgTotalLeads', "Total Leads")}</div>
           </div>
         </div>
         
-        <h2>Event Summary</h2>
+        <h2>{t('medicalGated.mgEventSummary', "Event Summary")}</h2>
         <table>
           <thead>
             <tr>
-              <th>Event Type</th>
+              <th>{t('medicalGated.mgEventType', "Event Type")}</th>
               <th style="text-align: right;">Count</th>
             </tr>
           </thead>
           <tbody>${summaryRows}</tbody>
         </table>
         
-        <h2>Recent Events (Last 50)</h2>
+        <h2>{t('medicalGated.mgRecentEventsLast', "Recent Events (Last 50)")}</h2>
         <table>
           <thead>
             <tr>

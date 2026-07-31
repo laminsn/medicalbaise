@@ -1,37 +1,37 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CreditCard, ReceiptText, ShieldCheck, Star } from 'lucide-react';
+import { CalendarDays, Radio, ReceiptText } from 'lucide-react';
 
 const TRUST_COPY = {
   en: {
-    eyebrow: 'Trust that sells',
-    title: 'Trusted by service providers globally to find trusted service providers',
-    subtitle: 'Compare verified profiles, real reviews, secure payments, and service records before choosing a pro.',
-    rating: '4.8 average rating',
-    proof: 'Trusted by over 30,000 small businesses, agencies, and global users worldwide',
-    verified: 'Verified providers',
-    secure: 'Secure payments',
-    records: 'Receipts and history',
+    eyebrow: 'Service-provider social discovery',
+    title: 'Post stories, go live, and authentically present your services to people who came to discover and meet providers.',
+    subtitle: 'MD Baise brings provider-led social content together with appointment requests, client relationships, and invoices—without treating public posts as medical advice.',
+    spotlight: 'Tools for an authentic provider presence',
+    guidance: 'Show your approach, workspace, availability, and service updates. Keep private health details out of public posts.',
+    social: 'Stories and live video',
+    operations: 'Appointments and CRM',
+    billing: 'Invoices and records',
   },
   es: {
-    eyebrow: 'Confianza que convierte',
-    title: 'Usado por proveedores de servicios globales para encontrar proveedores confiables',
-    subtitle: 'Compara perfiles verificados, reseñas reales, pagos seguros e historial de servicio antes de elegir.',
-    rating: 'Calificacion promedio 4.8',
-    proof: 'Con la confianza de mas de 30,000 pequenas empresas, agencias y usuarios globales',
-    verified: 'Proveedores verificados',
-    secure: 'Pagos seguros',
-    records: 'Recibos e historial',
+    eyebrow: 'Descubrimiento social de proveedores',
+    title: 'Publica historias, transmite en vivo y presenta tus servicios de forma auténtica a quienes llegaron para descubrir y conocer proveedores.',
+    subtitle: 'MD Baise reúne contenido social creado por proveedores con solicitudes de citas, relaciones con clientes y facturas, sin tratar las publicaciones públicas como asesoramiento médico.',
+    spotlight: 'Herramientas para una presencia auténtica',
+    guidance: 'Muestra tu enfoque, espacio de trabajo, disponibilidad y novedades. No publiques datos privados de salud.',
+    social: 'Historias y video en vivo',
+    operations: 'Citas y CRM',
+    billing: 'Facturas y registros',
   },
   pt: {
-    eyebrow: 'Confianca que converte',
-    title: 'Usado por prestadores de servico globais para encontrar prestadores confiaveis',
-    subtitle: 'Compare perfis verificados, avaliacoes reais, pagamentos seguros e historico antes de escolher.',
-    rating: 'Avaliacao media 4.8',
-    proof: 'Confiado por mais de 30.000 pequenas empresas, agencias e usuarios globais',
-    verified: 'Prestadores verificados',
-    secure: 'Pagamentos seguros',
-    records: 'Recibos e historico',
+    eyebrow: 'Descoberta social de prestadores',
+    title: 'Publique stories, faça lives e apresente seus serviços de forma autêntica a quem chegou para descobrir e conhecer prestadores.',
+    subtitle: 'O MD Baise reúne conteúdo social criado por prestadores com solicitações de consulta, relacionamento com clientes e faturas, sem tratar publicações públicas como orientação médica.',
+    spotlight: 'Ferramentas para uma presença autêntica',
+    guidance: 'Mostre sua abordagem, espaço de trabalho, disponibilidade e novidades. Não publique dados privados de saúde.',
+    social: 'Stories e vídeo ao vivo',
+    operations: 'Consultas e CRM',
+    billing: 'Faturas e registros',
   },
 } as const;
 
@@ -49,9 +49,9 @@ export function HomeTrustStrip() {
   );
 
   const signals = [
-    { label: copy.verified, icon: ShieldCheck },
-    { label: copy.secure, icon: CreditCard },
-    { label: copy.records, icon: ReceiptText },
+    { label: copy.social, icon: Radio },
+    { label: copy.operations, icon: CalendarDays },
+    { label: copy.billing, icon: ReceiptText },
   ];
 
   return (
@@ -66,13 +66,8 @@ export function HomeTrustStrip() {
 
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
             <div className="rounded-lg bg-muted/60 px-4 py-3">
-              <div className="flex items-center gap-1 text-amber-500" aria-hidden="true">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="mt-1 text-sm font-semibold">{copy.rating}</p>
-              <p className="text-xs text-muted-foreground">{copy.proof}</p>
+              <p className="mt-1 text-sm font-semibold">{copy.spotlight}</p>
+              <p className="text-xs text-muted-foreground">{copy.guidance}</p>
             </div>
 
             <div className="grid gap-2 sm:min-w-[340px] sm:grid-cols-3 lg:min-w-[380px]">

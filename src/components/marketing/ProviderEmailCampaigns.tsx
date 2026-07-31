@@ -45,30 +45,30 @@ const EMAIL_TEMPLATES = [
   {
     name: '🔥 Special Offer',
     subject: '🔥 Exclusive Offer Just for You!',
-    content: `<h2>Special Offer for Our Valued Followers!</h2>
-<p>As a thank you for following us, we're offering an <strong>exclusive discount</strong> this week only.</p>
-<p>📅 <strong>Limited time offer</strong> — Book before this Friday!</p>
+    content: `<h2>{t('medicalGated.mgSpecialOfferForOur', "Special Offer for Our Valued Followers!")}</h2>
+<p>{t('medicalGated.mgAsAThankYou', "As a thank you for following us, we're offering an")}<strong>exclusive discount</strong> this week only.</p>
+<p>📅 <strong>{t('medicalGated.mgLimitedTimeOffer', "Limited time offer")}</strong> — Book before this Friday!</p>
 <p>💰 <strong>20% off</strong> your first consultation</p>
-<p>Don't miss out on this opportunity to experience premium care at an unbeatable price.</p>`,
+<p>{t('medicalGated.mgDonTMissOut', "Don't miss out on this opportunity to experience premium care at an unbeatable price.")}</p>`,
   },
   {
     name: '📅 New Availability',
     subject: '📅 New Appointment Slots Available!',
-    content: `<h2>We've Opened New Appointment Slots!</h2>
-<p>Great news! We have <strong>new availability</strong> this week.</p>
-<p>Whether you need a routine check-up or a specialized consultation, we've got you covered.</p>
-<p>🕐 <strong>Morning and evening slots available</strong></p>
-<p>📍 <strong>In-person and teleconsultation options</strong></p>
-<p>Book now before slots fill up!</p>`,
+    content: `<h2>{t('medicalGated.mgWeVeOpenedNew', "We've Opened New Appointment Slots!")}</h2>
+<p>{t('medicalGated.mgGreatNewsWeHave', "Great news! We have")}<strong>new availability</strong> this week.</p>
+<p>{t('medicalGated.mgWhetherYouNeedA', "Whether you need a routine check-up or a specialized consultation, we've got you covered.")}</p>
+<p>🕐 <strong>{t('medicalGated.mgMorningAndEveningSlots', "Morning and evening slots available")}</strong></p>
+<p>📍 <strong>{t('medicalGated.mgInPersonAndTeleconsultation', "In-person and teleconsultation options")}</strong></p>
+<p>{t('medicalGated.mgBookNowBeforeSlots', "Book now before slots fill up!")}</p>`,
   },
   {
     name: '✨ New Service',
     subject: '✨ Exciting New Service Now Available!',
-    content: `<h2>Introducing Our Newest Service!</h2>
-<p>We're excited to announce that we now offer a <strong>brand new service</strong> designed to better serve your needs.</p>
-<p>🌟 <strong>State-of-the-art techniques</strong></p>
-<p>💯 <strong>Satisfaction guaranteed</strong></p>
-<p>Visit our profile to learn more and book your appointment today!</p>`,
+    content: `<h2>{t('medicalGated.mgIntroducingOurNewestService', "Introducing Our Newest Service!")}</h2>
+<p>{t('medicalGated.mgWeReExcitedTo', "We're excited to announce that we now offer a")}<strong>brand new service</strong> designed to better serve your needs.</p>
+<p>🌟 <strong>{t('medicalGated.mgStateOfTheArt', "State-of-the-art techniques")}</strong></p>
+<p>✅ <strong>{t('medicalGated.mgClearFollowUpAnd', "Clear follow-up and service-resolution policy")}</strong></p>
+<p>{t('medicalGated.mgVisitOurProfileTo', "Visit our profile to learn more and book your appointment today!")}</p>`,
   },
 ];
 
@@ -198,7 +198,7 @@ export function ProviderEmailCampaigns() {
       case 'completed':
         return <Badge className="bg-green-500/20 text-green-600 border-green-500/30">Sent</Badge>;
       case 'sending':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">Sending...</Badge>;
+        return <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">{t('medicalGated.mgSending', "Sending...")}</Badge>;
       case 'failed':
         return <Badge variant="destructive">Failed</Badge>;
       default:
@@ -229,7 +229,7 @@ export function ProviderEmailCampaigns() {
             </div>
             <div>
               <p className="text-2xl font-bold">{formatPrice(creditsBalance)}</p>
-              <p className="text-xs text-muted-foreground">Credit Balance</p>
+              <p className="text-xs text-muted-foreground">{t('medicalGated.mgCreditBalance', "Credit Balance")}</p>
             </div>
           </CardContent>
         </Card>
@@ -253,9 +253,7 @@ export function ProviderEmailCampaigns() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" />
-            Compose Email Campaign
-          </CardTitle>
+            <Mail className="h-5 w-5" />{t('medicalGated.mgComposeEmailCampaign', "Compose Email Campaign")}</CardTitle>
           <CardDescription>
             Send branded emails directly to your {followersCount} followers. Each email costs {formatPrice(COST_PER_EMAIL)}.
           </CardDescription>
@@ -263,7 +261,7 @@ export function ProviderEmailCampaigns() {
         <CardContent className="space-y-4">
           {/* Templates */}
           <div>
-            <p className="text-sm font-medium mb-2">Quick Templates</p>
+            <p className="text-sm font-medium mb-2">{t('medicalGated.mgQuickTemplates', "Quick Templates")}</p>
             <div className="flex flex-wrap gap-2">
               {EMAIL_TEMPLATES.map((tmpl) => (
                 <Button
@@ -282,7 +280,7 @@ export function ProviderEmailCampaigns() {
 
           {/* Subject */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Email Subject</label>
+            <label className="text-sm font-medium">{t('medicalGated.mgEmailSubject', "Email Subject")}</label>
             <Input
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
@@ -294,7 +292,7 @@ export function ProviderEmailCampaigns() {
 
           {/* Content */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Email Content (HTML supported)</label>
+            <label className="text-sm font-medium">{t('medicalGated.mgEmailContentHtmlSupported', "Email Content (HTML supported)")}</label>
             <Textarea
               value={htmlContent}
               onChange={(e) => setHtmlContent(e.target.value)}
@@ -320,7 +318,7 @@ export function ProviderEmailCampaigns() {
           {/* Preview */}
           {showPreview && (subject || htmlContent) && (
             <div className="rounded-lg border border-border bg-white dark:bg-card p-4">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Email Preview</p>
+              <p className="text-xs font-medium text-muted-foreground mb-2">{t('medicalGated.mgEmailPreview', "Email Preview")}</p>
               <div className="border-b border-border pb-2 mb-3">
                 <p className="text-xs text-muted-foreground">From: {providerName} via MDBaise</p>
                 <p className="font-semibold text-sm">{subject || '(No subject)'}</p>
@@ -341,7 +339,7 @@ export function ProviderEmailCampaigns() {
                 ) : (
                   <AlertCircle className="h-4 w-4 text-destructive" />
                 )}
-                <span className="text-sm font-medium">Estimated Cost</span>
+                <span className="text-sm font-medium">{t('medicalGated.mgEstimatedCost', "Estimated Cost")}</span>
               </div>
               <div className="text-right">
                 <p className="font-bold">{formatPrice(estimatedCost)}</p>
@@ -371,9 +369,7 @@ export function ProviderEmailCampaigns() {
           >
             {isSending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Sending campaign...
-              </>
+                <Loader2 className="h-4 w-4 animate-spin" />{t('medicalGated.mgSendingCampaign', "Sending campaign...")}</>
             ) : (
               <>
                 <Send className="h-4 w-4" />
@@ -388,9 +384,7 @@ export function ProviderEmailCampaigns() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Campaign History
-          </CardTitle>
+            <Clock className="h-5 w-5" />{t('medicalGated.mgCampaignHistory', "Campaign History")}</CardTitle>
         </CardHeader>
         <CardContent>
           {loadingHistory ? (
@@ -400,7 +394,7 @@ export function ProviderEmailCampaigns() {
           ) : campaigns.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Mail className="h-8 w-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">No email campaigns sent yet</p>
+              <p className="text-sm">{t('medicalGated.mgNoEmailCampaignsSent', "No email campaigns sent yet")}</p>
             </div>
           ) : (
             <div className="space-y-3">

@@ -137,7 +137,7 @@ export default function Profile() {
   return (
     <>
       <Helmet>
-        <title>{profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}` : t('profile.title')} - Brasil Base</title>
+        <title>{profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}` : t('profile.title')} - Medical Baise</title>
       </Helmet>
       <AppLayout>
       <div className="px-4 py-6">

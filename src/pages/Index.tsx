@@ -16,23 +16,23 @@ const Index = () => {
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
 
   const title = isPt
-    ? 'MD Baise - Encontre médicos e profissionais de saúde de confiança'
+    ? 'MD Baise - Descubra prestadores de serviços de saúde'
     : isEs
-      ? 'MD Baise - Encuentra médicos y profesionales de salud de confianza'
-      : 'MD Baise - Find Trusted Doctors & Healthcare Professionals';
+      ? 'MD Baise - Descubre proveedores de servicios de salud'
+      : 'MD Baise - Discover Healthcare Service Providers';
 
   const description = isPt
-    ? 'Conecte-se com médicos, especialistas e profissionais de saúde verificados. Agende consultas presenciais e teleconsultas. Confiado por milhares de pacientes.'
+    ? 'Descubra perfis de prestadores, acompanhe stories e lives e solicite consultas. Prestadores também podem gerenciar relacionamentos com clientes, faturas e registros no portal.'
     : isEs
-      ? 'Conéctate con médicos, especialistas y profesionales de salud verificados. Agenda consultas presenciales y teleconsultas. Con la confianza de miles de pacientes.'
-      : 'Connect with verified doctors, specialists, and healthcare providers. Book consultations, teleconsultations, and appointments. Trusted by thousands of patients.';
+      ? 'Descubre perfiles de proveedores, mira historias y transmisiones en vivo y solicita citas. Los proveedores también pueden gestionar relaciones con clientes, facturas y registros en el portal.'
+      : 'Discover provider profiles, watch stories and live video, and request appointments. Providers can also manage client relationships, invoices, and records in the portal.';
 
   return (
     <>
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <meta name="keywords" content="doctors, healthcare, medical, consultation, teleconsultation, appointment, specialist, clinic" />
+        <meta name="keywords" content="healthcare service providers, provider stories, live video, appointments, provider CRM, invoices, medical services" />
       </Helmet>
       <AppLayout>
         <main className="flex flex-col min-h-screen">

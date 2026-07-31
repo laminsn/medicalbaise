@@ -27,6 +27,7 @@ import {
 import { StoryFilterPanel } from './StoryFilterPanel';
 import { StoryTextPanel } from './StoryTextPanel';
 import { StickerPanel } from './StickerPanel';
+import { CameraZoomControl } from '@/components/camera/CameraZoomControl';
 
 interface CreateStoryDialogProps {
   open: boolean;
@@ -72,20 +73,28 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const autoStartAttemptedRef = useRef(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const {
     isRecording,
     isPreviewing,
+    isStartingPreview,
+    isChangingZoom,
     duration,
+    error: cameraError,
     recordedUrl,
     recordedBlob,
     facingMode,
+    zoom,
+    supportedZooms,
     startPreview,
     stopPreview,
     startRecording,
     stopRecording,
+    capturePhoto,
     flipCamera,
+    setZoom,
     cleanup: cleanupCamera,
   } = useCameraRecorder();
 
@@ -97,10 +106,21 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
 
   // Auto-start camera
   useEffect(() => {
-    if (open && captureMode === 'normal' && mode === 'capture' && !isPreviewing && videoRef.current) {
+    if (!open || captureMode !== 'normal' || mode !== 'capture') {
+      autoStartAttemptedRef.current = false;
+      return;
+    }
+
+    if (
+      !isPreviewing
+      && !isStartingPreview
+      && !autoStartAttemptedRef.current
+      && videoRef.current
+    ) {
+      autoStartAttemptedRef.current = true;
       startPreview(videoRef.current).catch(() => {});
     }
-  }, [open, captureMode, mode]);
+  }, [captureMode, isPreviewing, isStartingPreview, mode, open, startPreview]);
 
   // Auto-stop at max duration
   useEffect(() => {
@@ -172,7 +192,13 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
 
   // ─── Shutter: tap = photo, hold = video ───
   const handleShutterDown = useCallback(() => {
-    if (!isPreviewing || !videoRef.current) return;
+    if (!videoRef.current) return;
+    if (!isPreviewing) {
+      if (!isStartingPreview) {
+        startPreview(videoRef.current).catch(() => {});
+      }
+      return;
+    }
     isLongPress.current = false;
     longPressTimer.current = window.setTimeout(async () => {
       isLongPress.current = true;
@@ -180,9 +206,9 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
         // Recording start errors are handled by recorder state/toasts.
       }
     }, 300);
-  }, [isPreviewing, startRecording]);
+  }, [isPreviewing, isStartingPreview, startPreview, startRecording]);
 
-  const handleShutterUp = useCallback(() => {
+  const handleShutterUp = useCallback(async () => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
@@ -191,30 +217,22 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
     if (isRecording) {
       stopRecording();
     } else if (!isLongPress.current && isPreviewing && videoRef.current) {
-      // Quick tap → capture photo
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        if (facingMode === 'user') {
-          ctx.translate(canvas.width, 0);
-          ctx.scale(-1, 1);
-        }
-        ctx.drawImage(videoRef.current, 0, 0);
+      try {
+        const blob = await capturePhoto();
+        const file = new File([blob], 'photo.jpg', { type: blob.type || 'image/jpeg' });
+        setMediaFile(file);
+        setMediaType('image');
+        setPreviewUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
+        setMode('edit');
+        stopPreview();
+      } catch {
+        // The recorder exposes camera readiness errors to the surrounding UI.
       }
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
-          setMediaFile(file);
-          setMediaType('image');
-          setPreviewUrl(URL.createObjectURL(blob));
-          setMode('edit');
-          stopPreview();
-        }
-      }, 'image/jpeg', 0.92);
     }
-  }, [isRecording, isPreviewing, stopRecording, stopPreview, facingMode]);
+  }, [capturePhoto, isRecording, isPreviewing, stopRecording, stopPreview]);
 
   // When recording finishes → go to edit
   useEffect(() => {
@@ -352,7 +370,7 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="max-w-[420px] h-[90vh] max-h-[800px] p-0 overflow-hidden bg-black border-0 rounded-2xl">
+      <DialogContent className="max-w-[420px] h-[100dvh] sm:h-[90vh] sm:max-h-[800px] p-0 overflow-hidden bg-black border-0 sm:rounded-2xl [&>button]:hidden">
         <VisuallyHidden>
           <DialogTitle>{t('stories.create', 'Create Story')}</DialogTitle>
           <DialogDescription>{t('stories.createDesc', 'Capture or upload media')}</DialogDescription>
@@ -379,10 +397,27 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
 
                     {!isPreviewing && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black">
-                        <div className="text-center text-white/60">
-                          <Camera className="h-12 w-12 mx-auto mb-2 animate-pulse" />
-                          <p className="text-sm">{t('stories.startingCamera', 'Starting camera...')}</p>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => videoRef.current && startPreview(videoRef.current).catch(() => {})}
+                          disabled={isStartingPreview}
+                          className="max-w-[260px] rounded-2xl px-6 py-5 text-center text-white/70 transition-[transform,background-color] duration-150 ease-out active:scale-[0.97] disabled:cursor-wait"
+                        >
+                          <Camera className={cn(
+                            'mx-auto mb-2 h-12 w-12',
+                            isStartingPreview && 'animate-pulse',
+                          )} />
+                          <p className="text-sm font-medium text-white/80">
+                            {isStartingPreview
+                              ? t('stories.startingCamera', 'Starting camera…')
+                              : cameraError
+                                ? t('stories.retryCamera', 'Camera did not start — tap to retry')
+                                : t('stories.tapToStart', 'Tap to start camera')}
+                          </p>
+                          {cameraError && (
+                            <p className="mt-1 text-xs leading-relaxed text-white/45">{cameraError}</p>
+                          )}
+                        </button>
                       </div>
                     )}
 
@@ -408,6 +443,20 @@ export function CreateStoryDialog({ open, onOpenChange }: CreateStoryDialogProps
                           {Math.floor(duration / 60)}:{(duration % 60).toString().padStart(2, '0')}
                         </span>
                       </div>
+                    )}
+
+                    {isPreviewing && (
+                      <CameraZoomControl
+                        value={zoom}
+                        supportedPresets={supportedZooms}
+                        disabled={isRecording || isChangingZoom}
+                        onChange={(preset) => void setZoom(preset)}
+                        unsupportedLabel={t(
+                          'stories.zoomUnsupported',
+                          'This camera does not expose zoom controls',
+                        )}
+                        className="absolute bottom-[11.5rem] left-1/2 z-10 -translate-x-1/2"
+                      />
                     )}
 
                     {/* Bottom: shutter + gallery */}

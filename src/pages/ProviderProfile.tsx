@@ -45,8 +45,6 @@ import {
   Send,
   Loader2,
 } from 'lucide-react';
-import { VideoTestimonialList } from '@/components/testimonials/VideoTestimonialList';
-import { UploadTestimonialDialog } from '@/components/testimonials/UploadTestimonialDialog';
 import { CreateScheduledServiceDialog } from '@/components/scheduling/CreateScheduledServiceDialog';
 import { ProviderFeedTab } from '@/components/provider/ProviderFeedTab';
 import { PortfolioGallery } from '@/components/provider/PortfolioGallery';
@@ -63,7 +61,6 @@ export default function ProviderProfile() {
   const { startConversation } = useStartConversation();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-  const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [isSchedulingDialogOpen, setIsSchedulingDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
   const [pixelData, setPixelData] = useState<{ meta_pixel_id?: string; google_analytics_id?: string } | null>(null);
@@ -557,22 +554,19 @@ export default function ProviderProfile() {
               )}
             </TabsContent>
 
-            {/* Video Testimonials Tab */}
+            {/* Medical feedback is private by default and never published here. */}
             <TabsContent value="videos" className="space-y-4 mt-4">
               <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold">{t('videoTestimonials.title')}</h3>
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setIsTestimonialDialogOpen(true)}
-                    >
-                      <Video className="h-4 w-4 mr-2" />
-                      {t('videoTestimonials.leaveTestimonial')}
-                    </Button>
-                  </div>
-                  <VideoTestimonialList providerId={id || '1'} />
+                <CardContent className="space-y-3 p-5">
+                  <h3 className="font-semibold">{t('videoTestimonials.privateTitle', 'Private feedback')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('videoTestimonials.privateDescription', 'For medical privacy, feedback submitted through this page is not published on the profile.')}
+                  </p>
+                  <Button
+                    onClick={() => navigate(`/testimonial-request?providerId=${encodeURIComponent(provider.id)}&providerName=${encodeURIComponent(provider.business_name)}`)}
+                  >
+                    {t('videoTestimonials.privateCta', 'Send private feedback')}
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -668,14 +662,6 @@ export default function ProviderProfile() {
         <QuoteRequestForm
           isOpen={isQuoteModalOpen}
           onClose={() => setIsQuoteModalOpen(false)}
-          providerId={provider.id}
-          providerName={provider.business_name}
-        />
-
-        {/* Upload Testimonial Dialog */}
-        <UploadTestimonialDialog
-          open={isTestimonialDialogOpen}
-          onOpenChange={setIsTestimonialDialogOpen}
           providerId={provider.id}
           providerName={provider.business_name}
         />

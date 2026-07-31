@@ -105,15 +105,7 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <TabsContent value="campaigns">
-              {isPt || isEs ? (
-                <div className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
-                  {isPt
-                    ? 'Conteúdo de campanhas em tradução para português.'
-                    : 'Contenido de campañas en traducción al español.'}
-                </div>
-              ) : (
-                <AdminEmailCampaigns />
-              )}
+              <AdminEmailCampaigns />
             </TabsContent>
 
             <TabsContent value="partners">

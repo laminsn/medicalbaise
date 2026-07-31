@@ -67,7 +67,7 @@ export default function SubmitBid() {
 
       // Fetch job
       const { data: jobData } = await supabase
-        .from('jobs_posted')
+        .from('jobs_marketplace_public')
         .select('*')
         .eq('id', id)
         .maybeSingle();

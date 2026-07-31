@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
-  CheckCircle2,
   ExternalLink,
-  Gift,
   Loader2,
   PlayCircle,
   ShieldCheck,
@@ -29,17 +27,9 @@ import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
 import { localizedPublicPath } from '@/lib/publicPageSeo';
 
 type LocaleKey = 'en' | 'es' | 'pt';
-type RewardType = 'google_review' | 'video_testimonial';
 
 type TestimonialRequestProps = {
   defaultLocale?: LocaleKey;
-};
-
-type RewardRecord = {
-  id: string;
-  reward_type: RewardType;
-  status: string;
-  amount_brl: number;
 };
 
 const brandName = {
@@ -51,28 +41,27 @@ const brandName = {
 const COPY = {
   en: {
     title: 'Share your experience',
-    description: 'Submit a Google review or video testimonial after a completed Baise service and earn up to R$150 in future service credit once approved.',
+    description: 'Share honest feedback after a completed Baise service. Reviews and testimonials are always optional and never incentivized.',
     badge: 'Client testimonial request',
     eyebrow: 'Your experience helps the next client choose with confidence.',
     headline: 'Tell us how your service went.',
-    intro: 'After a completed service, you can help another client choose a trusted provider and earn future service credit after Baise approval.',
+    intro: 'After a completed service, you may share honest feedback. A public review is optional; a private video testimonial is reviewed before publication.',
     googleTitle: 'Google review',
-    googleCredit: 'R$50 future service credit',
-    googleBody: 'Leave one Google review for your completed service. After approval, the credit is added for future Baise services.',
+    googleCredit: 'Optional public feedback',
+    googleBody: 'If you choose to leave a public review, describe your genuine experience in your own words. No reward is offered.',
     googleButton: 'Open Google reviews',
     googlePending: 'Google review link coming soon',
-    googleConfirm: 'I posted my Google review',
     videoTitle: 'Video testimonial',
-    videoCredit: 'R$100 future service credit',
+    videoCredit: 'Optional internal testimonial',
     videoBody: 'Upload one short testimonial video sharing what was helpful, professional, or worth recommending.',
-    totalCredit: 'Total available credit',
-    totalCreditValue: 'R$150',
-    rulesTitle: 'Simple credit rules',
+    totalCredit: 'Feedback principles',
+    totalCreditValue: 'Honest and optional',
+    rulesTitle: 'Review integrity',
     rules: [
-      'One Google review credit per client.',
-      'One video testimonial credit per client.',
-      'Credits are approved after review and apply to future services.',
-      'Maximum testimonial credit is R$150 per client.',
+      'Share only your genuine service experience.',
+      'Public reviews and internal testimonials are optional.',
+      'No discount, credit, or payment is offered for a review.',
+      'Submitted videos are reviewed before any publication.',
     ],
     uploadTitle: 'Upload your testimonial video',
     uploadHint: 'MP4, WebM, or MOV. Max 50MB.',
@@ -82,11 +71,11 @@ const COPY = {
     descriptionPlaceholder: 'Share a few details about the provider, service quality, communication, or result.',
     uploadButton: 'Submit video for approval',
     uploading: 'Uploading...',
-    signInTitle: 'Sign in to claim testimonial credit',
-    signInBody: 'Credits and video uploads are attached to your Baise account so we can approve them only once per client.',
+    signInTitle: 'Sign in to share feedback',
+    signInBody: 'Video uploads are attached to your Baise account and reviewed before publication.',
     signInButton: 'Sign in to continue',
     missingProvider: 'Open this page from your completed-service email to attach the testimonial to the right provider.',
-    approvedNote: 'Submitted credits stay pending until Baise approves the review or video.',
+    approvedNote: 'Video testimonials remain private until reviewed and approved for publication.',
     alreadyClaimed: 'Already submitted',
     pendingReview: 'Pending approval',
     nextStep: 'Once submitted, you can continue using your Baise portal for receipts, invoices, messages, and service history.',
@@ -94,28 +83,27 @@ const COPY = {
   },
   es: {
     title: 'Comparte tu experiencia',
-    description: 'Envía una reseña de Google o un vídeo testimonial después de un servicio completado en Baise y gana hasta R$150 en crédito para servicios futuros una vez aprobado.',
+    description: 'Comparte comentarios honestos después de un servicio Baise. Las reseñas y testimonios siempre son opcionales y nunca incentivados.',
     badge: 'Solicitud de testimonio',
     eyebrow: 'Tu experiencia ayuda al próximo cliente a elegir con confianza.',
     headline: 'Cuéntanos cómo fue tu servicio.',
-    intro: 'Después de un servicio completado, puedes ayudar a otro cliente a elegir un proveedor confiable y ganar crédito futuro después de la aprobación de Baise.',
+    intro: 'Después de un servicio, puedes compartir comentarios honestos. Una reseña pública es opcional y un video se revisa antes de publicarse.',
     googleTitle: 'Reseña de Google',
-    googleCredit: 'R$50 de crédito para servicios futuros',
-    googleBody: 'Deja una reseña de Google por tu servicio completado. Después de la aprobación, el crédito se agrega para futuros servicios Baise.',
+    googleCredit: 'Comentario público opcional',
+    googleBody: 'Si decides dejar una reseña pública, describe tu experiencia genuina con tus propias palabras. No se ofrece recompensa.',
     googleButton: 'Abrir reseñas de Google',
     googlePending: 'Link de Google disponible pronto',
-    googleConfirm: 'Ya publiqué mi reseña',
     videoTitle: 'Vídeo testimonial',
-    videoCredit: 'R$100 de crédito para servicios futuros',
+    videoCredit: 'Testimonio interno opcional',
     videoBody: 'Sube un vídeo corto contando qué fue útil, profesional o digno de recomendar.',
-    totalCredit: 'Crédito total disponible',
-    totalCreditValue: 'R$150',
-    rulesTitle: 'Reglas simples del crédito',
+    totalCredit: 'Principios de comentarios',
+    totalCreditValue: 'Honesto y opcional',
+    rulesTitle: 'Integridad de reseñas',
     rules: [
-      'Un crédito por reseña de Google por cliente.',
-      'Un crédito por vídeo testimonial por cliente.',
-      'Los créditos se aprueban después de revisión y aplican a servicios futuros.',
-      'El crédito máximo por testimonios es R$150 por cliente.',
+      'Comparte solo tu experiencia genuina.',
+      'Las reseñas públicas y testimonios internos son opcionales.',
+      'No se ofrece descuento, crédito ni pago por una reseña.',
+      'Los videos se revisan antes de cualquier publicación.',
     ],
     uploadTitle: 'Sube tu vídeo testimonial',
     uploadHint: 'MP4, WebM o MOV. Máximo 50MB.',
@@ -125,11 +113,11 @@ const COPY = {
     descriptionPlaceholder: 'Comparte algunos detalles sobre el proveedor, calidad del servicio, comunicación o resultado.',
     uploadButton: 'Enviar vídeo para aprobación',
     uploading: 'Subiendo...',
-    signInTitle: 'Inicia sesión para reclamar crédito',
-    signInBody: 'Los créditos y vídeos se adjuntan a tu cuenta Baise para aprobarlos solo una vez por cliente.',
+    signInTitle: 'Inicia sesión para compartir comentarios',
+    signInBody: 'Los videos se vinculan a tu cuenta Baise y se revisan antes de su publicación.',
     signInButton: 'Iniciar sesión',
     missingProvider: 'Abre esta página desde tu email de servicio completado para conectar el testimonio con el proveedor correcto.',
-    approvedNote: 'Los créditos enviados quedan pendientes hasta que Baise apruebe la reseña o el vídeo.',
+    approvedNote: 'Los videos permanecen privados hasta ser revisados y aprobados para publicación.',
     alreadyClaimed: 'Ya enviado',
     pendingReview: 'Pendiente de aprobación',
     nextStep: 'Después de enviar, puedes seguir usando tu portal Baise para recibos, facturas, mensajes e historial de servicio.',
@@ -137,28 +125,27 @@ const COPY = {
   },
   pt: {
     title: 'Compartilhe sua experiência',
-    description: 'Envie uma avaliação no Google ou um vídeo depoimento depois de um serviço concluído na Baise e ganhe até R$150 em crédito para serviços futuros após aprovação.',
+    description: 'Compartilhe um feedback honesto depois de um serviço Baise. Avaliações e depoimentos são sempre opcionais e nunca incentivados.',
     badge: 'Pedido de depoimento do cliente',
     eyebrow: 'Sua experiência ajuda o próximo cliente a escolher com confiança.',
     headline: 'Conte como foi o seu serviço.',
-    intro: 'Depois de um serviço concluído, você pode ajudar outro cliente a escolher um prestador confiável e ganhar crédito futuro após a aprovação da Baise.',
+    intro: 'Depois de um serviço, você pode compartilhar um feedback honesto. Uma avaliação pública é opcional e o vídeo é analisado antes da publicação.',
     googleTitle: 'Avaliação no Google',
-    googleCredit: 'R$50 de crédito para serviços futuros',
-    googleBody: 'Deixe uma avaliação no Google sobre o serviço concluído. Depois da aprovação, o crédito é adicionado para futuros serviços Baise.',
+    googleCredit: 'Feedback público opcional',
+    googleBody: 'Se optar por uma avaliação pública, descreva sua experiência real com suas próprias palavras. Nenhuma recompensa é oferecida.',
     googleButton: 'Abrir avaliações do Google',
     googlePending: 'Link do Google em breve',
-    googleConfirm: 'Publiquei minha avaliação',
     videoTitle: 'Vídeo depoimento',
-    videoCredit: 'R$100 de crédito para serviços futuros',
+    videoCredit: 'Depoimento interno opcional',
     videoBody: 'Envie um vídeo curto contando o que foi útil, profissional ou vale recomendar.',
-    totalCredit: 'Crédito total disponível',
-    totalCreditValue: 'R$150',
-    rulesTitle: 'Regras simples do crédito',
+    totalCredit: 'Princípios do feedback',
+    totalCreditValue: 'Honesto e opcional',
+    rulesTitle: 'Integridade das avaliações',
     rules: [
-      'Um crédito por avaliação no Google por cliente.',
-      'Um crédito por vídeo depoimento por cliente.',
-      'Os créditos são aprovados após análise e valem para serviços futuros.',
-      'O crédito máximo por depoimentos é R$150 por cliente.',
+      'Compartilhe apenas sua experiência real.',
+      'Avaliações públicas e depoimentos internos são opcionais.',
+      'Nenhum desconto, crédito ou pagamento é oferecido por avaliação.',
+      'Vídeos enviados são analisados antes de qualquer publicação.',
     ],
     uploadTitle: 'Envie seu vídeo depoimento',
     uploadHint: 'MP4, WebM ou MOV. Máximo 50MB.',
@@ -168,11 +155,11 @@ const COPY = {
     descriptionPlaceholder: 'Compartilhe detalhes sobre o prestador, qualidade do serviço, comunicação ou resultado.',
     uploadButton: 'Enviar vídeo para aprovação',
     uploading: 'Enviando...',
-    signInTitle: 'Entre para solicitar o crédito',
-    signInBody: 'Créditos e vídeos ficam ligados à sua conta Baise para que possamos aprovar apenas uma vez por cliente.',
+    signInTitle: 'Entre para compartilhar seu feedback',
+    signInBody: 'Os vídeos ficam ligados à sua conta Baise e são analisados antes da publicação.',
     signInButton: 'Entrar para continuar',
     missingProvider: 'Abra esta página pelo email de serviço concluído para conectar o depoimento ao prestador certo.',
-    approvedNote: 'Créditos enviados ficam pendentes até a Baise aprovar a avaliação ou o vídeo.',
+    approvedNote: 'Vídeos permanecem privados até serem analisados e aprovados para publicação.',
     alreadyClaimed: 'Já enviado',
     pendingReview: 'Pendente de aprovação',
     nextStep: 'Depois do envio, você pode continuar usando o portal Baise para recibos, faturas, mensagens e histórico de serviços.',
@@ -194,7 +181,7 @@ const normalizeLocale = (language: string): LocaleKey => {
 
 export default function TestimonialRequest({ defaultLocale }: TestimonialRequestProps) {
   const { i18n } = useTranslation();
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const appKey = getBaiseAppKey();
@@ -204,33 +191,27 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
 
   const providerId = searchParams.get('providerId') || searchParams.get('provider_id') || '';
   const jobId = searchParams.get('jobId') || searchParams.get('job_id') || '';
-  const activeJobId = searchParams.get('activeJobId') || searchParams.get('active_job_id') || '';
   const providerName = searchParams.get('providerName') || searchParams.get('provider_name') || '';
   const googleReviewUrl =
     searchParams.get('googleReviewUrl') ||
     searchParams.get('google_review_url') ||
     String(import.meta.env.VITE_GOOGLE_REVIEW_URL || '');
 
-  const [rewards, setRewards] = useState<RewardRecord[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [isClaimingGoogle, setIsClaimingGoogle] = useState(false);
 
-  const googleReward = rewards.find((reward) => reward.reward_type === 'google_review');
-  const videoReward = rewards.find((reward) => reward.reward_type === 'video_testimonial');
   const signInPath = `/auth?redirect=${encodeURIComponent(`${window.location.pathname}${window.location.search}`)}`;
   const dashboardPath = user ? '/customer-dashboard' : '/auth';
 
   const hasProviderContext = Boolean(providerId);
-  const canUploadVideo = Boolean(user && hasProviderContext && !videoReward);
-  const canClaimGoogle = Boolean(user && hasProviderContext && !googleReward);
+  const canUploadVideo = Boolean(user && hasProviderContext);
 
   const proofStats = useMemo(() => [
-    { label: copy.googleTitle, value: 'R$50' },
-    { label: copy.videoTitle, value: 'R$100' },
+    { label: copy.googleTitle, value: copy.googleCredit },
+    { label: copy.videoTitle, value: copy.videoCredit },
     { label: copy.totalCredit, value: copy.totalCreditValue },
   ], [copy]);
 
@@ -247,82 +228,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
-
-  useEffect(() => {
-    if (!user) {
-      setRewards([]);
-      return;
-    }
-    void fetchRewards();
-  }, [user?.id, appKey]);
-
-  const fetchRewards = async () => {
-    if (!user) return;
-    const db = supabase as any;
-    const { data, error } = await db
-      .from('client_testimonial_rewards')
-      .select('id, reward_type, status, amount_brl')
-      .eq('customer_id', user.id)
-      .eq('app_key', appKey)
-      .in('reward_type', ['google_review', 'video_testimonial']);
-
-    if (error) {
-      return;
-    }
-
-    setRewards((data || []) as RewardRecord[]);
-  };
-
-  const recordReward = async (rewardType: RewardType, amountBrl: number, metadata: Record<string, unknown> = {}) => {
-    if (!user || !providerId) throw new Error('Missing testimonial request context');
-    const db = supabase as any;
-    const { data, error } = await db
-      .from('client_testimonial_rewards')
-      .insert({
-        app_key: appKey,
-        customer_id: user.id,
-        provider_id: providerId,
-        job_id: jobId || null,
-        active_job_id: activeJobId || null,
-        reward_type: rewardType,
-        amount_brl: amountBrl,
-        status: 'pending_review',
-        referral_code: profile?.referral_code || null,
-        client_id: profile?.client_id || null,
-        metadata: {
-          ...metadata,
-          referral_code: profile?.referral_code || null,
-          client_id: profile?.client_id || null,
-        },
-      })
-      .select('id, reward_type, status, amount_brl')
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        await fetchRewards();
-        throw new Error(copy.alreadyClaimed);
-      }
-      throw error;
-    }
-
-    setRewards((current) => [...current.filter((reward) => reward.reward_type !== rewardType), data as RewardRecord]);
-
-    if (profile?.referral_code) {
-      await db.rpc('track_referral_event', {
-        target_code: profile.referral_code,
-        target_event_type: rewardType === 'google_review' ? 'testimonial_google' : 'testimonial_video',
-        target_app_key: appKey,
-        event_metadata: {
-          reward_id: data?.id || null,
-          provider_id: providerId,
-          job_id: jobId || null,
-          active_job_id: activeJobId || null,
-          source: 'testimonial_request_page',
-        },
-      }).catch(() => null);
-    }
-  };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -355,23 +260,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const claimGoogleReview = async () => {
-    if (!canClaimGoogle) return;
-    setIsClaimingGoogle(true);
-    try {
-      await recordReward('google_review', 50, {
-        google_review_url: googleReviewUrl || null,
-        provider_name: providerName || null,
-        claimed_from: 'testimonial_request_page',
-      });
-      toast.success(copy.pendingReview);
-    } catch (error: any) {
-      toast.error(error.message || 'Unable to record Google review');
-    } finally {
-      setIsClaimingGoogle(false);
-    }
-  };
-
   const uploadVideo = async () => {
     if (!selectedFile || !canUploadVideo || !title.trim()) return;
     setIsUploading(true);
@@ -388,7 +276,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
         .from('testimonials')
         .getPublicUrl(fileName);
 
-      const { data: testimonial, error: testimonialError } = await supabase
+      const { error: testimonialError } = await supabase
         .from('video_testimonials')
         .insert({
           provider_id: providerId,
@@ -403,12 +291,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
         .single();
 
       if (testimonialError) throw testimonialError;
-
-      await recordReward('video_testimonial', 100, {
-        video_testimonial_id: testimonial?.id || null,
-        provider_name: providerName || null,
-        file_name: fileName,
-      });
 
       clearSelectedFile();
       setTitle('');
@@ -427,6 +309,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
         page="testimonial"
         locale={locale}
         path={localizedPublicPath('/testimonial-request', locale)}
+        basePath="/testimonial-request"
       />
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">
@@ -465,7 +348,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
               title={copy.googleTitle}
               credit={copy.googleCredit}
               body={copy.googleBody}
-              claimedLabel={googleReward ? rewardStatusLabel(googleReward.status, copy) : undefined}
             >
               <div className="grid gap-2">
                 <Button
@@ -483,16 +365,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
                     <span>{copy.googlePending}</span>
                   )}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="gap-2 border-white/15 bg-white/[0.04] text-white hover:bg-white/10 hover:text-white"
-                  disabled={!canClaimGoogle || isClaimingGoogle}
-                  onClick={claimGoogleReview}
-                >
-                  {isClaimingGoogle ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                  {googleReward ? copy.alreadyClaimed : copy.googleConfirm}
-                </Button>
               </div>
             </RewardCard>
 
@@ -501,7 +373,6 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
               title={copy.videoTitle}
               credit={copy.videoCredit}
               body={copy.videoBody}
-              claimedLabel={videoReward ? rewardStatusLabel(videoReward.status, copy) : undefined}
             >
               <Button
                 type="button"
@@ -628,7 +499,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
                 <h2 className="mt-1 text-4xl font-semibold tracking-tight">{copy.totalCreditValue}</h2>
                 <p className="mt-2 text-sm leading-6 text-black/58">{copy.approvedNote}</p>
               </div>
-              <Gift className="h-7 w-7 text-amber-500" />
+              <ShieldCheck className="h-7 w-7 text-emerald-700" />
             </div>
 
             <div className="rounded-lg bg-black/[0.04] p-4">

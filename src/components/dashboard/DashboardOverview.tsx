@@ -12,6 +12,7 @@ interface DashboardStats {
 
 export function DashboardOverview() {
   const { user } = useAuth();
+  const [loadError, setLoadError] = useState(false);
   const [stats, setStats] = useState<DashboardStats>({
     activeJobs: 0,
     avgRating: 0,
@@ -21,35 +22,72 @@ export function DashboardOverview() {
 
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
 
     const loadStats = async () => {
-      const [providerResult, activeJobsResult, unreadResult] = await Promise.all([
-        supabase
+      try {
+        setLoadError(false);
+        const { data: provider, error: providerError } = await supabase
           .from('providers')
-          .select('avg_rating, total_reviews')
+          .select('id, avg_rating, total_reviews')
           .eq('user_id', user.id)
-          .single(),
-        supabase
-          .from('active_jobs')
-          .select('*', { count: 'exact', head: true })
-          .eq('provider_id', user.id)
-          .eq('status', 'in_progress'),
-        supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('receiver_id', user.id)
-          .eq('is_read', false),
-      ]);
+          .maybeSingle();
 
-      setStats({
-        activeJobs: activeJobsResult.count ?? 0,
-        avgRating: providerResult.data?.avg_rating ?? 0,
-        totalReviews: providerResult.data?.total_reviews ?? 0,
-        unreadMessages: unreadResult.count ?? 0,
-      });
+        if (providerError) throw providerError;
+        if (!provider) {
+          if (!cancelled) {
+            setStats({ activeJobs: 0, avgRating: 0, totalReviews: 0, unreadMessages: 0 });
+          }
+          return;
+        }
+
+        const [activeJobsResult, conversationsResult] = await Promise.all([
+          supabase
+            .from('active_jobs')
+            .select('id', { count: 'exact', head: true })
+            .eq('provider_id', user.id)
+            .eq('job_status', 'in_progress'),
+          supabase
+            .from('conversations')
+            .select('id')
+            .eq('provider_id', provider.id),
+        ]);
+
+        if (activeJobsResult.error) throw activeJobsResult.error;
+        if (conversationsResult.error) throw conversationsResult.error;
+
+        const conversationIds = (conversationsResult.data || []).map(({ id }) => id);
+        let unreadMessages = 0;
+
+        if (conversationIds.length > 0) {
+          const unreadResult = await supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .in('conversation_id', conversationIds)
+            .neq('sender_id', user.id)
+            .eq('is_read', false);
+
+          if (unreadResult.error) throw unreadResult.error;
+          unreadMessages = unreadResult.count ?? 0;
+        }
+
+        if (!cancelled) {
+          setStats({
+            activeJobs: activeJobsResult.count ?? 0,
+            avgRating: provider.avg_rating ?? 0,
+            totalReviews: provider.total_reviews ?? 0,
+            unreadMessages,
+          });
+        }
+      } catch {
+        if (!cancelled) setLoadError(true);
+      }
     };
 
     loadStats();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   const cards = [
@@ -85,6 +123,14 @@ export function DashboardOverview() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      {loadError && (
+        <p
+          role="alert"
+          className="col-span-full rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          Dashboard stats are temporarily unavailable. Your account data is still safe.
+        </p>
+      )}
       {cards.map((card) => (
         <div key={card.label} className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-center gap-2 mb-1">

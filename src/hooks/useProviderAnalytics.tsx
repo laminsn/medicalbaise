@@ -41,22 +41,32 @@ export function useProviderAnalytics() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [providerId, setProviderId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setAnalytics(null);
+      setProviderId(null);
+      setError(null);
+      setLoading(false);
+      return;
+    }
 
     async function fetchProviderAndAnalytics() {
       setLoading(true);
+      setError(null);
       
       try {
         // Get provider ID for current user
-        const { data: provider } = await supabase
+        const { data: provider, error: providerError } = await supabase
           .from('providers')
           .select('id, avg_rating, total_reviews, total_jobs')
           .eq('user_id', user.id)
           .maybeSingle();
 
+        if (providerError) throw providerError;
         if (!provider) {
+          setAnalytics(null);
           setLoading(false);
           return;
         }
@@ -69,7 +79,8 @@ export function useProviderAnalytics() {
           reviewsResult,
           servicesResult,
           conversationsResult,
-          profileViewsResult
+          profileViewsResult,
+          messagesResult,
         ] = await Promise.all([
           // Get completed active jobs for revenue and job counts
           supabase
@@ -99,14 +110,31 @@ export function useProviderAnalytics() {
           supabase
             .from('profile_views')
             .select('id, viewed_at')
-            .eq('provider_id', provider.id)
+            .eq('provider_id', provider.id),
+
+          supabase
+            .from('messages')
+            .select('conversation_id, sender_id, created_at, conversations!inner(provider_id)')
+            .eq('conversations.provider_id', provider.id)
+            .order('created_at', { ascending: true })
         ]);
+
+        const failedResult = [
+          activeJobsResult,
+          reviewsResult,
+          servicesResult,
+          conversationsResult,
+          profileViewsResult,
+          messagesResult,
+        ].find((result) => result.error);
+        if (failedResult?.error) throw failedResult.error;
 
         const activeJobs = activeJobsResult.data || [];
         const reviews = reviewsResult.data || [];
         const services = servicesResult.data || [];
         const conversations = conversationsResult.data || [];
         const profileViews = profileViewsResult.data || [];
+        const messages = messagesResult.data || [];
 
         // Calculate total jobs and revenue
         const completedJobs = activeJobs.filter(j => j.job_status === 'completed');
@@ -119,18 +147,22 @@ export function useProviderAnalytics() {
         const serviceBreakdown = calculateServiceBreakdown(services);
 
         // Calculate repeat customers
-        const customerIds = activeJobs.map(j => j.customer_id);
-        const uniqueCustomers = new Set(customerIds);
-        const repeatCustomerCount = customerIds.length - uniqueCustomers.size;
-        const repeatCustomerRate = uniqueCustomers.size > 0 
-          ? Math.round((repeatCustomerCount / customerIds.length) * 100) 
+        const customerJobCounts = activeJobs.reduce<Record<string, number>>((counts, job) => {
+          if (job.customer_id) {
+            counts[job.customer_id] = (counts[job.customer_id] || 0) + 1;
+          }
+          return counts;
+        }, {});
+        const customerCounts = Object.values(customerJobCounts);
+        const repeatCustomerRate = customerCounts.length > 0
+          ? Math.round((customerCounts.filter((count) => count > 1).length / customerCounts.length) * 100)
           : 0;
 
         // Calculate completion rate
         const totalStartedJobs = activeJobs.filter(j => j.start_date).length;
         const completionRate = totalStartedJobs > 0 
           ? Math.round((completedJobs.length / totalStartedJobs) * 100) 
-          : 100;
+          : 0;
 
         // Calculate average completion time
         const jobsWithDates = completedJobs.filter(j => j.start_date && j.actual_completion_date);
@@ -145,8 +177,22 @@ export function useProviderAnalytics() {
           avgCompletionDays = Math.round((totalDays / jobsWithDates.length) * 10) / 10;
         }
 
-        // Estimate response rate (simplified - based on conversations with messages)
-        const responseRate = conversations.length > 0 ? 95 : 100; // Placeholder
+        const messagesByConversation = messages.reduce<Record<string, typeof messages>>((groups, message) => {
+          (groups[message.conversation_id] ||= []).push(message);
+          return groups;
+        }, {});
+        const conversationsWithInbound = conversations.filter((conversation) =>
+          (messagesByConversation[conversation.id] || []).some((message) => message.sender_id !== user.id)
+        );
+        const respondedConversations = conversationsWithInbound.filter((conversation) => {
+          const thread = messagesByConversation[conversation.id] || [];
+          const firstInboundIndex = thread.findIndex((message) => message.sender_id !== user.id);
+          return firstInboundIndex >= 0
+            && thread.slice(firstInboundIndex + 1).some((message) => message.sender_id === user.id);
+        });
+        const responseRate = conversationsWithInbound.length > 0
+          ? Math.round((respondedConversations.length / conversationsWithInbound.length) * 100)
+          : 0;
 
         // Calculate average rating from reviews or use provider's stored value
         const avgRating = reviews.length > 0
@@ -164,9 +210,11 @@ export function useProviderAnalytics() {
           responseRate,
           completionRate,
           repeatCustomers: repeatCustomerRate,
-          avgCompletionDays: avgCompletionDays || 2.5,
+          avgCompletionDays,
         });
-      } catch (error) {
+      } catch {
+        setAnalytics(null);
+        setError('Analytics are temporarily unavailable. Please try again.');
 
       } finally {
         setLoading(false);
@@ -176,7 +224,7 @@ export function useProviderAnalytics() {
     fetchProviderAndAnalytics();
   }, [user]);
 
-  return { analytics, loading, providerId };
+  return { analytics, loading, providerId, error };
 }
 
 function calculateMonthlyData(jobs: any[]): MonthlyData[] {

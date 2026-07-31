@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Video, Radio, Square, Eye, Camera, CameraOff, 
-  MessageSquare, Send, Users, X 
+  MessageSquare, Send, Users, X, SwitchCamera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +21,18 @@ import { toast } from 'sonner';
 import { useLiveStream, StreamMessage } from '@/hooks/useLiveStream';
 import { supabase } from '@/integrations/supabase/client';
 import { StreamReactions } from './StreamReactions';
+import {
+  applyCameraZoom,
+  findCameraDeviceForZoom,
+  getCameraVideoConstraints,
+  getCameraZoomSupport,
+  listVideoInputDevices,
+  normalizeCameraTrack,
+  type CameraFacingMode,
+  type CameraZoomPreset,
+} from '@/lib/camera';
+import { CameraZoomControl } from '@/components/camera/CameraZoomControl';
+import { cn } from '@/lib/utils';
 
 
 interface LiveBroadcastDialogProps {
@@ -39,12 +51,25 @@ export function LiveBroadcastDialog({
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const tx = (en: string, pt: string, es: string) => (isPt ? pt : isEs ? es : en);
+  const tx = useCallback(
+    (en: string, pt: string, es: string) => (isPt ? pt : isEs ? es : en),
+    [isEs, isPt],
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraDevicesRef = useRef<MediaDeviceInfo[]>([]);
+  const cameraFacingRef = useRef<CameraFacingMode>('environment');
+  const physicalLensZoomRef = useRef<CameraZoomPreset>(1);
+  const initCameraTimeoutRef = useRef<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [chatMessage, setChatMessage] = useState('');
   const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [cameraFacing, setCameraFacing] = useState<CameraFacingMode>('environment');
+  const [cameraZoom, setCameraZoom] = useState<CameraZoomPreset>(1);
+  const [supportedZooms, setSupportedZooms] = useState<CameraZoomPreset[]>([1]);
+  const [supportedTrackZooms, setSupportedTrackZooms] = useState<CameraZoomPreset[]>([1]);
+  const [isChangingCamera, setIsChangingCamera] = useState(false);
   const [duration, setDuration] = useState(0);
   
   const {
@@ -58,21 +83,82 @@ export function LiveBroadcastDialog({
   } = useLiveStream();
 
   // Initialize camera preview
-  const initializeCamera = useCallback(async () => {
+  const initializeCamera = useCallback(async (options?: {
+    facing?: CameraFacingMode;
+    deviceId?: string;
+    displayedZoom?: CameraZoomPreset;
+  }) => {
     if (!videoRef.current) return;
-    
+
+    const facing = options?.facing ?? cameraFacingRef.current;
+    const displayedZoom = options?.displayedZoom ?? 1;
+    const videoElement = videoRef.current;
+
     try {
+      setCameraReady(false);
+      setCameraError(null);
+
+      if (videoElement.srcObject) {
+        (videoElement.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 1280, height: 720, facingMode: 'user' },
-        audio: true
+        video: getCameraVideoConstraints(facing, options?.deviceId),
+        audio: false,
       });
-      
-      videoRef.current.srcObject = stream;
+
+      await Promise.all(stream.getVideoTracks().map((track) => normalizeCameraTrack(track, 'motion')));
+
+      try {
+        const microphoneStream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+        microphoneStream.getAudioTracks().forEach((track) => stream.addTrack(track));
+      } catch {
+        toast.warning(tx(
+          'Camera is ready, but microphone access is off.',
+          'A câmera está pronta, mas o acesso ao microfone está desativado.',
+          'La cámara está lista, pero el acceso al micrófono está desactivado.',
+        ));
+      }
+
+      const devices = await listVideoInputDevices();
+      const track = stream.getVideoTracks()[0];
+      const support = track
+        ? getCameraZoomSupport(track, devices, facing)
+        : {
+            presets: [1] as CameraZoomPreset[],
+            trackPresets: [1] as CameraZoomPreset[],
+          };
+      const resolvedZoom = support.presets.includes(displayedZoom) ? displayedZoom : 1;
+
+      cameraDevicesRef.current = devices;
+      cameraFacingRef.current = facing;
+      physicalLensZoomRef.current = resolvedZoom === 0.5 || resolvedZoom >= 2
+        ? resolvedZoom
+        : 1;
+      setCameraFacing(facing);
+      setCameraZoom(resolvedZoom);
+      setSupportedZooms(support.presets);
+      setSupportedTrackZooms(support.trackPresets);
+      videoElement.srcObject = stream;
+      videoElement.muted = true;
+      await videoElement.play();
       setCameraReady(true);
     } catch (err) {
+      setCameraError(tx(
+        'Failed to access camera. Please check permissions.',
+        'Falha ao acessar a câmera. Verifique as permissões.',
+        'No se pudo acceder a la cámara. Revisa los permisos.',
+      ));
       toast.error(tx('Failed to access camera. Please check permissions.', 'Falha ao acessar a câmera. Verifique as permissões.', 'No se pudo acceder a la cámara. Revisa los permisos.'));
     }
-  }, [isPt, isEs]);
+  }, [tx]);
 
   // Stop camera preview
   const stopCamera = useCallback(() => {
@@ -82,7 +168,76 @@ export function LiveBroadcastDialog({
       videoRef.current.srcObject = null;
     }
     setCameraReady(false);
+    setCameraError(null);
   }, []);
+
+  const flipCamera = useCallback(async () => {
+    if (isStreaming || isChangingCamera) return;
+    const facing: CameraFacingMode = cameraFacing === 'user' ? 'environment' : 'user';
+    setIsChangingCamera(true);
+    try {
+      await initializeCamera({ facing, displayedZoom: 1 });
+    } finally {
+      setIsChangingCamera(false);
+    }
+  }, [cameraFacing, initializeCamera, isChangingCamera, isStreaming]);
+
+  const changeZoom = useCallback(async (preset: CameraZoomPreset) => {
+    const videoElement = videoRef.current;
+    const stream = videoElement?.srcObject as MediaStream | null;
+    const track = stream?.getVideoTracks()[0];
+    if (!videoElement || !track || isChangingCamera) return;
+    if (!supportedZooms.includes(preset)) return;
+
+    setIsChangingCamera(true);
+    try {
+      const currentDeviceId = track.getSettings().deviceId;
+      const targetDevice = findCameraDeviceForZoom(
+        cameraDevicesRef.current,
+        cameraFacing,
+        preset,
+        currentDeviceId,
+      );
+      const needsStandardLens = preset === 1 && physicalLensZoomRef.current !== 1;
+      const needsLensSwitch = targetDevice
+        && targetDevice.deviceId !== currentDeviceId
+        && (preset === 0.5 || preset >= 2 || needsStandardLens);
+
+      if (needsLensSwitch) {
+        if (isStreaming) {
+          setCameraError(tx(
+            'Lens switching is unavailable while live. Track zoom remains available.',
+            'A troca de lente não está disponível durante a transmissão. O zoom da câmera continua disponível.',
+            'El cambio de lente no está disponible durante la transmisión. El zoom de la cámara sigue disponible.',
+          ));
+          return;
+        }
+        await initializeCamera({
+          facing: cameraFacing,
+          deviceId: targetDevice.deviceId,
+          displayedZoom: preset,
+        });
+        return;
+      }
+
+      const applied = await applyCameraZoom(track, preset);
+      if (applied || preset === 1) {
+        physicalLensZoomRef.current = 1;
+        setCameraZoom(preset);
+        setCameraError(null);
+      } else {
+        setCameraError(tx(
+          'Zoom is not supported by the active camera.',
+          'O zoom não é compatível com a câmera ativa.',
+          'El zoom no es compatible con la cámara activa.',
+        ));
+      }
+    } catch {
+      setCameraError(tx('Unable to change zoom.', 'Não foi possível alterar o zoom.', 'No se pudo cambiar el zoom.'));
+    } finally {
+      setIsChangingCamera(false);
+    }
+  }, [cameraFacing, initializeCamera, isChangingCamera, isStreaming, supportedZooms, tx]);
 
   // Notify all followers when going live
   const notifyFollowers = useCallback(async (streamId: string, pId: string, pName: string, streamTitle: string) => {
@@ -170,12 +325,19 @@ export function LiveBroadcastDialog({
   // Initialize camera when dialog opens
   useEffect(() => {
     if (open) {
-      setTimeout(initializeCamera, 100);
+      initCameraTimeoutRef.current = window.setTimeout(() => void initializeCamera(), 100);
     } else {
       if (!isStreaming) {
         stopCamera();
       }
     }
+
+    return () => {
+      if (initCameraTimeoutRef.current) {
+        window.clearTimeout(initCameraTimeoutRef.current);
+        initCameraTimeoutRef.current = null;
+      }
+    };
   }, [open, isStreaming, initializeCamera, stopCamera]);
 
   // Cleanup on close
@@ -227,11 +389,14 @@ export function LiveBroadcastDialog({
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-full object-contain scale-x-[-1]"
+                  className={cn(
+                    'h-full w-full object-contain',
+                    cameraFacing === 'user' && 'scale-x-[-1]',
+                  )}
                 />
                 
                 {/* Loading State */}
-                {!cameraReady && !error && (
+                {!cameraReady && !cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted">
                     <div className="text-center">
                       <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-2 animate-pulse" />
@@ -241,17 +406,53 @@ export function LiveBroadcastDialog({
                 )}
                 
                 {/* Error State */}
-                {error && (
+                {cameraError && (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted">
                     <div className="text-center p-4">
                       <CameraOff className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
                       <p className="text-sm text-muted-foreground mb-2">{tx('Camera access denied', 'Acesso à câmera negado', 'Acceso a cámara denegado')}</p>
-                      <Button variant="outline" size="sm" onClick={initializeCamera}>
+                      <Button variant="outline" size="sm" onClick={() => void initializeCamera()}>
                         <Camera className="h-4 w-4 mr-2" />
                         {tx('Retry', 'Tentar novamente', 'Reintentar')}
                       </Button>
                     </div>
                   </div>
+                )}
+
+                {cameraReady && (
+                  <>
+                    {!isStreaming && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      onClick={() => void flipCamera()}
+                      disabled={isChangingCamera}
+                      className="absolute right-3 top-3 h-10 w-10 rounded-full border border-white/10 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-black/70 active:scale-[0.97]"
+                      aria-label={tx('Switch camera', 'Trocar câmera', 'Cambiar cámara')}
+                    >
+                      <SwitchCamera className="h-5 w-5" />
+                    </Button>
+                    )}
+                    <CameraZoomControl
+                      value={cameraZoom}
+                      supportedPresets={
+                        isStreaming && physicalLensZoomRef.current === 1
+                          ? supportedTrackZooms
+                          : isStreaming
+                            ? [cameraZoom]
+                            : supportedZooms
+                      }
+                      disabled={isChangingCamera}
+                      onChange={(preset) => void changeZoom(preset)}
+                      unsupportedLabel={tx(
+                        'Zoom is unavailable on this active camera',
+                        'O zoom não está disponível nesta câmera ativa',
+                        'El zoom no está disponible en esta cámara activa',
+                      )}
+                      className="absolute bottom-3 left-1/2 -translate-x-1/2"
+                    />
+                  </>
                 )}
                 
                 {/* Live Indicator */}

@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "generated": "2026-07-23",
+    "purpose": "Per-platform native-app handoff matrix for empire link-in-bio hubs.",
+    "confidence_legend": {
+      "VERIFIED": "Confirmed against a primary/official source cited in `sources`.",
+      "PARTIAL": "Android path confirmed, iOS scheme not confirmed against a primary source. Web fallback always applies.",
+      "UNVERIFIED": "Not confirmed. The resolver will NOT emit a native handoff for this row; it degrades to the plain web URL."
+    },
+    "rule": "A row that is not VERIFIED or PARTIAL never produces a scheme/intent handoff. Degrading to a working https link is always preferred over shipping a guess that fails silently.",
+    "research": "BUSINESSES/knowledge-base/marketing/deep-link-research-2026-07-23.md"
+  },
+
+  "youtube": {
+    "confidence": "PARTIAL",
+    "web": "https://www.youtube.com/{handle}",
+    "ios_scheme": "youtube://www.youtube.com/{handle}",
+    "ios_note": "Apple's archived URL-scheme reference states YouTube is addressed via http(s) links rather than a documented youtube:// scheme. The scheme is widely reported to work but is NOT confirmed against an official source — hence PARTIAL. iOS relies primarily on Universal Links, which in-app WebViews frequently suppress.",
+    "android_package": "com.google.android.youtube",
+    "sources": [
+      "https://developer.chrome.com/docs/android/intents",
+      "https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/YouTubeLinks/YouTubeLinks.html",
+      "https://support.google.com/youtube/answer/7174035"
+    ]
+  },
+
+  "instagram": {
+    "confidence": "VERIFIED",
+    "web": "https://www.instagram.com/{handle}/",
+    "ios_scheme": "instagram://user?username={handle}",
+    "android_package": "com.instagram.android",
+    "sources": [
+      "https://dev.to/ahandsel/instagram-url-schemes-1k6n",
+      "https://gist.github.com/imbudhiraja/5b0a485fb7f36fb16c9d7d5f19b6ee40"
+    ]
+  },
+
+  "facebook": {
+    "confidence": "UNVERIFIED",
+    "web": "https://www.facebook.com/{handle}",
+    "ios_scheme": "fb://profile/{numeric_id}",
+    "blocker": "The classic fb:// profile scheme keys off a NUMERIC page id, not the vanity @name. We hold no numeric page ids, so this row cannot ship a handoff. Degrades to the plain https URL. (Downgraded from PARTIAL after Grok research 2026-07-23 — the facewebmodal variant is community-only and the numeric requirement is the real constraint.)",
+    "android_package": "com.facebook.katana",
+    "sources": ["https://gist.github.com/imbudhiraja/5b0a485fb7f36fb16c9d7d5f19b6ee40"]
+  },
+
+  "linkedin": {
+    "confidence": "UNVERIFIED",
+    "web": "https://www.linkedin.com/{path}",
+    "ios_scheme": "linkedin://profile/{id}",
+    "blocker": "Public reports CONFLICT on whether the path takes a numeric id or a vanity slug, and there is no official public scheme catalog. Not shippable without device testing. Degrades to the plain https URL. (Downgraded from PARTIAL after Grok research 2026-07-23.)",
+    "android_package": "com.linkedin.android",
+    "sources": ["https://gist.github.com/imbudhiraja/5b0a485fb7f36fb16c9d7d5f19b6ee40"]
+  },
+
+  "spotify": {
+    "confidence": "VERIFIED",
+    "web": "https://open.spotify.com/{path}",
+    "ios_scheme": "spotify://{path}",
+    "ios_note": "Spotify's documented canonical form is the colon URI (spotify:show:<id>, spotify:artist:<id>). The spotify://<path> form is the URL-shaped equivalent. If a handoff misbehaves on device, switch this row to the colon form.",
+    "android_package": "com.spotify.music",
+    "android_note": "Spotify's own Android content-linking docs give com.spotify.music. A widely-copied public gist lists com.spotify.mobile.android.ui, which is stale — do not use it.",
+    "sources": [
+      "https://developer.spotify.com/documentation/android/tutorials/content-linking",
+      "https://developer.spotify.com/documentation/ios/tutorials/content-linking"
+    ]
+  },
+
+  "whatsapp": {
+    "confidence": "VERIFIED",
+    "web": "https://wa.me/{number}",
+    "ios_scheme": null,
+    "ios_note": "No scheme needed. wa.me is WhatsApp's own universal-link service and already hands off to the app on both platforms.",
+    "android_package": "com.whatsapp",
+    "sources": ["https://faq.whatsapp.com/5913398998672934"]
+  },
+
+  "tiktok": {
+    "confidence": "UNVERIFIED",
+    "web": "https://www.tiktok.com/@{handle}",
+    "ios_scheme": null,
+    "blocker": "TWO separate problems. (1) snssdk1128 is DOUYIN (the China app), NOT global TikTok — global TikTok's SDK lists snssdk1233 / snssdk1180, and those are documented for install-DETECTION, not as a public profile deep-link format. (2) The Douyin-family profile path keys off a NUMERIC uid, not the @handle, and there is no stable official public endpoint mapping @handle to that uid. Correcting an earlier draft of this file that would have shipped snssdk1128 for global TikTok. Use the plain https URL.",
+    "android_package": "com.zhiliaoapp.musically",
+    "android_note": "Community-reported for global TikTok; not confirmed against an official source.",
+    "sources": [
+      "https://developers.tiktok.com/doc/mobile-sdk-ios-quickstart",
+      "https://github.com/Oct1a/TikTok-Scheme",
+      "https://www.codeofaninja.com/tools/find-tiktok-id/"
+    ]
+  },
+
+  "apple_podcasts": {
+    "confidence": "UNVERIFIED",
+    "web": "https://podcasts.apple.com/{path}",
+    "ios_scheme": "podcasts://",
+    "blocker": "Not confirmed against an official Apple source. Degrades to the plain https URL — which is correct: podcasts.apple.com is an Apple Universal Link and opens the Podcasts app on iOS natively. Android has no first-party Apple Podcasts app.",
+    "android_package": null,
+    "sources": []
+  },
+
+  "youtube_music": {
+    "confidence": "PARTIAL",
+    "web": "https://music.youtube.com/{path}",
+    "ios_scheme": "youtubemusic://{path}",
+    "ios_note": "The Android package is confirmed; the iOS scheme is community-reported, not officially documented. On iOS the web URL is used (Universal Links open the app). PARTIAL = Android intent handoff only.",
+    "android_package": "com.google.android.apps.youtube.music",
+    "sources": [
+      "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.music"
+    ]
+  },
+
+  "amazon_music": {
+    "confidence": "PARTIAL",
+    "web": "https://music.amazon.com/{path}",
+    "ios_scheme": null,
+    "ios_note": "No confirmed iOS scheme; the web URL opens the app via Universal Links on iOS. Android package is confirmed → intent handoff on Android only.",
+    "android_package": "com.amazon.mp3",
+    "sources": [
+      "https://play.google.com/store/apps/details?id=com.amazon.mp3"
+    ]
+  },
+
+  "deezer": {
+    "confidence": "PARTIAL",
+    "web": "https://www.deezer.com/{path}",
+    "ios_scheme": "deezer://www.deezer.com/{path}",
+    "ios_note": "The deezer:// scheme (deezer://www.deezer.com/<type>/<id>) is confirmed in long-standing app-behavior reports; the podcast show path (show/<id>) is less re-verified for 2026 — retest on device. iOS uses the web URL (Universal Links) regardless; PARTIAL = Android intent handoff only.",
+    "android_package": "deezer.android.app",
+    "android_note": "Play Store id confirmed (Grok live probe 2026-07-23). Meaningful for the Brazilian audience (Fica com Deus).",
+    "sources": [
+      "https://play.google.com/store/apps/details?id=deezer.android.app"
+    ]
+  },
+
+  "_browser_escape": {
+    "confidence": "UNVERIFIED",
+    "ios": "x-safari-https://{host_and_path}",
+    "ios_note": "DOWNGRADED 2026-07-23 after Grok research. x-safari-https historically worked but is widely reported BROKEN/BLOCKED in modern Instagram and Facebook builds, and it fails SILENTLY. Meta actively intercepts Safari-escape tricks; engineers report there is no reliable silent 'always leave Instagram' path. Keep it as a best-effort attempt only.",
+    "android": "intent://{host_and_path}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url={encoded_web_url};end",
+    "android_note": "More reliable than the iOS path, but some WebViews strip intent: and the host app may still intercept.",
+    "note": "MANDATORY: because the programmatic escape is unreliable-to-blocked, every hub MUST render a visible 'Open in browser' + 'Copy link' control. The user-driven path (the in-app browser's own ⋯ → 'Open in Safari/Chrome') is the only method that actually works consistently, and it cannot be blocked. Never rely on the programmatic escape alone.",
+    "sources": [
+      "https://dev.to/jplogix/escaping-instagrams-in-app-browser-on-ios-and-why-its-so-hard-58om",
+      "https://jhrun.com/2025/11/escape-in-app-browser-programmatically-introducing-a-zero-dependency-javascript-library/"
+    ]
+  },
+
+  "_in_app_signatures": {
+    "confidence": "PARTIAL",
+    "instagram": ["Instagram"],
+    "facebook": ["FBAN", "FBAV", "FB_IAB", "FB4A", "FBIOS"],
+    "tiktok": ["TikTok", "BytedanceWebview", "musical_ly"],
+    "linkedin": ["LinkedInApp"],
+    "note": "Instagram + Facebook tokens are high-confidence (Meta's own ads-troubleshooting docs sample these strings). TikTok tokens vary by OS/version — treat sole reliance as fragile. LinkedIn's token is solid on iOS, but some Android builds open the SYSTEM browser and produce no in-app signature at all (which is fine — they get the plain web link). THREADS IS DELIBERATELY OMITTED: no stable public token was confirmed, and some builds masquerade as the Instagram family. Add it only after capturing a real device UA. UA sniffing is spoofable; it is used here only to ADD a native handoff, never to gate content, so a false negative degrades safely to the normal web link.",
+    "sources": [
+      "https://medium.com/geekculture/how-to-detect-if-a-user-is-using-the-facebook-in-app-browser-41ccc2c5deca",
+      "https://github.com/shalanah/inapp-spy"
+    ]
+  }
+}

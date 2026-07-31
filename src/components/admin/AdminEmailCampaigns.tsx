@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,6 +78,7 @@ const CAMPAIGN_PREVIEWS = [
 ];
 
 export function AdminEmailCampaigns() {
+  const { t } = useTranslation();
   const [sending, setSending] = useState(false);
   const [lastResult, setLastResult] = useState<any>(null);
 
@@ -108,9 +110,7 @@ export function AdminEmailCampaigns() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-primary" />
-            Weekly Provider Education Campaign
-          </CardTitle>
+            <Mail className="h-5 w-5 text-primary" />{t('medicalGated.mgWeeklyProviderEducationCampaign', "Weekly Provider Education Campaign")}</CardTitle>
           <CardDescription>
             Educational emails inspired by Gary Vee, Alex Hormozi & MrBeast strategies. 
             Rotates through {CAMPAIGN_PREVIEWS.length} topics weekly.
@@ -139,11 +139,11 @@ export function AdminEmailCampaigns() {
               <p className="font-medium text-green-700 dark:text-green-400">✅ Campaign Sent</p>
               <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Emails Sent</p>
+                  <p className="text-muted-foreground">{t('medicalGated.mgEmailsSent', "Emails Sent")}</p>
                   <p className="font-bold text-lg">{lastResult.emailsSent}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Notifications</p>
+                  <p className="text-muted-foreground">{t('medicalGated.mgNotifications', "Notifications")}</p>
                   <p className="font-bold text-lg">{lastResult.notificationsSent}</p>
                 </div>
                 <div>

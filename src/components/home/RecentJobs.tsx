@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { formatDistanceToNow } from 'date-fns';
+import { Banknote, Clock, Flame, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { getDateFnsLocale, isPortuguese, isSpanish } from '@/lib/i18n-utils';
+import { getDateFnsLocale, isPortuguese } from '@/lib/i18n-utils';
 import { formatPrice } from '@/lib/currency';
 
 export function RecentJobs() {
@@ -12,7 +17,7 @@ export function RecentJobs() {
     queryKey: ['recent-jobs-medical'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('jobs_posted')
+        .from('jobs_marketplace_public')
         .select(`
           id,
           title,

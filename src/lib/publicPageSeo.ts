@@ -8,7 +8,8 @@ export type PublicPageKey =
   | 'referral'
   | 'referral-dashboard'
   | 'partner-dashboard'
-  | 'partner-review';
+  | 'partner-review'
+  | 'pilot';
 
 export type PublicPageSeo = {
   title: string;
@@ -66,6 +67,23 @@ const appAudience = {
 } as const;
 
 export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppKey) => PublicPageSeo>> = {
+  pilot: {
+    en: (app) => ({
+      title: `Pilot Tester Program | ${BRAND_SEO[app].name}`,
+      description: `Apply to join the ${BRAND_SEO[app].name} pilot. Twenty testers get 60 days of full professional account access to help us find problems before launch. No cost, no real payments, fictitious data only.`,
+      imageAlt: `${BRAND_SEO[app].name} pilot tester program preview with 60 days of full professional access.`,
+    }),
+    pt: (app) => ({
+      title: `Programa Piloto de Testadores | ${BRAND_SEO[app].name}`,
+      description: `Inscreva-se no programa piloto da ${BRAND_SEO[app].name}. Vinte testadores recebem 60 dias de acesso profissional completo para nos ajudar a encontrar problemas antes do lançamento. Sem custo, sem pagamentos reais, apenas dados fictícios.`,
+      imageAlt: `Prévia do programa piloto de testadores da ${BRAND_SEO[app].name} com 60 dias de acesso profissional completo.`,
+    }),
+    es: (app) => ({
+      title: `Programa Piloto de Testers | ${BRAND_SEO[app].name}`,
+      description: `Postúlate al programa piloto de ${BRAND_SEO[app].name}. Veinte testers reciben 60 días de acceso profesional completo para ayudarnos a encontrar problemas antes del lanzamiento. Sin costo, sin pagos reales, solo datos ficticios.`,
+      imageAlt: `Vista previa del programa piloto de testers de ${BRAND_SEO[app].name} con 60 días de acceso profesional completo.`,
+    }),
+  },
   'give-month': {
     en: (app) => ({
       title: `Give a Month, Get a Month | ${BRAND_SEO[app].name}`,
@@ -119,19 +137,19 @@ export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppK
   },
   testimonial: {
     en: (app) => ({
-      title: `Share Your Experience | ${BRAND_SEO[app].name}`,
-      description: `After a completed ${BRAND_SEO[app].name} service, leave a Google review or upload a short testimonial video and earn up to R$150 in approved future service credit.`,
-      imageAlt: `${BRAND_SEO[app].name} testimonial request preview with R$150 service credit offer.`,
+      title: `Share Private Feedback | ${BRAND_SEO[app].name}`,
+      description: `After a completed ${BRAND_SEO[app].name} appointment, you may share voluntary, honest feedback through your secure account. No payment, credit, discount, or benefit is offered.`,
+      imageAlt: `${BRAND_SEO[app].name} voluntary private feedback request preview.`,
     }),
     pt: (app) => ({
-      title: `Compartilhe sua Experiência | ${BRAND_SEO[app].name}`,
-      description: `Depois de um serviço concluído na ${BRAND_SEO[app].name}, deixe uma avaliação no Google ou envie um vídeo depoimento e ganhe até R$150 em crédito aprovado para serviços futuros.`,
-      imageAlt: `Prévia do pedido de depoimento da ${BRAND_SEO[app].name} com crédito de até R$150.`,
+      title: `Compartilhe Feedback Privado | ${BRAND_SEO[app].name}`,
+      description: `Depois de uma consulta concluída na ${BRAND_SEO[app].name}, você pode compartilhar feedback voluntário e honesto pela sua conta segura. Nenhum pagamento, crédito, desconto ou benefício é oferecido.`,
+      imageAlt: `Prévia do pedido de feedback privado e voluntário da ${BRAND_SEO[app].name}.`,
     }),
     es: (app) => ({
-      title: `Comparte tu Experiencia | ${BRAND_SEO[app].name}`,
-      description: `Después de un servicio completado en ${BRAND_SEO[app].name}, deja una reseña en Google o sube un video testimonial y gana hasta R$150 en crédito aprobado para servicios futuros.`,
-      imageAlt: `Vista previa de solicitud de testimonio de ${BRAND_SEO[app].name} con crédito de hasta R$150.`,
+      title: `Comparte Comentarios Privados | ${BRAND_SEO[app].name}`,
+      description: `Después de una cita completada en ${BRAND_SEO[app].name}, puedes compartir comentarios voluntarios y honestos mediante tu cuenta segura. No se ofrece pago, crédito, descuento o beneficio.`,
+      imageAlt: `Vista previa de comentarios privados y voluntarios de ${BRAND_SEO[app].name}.`,
     }),
   },
   referral: {

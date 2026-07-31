@@ -17,6 +17,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { FaceAuthEnroll } from '@/components/auth/FaceAuthEnroll';
 import { useFaceAuth } from '@/hooks/useFaceAuth';
 import { useToast } from '@/hooks/use-toast';
+import { AccountDeletionCard } from '@/components/account/AccountDeletion';
+import { AppointmentLifecycleSettings } from '@/components/appointments/AppointmentLifecycleSettings';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -25,7 +27,7 @@ const languages = [
 ];
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
@@ -254,6 +256,11 @@ export default function Settings() {
               </CardContent>
             </Card>
 
+            <AppointmentLifecycleSettings
+              userId={user.id}
+              providerId={providerId}
+            />
+
             {/* Provider Add-ons (Pro+ only) */}
             {providerId && isPro && (
               <ProviderAddonsSettings providerId={providerId} />
@@ -336,20 +343,7 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            {/* Danger Zone */}
-            <Card className="border-destructive/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2 text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                  {t('settings.dangerZone')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button variant="destructive" className="w-full">
-                  {t('settings.deleteAccount')}
-                </Button>
-              </CardContent>
-            </Card>
+            <AccountDeletionCard onScheduled={refreshProfile} />
           </div>
         </div>
       </AppLayout>

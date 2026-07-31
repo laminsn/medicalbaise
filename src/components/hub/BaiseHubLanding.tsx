@@ -19,7 +19,6 @@ import {
   PenSquare,
   Megaphone,
   ArrowRight,
-  Star,
   TrendingUp,
   Users,
   WalletCards,
@@ -78,19 +77,16 @@ const REVIEW_CARDS = [
   {
     name: 'Mariana Costa',
     roleKey: 'hub.reviews.mariana.role',
-    rating: '4.9',
     bodyKey: 'hub.reviews.mariana.body',
   },
   {
     name: 'Daniel Ribeiro',
     roleKey: 'hub.reviews.daniel.role',
-    rating: '4.8',
     bodyKey: 'hub.reviews.daniel.body',
   },
   {
     name: 'Priya Mendes',
     roleKey: 'hub.reviews.priya.role',
-    rating: '4.7',
     bodyKey: 'hub.reviews.priya.body',
   },
 ];
@@ -250,6 +246,7 @@ export default function BaiseHubLanding() {
         <title>{t('hub.metaTitle')}</title>
         <meta name="description" content={t('hub.metaDescription')} />
         <meta name="theme-color" content="#111111" />
+        <link rel="icon" type="image/svg+xml" href="/baise-logo.svg" />
       </Helmet>
       <div
         className="relative min-h-screen flex flex-col overflow-hidden"
@@ -523,18 +520,6 @@ function SocialProofSection() {
                           {t('hub.socialProof.sampleReview')}
                         </p>
                       </div>
-                      <span className="rounded-full bg-white px-2 py-1 text-xs font-black text-black">
-                        {review.rating}
-                      </span>
-                    </div>
-                    <div className="mb-3 flex items-center gap-1 text-[#fbbf24]">
-                      {Array.from({ length: 5 }).map((_, starIndex) => (
-                        <Star
-                          key={starIndex}
-                          className="h-3.5 w-3.5 fill-current"
-                          aria-hidden="true"
-                        />
-                      ))}
                     </div>
                     <p className="mb-4 text-[13px] leading-relaxed text-white/74">
                       "{t(review.bodyKey)}"
@@ -987,11 +972,8 @@ function FloatingRatingCard() {
     >
       <div className="flex items-center justify-between gap-4">
         <div>
-          <div className="mb-1 flex items-center gap-1 text-[#fbbf24]">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Star key={index} className="h-4 w-4 fill-current" aria-hidden="true" />
-            ))}
-            <span className="ml-1 text-sm font-black text-white">4.8</span>
+          <div className="mb-1 text-sm font-black text-white">
+            Verified profiles and service feedback
           </div>
           <p className="text-[12px] font-semibold leading-snug text-white/80">
             {t('hub.floatingRating')}
