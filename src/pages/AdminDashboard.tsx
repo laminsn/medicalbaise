@@ -1,4 +1,4 @@
-import { FlaskConical, Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,7 +12,7 @@ import { AdminAllUsers } from '@/components/admin/AdminAllUsers';
 import { AdminEmailCampaigns } from '@/components/admin/AdminEmailCampaigns';
 import { AdminPartnerApplications } from '@/components/admin/AdminPartnerApplications';
 import { AdminGrowthHub } from '@/components/admin/AdminGrowthHub';
-import { BarChart3, Loader2, Shield } from 'lucide-react';
+import { BarChart3, FlaskConical, Loader2, Shield } from 'lucide-react';
 import { AdminPilotCohort } from '@/components/admin/AdminPilotCohort';
 
 export default function AdminDashboard() {
