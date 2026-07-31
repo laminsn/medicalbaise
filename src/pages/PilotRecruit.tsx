@@ -174,7 +174,10 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             {t('pilot.successBody', 'Vamos analisar as inscrições e entrar em contato pelo e-mail que você informou. Se você for selecionado, enviaremos o contrato de testador para assinatura e, depois, o seu código de acesso individual.')}
           </p>
           <Button asChild variant="outline">
-            <Link to={localizedPublicPath('/', locale)}>
+            {/* NOT localizedPublicPath: only blog/pilot/influencer/testimonial/
+                give-a-month/bio/links have /pt and /es routes. Home and /privacy
+                do not, so prefixing the locale 404s. */}
+            <Link to="/">
               {t('pilot.backHome', 'Voltar ao início')}
             </Link>
           </Button>
@@ -375,7 +378,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
                   onCheckedChange={(v) => setConsentLgpd(v === true)} className="mt-1" />
                 <Label htmlFor="pilot-consent-lgpd" className="text-sm font-normal leading-relaxed">
                   {t('pilot.consentLgpd', 'Autorizo o uso dos meus dados de contato para avaliar minha inscrição e falar comigo sobre o piloto. Posso retirar essa autorização a qualquer momento.')} *{' '}
-                  <Link to={localizedPublicPath('/privacy', locale)} className="text-primary underline underline-offset-2">
+                  <Link to="/privacy" className="text-primary underline underline-offset-2">
                     {t('pilot.privacyLink', 'Política de Privacidade')}
                   </Link>
                 </Label>
