@@ -133,44 +133,44 @@ export default function CustomerDashboard() {
           eyebrow="Medical Baise"
           title={t('customerDashboard.title', 'My Dashboard')}
           description={t('customerDashboard.subtitle', 'Track appointments, healthcare service requests, approvals, and provider conversations from one workspace.')}
-          badge={counts?.approvals ? `${counts.approvals} pending approval${counts.approvals === 1 ? '' : 's'}` : 'All clear'}
+          badge={counts?.approvals ? `${counts.approvals} pending approval${counts.approvals === 1 ? '' : 's'}` : t('customerDashboard.cc.allClear', "All clear")}
           focus={{
-            label: 'Priority',
-            title: counts?.approvals ? 'Review care updates waiting on you' : 'Your patient workspace is clear',
+            label: t('customerDashboard.cc.priority', "Priority"),
+            title: counts?.approvals ? t('customerDashboard.cc.reviewCareUpdatesWaiting', "Review care updates waiting on you") : t('customerDashboard.cc.yourPatientWorkspaceIs', "Your patient workspace is clear"),
             description: counts?.approvals
               ? 'Check provider media, approve completed work, or request changes before the care request closes.'
               : 'Start a care request, browse providers, or check messages when something needs attention.',
             icon: counts?.approvals ? CheckCircle : ClipboardList,
             tone: counts?.approvals ? 'amber' : 'green',
-            actionLabel: counts?.approvals ? 'Open approvals' : 'Post a request',
+            actionLabel: counts?.approvals ? t('customerDashboard.cc.openApprovals', "Open approvals") : t('customerDashboard.cc.postARequest', "Post a request"),
             onAction: () => counts?.approvals ? setActiveTab('approvals') : navigate('/post-job'),
           }}
           metrics={[
             {
               label: t('customerDashboard.stats.activeJobs', 'Active Jobs'),
               value: counts?.jobs || 0,
-              detail: 'Open healthcare requests and active care services.',
+              detail: t('customerDashboard.cc.openHealthcareRequestsAnd', "Open healthcare requests and active care services."),
               icon: ClipboardList,
               tone: 'blue',
             },
             {
-              label: t('customerDashboard.stats.scheduled', 'Scheduled'),
+              label: t('customerDashboard.stats.scheduled', t('customerDashboard.cc.scheduled', "Scheduled")),
               value: counts?.scheduled || 0,
-              detail: 'Upcoming appointments and recurring services.',
+              detail: t('customerDashboard.cc.upcomingAppointmentsAndRecurring', "Upcoming appointments and recurring services."),
               icon: Clock,
               tone: 'green',
             },
             {
               label: t('customerDashboard.stats.pendingApprovals', 'Pending'),
               value: counts?.approvals || 0,
-              detail: 'Care updates or work media waiting for review.',
+              detail: t('customerDashboard.cc.careUpdatesOrWork', "Care updates or work media waiting for review."),
               icon: CheckCircle,
               tone: 'amber',
             },
             {
-              label: 'Workspace',
-              value: 'Patient',
-              detail: 'Built for booking, tracking, and follow-up.',
+              label: t('customerDashboard.cc.workspace', "Workspace"),
+              value: t('customerDashboard.cc.patient', "Patient"),
+              detail: t('customerDashboard.cc.builtForBookingTracking', "Built for booking, tracking, and follow-up."),
               icon: Briefcase,
               tone: 'purple',
             },
@@ -178,19 +178,19 @@ export default function CustomerDashboard() {
           actions={[
             {
               label: t('nav.postJob', 'Post a Job'),
-              description: 'Request healthcare help with specialty, location, and timing.',
+              description: t('customerDashboard.cc.requestHealthcareHelpWith', "Request healthcare help with specialty, location, and timing."),
               icon: Plus,
               onClick: () => navigate('/post-job'),
             },
             {
-              label: 'Browse providers',
-              description: 'Find doctors and healthcare professionals by specialty.',
+              label: t('customerDashboard.cc.browseProviders', "Browse providers"),
+              description: t('customerDashboard.cc.findDoctorsAndHealthcare', "Find doctors and healthcare professionals by specialty."),
               icon: Search,
               onClick: () => navigate('/browse'),
             },
             {
-              label: 'Messages',
-              description: 'Review provider conversations and follow-ups.',
+              label: t('customerDashboard.cc.messages', "Messages"),
+              description: t('customerDashboard.cc.reviewProviderConversationsAnd', "Review provider conversations and follow-ups."),
               icon: MessageSquare,
               onClick: () => navigate('/messages'),
             },
@@ -198,21 +198,21 @@ export default function CustomerDashboard() {
         />
 
         <DashboardVisualKpis
-          title="Visual KPI snapshot"
-          description="A quick read on care requests, approvals, scheduled visits, and patient follow-through."
-          ratingLabel="Provider rating signal"
-          ratingDetail="Ratings appear after completed care interactions, helping you compare providers over time."
-          revenueLabel="Care spend visibility"
-          revenueValue="Tracked per request"
-          revenueDetail="Approved services and payments stay connected to each healthcare request."
-          timelineLabel="Care timeline"
+          title={t('customerDashboard.cc.visualKpiSnapshot', "Visual KPI snapshot")}
+          description={t('customerDashboard.cc.aQuickReadOn', "A quick read on care requests, approvals, scheduled visits, and patient follow-through.")}
+          ratingLabel={t('customerDashboard.cc.providerRatingSignal', "Provider rating signal")}
+          ratingDetail={t('customerDashboard.cc.ratingsAppearAfterCompleted', "Ratings appear after completed care interactions, helping you compare providers over time.")}
+          revenueLabel={t('customerDashboard.cc.careSpendVisibility', "Care spend visibility")}
+          revenueValue={t('customerDashboard.cc.trackedPerRequest', "Tracked per request")}
+          revenueDetail={t('customerDashboard.cc.approvedServicesAndPayments', "Approved services and payments stay connected to each healthcare request.")}
+          timelineLabel={t('customerDashboard.cc.careTimeline', "Care timeline")}
           timelineData={[
             { label: 'Active', value: counts?.jobs || 0 },
-            { label: 'Scheduled', value: counts?.scheduled || 0 },
+            { label: t('customerDashboard.cc.scheduled', "Scheduled"), value: counts?.scheduled || 0 },
             { label: 'Approvals', value: counts?.approvals || 0 },
             { label: 'Clear', value: counts?.approvals ? 0 : 1 },
           ]}
-          barLabel="Care workload mix"
+          barLabel={t('customerDashboard.cc.careWorkloadMix', "Care workload mix")}
           barData={[
             { label: 'Requests', value: counts?.jobs || 0 },
             { label: 'Visits', value: counts?.scheduled || 0 },
@@ -220,19 +220,19 @@ export default function CustomerDashboard() {
           ]}
           meters={[
             {
-              label: 'Approval health',
+              label: t('customerDashboard.cc.approvalHealth', "Approval health"),
               value: counts?.approvals ? Math.max(30, 100 - counts.approvals * 20) : 100,
-              detail: counts?.approvals ? 'Care updates need review.' : 'No review blockers right now.',
+              detail: counts?.approvals ? t('customerDashboard.cc.careUpdatesNeedReview', "Care updates need review.") : t('customerDashboard.cc.noReviewBlockersRight', "No review blockers right now."),
             },
             {
-              label: 'Schedule coverage',
+              label: t('customerDashboard.cc.scheduleCoverage', "Schedule coverage"),
               value: counts?.scheduled ? 88 : 45,
-              detail: counts?.scheduled ? 'You have upcoming care on the calendar.' : 'Schedule services to improve continuity.',
+              detail: counts?.scheduled ? t('customerDashboard.cc.youHaveUpcomingCare', "You have upcoming care on the calendar.") : t('customerDashboard.cc.scheduleServicesToImprove', "Schedule services to improve continuity."),
             },
             {
-              label: 'Follow-up readiness',
+              label: t('customerDashboard.cc.followUpReadiness', "Follow-up readiness"),
               value: counts?.jobs || counts?.scheduled ? 82 : 58,
-              detail: 'Use requests, messages, and provider search to keep care moving.',
+              detail: t('customerDashboard.cc.useRequestsMessagesAnd', "Use requests, messages, and provider search to keep care moving."),
             },
           ]}
         />
@@ -240,60 +240,60 @@ export default function CustomerDashboard() {
         <PrintableDashboard
           brandName="Medical Baise"
           audience="client"
-          title="Printable patient dashboard"
-          subtitle="A clean client report for healthcare service tracking: active requests, scheduled visits, approvals, receipts, follow-up, and records in one printable view."
-          accountLabel="Patient workspace"
+          title={t('customerDashboard.cc.printablePatientDashboard', "Printable patient dashboard")}
+          subtitle={t('customerDashboard.cc.aCleanClientReport', "A clean client report for healthcare service tracking: active requests, scheduled visits, approvals, receipts, follow-up, and records in one printable view.")}
+          accountLabel={t('customerDashboard.cc.patientWorkspace', "Patient workspace")}
           generatedFor={user?.email}
           metrics={[
             {
-              label: 'Active requests',
+              label: t('customerDashboard.cc.activeRequests', "Active requests"),
               value: counts?.jobs || 0,
-              detail: 'Open healthcare requests and active care services currently in motion.',
+              detail: t('customerDashboard.cc.openHealthcareRequestsAnd', "Open healthcare requests and active care services currently in motion."),
             },
             {
-              label: 'Scheduled',
+              label: t('customerDashboard.cc.scheduled', "Scheduled"),
               value: counts?.scheduled || 0,
-              detail: 'Upcoming visits or recurring services.',
+              detail: t('customerDashboard.cc.upcomingVisitsOrRecurring', "Upcoming visits or recurring services."),
             },
             {
-              label: 'Pending approvals',
+              label: t('customerDashboard.cc.pendingApprovals', "Pending approvals"),
               value: counts?.approvals || 0,
-              detail: 'Care updates, work media, or sign-offs waiting for review.',
+              detail: t('customerDashboard.cc.careUpdatesWorkMedia', "Care updates, work media, or sign-offs waiting for review."),
             },
             {
-              label: 'Workspace',
-              value: 'Patient',
-              detail: 'Built for booking, tracking, approving, and saving care records.',
+              label: t('customerDashboard.cc.workspace', "Workspace"),
+              value: t('customerDashboard.cc.patient', "Patient"),
+              detail: t('customerDashboard.cc.builtForBookingTracking', "Built for booking, tracking, approving, and saving care records."),
             },
           ]}
           sections={[
             {
-              title: 'Care tracking summary',
+              title: t('customerDashboard.cc.careTrackingSummary', "Care tracking summary"),
               items: [
-                'Open requests, scheduled visits, provider messages, and approvals are managed in the portal.',
-                'Each service can keep its quote, invoice, payment status, follow-up notes, and activity history together.',
-                'Approvals and sign-offs help keep care moving while preserving proof of what happened.',
+                t('customerDashboard.cc.openRequestsScheduledVisits', "Open requests, scheduled visits, provider messages, and approvals are managed in the portal."),
+                t('customerDashboard.cc.eachServiceCanKeep', "Each service can keep its quote, invoice, payment status, follow-up notes, and activity history together."),
+                t('customerDashboard.cc.approvalsAndSignOffs', "Approvals and sign-offs help keep care moving while preserving proof of what happened."),
               ],
             },
             {
-              title: 'Patient records summary',
+              title: t('customerDashboard.cc.patientRecordsSummary', "Patient records summary"),
               items: [
-                'Receipts, invoices, service history, and provider details remain available through transaction history.',
-                'Monthly, month-to-date, annual, and custom transaction filters support proof and tax records.',
-                'Messages, signatures, files, and decisions should stay inside the portal whenever the record matters.',
+                t('customerDashboard.cc.receiptsInvoicesServiceHistory', "Receipts, invoices, service history, and provider details remain available through transaction history."),
+                t('customerDashboard.cc.monthlyMonthToDate', "Monthly, month-to-date, annual, and custom transaction filters support proof and tax records."),
+                t('customerDashboard.cc.messagesSignaturesFilesAnd', "Messages, signatures, files, and decisions should stay inside the portal whenever the record matters."),
               ],
             },
           ]}
           nextSteps={[
-            counts?.approvals ? 'Review pending approvals so your care request can continue.' : 'Start a new care request or browse providers when you need support.',
-            'Download or print receipts and invoices for any service that may matter later.',
-            'Keep messages, files, signatures, and service decisions inside the portal for a clean history.',
+            counts?.approvals ? t('customerDashboard.cc.reviewPendingApprovalsSo', "Review pending approvals so your care request can continue.") : 'Start a new care request or browse providers when you need support.',
+            t('customerDashboard.cc.downloadOrPrintReceipts', "Download or print receipts and invoices for any service that may matter later."),
+            t('customerDashboard.cc.keepMessagesFilesSignatures', "Keep messages, files, signatures, and service decisions inside the portal for a clean history."),
           ]}
           recordsChecklist={[
-            'Invoices, receipts, transaction history, and payment status.',
-            'Provider name, service description, timestamps, and care details.',
-            'Uploaded files, work approvals, notes, and signed records.',
-            'Monthly, quarterly, annual, and custom transaction exports when needed.',
+            t('customerDashboard.cc.invoicesReceiptsTransactionHistory', "Invoices, receipts, transaction history, and payment status."),
+            t('customerDashboard.cc.providerNameServiceDescription', "Provider name, service description, timestamps, and care details."),
+            t('customerDashboard.cc.uploadedFilesWorkApprovals', "Uploaded files, work approvals, notes, and signed records."),
+            t('customerDashboard.cc.monthlyQuarterlyAnnualAnd', "Monthly, quarterly, annual, and custom transaction exports when needed."),
           ]}
         />
 
