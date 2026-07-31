@@ -91,7 +91,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
     { q: t('pilot.faq.q4', 'O que acontece depois dos 60 dias?'),
       a: t('pilot.faq.a4', 'O acesso expira automaticamente e a conta é desativada. O conteúdo criado durante o teste não é aproveitado para uma conta real.') },
     { q: t('pilot.faq.q5', 'Preciso assinar alguma coisa?'),
-      a: t('pilot.faq.a5', 'Sim. Quem for selecionado assina um contrato de testador antes de receber o código de acesso — confidencialidade, uso de dados fictícios e software fornecido "como está".') },
+      a: t('pilot.faq.a5', 'Você aceita as regras nesta própria página, marcando as caixas antes de enviar — e pode assinar com o dedo se quiser. Não há outro contrato depois.') },
     { q: t('pilot.faq.q6', 'Quanto tempo isso vai tomar?'),
       a: t('pilot.faq.a6', 'O que você puder dar. Pedimos que use a plataforma como usaria de verdade e nos conte o que quebrar ou confundir.') },
   ];
@@ -177,7 +177,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             {t('pilot.successTitle', 'Inscrição recebida')}
           </h1>
           <p className="mb-8 text-muted-foreground">
-            {t('pilot.successBody', 'Vamos analisar as inscrições e entrar em contato pelo e-mail que você informou. Se você for selecionado, enviaremos o contrato de testador para assinatura e, depois, o seu código de acesso individual.')}
+            {t('pilot.successBody', 'Vamos analisar as inscrições e entrar em contato pelo e-mail que você informou. Se você for selecionado, enviaremos o seu código de acesso individual.')}
           </p>
           <Button asChild variant="outline">
             {/* NOT localizedPublicPath: only blog/pilot/influencer/testimonial/

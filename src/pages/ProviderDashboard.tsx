@@ -155,7 +155,7 @@ export default function ProviderDashboard() {
           description={t('dashboard.subtitle', 'Run your healthcare practice workspace: appointments, patient requests, services, messaging, and growth tools.')}
           badge={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
           focus={{
-            label: 'Care operations',
+            label: t('providerDashboard.pd.pdCareOperations', "Care operations"),
             title: isProOrAbove ? 'Keep patient demand moving' : 'Set up the care workflow first',
             description: isProOrAbove
               ? 'Use analytics, patient messages, and service settings to stay responsive and credible.'
@@ -167,50 +167,50 @@ export default function ProviderDashboard() {
           }}
           metrics={[
             {
-              label: 'Provider tier',
+              label: t('providerDashboard.pd.pdProviderTier', "Provider tier"),
               value: tierLabel(providerTier),
               detail: isEliteOrAbove ? 'Automation and campaigns are available.' : 'Upgrade when you need automation and campaigns.',
               icon: Crown,
               tone: providerTier === 'free' ? 'amber' : 'purple',
             },
             {
-              label: 'Care queue',
+              label: t('providerDashboard.pd.pdCareQueue', "Care queue"),
               value: 'Jobs',
-              detail: 'Appointments and active service requests stay organized.',
+              detail: t('providerDashboard.pd.pdAppointmentsAndActiveService', "Appointments and active service requests stay organized."),
               icon: Briefcase,
               tone: 'blue',
             },
             {
-              label: 'Revenue',
+              label: t('providerDashboard.pd.pdRevenue', "Revenue"),
               value: 'Payments',
-              detail: 'Create invoices, plans, POS payments, and exports.',
+              detail: t('providerDashboard.pd.pdCreateInvoicesPlansPos', "Create invoices, plans, POS payments, and exports."),
               icon: Wallet,
               tone: 'green',
             },
             {
-              label: 'Growth',
+              label: t('providerDashboard.pd.pdGrowth', "Growth"),
               value: isProOrAbove ? 'Enabled' : 'Limited',
-              detail: 'Marketing, analytics, and tracking tools live below.',
+              detail: t('providerDashboard.pd.pdMarketingAnalyticsAndTracking', "Marketing, analytics, and tracking tools live below."),
               icon: Megaphone,
               tone: 'purple',
             },
           ]}
           actions={[
             {
-              label: 'Find jobs',
-              description: 'Browse patient requests and appointment opportunities.',
+              label: t('providerDashboard.pd.pdFindJobs', "Find jobs"),
+              description: t('providerDashboard.pd.pdBrowsePatientRequestsAnd', "Browse patient requests and appointment opportunities."),
               icon: Search,
               onClick: () => navigate('/jobs'),
             },
             {
-              label: 'Manage services',
-              description: 'Update specialties, pricing, add-ons, and availability.',
+              label: t('providerDashboard.pd.pdManageServices', "Manage services"),
+              description: t('providerDashboard.pd.pdUpdateSpecialtiesPricingAdd', "Update specialties, pricing, add-ons, and availability."),
               icon: Settings,
               onClick: () => navigate('/services'),
             },
             {
-              label: 'Payments',
-              description: 'Create payment plans, POS checkout, and exports.',
+              label: t('providerDashboard.pd.pdPayments', "Payments"),
+              description: t('providerDashboard.pd.pdCreatePaymentPlansPos', "Create payment plans, POS checkout, and exports."),
               icon: Wallet,
               onClick: () => navigate('/payments'),
             },
@@ -218,33 +218,33 @@ export default function ProviderDashboard() {
         />
 
         <DashboardVisualKpis
-          title="Performance visual board"
-          description="Ratings, earnings, care timelines, and operating meters for quick decision-making."
-          ratingLabel="Average rating"
+          title={t('providerDashboard.pd.pdPerformanceVisualBoard', "Performance visual board")}
+          description={t('providerDashboard.pd.pdRatingsEarningsCareTimelines', "Ratings, earnings, care timelines, and operating meters for quick decision-making.")}
+          ratingLabel={t('providerDashboard.pd.pdAverageRating', "Average rating")}
           ratingValue={analytics?.avgRating}
           ratingDetail={`${analytics?.totalReviews || 0} review${analytics?.totalReviews === 1 ? '' : 's'} contributing to patient trust.`}
-          revenueLabel="Revenue generated"
+          revenueLabel={t('providerDashboard.pd.pdRevenueGenerated', "Revenue generated")}
           revenueValue={formatPrice(analytics?.totalRevenue || 0)}
           revenueDetail={`${analytics?.totalJobs || 0} completed care request${analytics?.totalJobs === 1 ? '' : 's'} tracked in the provider workspace.`}
           timelineLabel="6-month revenue timeline"
           timelineData={(analytics?.monthlyData || []).map((item) => ({ label: item.month, value: item.revenue }))}
-          barLabel="Care requests completed by month"
+          barLabel={t('providerDashboard.pd.pdCareRequestsCompletedBy', "Care requests completed by month")}
           barData={(analytics?.monthlyData || []).map((item) => ({ label: item.month, value: item.jobs }))}
           meters={[
             {
-              label: 'Completion rate',
+              label: t('providerDashboard.pd.pdCompletionRate', "Completion rate"),
               value: analytics?.completionRate ?? 100,
-              detail: 'Percent of started care requests that reach completion.',
+              detail: t('providerDashboard.pd.pdPercentOfStartedCare', "Percent of started care requests that reach completion."),
             },
             {
-              label: 'Response rate',
+              label: t('providerDashboard.pd.pdResponseRate', "Response rate"),
               value: analytics?.responseRate ?? 100,
-              detail: 'Conversation responsiveness signal.',
+              detail: t('providerDashboard.pd.pdConversationResponsivenessSignal', "Conversation responsiveness signal."),
             },
             {
-              label: 'Tier leverage',
+              label: t('providerDashboard.pd.pdTierLeverage', "Tier leverage"),
               value: tierMeter,
-              detail: 'How much of the growth toolkit is available on this plan.',
+              detail: t('providerDashboard.pd.pdHowMuchOfThe', "How much of the growth toolkit is available on this plan."),
             },
           ]}
         />
@@ -252,60 +252,60 @@ export default function ProviderDashboard() {
         <PrintableDashboard
           brandName="Medical Baise"
           audience="provider"
-          title="Printable provider dashboard"
-          subtitle="A concise healthcare operations report: appointment activity, revenue visibility, patient follow-up, records, and growth readiness in one printable view."
+          title={t('providerDashboard.pd.pdPrintableProviderDashboard', "Printable provider dashboard")}
+          subtitle={t('providerDashboard.pd.pdAConciseHealthcareOperations', "A concise healthcare operations report: appointment activity, revenue visibility, patient follow-up, records, and growth readiness in one printable view.")}
           accountLabel={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
           generatedFor={user?.email}
           metrics={[
             {
-              label: 'Provider tier',
+              label: t('providerDashboard.pd.pdProviderTier', "Provider tier"),
               value: tierLabel(providerTier),
               detail: isEliteOrAbove ? 'Advanced automation and campaign tools are available.' : 'Core tools are active; upgrade when automation is needed.',
             },
             {
-              label: 'Completed care requests',
+              label: t('providerDashboard.pd.pdCompletedCareRequests', "Completed care requests"),
               value: analytics?.totalJobs || 0,
-              detail: 'Completed healthcare work tracked in the provider workspace.',
+              detail: t('providerDashboard.pd.pdCompletedHealthcareWorkTracked', "Completed healthcare work tracked in the provider workspace."),
             },
             {
-              label: 'Revenue generated',
+              label: t('providerDashboard.pd.pdRevenueGenerated', "Revenue generated"),
               value: formatPrice(analytics?.totalRevenue || 0),
-              detail: 'Tracked from completed care requests and payment records.',
+              detail: t('providerDashboard.pd.pdTrackedFromCompletedCare', "Tracked from completed care requests and payment records."),
             },
             {
-              label: 'Average rating',
+              label: t('providerDashboard.pd.pdAverageRating', "Average rating"),
               value: analytics?.avgRating ? `${analytics.avgRating.toFixed(1)} / 5` : 'New',
               detail: `${analytics?.totalReviews || 0} review${analytics?.totalReviews === 1 ? '' : 's'} currently support patient trust.`,
             },
           ]}
           sections={[
             {
-              title: 'Provider operating summary',
+              title: t('providerDashboard.pd.pdProviderOperatingSummary', "Provider operating summary"),
               items: [
-                'Appointments, care requests, patient messages, and approvals stay connected inside the portal.',
-                'Invoices, payment plans, POS payments, receipts, and client IDs support cleaner accounting.',
-                'Calendar tasks, follow-ups, signatures, notes, and delivery records help document each interaction.',
+                t('providerDashboard.pd.pdAppointmentsCareRequestsPatient', "Appointments, care requests, patient messages, and approvals stay connected inside the portal."),
+                t('providerDashboard.pd.pdInvoicesPaymentPlansPos', "Invoices, payment plans, POS payments, receipts, and client IDs support cleaner accounting."),
+                t('providerDashboard.pd.pdCalendarTasksFollowUps', "Calendar tasks, follow-ups, signatures, notes, and delivery records help document each interaction."),
               ],
             },
             {
-              title: 'Growth and reputation summary',
+              title: t('providerDashboard.pd.pdGrowthAndReputationSummary', "Growth and reputation summary"),
               items: [
-                'Reviews, ratings, and profile quality help patients choose with more confidence.',
-                'Campaigns, referrals, social analytics, and service updates support consistent patient acquisition.',
-                'Monthly, quarterly, annual, and custom records support reporting, taxes, and client proof.',
+                t('providerDashboard.pd.pdReviewsRatingsAndProfile', "Reviews, ratings, and profile quality help patients choose with more confidence."),
+                t('providerDashboard.pd.pdCampaignsReferralsSocialAnalytics', "Campaigns, referrals, social analytics, and service updates support consistent patient acquisition."),
+                t('providerDashboard.pd.pdMonthlyQuarterlyAnnualAnd', "Monthly, quarterly, annual, and custom records support reporting, taxes, and client proof."),
               ],
             },
           ]}
           nextSteps={[
-            'Review active care requests, scheduled visits, and follow-ups before the next appointment window.',
-            'Confirm every paid service has an invoice, payment status, receipt, and client record.',
-            'Update specialties, pricing, availability, and proof before promoting services.',
+            t('providerDashboard.pd.pdReviewActiveCareRequests', "Review active care requests, scheduled visits, and follow-ups before the next appointment window."),
+            t('providerDashboard.pd.pdConfirmEveryPaidService', "Confirm every paid service has an invoice, payment status, receipt, and client record."),
+            t('providerDashboard.pd.pdUpdateSpecialtiesPricingAvailabili', "Update specialties, pricing, availability, and proof before promoting services."),
           ]}
           recordsChecklist={[
-            'Unique invoice and client ID for each paid healthcare service.',
-            'Payment, refund, service credit, and receipt records.',
-            'Signatures, approval notes, service descriptions, and timestamps.',
-            'Monthly, quarterly, annual, and custom financial exports.',
+            t('providerDashboard.pd.pdUniqueInvoiceAndClient', "Unique invoice and client ID for each paid healthcare service."),
+            t('providerDashboard.pd.pdPaymentRefundServiceCredit', "Payment, refund, service credit, and receipt records."),
+            t('providerDashboard.pd.pdSignaturesApprovalNotesService', "Signatures, approval notes, service descriptions, and timestamps."),
+            t('providerDashboard.pd.pdMonthlyQuarterlyAnnualAnd', "Monthly, quarterly, annual, and custom financial exports."),
           ]}
         />
 
@@ -392,7 +392,7 @@ export default function ProviderDashboard() {
               </>
             ) : (
               <UpgradePrompt
-                feature="Automation settings and custom message templates"
+                feature={t('providerDashboard.pd.pdAutomationSettingsAndCustom', "Automation settings and custom message templates")}
                 requiredTier="Elite"
               />
             )}
@@ -406,7 +406,7 @@ export default function ProviderDashboard() {
             ) : (
               <UpgradePrompt
                 feature={t('dashboard.features.pixelTracking')}
-                requiredTier="Enterprise"
+                requiredTier={t('providerDashboard.pd.pdEnterprise', "Enterprise")}
               />
             )}
           </TabsContent>
