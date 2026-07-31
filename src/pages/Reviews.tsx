@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { getDateFnsLocale } from '@/lib/i18n-utils';
 
 import { AppLayout } from '@/components/layout/AppLayout';
+import { TestimonialRequestTracker } from '@/components/provider/TestimonialRequestTracker';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +39,7 @@ export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('received');
+  const [providerId, setProviderId] = useState<string | null>(null);
   const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
@@ -59,6 +61,8 @@ export default function Reviews() {
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      setProviderId(provider?.id ?? null);
 
       let query;
       if (activeTab === 'received' && provider) {
@@ -125,6 +129,12 @@ export default function Reviews() {
             <p className="text-muted-foreground">{t('reviews.subtitle')}</p>
           </div>
         </div>
+
+        {providerId && (
+          <div className="mb-6">
+            <TestimonialRequestTracker providerId={providerId} />
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">

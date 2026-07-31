@@ -14,6 +14,7 @@ import { NotificationPermissionBanner } from "@/components/notifications/Notific
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { AttributionTracker } from "@/components/analytics/AttributionTracker";
+import { PilotModeBanner } from "@/components/pilot/PilotModeBanner";
 const BaiseHubLanding = lazy(() => import("./components/hub/BaiseHubLanding"));
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -25,6 +26,9 @@ const PostJob = lazy(() => import("./pages/PostJob"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ProfileEdit = lazy(() => import("./pages/ProfileEdit"));
 const Settings = lazy(() => import("./pages/Settings"));
+const TestCohortRedeem = lazy(() => import("./pages/TestCohortRedeem"));
+const PilotRecruit = lazy(() => import("./pages/PilotRecruit"));
+const PilotOnboarding = lazy(() => import("./pages/PilotOnboarding"));
 const Payments = lazy(() => import("./pages/Payments"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Referral = lazy(() => import("./pages/Referral"));
@@ -68,6 +72,7 @@ const BookAppointment = lazy(() => import("./pages/BookAppointment"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -108,6 +113,9 @@ const campaignLandingPaths = new Set([
   "/pt/links",
   "/bio",
   "/pt/bio",
+  "/pilot",
+  "/pt/pilot",
+  "/es/pilot",
 ]);
 
 const CampaignAwareHIPAADisclaimer = () => {
@@ -133,6 +141,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <AttributionTracker />
+              <PilotModeBanner />
               <CampaignAwareHIPAADisclaimer />
               <MessageNotificationProvider>
                 <Suspense fallback={<PageLoader />}>
@@ -141,12 +150,18 @@ const App = () => (
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/categories" element={<Categories />} />
                     <Route path="/categories/:categoryId" element={<CategoryDetail />} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/profile/edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                    <Route path="/test-access" element={<ProtectedRoute><TestCohortRedeem /></ProtectedRoute>} />
+                    <Route path="/pilot/start" element={<ProtectedRoute><PilotOnboarding /></ProtectedRoute>} />
+                    <Route path="/pilot" element={<PilotRecruit defaultLocale="en" />} />
+                    <Route path="/pt/pilot" element={<PilotRecruit defaultLocale="pt" />} />
+                    <Route path="/es/pilot" element={<PilotRecruit defaultLocale="es" />} />
                     <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                     <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
                     <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />

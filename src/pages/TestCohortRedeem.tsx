@@ -104,7 +104,8 @@ export default function TestCohortRedeem() {
 
       await refreshProfile();
       toast.success(t('testCohort.success', 'Acesso de teste ativado.'));
-      navigate(result.role === 'provider' ? '/provider-dashboard' : '/');
+      // straight into the instructions rather than dropping them on a dashboard
+      navigate('/pilot/start');
     } catch {
       setError(t('testCohort.errors.generic', 'Não foi possível ativar o código.'));
     } finally {
