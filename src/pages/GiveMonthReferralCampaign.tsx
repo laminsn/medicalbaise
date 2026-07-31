@@ -142,7 +142,7 @@ const COPY = {
     rewardTitle: 'Ganhe um mês grátis por cada cadastro premium qualificado.',
     rewardBody: 'Ganhe até 12 meses grátis em um ano calendário quando suas indicações entrarem em um serviço premium.',
     audienceTitle: 'Para quem é esta campanha',
-    audienceBody: 'Esta campanha é para clientes atuais da Baise com serviço premium, incluindo prestadores de serviço e pessoas que contratam serviços. Compartilhe a Baise com quem precisa de prestadores confiáveis, apoio jurídico, apoio médico ou uma forma melhor de gerenciar relações de serviço.',
+    audienceBody: 'Está campanha é para clientes atuais da Baise com serviço premium, incluindo prestadores de serviço e pessoas que contratam serviços. Compartilhe a Baise com quem precisa de prestadores confiáveis, apoio jurídico, apoio médico ou uma forma melhor de gerenciar relações de serviço.',
     audienceLanes: ['Prestadores de serviço', 'Clientes', 'Famílias', 'Amigos', 'Contatos comerciais', 'Indicações premium'],
     cardEyebrow: 'Campanha para clientes atuais',
     cardTitle: 'Comece a ganhar meses grátis',
@@ -168,7 +168,7 @@ const COPY = {
     intro: 'Los clientes premium de Baise pueden invitar amigos, familiares, clientes y contactos de confianza. Cada registro premium calificado da valor a la persona invitada y te devuelve un mes gratis.',
     proofStats: [
       { label: 'Créditos máximos anuales', value: '12 meses' },
-      { label: 'Periodo de campaña', value: 'Jul + Ago' },
+      { label: 'Período de campaña', value: 'Jul + Ago' },
       { label: 'Recompensa por referido premium', value: '1 mes' },
     ],
     benefits: [
@@ -206,7 +206,7 @@ const COPY = {
     rewardTitle: 'Gana un mes gratis por cada registro premium calificado.',
     rewardBody: 'Gana hasta 12 meses gratis en un año calendario cuando tus referidos se registren en un servicio premium.',
     audienceTitle: 'Para quién es esta campaña',
-    audienceBody: 'Esta campaña es para clientes actuales de Baise con servicio premium, incluidos proveedores de servicios y personas que contratan servicios. Comparte Baise con quienes necesitan proveedores confiables, apoyo legal, apoyo médico o una mejor forma de gestionar relaciones de servicio.',
+    audienceBody: 'Está campaña es para clientes actuales de Baise con servicio premium, incluidos proveedores de servicios y personas que contratan servicios. Comparte Baise con quienes necesitan proveedores confiables, apoyo legal, apoyo médico o una mejor forma de gestionar relaciones de servicio.',
     audienceLanes: ['Proveedores de servicios', 'Clientes', 'Familias', 'Amigos', 'Contactos comerciales', 'Referidos premium'],
     cardEyebrow: 'Campaña para clientes actuales',
     cardTitle: 'Empieza a ganar meses gratis',
