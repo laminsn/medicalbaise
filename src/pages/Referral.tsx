@@ -15,7 +15,7 @@ export default function Referral() {
   if (!user) {
     return (
       <>
-        <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" />
+        <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" noIndex />
         <AppLayout>
           <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -36,7 +36,7 @@ export default function Referral() {
 
   return (
     <>
-      <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" />
+      <PageMetadata page="referral-dashboard" locale={i18n.resolvedLanguage || i18n.language} path="/referral" noIndex />
       <AppLayout>
         <div className="px-4 py-6 pb-24">
           <Button

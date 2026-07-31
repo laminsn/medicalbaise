@@ -7,6 +7,7 @@ import {
   PublicPageKey,
   SeoLocale,
   getPublicPageSeo,
+  localizedPublicPath,
   normalizeSeoLocale,
   publicPageImagePath,
 } from '@/lib/publicPageSeo';
@@ -15,12 +16,23 @@ type PageMetadataProps = {
   page: PublicPageKey;
   locale?: SeoLocale | string;
   path?: string;
+  /**
+   * The UNLOCALIZED path (e.g. '/pilot'). When supplied on an indexable page,
+   * hreflang alternates are emitted for every locale plus x-default. Omit it
+   * for pages whose URL is personalized or otherwise not translatable 1:1.
+   */
+  basePath?: string;
   title?: string;
   description?: string;
   imagePath?: string;
   imageAlt?: string;
   noIndex?: boolean;
+  /** Extra JSON-LD nodes merged into the page's @graph (e.g. FAQPage). */
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 };
+
+const ALTERNATE_LOCALES: SeoLocale[] = ['en', 'pt', 'es'];
+const HREFLANG: Record<SeoLocale, string> = { en: 'en', pt: 'pt-BR', es: 'es' };
 
 const absoluteUrl = (base: string, path: string) => new URL(path, base).toString();
 
@@ -47,11 +59,13 @@ export function PageMetadata({
   page,
   locale,
   path,
+  basePath,
   title,
   description,
   imagePath,
   imageAlt,
   noIndex = false,
+  structuredData,
 }: PageMetadataProps) {
   const appKey = getBaiseAppKey();
   const seoLocale = normalizeSeoLocale(locale);
@@ -64,6 +78,51 @@ export function PageMetadata({
   const resolvedTitle = title || meta.title;
   const resolvedDescription = description || meta.description;
   const resolvedImageAlt = imageAlt || meta.imageAlt;
+
+  // hreflang: only for indexable pages that gave us a translatable base path.
+  // x-default points at the 'en' entry, which localizedPublicPath leaves bare.
+  const alternates =
+    basePath && !noIndex
+      ? ALTERNATE_LOCALES.map((alt) => ({
+          hrefLang: HREFLANG[alt],
+          href: absoluteUrl(getBaiseAppUrl(), localizedPublicPath(basePath, alt)),
+        }))
+      : [];
+
+  // Site identity + this page, plus anything the page adds (e.g. FAQPage).
+  // Suppressed entirely on noIndex pages — there is nothing to describe to a
+  // crawler that is being told not to index.
+  const organizationId = `${getBaiseAppUrl()}/#organization`;
+  const extraNodes = structuredData
+    ? Array.isArray(structuredData)
+      ? structuredData
+      : [structuredData]
+    : [];
+  const graph: Record<string, unknown>[] = noIndex
+    ? []
+    : [
+        {
+          '@type': 'Organization',
+          '@id': organizationId,
+          name: brand.name,
+          url: getBaiseAppUrl(),
+          logo: absoluteUrl(getBaiseAppUrl(), '/baise-logo.svg'),
+          ...(brand.twitter
+            ? { sameAs: [`https://twitter.com/${brand.twitter.replace('@', '')}`] }
+            : {}),
+        },
+        {
+          '@type': 'WebPage',
+          '@id': `${pageUrl}#webpage`,
+          url: pageUrl,
+          name: resolvedTitle,
+          description: resolvedDescription,
+          inLanguage: localeMeta.htmlLang,
+          isPartOf: { '@id': organizationId },
+          primaryImageOfPage: { '@type': 'ImageObject', url: shareImage },
+        },
+        ...extraNodes,
+      ];
 
   useEffect(() => {
     document.documentElement.lang = localeMeta.htmlLang;
@@ -124,6 +183,19 @@ export function PageMetadata({
       <meta name="twitter:description" content={resolvedDescription} />
       <meta name="twitter:image" content={shareImage} />
       <meta name="twitter:image:alt" content={resolvedImageAlt} />
+
+      {alternates.map(({ hrefLang, href }) => (
+        <link key={hrefLang} rel="alternate" hrefLang={hrefLang} href={href} />
+      ))}
+      {alternates.length ? (
+        <link rel="alternate" hrefLang="x-default" href={alternates[0].href} />
+      ) : null}
+
+      {graph.length ? (
+        <script type="application/ld+json">
+          {JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}
+        </script>
+      ) : null}
     </Helmet>
   );
 }

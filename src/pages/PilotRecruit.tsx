@@ -18,7 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import {
-  SeoLocale, localizedPublicPath, normalizeSeoLocale, publicPageImagePath,
+  BRAND_SEO, SeoLocale, localizedPublicPath, normalizeSeoLocale, publicPageImagePath,
 } from '@/lib/publicPageSeo';
 
 /**
@@ -74,6 +74,36 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
     t('pilot.terms.5', 'Ao final dos 60 dias sua conta é desativada e o conteúdo do teste é removido. Nada é guardado para você.'),
     t('pilot.terms.6', 'Confidencialidade: você verá recursos e telas ainda não lançados. Não publique nem compartilhe até liberarmos.'),
   ];
+
+  // Rendered visibly below AND emitted as FAQPage structured data. Schema
+  // requires the answers to be on the page, so these two must stay in sync.
+  const faqs = [
+    { q: t('pilot.faq.q1', 'O programa custa alguma coisa?'),
+      a: t('pilot.faq.a1', 'Não. As 60 dias de acesso profissional completo são gratuitos. Não pedimos cartão e não há cobrança em nenhum momento.') },
+    { q: t('pilot.faq.q2', 'Vou receber ou pagar dinheiro de verdade?'),
+      a: t('pilot.faq.a2', 'Não. Nenhuma forma de pagamento é conectada. As faturas, saldos e repasses que você vir são simulados e ficam marcados como tal no sistema.') },
+    { q: t('pilot.faq.q3', 'Clientes reais vão me encontrar?'),
+      a: t('pilot.faq.a3', 'Não. Sua conta recebe a marca [TESTE] e fica invisível para o público — só outros testadores conseguem ver você. Isso é garantido no banco de dados, não apenas na tela.') },
+    { q: t('pilot.faq.q4', 'O que acontece depois dos 60 dias?'),
+      a: t('pilot.faq.a4', 'O acesso expira automaticamente e a conta é desativada. O conteúdo criado durante o teste não é aproveitado para uma conta real.') },
+    { q: t('pilot.faq.q5', 'Preciso assinar alguma coisa?'),
+      a: t('pilot.faq.a5', 'Sim. Quem for selecionado assina um contrato de testador antes de receber o código de acesso — confidencialidade, uso de dados fictícios e software fornecido "como está".') },
+    { q: t('pilot.faq.q6', 'Quanto tempo isso vai tomar?'),
+      a: t('pilot.faq.a6', 'O que você puder dar. Pedimos que use a plataforma como usaria de verdade e nos conte o que quebrar ou confundir.') },
+  ];
+
+  const brand = BRAND_SEO[appKey];
+
+  // Organization + WebPage now come from PageMetadata; this page only adds the
+  // FAQ node, whose questions must stay identical to the visible list above.
+  const faqSchema = {
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  };
 
   const benefits = [
     { icon: Sparkles, title: t('pilot.benefit1Title', '60 dias de acesso completo'),
@@ -134,7 +164,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
   if (submitted) {
     return (
       <div className="min-h-screen bg-background">
-        <PageMetadata page="pilot" locale={locale} path={localizedPublicPath('/pilot', locale)} />
+        <PageMetadata page="pilot" locale={locale} path={localizedPublicPath('/pilot', locale)} basePath="/pilot" />
         <div className="container max-w-xl py-24 text-center">
           <CheckCircle2 className="mx-auto mb-6 h-14 w-14 text-primary" />
           <h1 className="mb-4 text-3xl font-bold">
@@ -155,13 +185,23 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <PageMetadata page="pilot" locale={locale} path={localizedPublicPath('/pilot', locale)} />
+      <PageMetadata
+        page="pilot"
+        locale={locale}
+        path={localizedPublicPath('/pilot', locale)}
+        basePath="/pilot"
+        structuredData={faqSchema}
+      />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b">
         <div className="pointer-events-none absolute -right-32 -top-40 h-[520px] w-[520px] rounded-full bg-primary/25 blur-[110px]" />
         <div className="container relative grid gap-12 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
           <div>
+            <div className="mb-8 flex items-center gap-3">
+              <img src="/baise-logo.svg" alt="" width={40} height={40} className="rounded-lg" />
+              <span className="text-xl font-extrabold tracking-tight">{brand.name}</span>
+            </div>
             <Badge variant="outline" className="mb-6 border-primary/50 text-primary">
               <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
               {t('pilot.kicker', 'Programa Piloto — {{count}} vagas', { count: COHORT_SIZE })}
@@ -226,6 +266,21 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             ))}
           </ul>
         </div>
+      </section>
+
+      {/* FAQ — rendered visibly because the FAQPage schema above describes it */}
+      <section className="container py-16">
+        <h2 className="mb-10 text-2xl font-bold md:text-3xl">
+          {t('pilot.faqTitle', 'Perguntas frequentes')}
+        </h2>
+        <dl className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {faqs.map(({ q, a }) => (
+            <div key={q}>
+              <dt className="mb-2 font-semibold">{q}</dt>
+              <dd className="text-sm leading-relaxed text-muted-foreground">{a}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* Application */}

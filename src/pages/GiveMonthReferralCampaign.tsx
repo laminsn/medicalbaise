@@ -245,6 +245,7 @@ export default function GiveMonthReferralCampaign({ defaultLocale }: GiveMonthRe
         page="give-month"
         locale={locale}
         path={localizedPublicPath('/give-a-month-get-a-month', locale)}
+        basePath="/give-a-month-get-a-month"
       />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">

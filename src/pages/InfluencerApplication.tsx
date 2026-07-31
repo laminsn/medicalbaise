@@ -284,7 +284,7 @@ export default function InfluencerApplication({ defaultLocale }: InfluencerAppli
   if (submittedReviewDue) {
     return (
       <InfluencerCampaignShell brand={brandName[appKey]}>
-        <PageMetadata page="influencer-application" locale={locale} path={applicationPath} />
+        <PageMetadata page="influencer-application" locale={locale} path={applicationPath} basePath="/influencer-application" />
         <div className="px-4 py-12">
           <div className="mx-auto max-w-2xl rounded-lg border border-white/12 bg-white/[0.06] p-6 text-center shadow-2xl">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/12 text-emerald-300">
@@ -315,7 +315,7 @@ export default function InfluencerApplication({ defaultLocale }: InfluencerAppli
 
   return (
     <InfluencerCampaignShell brand={brandName[appKey]}>
-      <PageMetadata page="influencer-application" locale={locale} path={applicationPath} />
+      <PageMetadata page="influencer-application" locale={locale} path={applicationPath} basePath="/influencer-application" />
 
         <form onSubmit={submitApplication} className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8">
           <main className="space-y-6">

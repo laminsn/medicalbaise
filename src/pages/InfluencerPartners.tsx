@@ -183,7 +183,7 @@ export default function InfluencerPartners({ defaultLocale }: InfluencerPartners
 
   return (
     <InfluencerCampaignShell brand={brand}>
-      <PageMetadata page="influencer" locale={locale} path={localizedPublicPath('/influencer-partners', locale)} />
+      <PageMetadata page="influencer" locale={locale} path={localizedPublicPath('/influencer-partners', locale)} basePath="/influencer-partners" />
 
         <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_390px] lg:px-8 lg:pb-16 lg:pt-8">
           <div className="min-w-0 space-y-8 lg:py-6">
