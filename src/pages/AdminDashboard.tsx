@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { FlaskConical, Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +13,7 @@ import { AdminEmailCampaigns } from '@/components/admin/AdminEmailCampaigns';
 import { AdminPartnerApplications } from '@/components/admin/AdminPartnerApplications';
 import { AdminGrowthHub } from '@/components/admin/AdminGrowthHub';
 import { BarChart3, Loader2, Shield } from 'lucide-react';
+import { AdminPilotCohort } from '@/components/admin/AdminPilotCohort';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -73,6 +74,10 @@ export default function AdminDashboard() {
               <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>
               <TabsTrigger value="campaigns" className="flex-1">{isPt ? 'Campanhas' : isEs ? 'Campañas' : 'Campaigns'}</TabsTrigger>
               <TabsTrigger value="partners" className="flex-1">{isPt ? 'Parceiros' : isEs ? 'Socios' : 'Partners'}</TabsTrigger>
+              <TabsTrigger value="pilot" className="flex-1 gap-1.5">
+                <FlaskConical className="h-4 w-4" />
+                {isPt ? 'Piloto' : isEs ? 'Piloto' : 'Pilot'}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="growth">
@@ -113,6 +118,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="partners">
               <AdminPartnerApplications />
+            </TabsContent>
+
+            <TabsContent value="pilot">
+              <AdminPilotCohort />
             </TabsContent>
           </Tabs>
         </div>
