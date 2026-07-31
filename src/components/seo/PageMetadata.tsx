@@ -31,6 +31,9 @@ type PageMetadataProps = {
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
 };
 
+// Bump together with the ?v= in index.html whenever an icon file changes.
+const ICON_VERSION = '20260731';
+
 const ALTERNATE_LOCALES: SeoLocale[] = ['en', 'pt', 'es'];
 const HREFLANG: Record<SeoLocale, string> = { en: 'en', pt: 'pt-BR', es: 'es' };
 
@@ -149,8 +152,8 @@ export function PageMetadata({
     syncMeta('meta[name="twitter:image"]', 'name', 'twitter:image', shareImage);
     syncMeta('meta[name="twitter:image:alt"]', 'name', 'twitter:image:alt', resolvedImageAlt);
     syncLink('link[rel="canonical"]', 'canonical', pageUrl);
-    syncLink('link[rel="icon"]', 'icon', '/favicon.svg', 'image/svg+xml');
-    syncLink('link[rel="alternate icon"]', 'alternate icon', '/favicon.ico');
+    syncLink('link[rel="icon"]', 'icon', `/favicon.svg?v=${ICON_VERSION}`, 'image/svg+xml');
+    syncLink('link[rel="alternate icon"]', 'alternate icon', `/favicon.ico?v=${ICON_VERSION}`);
   }, [brand.name, brand.twitter, localeMeta.htmlLang, localeMeta.ogLocale, pageUrl, resolvedDescription, resolvedImageAlt, resolvedTitle, shareImage]);
 
   return (
@@ -161,8 +164,8 @@ export function PageMetadata({
       <meta name="language" content={localeMeta.htmlLang} />
       {noIndex ? <meta name="robots" content="noindex, nofollow" /> : null}
       <link rel="canonical" href={pageUrl} />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <link rel="alternate icon" href="/favicon.ico" />
+      <link rel="icon" type="image/svg+xml" href={`/favicon.svg?v=${ICON_VERSION}`} />
+      <link rel="alternate icon" href={`/favicon.ico?v=${ICON_VERSION}`} />
 
       <meta property="og:title" content={resolvedTitle} />
       <meta property="og:description" content={resolvedDescription} />
