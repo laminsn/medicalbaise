@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera, ScanFace } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,6 +81,32 @@ export default function Auth() {
   const { signUp, signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // AuthCallback redirects failures back here with ?error=. Without this the
+  // user was returned to a blank login form and told nothing at all.
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (!error) return;
+    const reasons: Record<string, string> = {
+      wrong_browser: t(
+        'auth.wrongBrowserError',
+        'Abra o link no mesmo navegador em que você começou o login. Toques em links dentro do WhatsApp costumam abrir outro navegador.',
+      ),
+      timeout: t(
+        'auth.timeoutError',
+        'A conexão demorou demais. Verifique sua internet e tente entrar novamente.',
+      ),
+    };
+    toast({
+      title: t('auth.errorSigningIn', 'Não foi possível entrar'),
+      description: reasons[error] ?? t(
+        'auth.genericSignInError',
+        'We could not complete sign-in. Please try again.',
+      ),
+      variant: 'destructive',
+    });
+  }, [searchParams, toast, t]);
 
   const signUpSchema = z.object({
     email: z.string().email(t('auth.invalidEmail')),
@@ -115,14 +141,20 @@ export default function Auth() {
       if (error) {
         toast({
           title: t('auth.errorSigningIn'),
-          description: error.message,
+          description: t(
+            'auth.genericSignInError',
+            'We could not complete sign-in. Please try again.',
+          ),
           variant: 'destructive',
         });
       }
-    } catch (err) {
+    } catch {
       toast({
         title: t('auth.errorSigningIn'),
-        description: err instanceof Error ? err.message : isPt ? 'Erro desconhecido' : isEs ? 'Error desconocido' : 'Unknown error',
+        description: t(
+          'auth.genericSignInError',
+          'We could not complete sign-in. Please try again.',
+        ),
         variant: 'destructive',
       });
     } finally {
@@ -172,23 +204,24 @@ export default function Auth() {
         );
 
         if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: t('auth.emailAlreadyRegistered'),
-              description: t('auth.tryLoginOrUseAnotherEmail'),
-              variant: 'destructive',
-            });
+          if (error.message.includes('Invalid email')) {
+            setErrors({ email: t('auth.invalidEmail') });
           } else {
             toast({
-              title: t('auth.errorCreatingAccount'),
-              description: error.message,
-              variant: 'destructive',
+              title: t('auth.checkEmailToVerify', 'Check your email'),
+              description: t(
+                'auth.genericSignupResult',
+                'If the address can be used, we sent the next step. You can also try signing in or resetting your password.',
+              ),
             });
           }
         } else {
           toast({
-            title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
-            description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
+            title: t('auth.checkEmailToVerify', 'Check your email'),
+            description: t(
+              'auth.genericSignupResult',
+              'If the address can be used, we sent the next step. You can also try signing in or resetting your password.',
+            ),
             duration: 10000,
           });
           setIsSignUp(false);
@@ -476,14 +509,20 @@ export default function Auth() {
                       toast({ title: t('auth.enterEmailFirst', 'Please enter your email first'), variant: 'destructive' });
                       return;
                     }
-                    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
-                      redirectTo: `${window.location.origin}/reset-password`,
-                    });
-                    if (error) {
-                      toast({ title: t('auth.resetError', 'Error sending reset email'), variant: 'destructive' });
-                    } else {
-                      toast({ title: t('auth.resetSent', 'Password reset email sent. Check your inbox.') });
+                    try {
+                      await supabase.auth.resetPasswordForEmail(formData.email.trim().toLowerCase(), {
+                        redirectTo: 'https://www.mdbaise.com/reset-password',
+                      });
+                    } catch {
+                      // Recovery responses stay identical to prevent account enumeration.
                     }
+                    toast({
+                      title: t('auth.resetSent', 'Check your email'),
+                      description: t(
+                        'auth.resetSentDescription',
+                        'If an account matches that email, a secure reset link will arrive shortly.',
+                      ),
+                    });
                   }}
                 >
                   {t('auth.forgotPassword', 'Forgot password?')}

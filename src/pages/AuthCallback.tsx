@@ -7,135 +7,151 @@ import { getBaiseAppKey } from '@/lib/providerCommunication';
 
 const db = supabase as any;
 
+// Nobody should ever be stranded on this spinner. If sign-in has not settled by
+// now, send them back to /auth with something actionable instead.
+const AUTH_TIMEOUT_MS = 12_000;
+
+/**
+ * OAuth / magic-link landing page.
+ *
+ * Only two things gate the redirect: a valid session, and a profile row. The
+ * referral and partner attribution calls used to be awaited here too, which put
+ * four extra network round-trips between a successful login and the app. They
+ * now fire after navigating — attribution is not authentication, and it must
+ * never be the reason someone waits.
+ */
 export default function AuthCallback() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
+    let settled = false;
+
+    const go = (path: string) => {
+      if (settled) return;
+      settled = true;
+      navigate(path, { replace: true });
+    };
+
+    const timer = setTimeout(() => go('/auth?error=timeout'), AUTH_TIMEOUT_MS);
+
+    // Fire-and-forget: runs after the redirect and can fail without consequence.
+    const recordAttribution = (userId: string, email: string | null) => {
+      const appKey = getBaiseAppKey();
+      const referralCode = localStorage.getItem('baise_referral_code');
+      const referralLanding = localStorage.getItem('baise_referral_landing');
+      const partnerCode = localStorage.getItem('baise_partner_code');
+      const partnerLanding = localStorage.getItem('baise_partner_landing');
+
+      void db.rpc('ensure_profile_referral_identity', {
+        target_user_id: userId, target_app_key: appKey,
+      }).then(null, () => null);
+
+      void db.rpc('activate_partner_applications_for_user', {
+        target_user_id: userId, target_email: email,
+      }).then(null, () => null);
+
+      if (referralCode) {
+        void db.rpc('track_referral_event', {
+          target_code: referralCode,
+          target_event_type: 'signup',
+          target_app_key: appKey,
+          event_metadata: { source: 'auth_callback', landing: referralLanding || null },
+        }).then(null, () => null);
+      }
+
+      if (partnerCode) {
+        void db.rpc('track_partner_campaign_click', {
+          target_tracking_code: partnerCode,
+          target_event_type: 'lead',
+          event_metadata: { source: 'auth_callback', landing: partnerLanding || null, app_key: appKey },
+        }).then(null, () => null);
+      }
+
+      if (referralCode || partnerCode) {
+        localStorage.removeItem('baise_referral_code');
+        localStorage.removeItem('baise_referral_landing');
+        localStorage.removeItem('baise_partner_code');
+        localStorage.removeItem('baise_partner_landing');
+      }
+    };
+
     const handleAuthCallback = async () => {
       const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
-      const providerError = url.searchParams.get('error');
-      const providerErrorDescription =
-        url.searchParams.get('error_description') || url.searchParams.get('error_code');
-
-      // Provider-side failure (user denied, misconfigured client, etc.) — surface it.
-      if (providerError) {
-        const message = providerErrorDescription || providerError;
-        navigate(`/auth?error=${encodeURIComponent(message)}`, { replace: true });
+      if (url.searchParams.get('error')) {
+        go('/auth?error=oauth_failed');
         return;
       }
 
-      // PKCE flow: convert ?code=... into a session before anything else.
-      if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
-          window.location.href,
-        );
-        if (exchangeError) {
-          navigate(
-            `/auth?error=${encodeURIComponent(exchangeError.message)}`,
-            { replace: true },
-          );
+      // The shared client owns the single PKCE exchange via detectSessionInUrl.
+      // Never exchange the callback URL a second time here.
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        // PKCE keeps the code verifier in the localStorage of the browser that
+        // STARTED the login. Opening the link somewhere else — tapping it inside
+        // WhatsApp, or in a different browser — leaves no verifier to exchange.
+        // That deserves its own message, not a generic "try again".
+        const message = (error.message || '').toLowerCase();
+        const wrongBrowser = message.includes('verifier') || message.includes('pkce');
+        go(`/auth?error=${wrongBrowser ? 'wrong_browser' : 'oauth_failed'}`);
+        return;
+      }
+
+      if (!session?.user) {
+        go('/auth?error=wrong_browser');
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        go('/auth?error=oauth_failed');
+        return;
+      }
+
+      if (!profile) {
+        // handle_new_user() covers normal signup; this is the OAuth fallback.
+        const meta = session.user.user_metadata || {};
+        const fullName = meta.full_name || meta.name || '';
+        const firstName = meta.first_name || fullName.split(' ')[0] || '';
+        const lastName = meta.last_name || fullName.split(' ').slice(1).join(' ') || '';
+
+        const { error: insertError } = await supabase.from('profiles').insert({
+          user_id: session.user.id,
+          email: session.user.email,
+          first_name: firstName || null,
+          last_name: lastName || null,
+          avatar_url: meta.avatar_url || meta.picture || null,
+          user_type: 'customer',
+          handle: `user_${session.user.id.slice(0, 8)}`,
+          referral_code: `REF${session.user.id.slice(0, 6).toUpperCase()}`,
+          credits_balance: 0,
+          status: 'active',
+          languages: ['portuguese'],
+        });
+        // 23505 = the row already exists, which is success for our purposes.
+        if (insertError && insertError.code !== '23505') {
+          go('/auth?error=oauth_failed');
           return;
         }
       }
 
-      const { data: { session }, error } = await supabase.auth.getSession();
-
-      if (error) {
-        navigate(`/auth?error=${encodeURIComponent(error.message)}`, { replace: true });
-        return;
-      }
-
-      if (session?.user) {
-        const appKey = getBaiseAppKey();
-        const inboundReferralCode = localStorage.getItem('baise_referral_code');
-        const inboundReferralLanding = localStorage.getItem('baise_referral_landing');
-        const inboundPartnerCode = localStorage.getItem('baise_partner_code');
-        const inboundPartnerLanding = localStorage.getItem('baise_partner_landing');
-
-        // Ensure profile exists for OAuth users
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (!profile) {
-          // Profile missing — create one from OAuth metadata
-          const meta = session.user.user_metadata || {};
-          const fullName = meta.full_name || meta.name || '';
-          const firstName = meta.first_name || fullName.split(' ')[0] || '';
-          const lastName = meta.last_name || fullName.split(' ').slice(1).join(' ') || '';
-
-          await supabase.from('profiles').insert({
-            user_id: session.user.id,
-            email: session.user.email,
-            first_name: firstName || null,
-            last_name: lastName || null,
-            avatar_url: meta.avatar_url || meta.picture || null,
-            user_type: 'customer',
-            handle: `user_${session.user.id.slice(0, 8)}`,
-            referral_code: `REF${session.user.id.slice(0, 6).toUpperCase()}`,
-            credits_balance: 0,
-            status: 'active',
-            languages: ['portuguese'],
-          });
-        }
-
-        await db.rpc('ensure_profile_referral_identity', {
-          target_user_id: session.user.id,
-          target_app_key: appKey,
-        }).catch(() => null);
-
-        await db.rpc('activate_partner_applications_for_user', {
-          target_user_id: session.user.id,
-          target_email: session.user.email || null,
-        }).catch(() => null);
-
-        if (inboundReferralCode) {
-          await db.rpc('track_referral_event', {
-            target_code: inboundReferralCode,
-            target_event_type: 'signup',
-            target_app_key: appKey,
-            event_metadata: {
-              source: 'auth_callback',
-              landing: inboundReferralLanding || null,
-            },
-          }).catch(() => null);
-        }
-
-        if (inboundPartnerCode) {
-          await db.rpc('track_partner_campaign_click', {
-            target_tracking_code: inboundPartnerCode,
-            target_event_type: 'lead',
-            event_metadata: {
-              source: 'auth_callback',
-              landing: inboundPartnerLanding || null,
-              app_key: appKey,
-            },
-          }).catch(() => null);
-        }
-
-        if (inboundReferralCode || inboundPartnerCode) {
-          localStorage.removeItem('baise_referral_code');
-          localStorage.removeItem('baise_referral_landing');
-          localStorage.removeItem('baise_partner_code');
-          localStorage.removeItem('baise_partner_landing');
-        }
-
-        navigate('/', { replace: true });
-        return;
-      }
-
-      // No session and no code — the user landed here without completing OAuth.
-      navigate(
-        `/auth?error=${encodeURIComponent('No authentication code received. Please try signing in again.')}`,
-        { replace: true },
-      );
+      clearTimeout(timer);
+      go('/');
+      recordAttribution(session.user.id, session.user.email || null);
     };
 
-    handleAuthCallback();
+    handleAuthCallback().catch(() => go('/auth?error=oauth_failed'));
+
+    return () => {
+      settled = true;
+      clearTimeout(timer);
+    };
   }, [navigate]);
 
   return (

@@ -231,9 +231,11 @@ const Blog = () => {
                   <Link to="/provider-dashboard">Provider dashboard</Link>
                 </Button>
                 <Button asChild variant="ghost" className="w-full">
-                  <Link to="/training">
+                  {/* Medical mounts its learning centre (Learn.tsx) at /help.
+                      /training is the Casa/Legal route and 404s here. */}
+                  <Link to="/help">
                     <BookOpen className="mr-2 h-4 w-4" />
-                    Training center
+                    Learning centre
                   </Link>
                 </Button>
               </div>
