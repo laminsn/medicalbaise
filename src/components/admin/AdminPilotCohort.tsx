@@ -27,6 +27,8 @@ type Application = {
   city: string | null; intended_role: string; profession: string | null;
   years_experience: number | null; device: string | null; motivation: string | null;
   status: string; created_at: string; invite_id: string | null;
+  consent_version: string | null; consented_at: string | null;
+  signature_data_url: string | null;
 };
 type Invite = {
   id: string; app_key: string; label: string; intended_role: string; granted_tier: string | null;
@@ -94,8 +96,11 @@ export function AdminPilotCohort() {
     [scope],
   );
 
+  // Valid statuses are new|shortlisted|invited|signed|declined|withdrawn.
+  // Awaiting review means new or shortlisted; 'pending' matches nothing.
   const pending = useMemo(
-    () => inScope(apps).filter((a) => a.status === 'pending'), [apps, inScope]);
+    () => inScope(apps).filter((a) => a.status === 'new' || a.status === 'shortlisted'),
+    [apps, inScope]);
   const roster = useMemo(() => inScope(invites), [invites, inScope]);
   const openIssues = useMemo(
     () => inScope(issues).filter((i) => i.status !== 'resolved' && i.status !== 'closed'),
@@ -127,7 +132,7 @@ export function AdminPilotCohort() {
 
       if (applicationId) {
         await db.from('pilot_applications')
-          .update({ status: 'approved', invite_id: rows[0].invite_id, reviewed_at: new Date().toISOString() })
+          .update({ status: 'invited', invite_id: rows[0].invite_id, reviewed_at: new Date().toISOString() })
           .eq('id', applicationId);
       }
       toast.success(
@@ -252,8 +257,8 @@ export function AdminPilotCohort() {
         {/* ── applications ── */}
         <TabsContent value="applications" className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            Approving issues a code immediately. Only approve once their signed agreement is back —
-            no signature, no code.
+            Applicants accept the terms on the form itself, so there is nothing to countersign.
+            Approving mints a code and marks them invited.
           </p>
           {pending.length === 0 ? (
             <p className="rounded-md border p-6 text-center text-sm text-muted-foreground">
@@ -278,7 +283,18 @@ export function AdminPilotCohort() {
                     </p>
                   )}
                   {a.motivation && <p className="mt-2 text-sm">{a.motivation}</p>}
-                  <p className="mt-1 text-xs text-muted-foreground">Applied {fmt(a.created_at)}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Applied {fmt(a.created_at)}
+                    {a.consented_at && ` · accepted ${fmt(a.consented_at)}`}
+                    {a.consent_version && ` · ${a.consent_version}`}
+                  </p>
+                  {a.signature_data_url && (
+                    <img
+                      src={a.signature_data_url}
+                      alt={`Signature of ${a.full_name}`}
+                      className="mt-2 h-16 rounded border bg-background p-1"
+                    />
+                  )}
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <Button size="sm" variant="outline" disabled={busy === a.id} onClick={() => void decline(a.id)}>

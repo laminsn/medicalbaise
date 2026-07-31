@@ -9,6 +9,7 @@ import { PageMetadata } from '@/components/seo/PageMetadata';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { SignaturePad } from '@/components/pilot/SignaturePad';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -24,7 +25,9 @@ import {
 /**
  * Public pilot-tester recruitment page.
  *
- * Captures an APPLICATION plus consent — it is not the signature. The
+ * Captures the application AND the signature. Ticking the two boxes IS the
+ * acceptance (counsel-approved 2026-07-31) — there is no separate contract to
+ * countersign afterwards. The
  * attorney-cleared Tester Agreement is still executed separately before any
  * access code is issued (apply -> sign -> code).
  *
@@ -54,6 +57,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
   });
   const [consentTerms, setConsentTerms] = useState(false);
   const [consentLgpd, setConsentLgpd] = useState(false);
+  const [signature, setSignature] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -136,6 +140,8 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
         p_years_experience: form.years ? Number(form.years) : null,
         p_device: form.device || null,
         p_motivation: form.motivation || null,
+        p_signature: signature,
+        p_user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
       });
       if (error) throw error;
 
@@ -258,7 +264,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             {t('pilot.termsTitle', 'As regras do piloto')}
           </h2>
           <p className="mb-8 max-w-2xl text-muted-foreground">
-            {t('pilot.termsLede', 'Leia antes de se inscrever. Se for selecionado, você assinará um contrato de testador com estes mesmos termos.')}
+            {t('pilot.termsLede', 'Leia com atenção. Ao marcar as caixas abaixo você aceita estes termos — não há outro contrato para assinar depois.')}
           </p>
           <ul className="grid gap-4 md:grid-cols-2">
             {terms.map((line, index) => (
@@ -383,6 +389,13 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
                   </Link>
                 </Label>
               </div>
+
+              <div className="border-t pt-4">
+                <p className="mb-2 text-sm font-medium">
+                  {t('pilot.signature.title', 'Sua assinatura')}
+                </p>
+                <SignaturePad onChange={setSignature} />
+              </div>
             </div>
 
             <Button type="submit" size="lg" className="w-full"
@@ -392,7 +405,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             </Button>
 
             <p className="text-center text-xs text-muted-foreground">
-              {t('pilot.signNote', 'Selecionados assinam um contrato de testador antes de receber o código de acesso.')}
+              {t('pilot.signNote', 'Ao enviar, você aceita os termos acima. Guardamos a data, a versão dos termos e sua assinatura como registro.')}
             </p>
           </form>
         </div>
