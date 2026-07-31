@@ -2739,5 +2739,25 @@
     "mgWeeklyProviderEducationCampaign": "Weekly Provider Education Campaign",
     "mgEmailsSent": "Emails Sent",
     "mgNotifications": "Notifications"
+  },
+  "authFlow": {
+    "createANewPassword": "Create a new password",
+    "protectYourAccountWith": "Protect your account with a strong password you have not used before.",
+    "verifyingYourSecureReset": "Verifying your secure reset link…",
+    "thisResetLinkIs": "This reset link is invalid or has expired",
+    "resetLinksAreSingle": "Reset links are single-use and time-limited. Request a fresh one to continue safely.",
+    "requestANewReset": "Request a new reset link",
+    "resettingThePasswordFor": "Resetting the password for",
+    "atLeastCharacters": "At least 8 characters",
+    "containsALetter": "Contains a letter",
+    "containsANumber": "Contains a number",
+    "passwordsMatch": "Passwords match",
+    "securingYourAccount": "Securing your account…",
+    "saveNewPassword": "Save new password",
+    "yourPasswordIsSecure": "Your password is secure and updated",
+    "forYourProtectionOther": "For your protection, other sessions were signed out. You can now sign in with your new password.",
+    "continueToSignIn": "Continue to sign in",
+    "backToSignIn": "Back to sign in",
+    "didnTRequestThis": "Didn&apos;t request this? Do not reuse the link. Contact"
   }
 }

@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Eye, EyeOff, Loader2, LockKeyhole, ShieldCheck } from "lucide-react";
@@ -145,38 +146,38 @@ const ResetPassword = () => {
                 <LockKeyhole className="h-8 w-8" aria-hidden="true" />
               </div>
               <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-primary">{brand.name}</p>
-              <h1 className="text-3xl font-bold tracking-tight">Create a new password</h1>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">Protect your account with a strong password you have not used before.</p>
+              <h1 className="text-3xl font-bold tracking-tight">{t('authFlow.createANewPassword', "Create a new password")}</h1>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{t('authFlow.protectYourAccountWith', "Protect your account with a strong password you have not used before.")}</p>
             </div>
 
-            {state === "checking" && <div className="flex flex-col items-center gap-3 py-10 text-center" role="status"><Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" /><p className="font-medium">Verifying your secure reset link…</p></div>}
+            {state === "checking" && <div className="flex flex-col items-center gap-3 py-10 text-center" role="status"><Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" /><p className="font-medium">{t('authFlow.verifyingYourSecureReset', "Verifying your secure reset link…")}</p></div>}
 
             {state === "invalid" && (
               <div className="space-y-6">
                 <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-center">
                   <AlertTriangle className="mx-auto mb-3 h-8 w-8 text-destructive" aria-hidden="true" />
-                  <h2 className="font-semibold">This reset link is invalid or has expired</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">Reset links are single-use and time-limited. Request a fresh one to continue safely.</p>
+                  <h2 className="font-semibold">{t('authFlow.thisResetLinkIs', "This reset link is invalid or has expired")}</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('authFlow.resetLinksAreSingle', "Reset links are single-use and time-limited. Request a fresh one to continue safely.")}</p>
                   {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
                 </div>
-                <Button asChild size="lg" className="h-12 w-full rounded-xl"><Link to="/auth">Request a new reset link</Link></Button>
+                <Button asChild size="lg" className="h-12 w-full rounded-xl"><Link to="/auth">{t('authFlow.requestANewReset', "Request a new reset link")}</Link></Button>
               </div>
             )}
 
             {(state === "ready" || state === "saving") && (
               <form className="space-y-5" onSubmit={handleSubmit}>
-                {email && <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">Resetting the password for <span className="font-semibold">{email}</span></div>}
+                {email && <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">{t('authFlow.resettingThePasswordFor', "Resetting the password for")}<span className="font-semibold">{email}</span></div>}
                 <PasswordField id="new-password" label="New password" value={password} onChange={setPassword} visible={showPassword} onToggle={() => setShowPassword((value) => !value)} disabled={state === "saving"} />
                 <PasswordField id="confirm-password" label="Confirm new password" value={confirmation} onChange={setConfirmation} visible={showConfirmation} onToggle={() => setShowConfirmation((value) => !value)} disabled={state === "saving"} />
                 <ul className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-                  <PasswordCheck valid={passwordChecks.length}>At least 8 characters</PasswordCheck>
-                  <PasswordCheck valid={passwordChecks.letter}>Contains a letter</PasswordCheck>
-                  <PasswordCheck valid={passwordChecks.number}>Contains a number</PasswordCheck>
-                  <PasswordCheck valid={passwordChecks.match}>Passwords match</PasswordCheck>
+                  <PasswordCheck valid={passwordChecks.length}>{t('authFlow.atLeastCharacters', "At least 8 characters")}</PasswordCheck>
+                  <PasswordCheck valid={passwordChecks.letter}>{t('authFlow.containsALetter', "Contains a letter")}</PasswordCheck>
+                  <PasswordCheck valid={passwordChecks.number}>{t('authFlow.containsANumber', "Contains a number")}</PasswordCheck>
+                  <PasswordCheck valid={passwordChecks.match}>{t('authFlow.passwordsMatch', "Passwords match")}</PasswordCheck>
                 </ul>
                 {error && <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive" role="alert">{error}</p>}
                 <Button type="submit" size="lg" className="h-12 w-full rounded-xl text-base" disabled={!passwordIsValid || state === "saving"}>
-                  {state === "saving" ? <><Loader2 className="animate-spin" aria-hidden="true" />Securing your account…</> : <><ShieldCheck aria-hidden="true" />Save new password</>}
+                  {state === "saving" ? <><Loader2 className="animate-spin" aria-hidden="true" />{t('authFlow.securingYourAccount', "Securing your account…")}</> : <><ShieldCheck aria-hidden="true" />{t('authFlow.saveNewPassword', "Save new password")}</>}
                 </Button>
               </form>
             )}
@@ -185,19 +186,19 @@ const ResetPassword = () => {
               <div className="space-y-6 text-center">
                 <div className="rounded-2xl border border-primary/30 bg-primary/10 p-6">
                   <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-primary" aria-hidden="true" />
-                  <h2 className="text-xl font-bold">Your password is secure and updated</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">For your protection, other sessions were signed out. You can now sign in with your new password.</p>
+                  <h2 className="text-xl font-bold">{t('authFlow.yourPasswordIsSecure', "Your password is secure and updated")}</h2>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('authFlow.forYourProtectionOther', "For your protection, other sessions were signed out. You can now sign in with your new password.")}</p>
                 </div>
-                <Button asChild size="lg" className="h-12 w-full rounded-xl"><Link to="/auth">Continue to sign in</Link></Button>
+                <Button asChild size="lg" className="h-12 w-full rounded-xl"><Link to="/auth">{t('authFlow.continueToSignIn', "Continue to sign in")}</Link></Button>
               </div>
             )}
 
             <div className="mt-7 border-t border-border pt-5">
               <div className="flex gap-3 text-sm text-muted-foreground">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                <p>Didn&apos;t request this? Do not reuse the link. Contact <a className="font-semibold text-primary hover:underline" href={`mailto:${brand.securityEmail}`}>{brand.securityEmail}</a> so our team can help protect your account.</p>
+                <p>{t('authFlow.didnTRequestThis', "Didn&apos;t request this? Do not reuse the link. Contact")} <a className="font-semibold text-primary hover:underline" href={`mailto:${brand.securityEmail}`}>{brand.securityEmail}</a> so our team can help protect your account.</p>
               </div>
-              <Button asChild variant="ghost" className="mt-4 w-full"><Link to="/auth"><ArrowLeft aria-hidden="true" />Back to sign in</Link></Button>
+              <Button asChild variant="ghost" className="mt-4 w-full"><Link to="/auth"><ArrowLeft aria-hidden="true" />{t('authFlow.backToSignIn', "Back to sign in")}</Link></Button>
             </div>
           </section>
         </div>

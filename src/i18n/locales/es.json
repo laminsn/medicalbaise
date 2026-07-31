@@ -2739,5 +2739,25 @@
     "mgWeeklyProviderEducationCampaign": "Campaña semanal de educación para profesionales",
     "mgEmailsSent": "Correos enviados",
     "mgNotifications": "Notificaciones"
+  },
+  "authFlow": {
+    "createANewPassword": "Crear una nueva contraseña",
+    "protectYourAccountWith": "Protege tu cuenta con una contraseña fuerte que no hayas usado antes.",
+    "verifyingYourSecureReset": "Verificando tu enlace seguro…",
+    "thisResetLinkIs": "Este enlace de restablecimiento no es válido o expiró",
+    "resetLinksAreSingle": "Los enlaces de restablecimiento son de un solo uso y tienen plazo. Pide uno nuevo para continuar con seguridad.",
+    "requestANewReset": "Solicitar un enlace nuevo",
+    "resettingThePasswordFor": "Restableciendo la contraseña de",
+    "atLeastCharacters": "Al menos 8 caracteres",
+    "containsALetter": "Contiene una letra",
+    "containsANumber": "Contiene un número",
+    "passwordsMatch": "Las contraseñas coinciden",
+    "securingYourAccount": "Protegiendo tu cuenta…",
+    "saveNewPassword": "Guardar nueva contraseña",
+    "yourPasswordIsSecure": "Tu contraseña está segura y actualizada",
+    "forYourProtectionOther": "Por tu seguridad, se cerraron las otras sesiones. Ya puedes entrar con tu nueva contraseña.",
+    "continueToSignIn": "Ir al inicio de sesión",
+    "backToSignIn": "Volver al inicio de sesión",
+    "didnTRequestThis": "¿No lo pediste? No reutilices el enlace. Contacta con"
   }
 }
