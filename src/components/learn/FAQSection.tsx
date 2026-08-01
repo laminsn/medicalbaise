@@ -25,17 +25,18 @@ const iconMap: Record<string, any> = {
 export function FAQSection({ searchQuery }: FAQSectionProps) {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const categoryLabels: Record<string, { en: string; pt: string }> = {
-    all: { en: 'All', pt: 'Todos' },
-    account: { en: 'Account', pt: 'Conta' },
-    booking: { en: 'Bookings', pt: 'Agendamentos' },
-    payments: { en: 'Payments', pt: 'Pagamentos' },
-    teleconsultation: { en: 'Teleconsultation', pt: 'Teleconsulta' },
-    providers: { en: 'Providers', pt: 'Profissionais' },
-    features: { en: 'Features', pt: 'Recursos' },
-    support: { en: 'Support', pt: 'Suporte' },
+    all: { en: 'All', pt: 'Todos', es: 'Todos' },
+    account: { en: 'Account', pt: 'Conta', es: 'Cuenta' },
+    booking: { en: 'Bookings', pt: 'Agendamentos', es: 'Reservas' },
+    payments: { en: 'Payments', pt: 'Pagamentos', es: 'Pagos' },
+    teleconsultation: { en: 'Teleconsultation', pt: 'Teleconsulta', es: 'Teleconsulta' },
+    providers: { en: 'Providers', pt: 'Profissionais', es: 'Profesionales' },
+    features: { en: 'Features', pt: 'Recursos', es: 'Funciones' },
+    support: { en: 'Support', pt: 'Suporte', es: 'Soporte' },
   };
 
   const filteredFAQs = faqs.filter((faq) => {
@@ -97,13 +98,13 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
       {filteredFAQs.length === 0 && (
         <div className="text-center py-12">
           <HelpCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">{isPt ? 'Nenhuma FAQ encontrada para sua busca' : 'No FAQs found matching your search'}</p>
+          <p className="text-muted-foreground">{isPt ? 'Nenhuma FAQ encontrada para sua busca' : isEs ? 'No se encontraron preguntas para tu búsqueda' : 'No FAQs found matching your search'}</p>
           <Button
             variant="link"
             className="text-cyan-400 mt-2"
             onClick={() => setSelectedCategory('all')}
           >
-            {isPt ? 'Limpar filtros' : 'Clear filters'}
+            {isPt ? 'Limpar filtros' : isEs ? 'Limpiar filtros' : 'Clear filters'}
           </Button>
         </div>
       )}
@@ -113,7 +114,7 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
         <p className="text-muted-foreground mb-4">{isPt ? 'Não encontrou o que procura?' : "Can't find what you're looking for?"}</p>
         <Button className="bg-cyan-500 hover:bg-cyan-600 text-white">
           <MessageSquare className="w-4 h-4 mr-2" />
-          {isPt ? 'Falar com suporte' : 'Contact Support'}
+          {isPt ? 'Falar com suporte' : isEs ? 'Contactar con soporte' : 'Contact Support'}
         </Button>
       </div>
     </div>

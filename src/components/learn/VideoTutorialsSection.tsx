@@ -137,15 +137,16 @@ const videos = [
 export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProps) {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedVideo, setSelectedVideo] = useState<typeof videos[0] | null>(null);
 
   const videoCategoryLabels: Record<string, { en: string; pt: string }> = {
-    all: { en: 'All Videos', pt: 'Todos os vídeos' },
-    quickstart: { en: 'Quick Start', pt: 'Início rápido' },
-    features: { en: 'Feature Deep Dives', pt: 'Recursos em profundidade' },
-    tips: { en: 'Tips & Tricks', pt: 'Dicas e truques' },
-    webinars: { en: 'Webinars', pt: 'Webinars' },
+    all: { en: 'All Videos', pt: 'Todos os vídeos', es: 'Todos los vídeos' },
+    quickstart: { en: 'Quick Start', pt: 'Início rápido', es: 'Inicio rápido' },
+    features: { en: 'Feature Deep Dives', pt: 'Recursos em profundidade', es: 'Funciones a fondo' },
+    tips: { en: 'Tips & Tricks', pt: 'Dicas e truques', es: 'Consejos y trucos' },
+    webinars: { en: 'Webinars', pt: 'Webinars', es: 'Seminarios web' },
   };
 
   const filteredVideos = videos.filter((video) => {
@@ -190,7 +191,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
       {/* Featured Videos */}
       {featuredVideos.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-4">{isPt ? 'Destaques' : 'Featured'}</h3>
+          <h3 className="text-lg font-semibold mb-4">{isPt ? 'Destaques' : isEs ? 'Destacado' : 'Featured'}</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {featuredVideos.map((video) => (
               <Card
@@ -221,7 +222,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Eye className="w-3 h-3" />
-                      {formatViews(video.views)} {isPt ? 'visualizações' : 'views'}
+                      {formatViews(video.views)} {isPt ? 'visualizações' : isEs ? 'vistas' : 'views'}
                     </span>
                     <span className="flex items-center gap-1">
                       <ThumbsUp className="w-3 h-3" />
@@ -237,7 +238,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
 
       {/* Regular Videos */}
       <div>
-        {featuredVideos.length > 0 && <h3 className="text-lg font-semibold mb-4">{isPt ? 'Todos os vídeos' : 'All Videos'}</h3>}
+        {featuredVideos.length > 0 && <h3 className="text-lg font-semibold mb-4">{isPt ? 'Todos os vídeos' : isEs ? 'Todos los vídeos' : 'All Videos'}</h3>}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {regularVideos.map((video) => (
             <Card
@@ -263,7 +264,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
                   {video.title}
                 </h4>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{formatViews(video.views)} {isPt ? 'visualizações' : 'views'}</span>
+                  <span>{formatViews(video.views)} {isPt ? 'visualizações' : isEs ? 'vistas' : 'views'}</span>
                   <span className="capitalize">
                     {isPt ? (videoCategoryLabels[video.category]?.pt ?? video.category) : (videoCategoryLabels[video.category]?.en ?? video.category)}
                   </span>
@@ -277,7 +278,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
       {filteredVideos.length === 0 && (
         <div className="text-center py-12">
           <PlayCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">{isPt ? 'Nenhum vídeo encontrado para sua busca' : 'No videos found matching your search'}</p>
+          <p className="text-muted-foreground">{isPt ? 'Nenhum vídeo encontrado para sua busca' : isEs ? 'No se encontraron vídeos para tu búsqueda' : 'No videos found matching your search'}</p>
         </div>
       )}
 
@@ -297,8 +298,8 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
                     <div className="w-20 h-20 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:scale-105 transition-transform">
                       <PlayCircle className="w-10 h-10 text-white" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para player de vídeo' : 'Video player placeholder'}</p>
-                    <p className="text-xs text-muted-foreground">{isPt ? 'Duração' : 'Duration'}: {selectedVideo.duration}</p>
+                    <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para player de vídeo' : isEs ? 'Espacio para el reproductor de vídeo' : 'Video player placeholder'}</p>
+                    <p className="text-xs text-muted-foreground">{isPt ? 'Duração' : isEs ? 'Duración' : 'Duration'}: {selectedVideo.duration}</p>
                   </div>
                 </div>
               </div>
@@ -307,25 +308,25 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4" />
-                    {formatViews(selectedVideo.views)} {isPt ? 'visualizações' : 'views'}
+                    {formatViews(selectedVideo.views)} {isPt ? 'visualizações' : isEs ? 'vistas' : 'views'}
                   </span>
                   <span className="flex items-center gap-1">
                     <ThumbsUp className="w-4 h-4" />
-                    {selectedVideo.likes} {isPt ? 'curtidas' : 'likes'}
+                    {selectedVideo.likes} {isPt ? 'curtidas' : isEs ? 'me gusta' : 'likes'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" className="border-border/50">
                     <ThumbsUp className="w-4 h-4 mr-2" />
-                    {isPt ? 'Curtir' : 'Like'}
+                    {isPt ? 'Curtir' : isEs ? 'Me gusta' : 'Like'}
                   </Button>
                   <Button variant="outline" size="sm" className="border-border/50">
                     <BookmarkPlus className="w-4 h-4 mr-2" />
-                    {isPt ? 'Salvar' : 'Save'}
+                    {isPt ? 'Salvar' : isEs ? 'Guardar' : 'Save'}
                   </Button>
                   <Button variant="outline" size="sm" className="border-border/50">
                     <Share2 className="w-4 h-4 mr-2" />
-                    {isPt ? 'Compartilhar' : 'Share'}
+                    {isPt ? 'Compartilhar' : isEs ? 'Compartir' : 'Share'}
                   </Button>
                 </div>
               </div>

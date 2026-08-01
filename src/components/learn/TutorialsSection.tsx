@@ -263,27 +263,28 @@ const tutorials = [
 export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTutorial, setSelectedTutorial] = useState<typeof tutorials[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
   const tutorialCategoryLabels: Record<string, { en: string; pt: string }> = {
-    all: { en: 'All Tutorials', pt: 'Todos os tutoriais' },
-    patients: { en: 'For Patients', pt: 'Para pacientes' },
-    providers: { en: 'For Providers', pt: 'Para profissionais' },
-    advanced: { en: 'Advanced', pt: 'Avançado' },
+    all: { en: 'All Tutorials', pt: 'Todos os tutoriais', es: 'Todos los tutoriales' },
+    patients: { en: 'For Patients', pt: 'Para pacientes', es: 'Para pacientes' },
+    providers: { en: 'For Providers', pt: 'Para profissionais', es: 'Para profesionales' },
+    advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },
   };
 
   const audienceLabels: Record<string, { en: string; pt: string }> = {
-    patients: { en: 'patients', pt: 'pacientes' },
-    providers: { en: 'providers', pt: 'profissionais' },
-    advanced: { en: 'advanced', pt: 'avançado' },
+    patients: { en: 'patients', pt: 'pacientes', es: 'pacientes' },
+    providers: { en: 'providers', pt: 'profissionais', es: 'profesionales' },
+    advanced: { en: 'advanced', pt: 'avançado', es: 'avanzado' },
   };
 
   const difficultyLabels: Record<string, { en: string; pt: string }> = {
-    Beginner: { en: 'Beginner', pt: 'Iniciante' },
-    Intermediate: { en: 'Intermediate', pt: 'Intermediário' },
-    Advanced: { en: 'Advanced', pt: 'Avançado' },
+    Beginner: { en: 'Beginner', pt: 'Iniciante', es: 'Principiante' },
+    Intermediate: { en: 'Intermediate', pt: 'Intermediário', es: 'Intermedio' },
+    Advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },
   };
 
   const filteredTutorials = tutorials.filter((tutorial) => {
@@ -356,7 +357,7 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                         <Clock className="w-3 h-3" />
                         {tutorial.duration}
                       </span>
-                      <span>{tutorial.steps.length} {isPt ? 'etapas' : 'steps'}</span>
+                      <span>{tutorial.steps.length} {isPt ? 'etapas' : isEs ? 'pasos' : 'steps'}</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
@@ -370,7 +371,7 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
       {filteredTutorials.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">{isPt ? 'Nenhum tutorial encontrado para sua busca' : 'No tutorials found matching your search'}</p>
+          <p className="text-muted-foreground">{isPt ? 'Nenhum tutorial encontrado para sua busca' : isEs ? 'No se encontraron tutoriales para tu búsqueda' : 'No tutorials found matching your search'}</p>
         </div>
       )}
 
@@ -429,8 +430,8 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                   <div className="bg-muted/30 border border-border/50 rounded-xl aspect-video flex items-center justify-center">
                     <div className="text-center">
                       <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : 'Screenshot placeholder'}</p>
-                      <p className="text-xs text-muted-foreground">{isPt ? 'Gerado automaticamente com atualizações da plataforma' : 'Auto-generated with platform updates'}</p>
+                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : isEs ? 'Espacio para captura de pantalla' : 'Screenshot placeholder'}</p>
+                      <p className="text-xs text-muted-foreground">{isPt ? 'Gerado automaticamente com atualizações da plataforma' : isEs ? 'Generado automáticamente con las actualizaciones de la plataforma' : 'Auto-generated with platform updates'}</p>
                     </div>
                   </div>
 
@@ -442,24 +443,24 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
                       onClick={() => setCurrentStep(currentStep - 1)}
                       className="border-border/50"
                     >
-                      {isPt ? 'Anterior' : 'Previous'}
+                      {isPt ? 'Anterior' : isEs ? 'Anterior' : 'Previous'}
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      {isPt ? 'Etapa' : 'Step'} {currentStep + 1} {isPt ? 'de' : 'of'} {selectedTutorial.steps.length}
+                      {isPt ? 'Etapa' : isEs ? 'Paso' : 'Step'} {currentStep + 1} {isPt ? 'de' : isEs ? 'de' : 'of'} {selectedTutorial.steps.length}
                     </span>
                     <Button
                       disabled={currentStep === selectedTutorial.steps.length - 1}
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="bg-cyan-500 hover:bg-cyan-600 text-white"
                     >
-                      {isPt ? 'Próxima' : 'Next'}
+                      {isPt ? 'Próxima' : isEs ? 'Siguiente' : 'Next'}
                     </Button>
                   </div>
                 </div>
 
                 {/* Step List */}
                 <div className="mt-8 pt-6 border-t border-border/50">
-                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : 'All Steps'}</h4>
+                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : isEs ? 'Todos los pasos' : 'All Steps'}</h4>
                   <div className="space-y-2">
                     {selectedTutorial.steps.map((step, index) => (
                       <button

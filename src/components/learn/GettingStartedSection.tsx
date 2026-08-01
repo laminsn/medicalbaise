@@ -144,28 +144,29 @@ const gettingStartedGuides = [
 export function GettingStartedSection({ searchQuery }: GettingStartedSectionProps) {
   const { i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [selectedGuide, setSelectedGuide] = useState<typeof gettingStartedGuides[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
   const categoryLabels: Record<string, { en: string; pt: string }> = {
-    Account: { en: 'Account', pt: 'Conta' },
-    Search: { en: 'Search', pt: 'Busca' },
-    Booking: { en: 'Booking', pt: 'Agendamento' },
-    Communication: { en: 'Communication', pt: 'Comunicação' },
-    Reviews: { en: 'Reviews', pt: 'Avaliações' },
-    Payments: { en: 'Payments', pt: 'Pagamentos' },
-    Teleconsultation: { en: 'Teleconsultation', pt: 'Teleconsulta' },
-    Verification: { en: 'Verification', pt: 'Verificação' },
-    Providers: { en: 'Providers', pt: 'Profissionais' },
-    Settings: { en: 'Settings', pt: 'Configurações' },
-    Security: { en: 'Security', pt: 'Segurança' },
-    Compliance: { en: 'Compliance', pt: 'Conformidade' },
+    Account: { en: 'Account', pt: 'Conta', es: 'Cuenta' },
+    Search: { en: 'Search', pt: 'Busca', es: 'Búsqueda' },
+    Booking: { en: 'Booking', pt: 'Agendamento', es: 'Reservas' },
+    Communication: { en: 'Communication', pt: 'Comunicação', es: 'Comunicación' },
+    Reviews: { en: 'Reviews', pt: 'Avaliações', es: 'Reseñas' },
+    Payments: { en: 'Payments', pt: 'Pagamentos', es: 'Pagos' },
+    Teleconsultation: { en: 'Teleconsultation', pt: 'Teleconsulta', es: 'Teleconsulta' },
+    Verification: { en: 'Verification', pt: 'Verificação', es: 'Verificación' },
+    Providers: { en: 'Providers', pt: 'Profissionais', es: 'Profesionales' },
+    Settings: { en: 'Settings', pt: 'Configurações', es: 'Ajustes' },
+    Security: { en: 'Security', pt: 'Segurança', es: 'Seguridad' },
+    Compliance: { en: 'Compliance', pt: 'Conformidade', es: 'Cumplimiento' },
   };
 
   const difficultyLabels: Record<string, { en: string; pt: string }> = {
-    Beginner: { en: 'Beginner', pt: 'Iniciante' },
-    Intermediate: { en: 'Intermediate', pt: 'Intermediário' },
-    Advanced: { en: 'Advanced', pt: 'Avançado' },
+    Beginner: { en: 'Beginner', pt: 'Iniciante', es: 'Principiante' },
+    Intermediate: { en: 'Intermediate', pt: 'Intermediário', es: 'Intermedio' },
+    Advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },
   };
 
   const filteredGuides = gettingStartedGuides.filter(
@@ -184,7 +185,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
           </div>
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {isPt ? 'Bem-vindo ao MDBaise!' : 'Welcome to MDBaise!'}
+              {isPt ? 'Bem-vindo ao MDBaise!' : isEs ? '¡Bienvenido a MDBaise!' : 'Welcome to MDBaise!'}
             </h2>
             <p className="text-muted-foreground mb-4">
               {isPt
@@ -194,11 +195,11 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2 text-cyan-400">
                 <Clock className="w-4 h-4" />
-                <span>{isPt ? '~25 min no total' : '~25 min total'}</span>
+                <span>{isPt ? '~25 min no total' : isEs ? '~25 min en total' : '~25 min total'}</span>
               </div>
               <div className="flex items-center gap-2 text-cyan-400">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>{isPt ? '8 guias rápidos' : '8 quick guides'}</span>
+                <span>{isPt ? '8 guias rápidos' : isEs ? '8 guías rápidas' : '8 quick guides'}</span>
               </div>
             </div>
           </div>
@@ -223,7 +224,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-muted-foreground">{isPt ? 'Etapa' : 'Step'} {index + 1}</span>
+                    <span className="text-xs text-muted-foreground">{isPt ? 'Etapa' : isEs ? 'Paso' : 'Step'} {index + 1}</span>
                     <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400">
                       {isPt ? (categoryLabels[guide.category]?.pt ?? guide.category) : (categoryLabels[guide.category]?.en ?? guide.category)}
                     </Badge>
@@ -240,7 +241,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                         <Clock className="w-3 h-3" />
                         {guide.duration}
                       </span>
-                      <span>{guide.steps.length} {isPt ? 'etapas' : 'steps'}</span>
+                      <span>{guide.steps.length} {isPt ? 'etapas' : isEs ? 'pasos' : 'steps'}</span>
                     </div>
                     <ArrowRight className="w-4 h-4 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
@@ -255,8 +256,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {isPt
-              ? `Nenhum guia encontrado para "${searchQuery}"`
-              : `No guides found matching "${searchQuery}"`}
+              ? `Nenhum guia encontrado para "${searchQuery}"` : isEs ? `No se encontraron guías para "${searchQuery}"` : `No guides found matching "${searchQuery}"`}
           </p>
         </div>
       )}
@@ -314,8 +314,8 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                   <div className="bg-muted/30 border border-border/50 rounded-xl aspect-video flex items-center justify-center">
                     <div className="text-center">
                       <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : 'Screenshot placeholder'}</p>
-                      <p className="text-xs text-muted-foreground">{isPt ? 'Guia visual em breve' : 'Visual guide coming soon'}</p>
+                      <p className="text-sm text-muted-foreground">{isPt ? 'Espaço para captura de tela' : isEs ? 'Espacio para captura de pantalla' : 'Screenshot placeholder'}</p>
+                      <p className="text-xs text-muted-foreground">{isPt ? 'Guia visual em breve' : isEs ? 'Guía visual próximamente' : 'Visual guide coming soon'}</p>
                     </div>
                   </div>
 
@@ -327,24 +327,24 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
                       onClick={() => setCurrentStep(currentStep - 1)}
                       className="border-border/50"
                     >
-                      {isPt ? 'Anterior' : 'Previous'}
+                      {isPt ? 'Anterior' : isEs ? 'Anterior' : 'Previous'}
                     </Button>
                     <span className="text-sm text-muted-foreground">
-                      {isPt ? 'Etapa' : 'Step'} {currentStep + 1} {isPt ? 'de' : 'of'} {selectedGuide.steps.length}
+                      {isPt ? 'Etapa' : isEs ? 'Paso' : 'Step'} {currentStep + 1} {isPt ? 'de' : isEs ? 'de' : 'of'} {selectedGuide.steps.length}
                     </span>
                     <Button
                       disabled={currentStep === selectedGuide.steps.length - 1}
                       onClick={() => setCurrentStep(currentStep + 1)}
                       className="bg-cyan-500 hover:bg-cyan-600 text-white"
                     >
-                      {isPt ? 'Próxima' : 'Next'}
+                      {isPt ? 'Próxima' : isEs ? 'Siguiente' : 'Next'}
                     </Button>
                   </div>
                 </div>
 
                 {/* Step List */}
                 <div className="mt-8 pt-6 border-t border-border/50">
-                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : 'All Steps'}</h4>
+                  <h4 className="font-medium mb-4">{isPt ? 'Todas as etapas' : isEs ? 'Todos los pasos' : 'All Steps'}</h4>
                   <div className="space-y-2">
                     {selectedGuide.steps.map((step, index) => (
                       <button
