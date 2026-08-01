@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -158,6 +159,20 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
       }
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Confirmation email, in the language they filled the form in. Deliberately
+      // not awaited and never surfaced: the application is already saved, and a
+      // mail failure must not read to the applicant as a failed submission.
+      void supabase.functions
+        .invoke('send-pilot-confirmation', {
+          body: {
+            email: form.email.trim().toLowerCase(),
+            name: form.fullName,
+            app_key: appKey,
+            locale: (i18n.resolvedLanguage || i18n.language || 'pt').slice(0, 2),
+          },
+        })
+        .then(null, () => null);
     } catch {
       toast.error(t('pilot.errors.generic', 'Não foi possível enviar sua inscrição.'));
     } finally {
@@ -207,9 +222,15 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
         <div className="pointer-events-none absolute -right-32 -top-40 h-[520px] w-[520px] rounded-full bg-primary/25 blur-[110px]" />
         <div className="container relative grid gap-12 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
           <div>
+            {/* This page has no app header, so without a selector here a
+                non-Portuguese speaker has no way to switch. Consent has to be
+                legible before it can be given. */}
             <div className="mb-8 flex items-center gap-3">
               <img src="/baise-logo.svg" alt="" width={40} height={40} className="rounded-lg" />
               <span className="text-xl font-extrabold tracking-tight">{brand.name}</span>
+              <div className="ml-auto">
+                <LanguageSelector />
+              </div>
             </div>
             <Badge variant="outline" className="mb-6 border-primary/50 text-primary">
               <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
