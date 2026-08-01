@@ -76,7 +76,7 @@ const appLanes: AppLane[] = [
     name: "Casa Baise",
     label: {
       en: "Find or offer trusted local services",
-      pt: "Encontre ou ofereca servicos locais confiaveis",
+      pt: "Encontre ou ofereça serviços locais confiáveis",
     },
     description: {
       en: "Home, business, repairs, cleaning, inspections, projects, and everyday trusted help.",
@@ -95,11 +95,11 @@ const appLanes: AppLane[] = [
     name: "Medical Baise",
     label: {
       en: "Find or offer trusted medical support",
-      pt: "Encontre ou ofereca suporte medico confiavel",
+      pt: "Encontre ou ofereça suporte medico confiavel",
     },
     description: {
       en: "Medical professionals, care navigation, appointment records, follow-ups, and secure history.",
-      pt: "Profissionais medicos, orientacao de cuidado, registros, acompanhamentos e historico seguro.",
+      pt: "Profissionais medicos, orientação de cuidado, registros, acompanhamentos e histórico seguro.",
     },
     forProviders: {
       en: "Register to support patients with clearer communication, records, and follow-up workflows.",
@@ -114,11 +114,11 @@ const appLanes: AppLane[] = [
     name: "Legal Baise",
     label: {
       en: "Find or offer trusted legal support",
-      pt: "Encontre ou ofereca suporte juridico confiavel",
+      pt: "Encontre ou ofereça suporte juridico confiavel",
     },
     description: {
       en: "Lawyers, documents, consultations, service records, client history, and organized next steps.",
-      pt: "Advogados, documentos, consultas, registros de servico, historico e proximos passos organizados.",
+      pt: "Advogados, documentos, consultas, registros de serviço, histórico e proximos passos organizados.",
     },
     forProviders: {
       en: "Register to receive qualified requests and keep consultations, invoices, and documents clean.",

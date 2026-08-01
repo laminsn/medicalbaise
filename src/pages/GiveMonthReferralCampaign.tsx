@@ -160,7 +160,7 @@ const COPY = {
   },
   es: {
     title: 'Regala un Mes, Gana un Mes',
-    description: 'Los miembros premium de Baise pueden ganar un mes gratis por cada amigo, familiar, cliente o proveedor que se registre en un servicio premium mediante su enlace de referido.',
+    description: 'Los miembros premium de Baise pueden ganar un mês gratis por cada amigo, familiar, cliente o proveedor que se registre en un servicio premium mediante su enlace de referido.',
     badge: 'Campaña de referidos',
     dateWindow: '1 de julio - 31 de agosto de 2026',
     eyebrow: 'Comparte Baise. Gana meses premium.',
@@ -180,7 +180,7 @@ const COPY = {
       {
         icon: Repeat2,
         title: 'Acumula hasta un año completo',
-        body: 'Gana hasta 12 meses gratis en un año calendario, para que los referidores activos puedan cubrir un año de servicio premium elegible.',
+        body: 'Gana hasta 12 meses gratis en un año calendário, para que los referidores activos puedan cubrir un año de servicio premium elegible.',
       },
       {
         icon: Users,

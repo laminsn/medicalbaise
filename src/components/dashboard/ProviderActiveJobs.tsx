@@ -266,9 +266,9 @@ export function ProviderActiveJobs() {
                             <AlertDialogTitle>{isPt ? 'Cancelar este trabalho?' : isEs ? '¿Cancelar este trabajo?' : 'Cancel this job?'}</AlertDialogTitle>
                             <AlertDialogDescription>
                               {isPt
-                                ? 'Esta ação não pode ser desfeita. O cliente será notificado sobre o cancelamento.'
+                                ? 'Está ação não pode ser desfeita. O cliente será notificado sobre o cancelamento.'
                                 : isEs
-                                  ? 'Esta acción no se puede deshacer. El cliente será notificado de la cancelación.'
+                                  ? 'Está acción no se puede deshacer. El cliente será notificado de la cancelación.'
                                   : 'This action cannot be undone. The customer will be notified about the cancellation.'}
                             </AlertDialogDescription>
                           </AlertDialogHeader>

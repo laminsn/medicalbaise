@@ -108,7 +108,7 @@ const surveyCopy = {
 
 const revenueOptions = {
   en: ['Prefer not to say', 'Under R$5k/month', 'R$5k-R$15k/month', 'R$15k-R$40k/month', 'R$40k+/month', 'Business revenue varies'],
-  pt: ['Prefiro nao informar', 'Abaixo de R$5 mil/mes', 'R$5 mil-R$15 mil/mes', 'R$15 mil-R$40 mil/mes', 'R$40 mil+/mes', 'Faturamento varia'],
+  pt: ['Prefiro não informar', 'Abaixo de R$5 mil/mes', 'R$5 mil-R$15 mil/mes', 'R$15 mil-R$40 mil/mes', 'R$40 mil+/mes', 'Faturamento varia'],
   es: ['Prefiero no decir', 'Menos de R$5 mil/mes', 'R$5 mil-R$15 mil/mes', 'R$15 mil-R$40 mil/mes', 'R$40 mil+/mes', 'Ingresos variables'],
 };
 
@@ -120,7 +120,7 @@ const lifestyleOptions = {
 
 const educationOptions = {
   en: ['Prefer not to say', 'High school', 'Technical or vocational', 'Bachelor degree', 'Graduate degree', 'Doctorate or professional degree'],
-  pt: ['Prefiro nao informar', 'Ensino medio', 'Tecnico ou profissionalizante', 'Graduacao', 'Pos-graduacao', 'Doutorado ou grau profissional'],
+  pt: ['Prefiro não informar', 'Ensino medio', 'Tecnico ou profissionalizante', 'Graduacao', 'Pos-graduacao', 'Doutorado ou grau profissional'],
   es: ['Prefiero no decir', 'Secundaria', 'Tecnico o vocacional', 'Licenciatura', 'Posgrado', 'Doctorado o grado profesional'],
 };
 

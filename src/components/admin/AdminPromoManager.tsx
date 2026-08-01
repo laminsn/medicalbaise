@@ -142,7 +142,7 @@ export function AdminPromoManager() {
             <Input
               value={targetEmail}
               onChange={(e) => setTargetEmail(e.target.value)}
-              placeholder={isPt ? 'usuario@email.com ou @usuario' : isEs ? 'usuario@email.com o @usuario' : 'user@email.com or @handle'}
+              placeholder={isPt ? 'usuário@email.com ou @usuário' : isEs ? 'usuario@email.com o @usuario' : 'user@email.com or @handle'}
             />
           </div>
 

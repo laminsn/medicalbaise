@@ -141,7 +141,7 @@ export function AdminAllUsers() {
         <CardContent className="pt-6">
           <div className="flex gap-2">
             <Input
-              placeholder={isPt ? 'Buscar por nome, email ou @usuário...' : isEs ? 'Buscar por nombre, email o @usuario...' : 'Search by name, email, or handle...'}
+              placeholder={isPt ? 'Buscar por nome, email ou @usuário...' : isEs ? 'Buscar por nombre, email o @usuário...' : 'Search by name, email, or handle...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -176,7 +176,7 @@ export function AdminAllUsers() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{isPt ? 'Usuário' : isEs ? 'Usuario' : 'User'}</TableHead>
+                      <TableHead>{isPt ? 'Usuário' : isEs ? 'Usuário' : 'User'}</TableHead>
                       <TableHead>{isPt ? 'E-mail' : isEs ? 'Correo' : 'Email'}</TableHead>
                       <TableHead>{isPt ? 'Tipo' : isEs ? 'Tipo' : 'Type'}</TableHead>
                       <TableHead>{isPt ? 'Localização' : isEs ? 'Ubicación' : 'Location'}</TableHead>

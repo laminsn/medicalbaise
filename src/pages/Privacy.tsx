@@ -48,23 +48,23 @@ export default function Privacy() {
             {isPt ? 'Privacidade LGPD - Brasil primeiro' : 'LGPD Privacy - Brazil first'}
           </p>
           <h1 className="mt-2 text-3xl font-bold">
-            {isPt ? 'Politica de Privacidade e Protecao de Dados' : 'Privacy Policy and Data Protection Statement'}
+            {isPt ? 'Política de Privacidade e Proteção de Dados' : 'Privacy Policy and Data Protection Statement'}
           </h1>
           <p className="mt-3 text-muted-foreground">
-            {isPt ? 'Ultima atualizacao: 7 de julho de 2026. Versao 2026.07.' : 'Last updated: July 7, 2026. Version 2026.07.'}
+            {isPt ? 'Última atualização: 7 de julho de 2026. Versão 2026.07.' : 'Last updated: July 7, 2026. Version 2026.07.'}
           </p>
         </div>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-5">
-          <Section title={isPt ? '1. Quem somos e como esta politica se aplica' : '1. Who We Are and How This Policy Applies'}>
+          <Section title={isPt ? '1. Quem somos e como esta política se aplica' : '1. Who We Are and How This Policy Applies'}>
             <p>
               {isPt
-                ? `${profile.brandName} e ${profile.marketplacePt}. Esta politica se aplica ao site, portal, web app, app iOS/Apple, app Android/Google Play, suporte, mensagens, pagamentos, assinaturas, arquivos, recursos de IA e qualquer area autenticada da plataforma.`
+                ? `${profile.brandName} e ${profile.marketplacePt}. Está política se aplica ao site, portal, web app, app iOS/Apple, app Android/Google Play, suporte, mensagens, pagamentos, assinaturas, arquivos, recursos de IA e qualquer area autenticada da plataforma.`
                 : `${profile.brandName} is ${profile.marketplaceEn}. This policy applies to the website, portal, web app, iOS/Apple app, Android/Google Play app, support, messaging, payments, subscriptions, files, AI features, and any authenticated platform area.`}
             </p>
             <p>
               {isPt
-                ? 'Tratamos a LGPD como padrao base. Onde a plataforma for lancada fora do Brasil, aplicaremos camadas adicionais como GDPR/UK GDPR, CCPA/CPRA, regras de lojas de apps e exigencias locais.'
+                ? 'Tratamos a LGPD como padrão base. Onde a plataforma for lancada fora do Brasil, aplicaremos camadas adicionais como GDPR/UK GDPR, CCPA/CPRA, regras de lojas de apps e exigencias locais.'
                 : 'We treat LGPD as the baseline standard. Where the platform launches outside Brazil, we apply additional layers such as GDPR/UK GDPR, CCPA/CPRA, app store rules, and local requirements.'}
             </p>
           </Section>
@@ -74,10 +74,10 @@ export default function Privacy() {
               items={
                 isPt
                   ? [
-                      'Identidade e contato: nome, e-mail, telefone, CPF/CNPJ quando aplicavel, endereco, foto, idioma, cidade, estado e pais.',
+                      'Identidade e contato: nome, e-mail, telefone, CPF/CNPJ quando aplicável, endereço, foto, idioma, cidade, estado e pais.',
                       `Dados especificos da marca: ${profile.sensitiveDataPt}.`,
                       'Conta e seguranca: login, convites, redefinicoes de senha, MFA, sessoes, dispositivos, eventos de autenticacao, tentativas falhas, bloqueios, papeis e permissoes.',
-                      'Pagamentos e assinaturas: historico de compras, status de pagamento, reembolsos, chargebacks, recibos, tokens de processadores e referencias de transacao. Nao armazenamos numero completo de cartao.',
+                      'Pagamentos e assinaturas: histórico de compras, status de pagamento, reembolsos, chargebacks, recibos, tokens de processadores e referencias de transação. Não armazenamos número completo de cartao.',
                       'Comunicacoes: mensagens no app, e-mails, SMS, WhatsApp, chamadas, suporte, anexos, consentimentos e preferencias.',
                       'Uso tecnico: IP, navegador, sistema operacional, identificadores, cookies, analytics, logs, erros, performance, cache, auditoria e eventos antifraude.',
                       'Dados de terceiros: provedores de pagamento, provedores de identidade, profissionais, parceiros, fontes publicas, registros profissionais e autoridades quando necessario.',
@@ -103,9 +103,9 @@ export default function Privacy() {
                       'Operar a plataforma, contas, perfis, busca, agendamento, mensagens, pagamentos, avaliacoes, suporte e recursos do portal.',
                       'Verificar identidade, elegibilidade, credenciais profissionais, permissao de acesso, relacionamento entre usuarios e prevencao de fraude.',
                       'Processar pagamentos, assinaturas, reembolsos, disputas, chargebacks, recibos e obrigacoes fiscais.',
-                      'Aplicar seguranca: RLS, politicas de armazenamento, controles por papel, segregacao por usuario, verificacao de sessao, cache seguro, auditoria e resposta a incidentes.',
-                      'Melhorar qualidade, acessibilidade, localizacao, traducoes, desempenho, confiabilidade, analytics e experiencia do usuario.',
-                      'Cumprir leis, ordens, regulamentos profissionais, direitos do consumidor, LGPD, regras das lojas de apps e solicitacoes validas de autoridades.',
+                      'Aplicar seguranca: RLS, politicas de armazenamento, controles por papel, segregação por usuário, verificação de sessão, cache seguro, auditoria e resposta a incidentes.',
+                      'Melhorar qualidade, acessibilidade, localização, traduções, desempenho, confiabilidade, analytics e experiência do usuário.',
+                      'Cumprir leis, ordens, regulamentos profissionais, direitos do consumidor, LGPD, regras das lojas de apps e solicitações validas de autoridades.',
                     ]
                   : [
                       'Operate the platform, accounts, profiles, search, scheduling, messaging, payments, reviews, support, and portal features.',
@@ -124,12 +124,12 @@ export default function Privacy() {
               items={
                 isPt
                   ? [
-                      'Execucao de contrato ou procedimentos preliminares solicitados por voce.',
+                      'Execucao de contrato ou procedimentos preliminares solicitados por você.',
                       'Cumprimento de obrigacao legal ou regulatoria.',
-                      'Consentimento, inclusive para marketing, cookies opcionais, permissoes de app e dados sensiveis quando exigido.',
-                      'Legitimo interesse para seguranca, prevencao de fraude, melhoria, suporte, auditoria e operacao, sempre balanceado com seus direitos.',
+                      'Consentimento, inclusive para marketing, cookies opcionais, permissoes de app e dados sensíveis quando exigido.',
+                      'Legitimo interesse para seguranca, prevencao de fraude, melhoria, suporte, auditoria e operação, sempre balanceado com seus direitos.',
                       'Exercicio regular de direitos em processos judiciais, administrativos ou arbitrais.',
-                      'Protecao da vida, tutela da saude ou protecao do credito quando aplicavel ao contexto.',
+                      'Proteção da vida, tutela da saúde ou proteção do crédito quando aplicável ao contexto.',
                     ]
                   : [
                       'Performance of a contract or pre-contract steps requested by you.',
@@ -146,17 +146,17 @@ export default function Privacy() {
           <Section title={isPt ? '5. Compartilhamento' : '5. Sharing'}>
             <p>
               {isPt
-                ? 'Nao vendemos dados pessoais. Compartilhamos somente quando necessario para operar, proteger, cumprir a lei ou entregar o servico solicitado.'
+                ? 'Não vendemos dados pessoais. Compartilhamos somente quando necessario para operar, proteger, cumprir a lei ou entregar o serviço solicitado.'
                 : 'We do not sell personal data. We share only where needed to operate, protect, comply with law, or deliver the requested service.'}
             </p>
             <BulletList
               items={
                 isPt
                   ? [
-                      'Com usuarios e profissionais envolvidos na transacao, somente conforme permissao, papel, finalidade e visibilidade da plataforma.',
+                      'Com usuários e profissionais envolvidos na transação, somente conforme permissao, papel, finalidade e visibilidade da plataforma.',
                       'Com provedores de pagamento, hospedagem, banco de dados, e-mail, SMS, WhatsApp, analytics, mapas, suporte, seguranca, armazenamento e automacao.',
                       'Com consultores, auditores, advogados, contadores, seguradoras, parceiros e autoridades quando necessario e permitido.',
-                      'Com lojas de apps, provedores de identidade e sistemas operacionais para seguranca, login, notificacoes, compras ou permissao de dispositivo.',
+                      'Com lojas de apps, provedores de identidade e sistemas operacionais para seguranca, login, notificações, compras ou permissao de dispositivo.',
                       'Em transferencia societaria, fusao, aquisicao ou reorganizacao, sob protecoes equivalentes.',
                     ]
                   : [
@@ -175,12 +175,12 @@ export default function Privacy() {
               items={
                 isPt
                   ? [
-                      'Supabase e bancos similares devem manter RLS habilitado em tabelas privadas, com politicas por usuario, papel, equipe, dono, relacionamento e finalidade.',
-                      'Service-role keys, secrets, tokens e variaveis sensiveis nunca devem ser expostos ao navegador, app cliente, logs ou screenshots.',
-                      'Dados privados em portal, API ou app devem usar Cache-Control: no-store ou cache segmentado por usuario e invalido em logout, troca de papel, atualizacao sensivel ou revogacao.',
+                      'Supabase e bancos similares devem manter RLS habilitado em tabelas privadas, com politicas por usuário, papel, equipe, dono, relacionamento e finalidade.',
+                      'Service-role keys, secrets, tokens e variaveis sensíveis nunca devem ser expostos ao navegador, app cliente, logs ou screenshots.',
+                      'Dados privados em portal, API ou app devem usar Cache-Control: no-store ou cache segmentado por usuário e inválido em logout, troca de papel, atualização sensivel ou revogação.',
                       'Login, cadastro, redefinicao de senha, convite, MFA, upload, exportacao, pagamento, webhook, mensagens, IA, e-mail, SMS, API e outras rotas caras ou sujeitas a abuso devem ter limites de taxa, quotas, filas, desafios, bloqueios temporarios ou suspensao conforme o risco.',
-                      'Logs, traces de IA, analytics, ferramentas de suporte, dumps, relatorios e screenshots devem ser scrubbed ou mascarados antes de armazenamento, revisao ou compartilhamento.',
-                      'Mensagens de erro de login devem ser genericas e nao revelar qual credencial falhou nem se uma conta existe.',
+                      'Logs, traces de IA, analytics, ferramentas de suporte, dumps, relatórios e screenshots devem ser scrubbed ou mascarados antes de armazenamento, revisao ou compartilhamento.',
+                      'Mensagens de erro de login devem ser genericas e não revelar qual credencial falhou nem se uma conta existe.',
                       'Testes de seguranca, revisoes de RLS, verificacao de buckets, checagem de cache, varredura de segredos e validacao de permissao devem ocorrer antes de lancamentos e em ciclos recorrentes.',
                     ]
                   : [
@@ -196,19 +196,19 @@ export default function Privacy() {
             />
           </Section>
 
-          <Section title={isPt ? '7. Retencao, exclusao e direitos LGPD' : '7. Retention, Deletion, and LGPD Rights'}>
+          <Section title={isPt ? '7. Retenção, exclusão e direitos LGPD' : '7. Retention, Deletion, and LGPD Rights'}>
             <p>
               {isPt
-                ? 'Retemos dados pelo tempo necessario para fornecer o servico, cumprir leis, resolver disputas, prevenir fraude, manter registros fiscais, preservar seguranca e respeitar obrigacoes profissionais. Depois, dados devem ser excluidos, anonimizados ou arquivados com acesso restrito.'
+                ? 'Retemos dados pelo tempo necessario para fornecer o serviço, cumprir leis, resolver disputas, prevenir fraude, manter registros fiscais, preservar seguranca e respeitar obrigações profissionais. Depois, dados devem ser excluidos, anonimizados ou arquivados com acesso restrito.'
                 : 'We retain data as long as needed to provide the service, comply with law, resolve disputes, prevent fraud, maintain tax records, preserve security, and respect professional obligations. After that, data should be deleted, anonymized, or archived with restricted access.'}
             </p>
             <BulletList
               items={
                 isPt
                   ? [
-                      'Voce pode solicitar confirmacao de tratamento, acesso, correcao, anonimizacao, bloqueio, exclusao, portabilidade, informacao sobre compartilhamento, revisao de decisoes automatizadas e revogacao de consentimento.',
-                      'Exclusao de conta e dados pode ser limitada por retencoes legais, fiscais, antifraude, seguranca, chargeback, disputa, auditoria e registros profissionais.',
-                      `Para exercer direitos, contate ${profile.privacyEmail}. Voce tambem pode apresentar reclamacao a ANPD.`,
+                      'Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, bloqueio, exclusão, portabilidade, informação sobre compartilhamento, revisao de decisoes automatizadas e revogação de consentimento.',
+                      'Exclusão de conta e dados pode ser limitada por retenções legais, fiscais, antifraude, seguranca, chargeback, disputa, auditoria e registros profissionais.',
+                      `Para exercer direitos, contate ${profile.privacyEmail}. Você também pode apresentar reclamação a ANPD.`,
                     ]
                   : [
                       'You may request confirmation of processing, access, correction, anonymization, blocking, deletion, portability, information about sharing, review of automated decisions, and consent revocation.',
@@ -225,7 +225,7 @@ export default function Privacy() {
                 isPt
                   ? [
                       'Cookies essenciais operam login, seguranca, preferencia e funcionalidade. Cookies opcionais de analytics, marketing ou personalizacao devem respeitar consentimento quando exigido.',
-                      'Permissoes de app como camera, microfone, fotos, arquivos, notificacoes, localizacao e biometria sao solicitadas no contexto da funcionalidade e podem ser controladas no dispositivo.',
+                      'Permissoes de app como camera, microfone, fotos, arquivos, notificações, localização e biometria sao solicitadas no contexto da funcionalidade e podem ser controladas no dispositivo.',
                       'Dados podem ser processados fora do Brasil por provedores de nuvem e infraestrutura. Usamos contratos, controles de acesso e medidas tecnicas para proteger transferencias internacionais.',
                     ]
                   : [
@@ -240,7 +240,7 @@ export default function Privacy() {
           <Section title={isPt ? '9. Incidentes e contato' : '9. Incidents and Contact'}>
             <p>
               {isPt
-                ? 'Se identificarmos incidente de seguranca com risco relevante a dados pessoais, avaliaremos impacto, conteremos o evento, registraremos evidencias, comunicaremos autoridades e titulares quando exigido, e ajustaremos controles para reduzir recorrencia.'
+                ? 'Se identificarmos incidente de seguranca com risco relevante a dados pessoais, avaliaremos impacto, conteremos o evento, registraremos evidencias, comunicaremos autoridades e titulares quando exigido, e ajustaremos controles para reduzir recorrência.'
                 : 'If we identify a security incident with relevant risk to personal data, we assess impact, contain the event, preserve evidence, notify authorities and data subjects where required, and adjust controls to reduce recurrence.'}
             </p>
             <BulletList
