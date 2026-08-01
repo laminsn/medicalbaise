@@ -31,6 +31,7 @@ export default function Terms() {
   const { t, i18n } = useTranslation();
   const profile = getLegalProfile();
   const isPt = (i18n.language || '').startsWith('pt');
+  const isEs = (i18n.language || '').startsWith('es');
   const provider = isPt ? profile.providerPt : profile.providerEn;
 
   return (
@@ -46,31 +47,29 @@ export default function Terms() {
 
         <div className="mb-8">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
-            {isPt ? 'Brasil primeiro - global em seguida' : 'Brazil first - global second'}
+            {isPt ? 'Brasil primeiro - global em seguida' : isEs ? 'Brasil primero, el resto del mundo después' : 'Brazil first - global second'}
           </p>
           <h1 className="mt-2 text-3xl font-bold">
-            {isPt ? 'Termos de Uso e Política de Serviço' : 'Terms of Service and Operating Policy'}
+            {isPt ? 'Termos de Uso e Política de Serviço' : isEs ? 'Términos de Servicio y Política de Operación' : 'Terms of Service and Operating Policy'}
           </h1>
           <p className="mt-3 text-muted-foreground">
-            {isPt ? 'Última atualização: 7 de julho de 2026. Versão 2026.07.' : 'Last updated: July 7, 2026. Version 2026.07.'}
+            {isPt ? 'Última atualização: 7 de julho de 2026. Versão 2026.07.' : isEs ? 'Última actualización: 7 de julio de 2026. Versión 2026.07.' : 'Last updated: July 7, 2026. Version 2026.07.'}
           </p>
         </div>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-5">
-          <Section title={isPt ? '1. Escopo destes termos' : '1. Scope of These Terms'}>
+          <Section title={isPt ? '1. Escopo destes termos' : isEs ? '1. Alcance de estos términos' : '1. Scope of These Terms'}>
             <p>
               {isPt
-                ? `${profile.brandName} e ${profile.marketplacePt}. Estes Termos se aplicam ao site, portal, web app, app iOS/Apple, app Android/Google Play, contas, mensagens, pagamentos, assinaturas, conteúdo, suporte, APIs e recursos de IA quando oferecidos.`
-                : `${profile.brandName} is ${profile.marketplaceEn}. These Terms apply to the website, portal, web app, iOS/Apple app, Android/Google Play app, accounts, messaging, payments, subscriptions, content, support, APIs, and AI features when offered.`}
+                ? `${profile.brandName} e ${profile.marketplacePt}. Estes Termos se aplicam ao site, portal, web app, app iOS/Apple, app Android/Google Play, contas, mensagens, pagamentos, assinaturas, conteúdo, suporte, APIs e recursos de IA quando oferecidos.` : isEs ? `${profile.brandName} es ${profile.marketplaceEs}. Estos Términos se aplican al sitio web, el portal, la aplicación web, la app de iOS/Apple, la app de Android/Google Play, las cuentas, la mensajería, los pagos, las suscripciones, el contenido, el soporte, las API y las funciones de IA cuando se ofrezcan.` : `${profile.brandName} is ${profile.marketplaceEn}. These Terms apply to the website, portal, web app, iOS/Apple app, Android/Google Play app, accounts, messaging, payments, subscriptions, content, support, APIs, and AI features when offered.`}
             </p>
             <p>
               {isPt
-                ? 'A experiência e estruturada para o Brasil primeiro, com LGPD, Marco Civil da Internet, Código de Defesa do Consumidor e regras profissionais brasileiras como base. Expansoes globais recebem camadas adicionais quando uma nova jurisdicao for lancada.'
-                : 'The experience is structured for Brazil first, with LGPD, the Brazilian Internet Civil Framework, the Brazilian Consumer Protection Code, and applicable Brazilian professional rules as the baseline. Global expansion receives additional jurisdiction layers as new markets launch.'}
+                ? 'A experiência e estruturada para o Brasil primeiro, com LGPD, Marco Civil da Internet, Código de Defesa do Consumidor e regras profissionais brasileiras como base. Expansoes globais recebem camadas adicionais quando uma nova jurisdicao for lancada.' : isEs ? 'La experiencia está estructurada primero para Brasil, tomando como base la LGPD, el Marco Civil de Internet, el Código de Defensa del Consumidor y las normas profesionales brasileñas aplicables. La expansión internacional añade capas de jurisdicción a medida que se abren nuevos mercados.' : 'The experience is structured for Brazil first, with LGPD, the Brazilian Internet Civil Framework, the Brazilian Consumer Protection Code, and applicable Brazilian professional rules as the baseline. Global expansion receives additional jurisdiction layers as new markets launch.'}
             </p>
           </Section>
 
-          <Section title={isPt ? '2. Papel da plataforma e limites profissionais' : '2. Platform Role and Professional Boundaries'}>
+          <Section title={isPt ? '2. Papel da plataforma e limites profissionais' : isEs ? '2. Papel de la plataforma y límites profesionales' : '2. Platform Role and Professional Boundaries'}>
             <p>{isPt ? profile.professionalBoundaryPt : profile.professionalBoundaryEn}</p>
             {profile.emergencyEn && (
               <p className="font-semibold text-destructive">
@@ -81,11 +80,12 @@ export default function Terms() {
               items={
                 isPt
                   ? [
-                      `O ${provider} e independente e deve manter licencas, registros, seguros e autorizacoes exigidos.`,
+                      `O ${provider} e independente e deve manter licenças, registros, seguros e autorizações exigidos.`,
                       `${profile.brandName} pode verificar credenciais, mas verificação não e garantia, endosso ou promessa de resultado.`,
                       `${profile.brandName} pode remover, suspender ou exigir revisao adicional quando houver risco, reclamacao, fraude, conflito, credencial vencida ou violacao destes Termos.`,
                     ]
-                  : [
+              : isEs ? [`Cada ${provider} es independiente y debe mantener las licencias, registros, seguros y autorizaciones exigidos.`, `${profile.brandName} puede verificar credenciales, pero la verificación no es una garantía, un respaldo ni una promesa de resultado.`, `${profile.brandName} puede retirar, suspender o exigir una revisión adicional cuando exista riesgo, reclamación, fraude, conflicto, credencial vencida o incumplimiento de estos Términos.`]
+              : [
                       `Each ${provider} is independent and must maintain required licenses, registrations, insurance, and authorizations.`,
                       `${profile.brandName} may verify credentials, but verification is not a guarantee, endorsement, or promise of outcome.`,
                       `${profile.brandName} may remove, suspend, or require additional review where there is risk, complaint, fraud, conflict, expired credential, or violation of these Terms.`,
@@ -94,7 +94,7 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '3. Contas, login e seguranca do usuário' : '3. Accounts, Login, and User Security'}>
+          <Section title={isPt ? '3. Contas, login e seguranca do usuário' : isEs ? '3. Cuentas, inicio de sesión y seguridad del usuario' : '3. Accounts, Login, and User Security'}>
             <BulletList
               items={
                 isPt
@@ -104,7 +104,8 @@ export default function Terms() {
                       'Credenciais não devem ser compartilhadas. Contas de equipe devem usar usuários individuais, papeis, permissoes e trilhas de auditoria.',
                       'Login, cadastro, redefinicao de senha, convite, MFA, upload, exportação, pagamento, webhook, mensagens, IA, e-mail, SMS, API e outras rotas caras ou sujeitas a abuso podem ser limitadas por taxa, bloqueadas, enfileiradas, desafiadas, suspensas ou encerradas conforme o risco.',
                     ]
-                  : [
+              : isEs ? ['Debes tener al menos 18 años, dar información veraz y mantener bajo control tu cuenta, contraseña, dispositivos, MFA y sesiones.', 'Los mensajes de error de inicio de sesión deben ser genéricos. La plataforma no debe revelar si el dato incorrecto fue el correo, el teléfono, el usuario, la contraseña, la invitación, el código o la existencia de la cuenta.', 'Las credenciales no se comparten. Las cuentas de equipo deben usar usuarios individuales, roles, permisos y registros de auditoría.', 'El inicio de sesión, el registro, el restablecimiento de contraseña, las invitaciones, la MFA, las subidas, las exportaciones, los pagos, los webhooks, la mensajería, la IA, el correo, los SMS, la API y otras rutas costosas o propensas a abuso pueden ser limitadas, bloqueadas, encoladas, desafiadas, suspendidas o terminadas según el riesgo.']
+              : [
                       'You must be at least 18, provide truthful information, and keep your account, password, devices, MFA, and sessions under control.',
                       'Login error messages must be generic. The platform must not reveal whether the email, phone, username, password, invite, code, or account existence was the incorrect item.',
                       'Credentials must not be shared. Team accounts must use individual users, roles, permissions, and audit trails.',
@@ -114,7 +115,7 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '4. Pagamentos, assinaturas, cancelamentos e reembolsos' : '4. Payments, Subscriptions, Cancellations, and Refunds'}>
+          <Section title={isPt ? '4. Pagamentos, assinaturas, cancelamentos e reembolsos' : isEs ? '4. Pagos, suscripciones, cancelaciones y reembolsos' : '4. Payments, Subscriptions, Cancellations, and Refunds'}>
             <BulletList
               items={
                 isPt
@@ -126,7 +127,8 @@ export default function Terms() {
                       'Quando o direito de arrependimento de 7 dias for aplicável a compra remota, ele será respeitado conforme a lei brasileira, observadas exceções legais, execucao ja iniciada, produtos digitais acessados e custos de terceiros.',
                       'Chargebacks, fraude de pagamento, abuso de cupom ou tentativa de burlar a taxa da plataforma podem resultar em suspensao e cobranca de valores devidos.',
                     ]
-                  : [
+              : isEs ? ['Los precios, impuestos, comisiones de la plataforma, honorarios del profesional, costos de terceros y la moneda aplicable deben mostrarse antes de confirmar, cuando sea operativamente posible.', 'Los pagos pueden procesarse mediante proveedores como Stripe, PIX, tarjeta, boleto, billetera digital u otro método aprobado. La plataforma no debe almacenar números de tarjeta completos.', 'Las suscripciones se renuevan según el plan aceptado. La cancelación detiene los cargos futuros, pero no genera un reembolso prorrateado salvo que lo exija la ley o la política del plan.', 'Los reembolsos de servicios dependen del estado del trabajo, la política del profesional, los costos ya incurridos, las reglas del marketplace y los derechos irrenunciables del consumidor en Brasil.', 'Cuando corresponda el derecho de arrepentimiento de 7 días en una compra a distancia, se respetará conforme a la ley brasileña, con las excepciones legales, el trabajo ya iniciado, los productos digitales ya accedidos y los costos de terceros.', 'Los contracargos, el fraude en pagos, el abuso de cupones o los intentos de evadir las comisiones de la plataforma pueden derivar en suspensión y cobro de los importes adeudados.']
+              : [
                       'Prices, taxes, platform fees, provider fees, third-party costs, and applicable currency should be shown before confirmation where operationally available.',
                       'Payments may be processed by providers such as Stripe, PIX, card, boleto, digital wallet, or another approved method. The platform must not store full card numbers.',
                       'Subscriptions renew according to the accepted plan. Cancellation stops future charges but does not create a prorated refund unless required by law or the specific plan policy.',
@@ -138,11 +140,10 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '5. Dados, privacidade e controles tecnicos' : '5. Data, Privacy, and Technical Controls'}>
+          <Section title={isPt ? '5. Dados, privacidade e controles tecnicos' : isEs ? '5. Datos, privacidad y controles técnicos' : '5. Data, Privacy, and Technical Controls'}>
             <p>
               {isPt
-                ? `O tratamento de dados e descrito na Política de Privacidade da ${profile.brandName}. Os dados sensíveis para esta marca incluem ${profile.sensitiveDataPt}.`
-                : `${profile.brandName}'s processing of data is described in the Privacy Policy. Sensitive data for this brand includes ${profile.sensitiveDataEn}.`}
+                ? `O tratamento de dados e descrito na Política de Privacidade da ${profile.brandName}. Os dados sensíveis para esta marca incluem ${profile.sensitiveDataPt}.` : isEs ? `El tratamiento de datos de ${profile.brandName} se describe en la Política de Privacidad. Los datos sensibles de esta marca incluyen ${profile.sensitiveDataEs}.` : `${profile.brandName}'s processing of data is described in the Privacy Policy. Sensitive data for this brand includes ${profile.sensitiveDataEn}.`}
             </p>
             <BulletList
               items={
@@ -154,7 +155,8 @@ export default function Terms() {
                       'Logs, analytics, traces de IA, screenshots, exportações e suporte devem remover ou mascarar senhas, tokens, chaves, documentos, dados financeiros e dados sensíveis.',
                       'Incidentes de seguranca devem ser triados, contidos, documentados e comunicados conforme LGPD, ANPD e regras aplicaveis.',
                     ]
-                  : [
+              : isEs ? ['Los datos privados deben usar RLS o controles equivalentes por fila, rol, propietario, equipo, relación y finalidad.', 'Los archivos privados deben usar políticas de bucket o carpeta, URLs firmadas, caducidad y verificación de autorización antes de cada acceso.', 'Las páginas privadas, las respuestas autenticadas y los datos del usuario deben usar no-store o caché segmentada por usuario, sin filtraciones entre cuentas.', 'Los registros, la analítica, las trazas de IA, las capturas de pantalla, las exportaciones y los flujos de soporte deben eliminar o enmascarar contraseñas, tokens, claves, documentos, datos financieros y datos sensibles.', 'Los incidentes de seguridad deben clasificarse, contenerse, documentarse y comunicarse conforme a la LGPD, la ANPD y las normas aplicables.']
+              : [
                       'Private data must use RLS or equivalent controls by row, role, owner, team, relationship, and purpose.',
                       'Private files must use storage bucket/folder policies, signed URLs, expiration, and authorization checks before each access.',
                       'Private pages, authenticated responses, and user data must use no-store or user-segmented caching, with no leakage across accounts.',
@@ -165,7 +167,7 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '6. Uso aceitavel, conteúdo e avaliações' : '6. Acceptable Use, Content, and Reviews'}>
+          <Section title={isPt ? '6. Uso aceitavel, conteúdo e avaliações' : isEs ? '6. Uso aceptable, contenido y reseñas' : '6. Acceptable Use, Content, and Reviews'}>
             <BulletList
               items={
                 isPt
@@ -175,7 +177,8 @@ export default function Terms() {
                       'Você concede a plataforma uma licença limitada para hospedar, exibir e operar o conteúdo que você envia, somente para fornecer, proteger e melhorar o serviço.',
                       'A plataforma pode moderar, remover, limitar, preservar para auditoria ou denunciar conteúdo quando necessario para seguranca, conformidade, disputa, fraude ou obrigação legal.',
                     ]
-                  : [
+              : isEs ? ['Las reseñas deben ser auténticas, basadas en una experiencia real, y no pueden ser compradas, coaccionadas, falsas ni manipuladas.', 'No puedes publicar contenido ilegal, engañoso, discriminatorio, difamatorio, abusivo, invasivo de la privacidad, con malware o que vulnere derechos.', 'Concedes a la plataforma una licencia limitada para alojar, mostrar y operar el contenido que envías, únicamente para prestar, proteger y mejorar el servicio.', 'La plataforma puede moderar, retirar, limitar, conservar para auditoría o reportar contenido cuando sea necesario por seguridad, cumplimiento, controversia, fraude u obligación legal.']
+              : [
                       'Reviews must be authentic, based on real experience, and must not be bought, coerced, false, or manipulated.',
                       'You may not post illegal, misleading, discriminatory, defamatory, abusive, privacy-invasive, malware-bearing, or rights-violating content.',
                       'You grant the platform a limited license to host, display, and operate content you submit, only to provide, protect, and improve the service.',
@@ -185,20 +188,18 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '7. IA, automação e decisoes humanas' : '7. AI, Automation, and Human Decisions'}>
+          <Section title={isPt ? '7. IA, automação e decisoes humanas' : isEs ? '7. IA, automatización y decisiones humanas' : '7. AI, Automation, and Human Decisions'}>
             <p>
               {isPt
-                ? 'Recursos de IA podem ajudar com triagem, busca, resumo, suporte, qualidade, risco, seguranca, classificação, traducao e produtividade. A IA não substitui julgamento profissional, revisao humana, obrigações legais ou decisoes de seguranca.'
-                : 'AI features may assist with triage, search, summaries, support, quality, risk, security, classification, translation, and productivity. AI does not replace professional judgment, human review, legal obligations, or security decisions.'}
+                ? 'Recursos de IA podem ajudar com triagem, busca, resumo, suporte, qualidade, risco, seguranca, classificação, traducao e produtividade. A IA não substitui julgamento profissional, revisao humana, obrigações legais ou decisoes de seguranca.' : isEs ? 'Las funciones de IA pueden apoyar la clasificación, la búsqueda, los resúmenes, el soporte, la calidad, el riesgo, la seguridad, la traducción y la productividad. La IA no sustituye el criterio profesional, la revisión humana, las obligaciones legales ni las decisiones de seguridad.' : 'AI features may assist with triage, search, summaries, support, quality, risk, security, classification, translation, and productivity. AI does not replace professional judgment, human review, legal obligations, or security decisions.'}
             </p>
             <p>
               {isPt
-                ? 'Saidas de IA que afetem direitos, pagamentos, suspensoes, elegibilidade, atendimento sensivel ou comunicações profissionais devem ter revisao humana quando exigido por lei, risco ou política interna.'
-                : 'AI outputs affecting rights, payments, suspensions, eligibility, sensitive service delivery, or professional communications must receive human review where required by law, risk, or internal policy.'}
+                ? 'Saidas de IA que afetem direitos, pagamentos, suspensoes, elegibilidade, atendimento sensivel ou comunicações profissionais devem ter revisao humana quando exigido por lei, risco ou política interna.' : isEs ? 'Los resultados de IA que afecten derechos, pagos, suspensiones, elegibilidad, prestación de servicios sensibles o comunicaciones profesionales deben pasar por revisión humana cuando lo exija la ley, el riesgo o la política interna.' : 'AI outputs affecting rights, payments, suspensions, eligibility, sensitive service delivery, or professional communications must receive human review where required by law, risk, or internal policy.'}
             </p>
           </Section>
 
-          <Section title={isPt ? '8. Apps Apple, Google Play e exclusão de conta' : '8. Apple Apps, Google Play, and Account Deletion'}>
+          <Section title={isPt ? '8. Apps Apple, Google Play e exclusão de conta' : isEs ? '8. Aplicaciones de Apple, Google Play y eliminación de cuenta' : '8. Apple Apps, Google Play, and Account Deletion'}>
             <BulletList
               items={
                 isPt
@@ -207,7 +208,8 @@ export default function Terms() {
                       'Usuários devem ter caminho para solicitar exclusão de conta e dados, sujeito a retenções legais, fiscais, antifraude, seguranca, disputa, chargeback e registros profissionais.',
                       'Declarações de privacidade da Apple App Store e Google Play Data Safety devem refletir dados coletados, compartilhados, finalidade, seguranca, exclusão e retenção.',
                     ]
-                  : [
+              : isEs ? ['Los permisos de la aplicación, como cámara, micrófono, ubicación, notificaciones, fotos, archivos, contactos o biometría, deben solicitarse solo cuando sean necesarios y explicarse en contexto.', 'Los usuarios deben poder solicitar la eliminación de su cuenta y sus datos, sujeto a la conservación exigida por motivos legales, fiscales, antifraude, de seguridad, de controversias, de contracargos y de registros profesionales.', 'Las declaraciones de privacidad de la App Store de Apple y de Seguridad de los Datos de Google Play deben reflejar los datos recopilados, la compartición, la finalidad, la seguridad, la eliminación y la conservación.']
+              : [
                       'App permissions, such as camera, microphone, location, notifications, photos, files, contacts, or biometrics, must be requested only when needed and explained in context.',
                       'Users must have a path to request account and data deletion, subject to legal, tax, anti-fraud, security, dispute, chargeback, and professional-record retention.',
                       'Apple App Store privacy disclosures and Google Play Data Safety disclosures must reflect collected data, sharing, purpose, security, deletion, and retention.',
@@ -216,11 +218,10 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '9. Lei aplicável, disputas e contato' : '9. Governing Law, Disputes, and Contact'}>
+          <Section title={isPt ? '9. Lei aplicável, disputas e contato' : isEs ? '9. Ley aplicable, controversias y contacto' : '9. Governing Law, Disputes, and Contact'}>
             <p>
               {isPt
-                ? 'Estes Termos sao regidos pelas leis da Republica Federativa do Brasil, sem prejuizo de direitos obrigatorios do consumidor e regras profissionais aplicaveis. Disputas devem ser tentadas primeiro por suporte, mediação operacional e resolucao de boa-fe.'
-                : 'These Terms are governed by the laws of the Federative Republic of Brazil, without limiting mandatory consumer rights and applicable professional rules. Disputes should first be attempted through support, operational mediation, and good-faith resolution.'}
+                ? 'Estes Termos sao regidos pelas leis da Republica Federativa do Brasil, sem prejuizo de direitos obrigatorios do consumidor e regras profissionais aplicaveis. Disputas devem ser tentadas primeiro por suporte, mediação operacional e resolucao de boa-fe.' : isEs ? 'Estos Términos se rigen por las leyes de la República Federativa de Brasil, sin limitar los derechos irrenunciables del consumidor ni las normas profesionales aplicables. Las controversias deben intentarse primero por soporte, mediación operativa y resolución de buena fe.' : 'These Terms are governed by the laws of the Federative Republic of Brazil, without limiting mandatory consumer rights and applicable professional rules. Disputes should first be attempted through support, operational mediation, and good-faith resolution.'}
             </p>
             <BulletList
               items={
@@ -230,7 +231,8 @@ export default function Terms() {
                       `Privacidade/LGPD: ${profile.privacyEmail}`,
                       `Site: ${profile.website}`,
                     ]
-                  : [
+              : isEs ? [`Soporte: ${profile.supportEmail}`, `Privacidad/LGPD: ${profile.privacyEmail}`, `Sitio web: ${profile.website}`]
+              : [
                       `Support: ${profile.supportEmail}`,
                       `Privacy/LGPD: ${profile.privacyEmail}`,
                       `Website: ${profile.website}`,

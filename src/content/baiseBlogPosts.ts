@@ -65,7 +65,7 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
     key: 'sebraeWhatsappServices',
     label: 'WhatsApp is the main communication channel for 80% of service businesses',
     publisher: 'Agencia Sebrae de Noticias',
-    url: 'https://agenciasebrae.com.br/cultura-empreendedora/whatsapp-e-o-principal-meio-de-comunicacao-para-80-dos-negocios-de-servico/',
+    url: 'https://agenciasebrae.com.br/cultura-empreendedora/whatsapp-e-o-principal-meio-de-comunicação-para-80-dos-negócios-de-serviço/',
   },
   sebraePaidAds: {
     key: 'sebraePaidAds',
@@ -77,7 +77,7 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
     key: 'brazilReviews2025',
     label: '96% of consumers read Google reviews before buying',
     publisher: 'Mercado & Consumo / Reclame Aqui and Harmo',
-    url: 'https://mercadoeconsumo.com.br/26/03/2025/noticias-varejo/reclame-aqui-96-dos-consumidores-leem-avaliacoes-no-google-antes-de-comprar/',
+    url: 'https://mercadoeconsumo.com.br/26/03/2025/noticias-varejo/reclame-aqui-96-dos-consumidores-leem-avaliações-no-google-antes-de-comprar/',
   },
   brightLocalReviews2025: {
     key: 'brightLocalReviews2025',
@@ -95,13 +95,13 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
     key: 'medicalDemographics2025',
     label: 'Medical Demography in Brazil 2025',
     publisher: 'FMUSP, Ministry of Health, AMB',
-    url: 'https://www.fm.usp.br/fmusp/noticias/ministerio-da-saude-fmusp-e-amb-lancam-a-demografia-medica-no-brasil-2025',
+    url: 'https://www.fm.usp.br/fmusp/noticias/ministerio-da-saúde-fmusp-e-amb-lancam-a-demografia-medica-no-brasil-2025',
   },
   ansSectorData2026: {
     key: 'ansSectorData2026',
     label: 'Private health plan beneficiaries in Brazil',
     publisher: 'ANS',
-    url: 'https://www.gov.br/ans/pt-br/acesso-a-informacao/perfil-do-setor/dados-gerais',
+    url: 'https://www.gov.br/ans/pt-br/acesso-a-informação/perfil-do-setor/dados-gerais',
   },
   oabLawyerRegistry: {
     key: 'oabLawyerRegistry',
@@ -134,7 +134,7 @@ const CHART_PRESETS: Record<BlogStatPreset, { title: string; narrative: string; 
     narrative:
       'Sebrae reported WhatsApp as the main client communication channel for more than 80% of service businesses, while CRM importance was cited by only 6% on average. That gap is exactly where Baise can help providers become more organized and more trusted.',
     data: [
-      { label: 'WhatsApp use by service businesses', value: 80, display: '80%+', note: 'Sebrae Pesquisa Servico 2025' },
+      { label: 'WhatsApp use by service businesses', value: 80, display: '80%+', note: 'Sebrae Pesquisa Serviço 2025' },
       { label: 'In-person still important', value: 56, display: '56%', note: 'Sebrae service-business research' },
       { label: 'CRM importance cited', value: 6, display: '6%', note: 'Brazil average in Sebrae article' },
       { label: 'CRM importance in Southeast', value: 2, display: '2%', note: 'Sudeste reference in Sebrae article' },

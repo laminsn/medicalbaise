@@ -114,7 +114,7 @@ const appLanes: AppLane[] = [
     name: "Legal Baise",
     label: {
       en: "Find or offer trusted legal support",
-      pt: "Encontre ou ofereça suporte juridico confiavel",
+      pt: "Encontre ou ofereça suporte jurídico confiavel",
     },
     description: {
       en: "Lawyers, documents, consultations, service records, client history, and organized next steps.",
