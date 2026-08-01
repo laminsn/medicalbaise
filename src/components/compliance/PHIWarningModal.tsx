@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
 interface PHIWarningModalProps {
@@ -9,6 +10,7 @@ interface PHIWarningModalProps {
 }
 
 export function PHIWarningModal({ detectedTypes, onEdit, onSendAnyway, onClose }: PHIWarningModalProps) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
@@ -19,14 +21,10 @@ export function PHIWarningModal({ detectedTypes, onEdit, onSendAnyway, onClose }
           <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
-          <h3 className="text-lg font-bold text-foreground">
-            Sensitive Information Detected
-          </h3>
+          <h3 className="text-lg font-bold text-foreground">{t('app.sensitiveInformationDetected', "Sensitive Information Detected")}</h3>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-3">
-          Your message may contain Protected Health Information (PHI). Sharing PHI in public or unsecured channels may violate HIPAA regulations.
-        </p>
+        <p className="text-sm text-muted-foreground mb-3">{t('app.yourMessageMayContainProtected', "Your message may contain Protected Health Information (PHI). Sharing PHI in public or unsecured channels may violate HIPAA regulations.")}</p>
 
         <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 mb-4">
           <p className="text-xs font-medium text-destructive mb-1">Detected:</p>
@@ -37,17 +35,11 @@ export function PHIWarningModal({ detectedTypes, onEdit, onSendAnyway, onClose }
           </ul>
         </div>
 
-        <p className="text-xs text-muted-foreground mb-4">
-          Please remove or redact sensitive information before sending, or confirm you understand the risks.
-        </p>
+        <p className="text-xs text-muted-foreground mb-4">{t('app.pleaseRemoveOrRedactSensitive', "Please remove or redact sensitive information before sending, or confirm you understand the risks.")}</p>
 
         <div className="flex gap-3">
-          <Button onClick={onEdit} className="flex-1">
-            Edit Message
-          </Button>
-          <Button variant="outline" onClick={onSendAnyway} className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/5">
-            Send Anyway
-          </Button>
+          <Button onClick={onEdit} className="flex-1">{t('app.editMessage', "Edit Message")}</Button>
+          <Button variant="outline" onClick={onSendAnyway} className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/5">{t('app.sendAnyway', "Send Anyway")}</Button>
         </div>
       </div>
     </div>

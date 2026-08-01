@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Trash2, Copy } from 'lucide-react';
@@ -17,6 +18,7 @@ interface BidTemplatesProps {
 }
 
 export function BidTemplates({ onSelect, mode = 'manage' }: BidTemplatesProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [templates, setTemplates] = useState<BidTemplate[]>([]);
@@ -68,35 +70,34 @@ export function BidTemplates({ onSelect, mode = 'manage' }: BidTemplatesProps) {
         </h4>
         {mode === 'manage' && (
           <Button size="sm" variant="outline" onClick={() => setShowForm(!showForm)}>
-            <Plus className="w-3 h-3 mr-1" /> New
-          </Button>
+            <Plus className="w-3 h-3 mr-1" />{t('app.new', "New")}</Button>
         )}
       </div>
 
       {showForm && (
         <div className="border border-border rounded-lg p-3 space-y-2">
           <input
-            placeholder="Template name"
+            placeholder={t('app.templateName', "Template name")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 bg-background border border-border rounded text-sm"
           />
           <textarea
-            placeholder="Proposal text..."
+            placeholder={t('app.proposalText', "Proposal text...")}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={4}
             className="w-full px-3 py-2 bg-background border border-border rounded text-sm"
           />
           <div className="flex gap-2">
-            <Button size="sm" onClick={addTemplate}>Save Template</Button>
+            <Button size="sm" onClick={addTemplate}>{t('app.saveTemplate', "Save Template")}</Button>
             <Button size="sm" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
           </div>
         </div>
       )}
 
       {templates.length === 0 && (
-        <p className="text-xs text-muted-foreground">No templates yet.</p>
+        <p className="text-xs text-muted-foreground">{t('app.noTemplatesYet', "No templates yet.")}</p>
       )}
 
       {templates.map((t) => (
@@ -109,8 +110,7 @@ export function BidTemplates({ onSelect, mode = 'manage' }: BidTemplatesProps) {
             <div className="flex gap-1">
               {mode === 'select' && onSelect && (
                 <Button size="sm" variant="ghost" onClick={() => onSelect(t.content)}>
-                  <Copy className="w-3 h-3 mr-1" /> Use
-                </Button>
+                  <Copy className="w-3 h-3 mr-1" />{t('app.use', "Use")}</Button>
               )}
               <Button size="sm" variant="ghost" onClick={() => deleteTemplate(t.id)}>
                 <Trash2 className="w-3 h-3 text-destructive" />

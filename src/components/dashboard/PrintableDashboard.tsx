@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, FileText, Printer, ShieldCheck } from 'lucide-react';
@@ -29,12 +30,12 @@ type PrintableDashboardProps = {
 
 const audienceLabels = {
   provider: {
-    badge: 'Service provider report',
-    footer: 'Provider dashboard printout for operations, revenue review, client follow-up, and record keeping.',
+    badge: t('app.serviceProviderReport', "Service provider report"),
+    footer: t('app.providerDashboardPrintoutForOperations', "Provider dashboard printout for operations, revenue review, client follow-up, and record keeping."),
   },
   client: {
-    badge: 'Service user report',
-    footer: 'Client dashboard printout for service tracking, approvals, records, receipts, and follow-up.',
+    badge: t('app.serviceUserReport', "Service user report"),
+    footer: t('app.clientDashboardPrintoutForService', "Client dashboard printout for service tracking, approvals, records, receipts, and follow-up."),
   },
 };
 
@@ -50,6 +51,7 @@ export function PrintableDashboard({
   nextSteps,
   recordsChecklist,
 }: PrintableDashboardProps) {
+  const { t } = useTranslation();
   const generatedAt = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',
@@ -134,9 +136,7 @@ export function PrintableDashboard({
 
             <div className="baise-print-controls flex shrink-0 gap-2">
               <Button type="button" onClick={handlePrint} className="gap-2 active:scale-[0.98]">
-                <Printer className="h-4 w-4" />
-                Print / Save PDF
-              </Button>
+                <Printer className="h-4 w-4" />{t('app.printSavePdf', "Print / Save PDF")}</Button>
             </div>
           </div>
 
@@ -146,7 +146,7 @@ export function PrintableDashboard({
               <p className="mt-1 font-semibold">{brandName}</p>
             </div>
             <div className="rounded-lg border bg-background/70 p-3 baise-print-card">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground baise-print-muted">Generated for</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground baise-print-muted">{t('app.generatedFor', "Generated for")}</p>
               <p className="mt-1 font-semibold">{generatedFor || 'Current account'}</p>
             </div>
             <div className="rounded-lg border bg-background/70 p-3 baise-print-card">
@@ -158,9 +158,7 @@ export function PrintableDashboard({
 
         <CardContent className="space-y-6 p-5">
           <section className="baise-print-section">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground baise-print-muted">
-              Dashboard snapshot
-            </h3>
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground baise-print-muted">{t('app.dashboardSnapshot', "Dashboard snapshot")}</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {metrics.map((metric) => (
                 <div key={metric.label} className="rounded-xl border bg-card p-4 baise-print-card">
@@ -190,7 +188,7 @@ export function PrintableDashboard({
 
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="baise-print-section rounded-xl border bg-card p-4 baise-print-card">
-              <h3 className="text-base font-semibold">Recommended next steps</h3>
+              <h3 className="text-base font-semibold">{t('app.recommendedNextSteps', "Recommended next steps")}</h3>
               <ol className="mt-3 space-y-2">
                 {nextSteps.map((step, index) => (
                   <li key={step} className="flex gap-3 text-sm leading-6">
@@ -204,7 +202,7 @@ export function PrintableDashboard({
             </div>
 
             <div className="baise-print-section rounded-xl border bg-card p-4 baise-print-card">
-              <h3 className="text-base font-semibold">Records checklist</h3>
+              <h3 className="text-base font-semibold">{t('app.recordsChecklist', "Records checklist")}</h3>
               <ul className="mt-3 space-y-2">
                 {recordsChecklist.map((item) => (
                   <li key={item} className="flex gap-2 text-sm leading-6">

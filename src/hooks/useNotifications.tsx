@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -54,6 +55,7 @@ export interface NotificationPreferences {
 }
 
 export function useNotifications() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const { isGranted, sendNotification } = useBrowserNotifications();
@@ -223,7 +225,7 @@ export function useNotifications() {
     if (error) {
       toast({
         title: 'Error',
-        description: 'Failed to create reminder',
+        description: t('app.failedToCreateReminder', "Failed to create reminder"),
         variant: 'destructive',
       });
       return null;
@@ -231,8 +233,8 @@ export function useNotifications() {
 
     setReminders(prev => [...prev, data as ScheduledReminder]);
     toast({
-      title: 'Reminder Created',
-      description: 'Your reminder has been scheduled',
+      title: t('app.reminderCreated', "Reminder Created"),
+      description: t('app.yourReminderHasBeenScheduled', "Your reminder has been scheduled"),
     });
     return data;
   };

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -11,6 +12,7 @@ const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll'] as cons
  * and signs out the user after 30 minutes of no activity.
  */
 export function useSessionTimeout() {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -28,8 +30,8 @@ export function useSessionTimeout() {
     // Warning before timeout
     warningRef.current = setTimeout(() => {
       toast({
-        title: 'Session expiring soon',
-        description: 'You will be logged out in 2 minutes due to inactivity. Move your mouse or press a key to stay logged in.',
+        title: t('app.sessionExpiringSoon', "Session expiring soon"),
+        description: t('app.youWillBeLoggedOut', "You will be logged out in 2 minutes due to inactivity. Move your mouse or press a key to stay logged in."),
       });
     }, INACTIVITY_TIMEOUT_MS - WARNING_BEFORE_MS);
 
@@ -37,8 +39,8 @@ export function useSessionTimeout() {
     timeoutRef.current = setTimeout(() => {
       signOut();
       toast({
-        title: 'Session expired',
-        description: 'You have been logged out due to inactivity.',
+        title: t('app.sessionExpired', "Session expired"),
+        description: t('app.youHaveBeenLoggedOut', "You have been logged out due to inactivity."),
         variant: 'destructive',
       });
     }, INACTIVITY_TIMEOUT_MS);
