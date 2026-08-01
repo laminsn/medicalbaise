@@ -68,7 +68,7 @@ export default function AdminDashboard() {
                 Growth Hub
               </TabsTrigger>
               <TabsTrigger value="overview" className="flex-1">{t('admin.overview')}</TabsTrigger>
-              <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : isEs ? 'Todos los usuarios' : 'All Users'}</TabsTrigger>
+              <TabsTrigger value="all-users" className="flex-1">{isPt ? 'Todos os usuários' : isEs ? 'Todos los usuários' : 'All Users'}</TabsTrigger>
               <TabsTrigger value="users" className="flex-1">{t('admin.users')}</TabsTrigger>
               <TabsTrigger value="credits" className="flex-1">{t('admin.credits')}</TabsTrigger>
               <TabsTrigger value="promos" className="flex-1">{t('admin.promos')}</TabsTrigger>

@@ -114,13 +114,13 @@ const revenueOptions = {
 
 const lifestyleOptions = {
   en: ['Busy professional', 'Business owner', 'Family organizer', 'Frequent traveler', 'New to Brazil', 'Planning a major change'],
-  pt: ['Profissional ocupado', 'Dono de negocio', 'Organizador da familia', 'Viajante frequente', 'Novo no Brasil', 'Planejando uma grande mudanca'],
+  pt: ['Profissional ocupado', 'Dono de negocio', 'Organizador da familia', 'Viajante frequente', 'Novo no Brasil', 'Planejando uma grande mudança'],
   es: ['Profesional ocupado', 'Dueno de negocio', 'Organizador familiar', 'Viajero frecuente', 'Nuevo en Brasil', 'Planeando un cambio importante'],
 };
 
 const educationOptions = {
   en: ['Prefer not to say', 'High school', 'Technical or vocational', 'Bachelor degree', 'Graduate degree', 'Doctorate or professional degree'],
-  pt: ['Prefiro não informar', 'Ensino medio', 'Tecnico ou profissionalizante', 'Graduacao', 'Pos-graduacao', 'Doutorado ou grau profissional'],
+  pt: ['Prefiro não informar', 'Ensino medio', 'Tecnico ou profissionalizante', 'Graduação', 'Pos-graduação', 'Doutorado ou grau profissional'],
   es: ['Prefiero no decir', 'Secundaria', 'Tecnico o vocacional', 'Licenciatura', 'Posgrado', 'Doctorado o grado profesional'],
 };
 

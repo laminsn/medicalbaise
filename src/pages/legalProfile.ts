@@ -37,10 +37,10 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     marketplacePt: 'um marketplace brasileiro de serviços residenciais que conecta clientes a prestadores independentes para manutenção, reparos, limpeza, projetos, orçamentos, agendamentos, mensagens, pagamentos e avaliações',
     marketplaceEs: 'un marketplace brasileño de servicios para el hogar que conecta a clientes con proveedores independientes para mantenimiento, reparaciones, limpieza, proyectos y trabajo residencial',
     sensitiveDataEn: 'home address, service history, photos, access instructions, payment records, messages, reviews, provider credentials, and safety notes',
-    sensitiveDataPt: 'endereço residencial, histórico de serviços, fotos, instruções de acesso, registros de pagamento, mensagens, avaliações, credenciais dos prestadores e notas de seguranca',
+    sensitiveDataPt: 'endereço residencial, histórico de serviços, fotos, instruções de acesso, registros de pagamento, mensagens, avaliações, credenciais dos prestadores e notas de segurança',
     sensitiveDataEs: 'dirección del domicilio, historial de servicios, fotos, instrucciones de acceso, registros de pago, mensajes, reseñas, credenciales del proveedor y notas de seguridad',
     professionalBoundaryEn: 'Casa Baise is not a contractor, construction company, insurer, employer, or guarantor of a provider result. Providers are independent and responsible for licenses, permits, insurance, safety, pricing, and work quality.',
-    professionalBoundaryPt: 'A Casa Baise não e empreiteira, construtora, seguradora, empregadora nem garantidora de resultado do prestador. Os prestadores sao independentes e responsaveis por licenças, alvaras, seguros, seguranca, precos e qualidade do trabalho.',
+    professionalBoundaryPt: 'A Casa Baise não e empreiteira, construtora, seguradora, empregadora nem garantidora de resultado do prestador. Os prestadores sao independentes e responsaveis por licenças, alvaras, seguros, segurança, precos e qualidade do trabalho.',
   },
   legal: {
     appKey: 'legal',
@@ -80,9 +80,9 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     sensitiveDataPt: 'informações de saúde, sintomas, notas de consulta, metadados de telessaude, dados de identidade, registros de pagamento, mensagens, avaliações, credenciais profissionais e arquivos relacionados ao atendimento',
     sensitiveDataEs: 'información de salud, síntomas, notas de consulta, metadatos de telesalud, datos de identidad, registros de pago, mensajes, reseñas y credenciales del profesional',
     professionalBoundaryEn: 'Medical Baise is not a clinic, hospital, emergency service, insurer, or healthcare provider. Medical decisions, diagnosis, treatment, prescriptions, records, and professional duties belong to the independently licensed provider engaged by the patient.',
-    professionalBoundaryPt: 'A Medical Baise não e clinica, hospital, serviço de emergencia, seguradora nem prestadora de serviços de saúde. Decisoes medicas, diagnostico, tratamento, prescrições, prontuarios e deveres profissionais pertencem ao profissional licenciado contratado pelo paciente.',
+    professionalBoundaryPt: 'A Medical Baise não e clinica, hospital, serviço de emergência, seguradora nem prestadora de serviços de saúde. Decisoes medicas, diagnostico, tratamento, prescrições, prontuarios e deveres profissionais pertencem ao profissional licenciado contratado pelo paciente.',
     emergencyEn: 'Do not use Medical Baise for emergencies. In Brazil, call SAMU 192 or go to the nearest emergency service.',
-    emergencyPt: 'Não use a Medical Baise para emergencias. No Brasil, ligue para o SAMU 192 ou procure o pronto atendimento mais próximo.',
+    emergencyPt: 'Não use a Medical Baise para emergências. No Brasil, ligue para o SAMU 192 ou procure o pronto atendimento mais próximo.',
   },
 };
 

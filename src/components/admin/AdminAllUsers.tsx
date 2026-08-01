@@ -162,7 +162,7 @@ export function AdminAllUsers() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Users className="h-4 w-4" />
-            {isPt ? 'Todos os usuários' : isEs ? 'Todos los usuarios' : 'All Users'} ({totalCount})
+            {isPt ? 'Todos os usuários' : isEs ? 'Todos los usuários' : 'All Users'} ({totalCount})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -189,7 +189,7 @@ export function AdminAllUsers() {
                     {users.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                          {isPt ? 'Nenhum usuário encontrado' : isEs ? 'No se encontraron usuarios' : 'No users found'}
+                          {isPt ? 'Nenhum usuário encontrado' : isEs ? 'No se encontraron usuários' : 'No users found'}
                         </TableCell>
                       </TableRow>
                     ) : (

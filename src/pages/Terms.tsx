@@ -65,7 +65,7 @@ export default function Terms() {
             </p>
             <p>
               {isPt
-                ? 'A experiência e estruturada para o Brasil primeiro, com LGPD, Marco Civil da Internet, Código de Defesa do Consumidor e regras profissionais brasileiras como base. Expansoes globais recebem camadas adicionais quando uma nova jurisdicao for lancada.' : isEs ? 'La experiencia está estructurada primero para Brasil, tomando como base la LGPD, el Marco Civil de Internet, el Código de Defensa del Consumidor y las normas profesionales brasileñas aplicables. La expansión internacional añade capas de jurisdicción a medida que se abren nuevos mercados.' : 'The experience is structured for Brazil first, with LGPD, the Brazilian Internet Civil Framework, the Brazilian Consumer Protection Code, and applicable Brazilian professional rules as the baseline. Global expansion receives additional jurisdiction layers as new markets launch.'}
+                ? 'A experiência e estruturada para o Brasil primeiro, com LGPD, Marco Civil da Internet, Código de Defesa do Consumidor e regras profissionais brasileiras como base. Expansoes globais recebem camadas adicionais quando uma nova jurisdicao for lancada.' : isEs ? 'La experiência está estructurada primero para Brasil, tomando como base la LGPD, el Marco Civil de Internet, el Código de Defensa del Consumidor y las normas profesionales brasileñas aplicables. La expansión internacional añade capas de jurisdicción a medida que se abren nuevos mercados.' : 'The experience is structured for Brazil first, with LGPD, the Brazilian Internet Civil Framework, the Brazilian Consumer Protection Code, and applicable Brazilian professional rules as the baseline. Global expansion receives additional jurisdiction layers as new markets launch.'}
             </p>
           </Section>
 
@@ -82,9 +82,9 @@ export default function Terms() {
                   ? [
                       `O ${provider} e independente e deve manter licenças, registros, seguros e autorizações exigidos.`,
                       `${profile.brandName} pode verificar credenciais, mas verificação não e garantia, endosso ou promessa de resultado.`,
-                      `${profile.brandName} pode remover, suspender ou exigir revisao adicional quando houver risco, reclamacao, fraude, conflito, credencial vencida ou violacao destes Termos.`,
+                      `${profile.brandName} pode remover, suspender ou exigir revisao adicional quando houver risco, reclamação, fraude, conflito, credencial vencida ou violação destes Termos.`,
                     ]
-              : isEs ? [`Cada ${provider} es independiente y debe mantener las licencias, registros, seguros y autorizaciones exigidos.`, `${profile.brandName} puede verificar credenciales, pero la verificación no es una garantía, un respaldo ni una promesa de resultado.`, `${profile.brandName} puede retirar, suspender o exigir una revisión adicional cuando exista riesgo, reclamación, fraude, conflicto, credencial vencida o incumplimiento de estos Términos.`]
+              : isEs ? [`Cada ${provider} es independiente y debe mantener las licências, registros, seguros y autorizaciones exigidos.`, `${profile.brandName} puede verificar credenciales, pero la verificación no es una garantía, un respaldo ni una promesa de resultado.`, `${profile.brandName} puede retirar, suspender o exigir una revisión adicional cuando exista riesgo, reclamación, fraude, conflicto, credencial vencida o incumplimiento de estos Términos.`]
               : [
                       `Each ${provider} is independent and must maintain required licenses, registrations, insurance, and authorizations.`,
                       `${profile.brandName} may verify credentials, but verification is not a guarantee, endorsement, or promise of outcome.`,
@@ -94,17 +94,17 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '3. Contas, login e seguranca do usuário' : isEs ? '3. Cuentas, inicio de sesión y seguridad del usuario' : '3. Accounts, Login, and User Security'}>
+          <Section title={isPt ? '3. Contas, login e segurança do usuário' : isEs ? '3. Cuentas, inicio de sesión y seguridad del usuário' : '3. Accounts, Login, and User Security'}>
             <BulletList
               items={
                 isPt
                   ? [
-                      'Você deve ter pelo menos 18 anos, fornecer informações verdadeiras e manter sua conta, senha, dispositivos, MFA e sessoes sob controle.',
-                      'Mensagens de erro de login devem ser genericas. A plataforma não deve revelar se o e-mail, telefone, usuário, senha, convite, código ou existencia da conta foi o item incorreto.',
-                      'Credenciais não devem ser compartilhadas. Contas de equipe devem usar usuários individuais, papeis, permissoes e trilhas de auditoria.',
+                      'Você deve ter pelo menos 18 anos, fornecer informações verdadeiras e manter sua conta, senha, dispositivos, MFA e sessões sob controle.',
+                      'Mensagens de erro de login devem ser genericas. A plataforma não deve revelar se o e-mail, telefone, usuário, senha, convite, código ou existência da conta foi o item incorreto.',
+                      'Credenciais não devem ser compartilhadas. Contas de equipe devem usar usuários individuais, papeis, permissões e trilhas de auditoria.',
                       'Login, cadastro, redefinicao de senha, convite, MFA, upload, exportação, pagamento, webhook, mensagens, IA, e-mail, SMS, API e outras rotas caras ou sujeitas a abuso podem ser limitadas por taxa, bloqueadas, enfileiradas, desafiadas, suspensas ou encerradas conforme o risco.',
                     ]
-              : isEs ? ['Debes tener al menos 18 años, dar información veraz y mantener bajo control tu cuenta, contraseña, dispositivos, MFA y sesiones.', 'Los mensajes de error de inicio de sesión deben ser genéricos. La plataforma no debe revelar si el dato incorrecto fue el correo, el teléfono, el usuario, la contraseña, la invitación, el código o la existencia de la cuenta.', 'Las credenciales no se comparten. Las cuentas de equipo deben usar usuarios individuales, roles, permisos y registros de auditoría.', 'El inicio de sesión, el registro, el restablecimiento de contraseña, las invitaciones, la MFA, las subidas, las exportaciones, los pagos, los webhooks, la mensajería, la IA, el correo, los SMS, la API y otras rutas costosas o propensas a abuso pueden ser limitadas, bloqueadas, encoladas, desafiadas, suspendidas o terminadas según el riesgo.']
+              : isEs ? ['Debes tener al menos 18 años, dar información veraz y mantener bajo control tu cuenta, contraseña, dispositivos, MFA y sesiones.', 'Los mensajes de error de inicio de sesión deben ser genéricos. La plataforma no debe revelar si el dato incorrecto fue el correo, el teléfono, el usuário, la contraseña, la invitación, el código o la existência de la cuenta.', 'Las credenciales no se comparten. Las cuentas de equipo deben usar usuários individuales, roles, permisos y registros de auditoría.', 'El inicio de sesión, el registro, el restablecimiento de contraseña, las invitaciones, la MFA, las subidas, las exportaciones, los pagos, los webhooks, la mensajería, la IA, el correo, los SMS, la API y otras rutas costosas o propensas a abuso pueden ser limitadas, bloqueadas, encoladas, desafiadas, suspendidas o terminadas según el riesgo.']
               : [
                       'You must be at least 18, provide truthful information, and keep your account, password, devices, MFA, and sessions under control.',
                       'Login error messages must be generic. The platform must not reveal whether the email, phone, username, password, invite, code, or account existence was the incorrect item.',
@@ -122,10 +122,10 @@ export default function Terms() {
                   ? [
                       'Precos, impostos, taxas de plataforma, taxas do prestador, custos de terceiros e moeda aplicável devem ser exibidos antes da confirmação quando operacionalmente disponiveis.',
                       'Pagamentos podem ser processados por provedores como Stripe, PIX, cartao, boleto, carteira digital ou outro meio aprovado. A plataforma não deve armazenar número completo de cartao.',
-                      'Assinaturas renovam conforme o plano aceito. Cancelamento interrompe cobrancas futuras, mas não gera reembolso proporcional salvo quando exigido por lei ou pela política especifica do plano.',
+                      'Assinaturas renovam conforme o plano aceito. Cancelamento interrompe cobranças futuras, mas não gera reembolso proporcional salvo quando exigido por lei ou pela política especifica do plano.',
                       'Reembolsos de serviços dependem do status do trabalho, política do prestador, custos ja incorridos, regras de marketplace e direitos obrigatorios do consumidor no Brasil.',
                       'Quando o direito de arrependimento de 7 dias for aplicável a compra remota, ele será respeitado conforme a lei brasileira, observadas exceções legais, execucao ja iniciada, produtos digitais acessados e custos de terceiros.',
-                      'Chargebacks, fraude de pagamento, abuso de cupom ou tentativa de burlar a taxa da plataforma podem resultar em suspensao e cobranca de valores devidos.',
+                      'Chargebacks, fraude de pagamento, abuso de cupom ou tentativa de burlar a taxa da plataforma podem resultar em suspensao e cobrança de valores devidos.',
                     ]
               : isEs ? ['Los precios, impuestos, comisiones de la plataforma, honorarios del profesional, costos de terceros y la moneda aplicable deben mostrarse antes de confirmar, cuando sea operativamente posible.', 'Los pagos pueden procesarse mediante proveedores como Stripe, PIX, tarjeta, boleto, billetera digital u otro método aprobado. La plataforma no debe almacenar números de tarjeta completos.', 'Las suscripciones se renuevan según el plan aceptado. La cancelación detiene los cargos futuros, pero no genera un reembolso prorrateado salvo que lo exija la ley o la política del plan.', 'Los reembolsos de servicios dependen del estado del trabajo, la política del profesional, los costos ya incurridos, las reglas del marketplace y los derechos irrenunciables del consumidor en Brasil.', 'Cuando corresponda el derecho de arrepentimiento de 7 días en una compra a distancia, se respetará conforme a la ley brasileña, con las excepciones legales, el trabajo ya iniciado, los productos digitales ya accedidos y los costos de terceros.', 'Los contracargos, el fraude en pagos, el abuso de cupones o los intentos de evadir las comisiones de la plataforma pueden derivar en suspensión y cobro de los importes adeudados.']
               : [
@@ -140,7 +140,7 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '5. Dados, privacidade e controles tecnicos' : isEs ? '5. Datos, privacidad y controles técnicos' : '5. Data, Privacy, and Technical Controls'}>
+          <Section title={isPt ? '5. Dados, privacidade e controles técnicos' : isEs ? '5. Datos, privacidad y controles técnicos' : '5. Data, Privacy, and Technical Controls'}>
             <p>
               {isPt
                 ? `O tratamento de dados e descrito na Política de Privacidade da ${profile.brandName}. Os dados sensíveis para esta marca incluem ${profile.sensitiveDataPt}.` : isEs ? `El tratamiento de datos de ${profile.brandName} se describe en la Política de Privacidad. Los datos sensibles de esta marca incluyen ${profile.sensitiveDataEs}.` : `${profile.brandName}'s processing of data is described in the Privacy Policy. Sensitive data for this brand includes ${profile.sensitiveDataEn}.`}
@@ -150,12 +150,12 @@ export default function Terms() {
                 isPt
                   ? [
                       'Dados privados devem usar RLS ou controle equivalente por linha, papel, dono, equipe, relacionamento e finalidade.',
-                      'Arquivos privados devem usar buckets/pastas com politicas de armazenamento, URLs assinadas, expiracao e verificacao de autorizacao antes de cada acesso.',
+                      'Arquivos privados devem usar buckets/pastas com politicas de armazenamento, URLs assinadas, expiração e verificação de autorização antes de cada acesso.',
                       'Paginas privadas, respostas autenticadas e dados de usuário devem usar no-store ou cache segmentado por usuário, sem vazamento entre contas.',
                       'Logs, analytics, traces de IA, screenshots, exportações e suporte devem remover ou mascarar senhas, tokens, chaves, documentos, dados financeiros e dados sensíveis.',
-                      'Incidentes de seguranca devem ser triados, contidos, documentados e comunicados conforme LGPD, ANPD e regras aplicaveis.',
+                      'Incidentes de segurança devem ser triados, contidos, documentados e comunicados conforme LGPD, ANPD e regras aplicaveis.',
                     ]
-              : isEs ? ['Los datos privados deben usar RLS o controles equivalentes por fila, rol, propietario, equipo, relación y finalidad.', 'Los archivos privados deben usar políticas de bucket o carpeta, URLs firmadas, caducidad y verificación de autorización antes de cada acceso.', 'Las páginas privadas, las respuestas autenticadas y los datos del usuario deben usar no-store o caché segmentada por usuario, sin filtraciones entre cuentas.', 'Los registros, la analítica, las trazas de IA, las capturas de pantalla, las exportaciones y los flujos de soporte deben eliminar o enmascarar contraseñas, tokens, claves, documentos, datos financieros y datos sensibles.', 'Los incidentes de seguridad deben clasificarse, contenerse, documentarse y comunicarse conforme a la LGPD, la ANPD y las normas aplicables.']
+              : isEs ? ['Los datos privados deben usar RLS o controles equivalentes por fila, rol, propietario, equipo, relación y finalidad.', 'Los archivos privados deben usar políticas de bucket o carpeta, URLs firmadas, caducidad y verificación de autorización antes de cada acceso.', 'Las páginas privadas, las respuestas autenticadas y los datos del usuário deben usar no-store o caché segmentada por usuário, sin filtraciones entre cuentas.', 'Los registros, la analítica, las trazas de IA, las capturas de pantalla, las exportaciones y los flujos de soporte deben eliminar o enmascarar contraseñas, tokens, claves, documentos, datos financieros y datos sensibles.', 'Los incidentes de seguridad deben clasificarse, contenerse, documentarse y comunicarse conforme a la LGPD, la ANPD y las normas aplicables.']
               : [
                       'Private data must use RLS or equivalent controls by row, role, owner, team, relationship, and purpose.',
                       'Private files must use storage bucket/folder policies, signed URLs, expiration, and authorization checks before each access.',
@@ -175,9 +175,9 @@ export default function Terms() {
                       'Avaliações devem ser autenticas, baseadas em experiência real e não podem ser compradas, coagidas, falsas ou manipuladas.',
                       'Você não pode publicar conteúdo ilegal, enganoso, discriminatorio, difamatorio, abusivo, invasivo de privacidade, com malware ou que viole direitos de terceiros.',
                       'Você concede a plataforma uma licença limitada para hospedar, exibir e operar o conteúdo que você envia, somente para fornecer, proteger e melhorar o serviço.',
-                      'A plataforma pode moderar, remover, limitar, preservar para auditoria ou denunciar conteúdo quando necessario para seguranca, conformidade, disputa, fraude ou obrigação legal.',
+                      'A plataforma pode moderar, remover, limitar, preservar para auditoria ou denunciar conteúdo quando necessario para segurança, conformidade, disputa, fraude ou obrigação legal.',
                     ]
-              : isEs ? ['Las reseñas deben ser auténticas, basadas en una experiencia real, y no pueden ser compradas, coaccionadas, falsas ni manipuladas.', 'No puedes publicar contenido ilegal, engañoso, discriminatorio, difamatorio, abusivo, invasivo de la privacidad, con malware o que vulnere derechos.', 'Concedes a la plataforma una licencia limitada para alojar, mostrar y operar el contenido que envías, únicamente para prestar, proteger y mejorar el servicio.', 'La plataforma puede moderar, retirar, limitar, conservar para auditoría o reportar contenido cuando sea necesario por seguridad, cumplimiento, controversia, fraude u obligación legal.']
+              : isEs ? ['Las reseñas deben ser auténticas, basadas en una experiência real, y no pueden ser compradas, coaccionadas, falsas ni manipuladas.', 'No puedes publicar contenido ilegal, engañoso, discriminatorio, difamatorio, abusivo, invasivo de la privacidad, con malware o que vulnere derechos.', 'Concedes a la plataforma una licência limitada para alojar, mostrar y operar el contenido que envías, únicamente para prestar, proteger y mejorar el servicio.', 'La plataforma puede moderar, retirar, limitar, conservar para auditoría o reportar contenido cuando sea necesario por seguridad, cumplimiento, controversia, fraude u obligación legal.']
               : [
                       'Reviews must be authentic, based on real experience, and must not be bought, coerced, false, or manipulated.',
                       'You may not post illegal, misleading, discriminatory, defamatory, abusive, privacy-invasive, malware-bearing, or rights-violating content.',
@@ -191,7 +191,7 @@ export default function Terms() {
           <Section title={isPt ? '7. IA, automação e decisoes humanas' : isEs ? '7. IA, automatización y decisiones humanas' : '7. AI, Automation, and Human Decisions'}>
             <p>
               {isPt
-                ? 'Recursos de IA podem ajudar com triagem, busca, resumo, suporte, qualidade, risco, seguranca, classificação, traducao e produtividade. A IA não substitui julgamento profissional, revisao humana, obrigações legais ou decisoes de seguranca.' : isEs ? 'Las funciones de IA pueden apoyar la clasificación, la búsqueda, los resúmenes, el soporte, la calidad, el riesgo, la seguridad, la traducción y la productividad. La IA no sustituye el criterio profesional, la revisión humana, las obligaciones legales ni las decisiones de seguridad.' : 'AI features may assist with triage, search, summaries, support, quality, risk, security, classification, translation, and productivity. AI does not replace professional judgment, human review, legal obligations, or security decisions.'}
+                ? 'Recursos de IA podem ajudar com triagem, busca, resumo, suporte, qualidade, risco, segurança, classificação, traducao e produtividade. A IA não substitui julgamento profissional, revisao humana, obrigações legais ou decisoes de segurança.' : isEs ? 'Las funciones de IA pueden apoyar la clasificación, la búsqueda, los resúmenes, el soporte, la calidad, el riesgo, la seguridad, la traducción y la productividad. La IA no sustituye el criterio profesional, la revisión humana, las obligaciones legales ni las decisiones de seguridad.' : 'AI features may assist with triage, search, summaries, support, quality, risk, security, classification, translation, and productivity. AI does not replace professional judgment, human review, legal obligations, or security decisions.'}
             </p>
             <p>
               {isPt
@@ -204,11 +204,11 @@ export default function Terms() {
               items={
                 isPt
                   ? [
-                      'Permissoes de app, como camera, microfone, localização, notificações, fotos, arquivos, contatos ou biometria, devem ser solicitadas apenas quando necessarias e explicadas no contexto.',
-                      'Usuários devem ter caminho para solicitar exclusão de conta e dados, sujeito a retenções legais, fiscais, antifraude, seguranca, disputa, chargeback e registros profissionais.',
-                      'Declarações de privacidade da Apple App Store e Google Play Data Safety devem refletir dados coletados, compartilhados, finalidade, seguranca, exclusão e retenção.',
+                      'Permissões de app, como camera, microfone, localização, notificações, fotos, arquivos, contatos ou biometria, devem ser solicitadas apenas quando necessarias e explicadas no contexto.',
+                      'Usuários devem ter caminho para solicitar exclusão de conta e dados, sujeito a retenções legais, fiscais, antifraude, segurança, disputa, chargeback e registros profissionais.',
+                      'Declarações de privacidade da Apple App Store e Google Play Data Safety devem refletir dados coletados, compartilhados, finalidade, segurança, exclusão e retenção.',
                     ]
-              : isEs ? ['Los permisos de la aplicación, como cámara, micrófono, ubicación, notificaciones, fotos, archivos, contactos o biometría, deben solicitarse solo cuando sean necesarios y explicarse en contexto.', 'Los usuarios deben poder solicitar la eliminación de su cuenta y sus datos, sujeto a la conservación exigida por motivos legales, fiscales, antifraude, de seguridad, de controversias, de contracargos y de registros profesionales.', 'Las declaraciones de privacidad de la App Store de Apple y de Seguridad de los Datos de Google Play deben reflejar los datos recopilados, la compartición, la finalidad, la seguridad, la eliminación y la conservación.']
+              : isEs ? ['Los permisos de la aplicación, como cámara, micrófono, ubicación, notificaciones, fotos, archivos, contactos o biometría, deben solicitarse solo cuando sean necesarios y explicarse en contexto.', 'Los usuários deben poder solicitar la eliminación de su cuenta y sus datos, sujeto a la conservación exigida por motivos legales, fiscales, antifraude, de seguridad, de controversias, de contracargos y de registros profesionales.', 'Las declaraciones de privacidad de la App Store de Apple y de Seguridad de los Datos de Google Play deben reflejar los datos recopilados, la compartición, la finalidad, la seguridad, la eliminación y la conservación.']
               : [
                       'App permissions, such as camera, microphone, location, notifications, photos, files, contacts, or biometrics, must be requested only when needed and explained in context.',
                       'Users must have a path to request account and data deletion, subject to legal, tax, anti-fraud, security, dispute, chargeback, and professional-record retention.',

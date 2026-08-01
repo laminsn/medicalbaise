@@ -64,7 +64,7 @@ export default function Privacy() {
             </p>
             <p>
               {isPt
-                ? 'Tratamos a LGPD como padrão base. Onde a plataforma for lancada fora do Brasil, aplicaremos camadas adicionais como GDPR/UK GDPR, CCPA/CPRA, regras de lojas de apps e exigencias locais.' : isEs ? 'Tomamos la LGPD como estándar base. Cuando la plataforma opera fuera de Brasil, aplicamos capas adicionales como el RGPD y el RGPD del Reino Unido, la CCPA/CPRA, las reglas de las tiendas de aplicaciones y los requisitos locales.' : 'We treat LGPD as the baseline standard. Where the platform launches outside Brazil, we apply additional layers such as GDPR/UK GDPR, CCPA/CPRA, app store rules, and local requirements.'}
+                ? 'Tratamos a LGPD como padrão base. Onde a plataforma for lancada fora do Brasil, aplicaremos camadas adicionais como GDPR/UK GDPR, CCPA/CPRA, regras de lojas de apps e exigências locais.' : isEs ? 'Tomamos la LGPD como estándar base. Cuando la plataforma opera fuera de Brasil, aplicamos capas adicionales como el RGPD y el RGPD del Reino Unido, la CCPA/CPRA, las reglas de las tiendas de aplicaciones y los requisitos locales.' : 'We treat LGPD as the baseline standard. Where the platform launches outside Brazil, we apply additional layers such as GDPR/UK GDPR, CCPA/CPRA, app store rules, and local requirements.'}
             </p>
           </Section>
 
@@ -75,13 +75,13 @@ export default function Privacy() {
                   ? [
                       'Identidade e contato: nome, e-mail, telefone, CPF/CNPJ quando aplicável, endereço, foto, idioma, cidade, estado e pais.',
                       `Dados especificos da marca: ${profile.sensitiveDataPt}.`,
-                      'Conta e seguranca: login, convites, redefinicoes de senha, MFA, sessoes, dispositivos, eventos de autenticacao, tentativas falhas, bloqueios, papeis e permissoes.',
-                      'Pagamentos e assinaturas: histórico de compras, status de pagamento, reembolsos, chargebacks, recibos, tokens de processadores e referencias de transação. Não armazenamos número completo de cartao.',
-                      'Comunicacoes: mensagens no app, e-mails, SMS, WhatsApp, chamadas, suporte, anexos, consentimentos e preferencias.',
-                      'Uso tecnico: IP, navegador, sistema operacional, identificadores, cookies, analytics, logs, erros, performance, cache, auditoria e eventos antifraude.',
+                      'Conta e segurança: login, convites, redefinições de senha, MFA, sessões, dispositivos, eventos de autenticação, tentativas falhas, bloqueios, papeis e permissões.',
+                      'Pagamentos e assinaturas: histórico de compras, status de pagamento, reembolsos, chargebacks, recibos, tokens de processadores e referências de transação. Não armazenamos número completo de cartao.',
+                      'Comunicações: mensagens no app, e-mails, SMS, WhatsApp, chamadas, suporte, anexos, consentimentos e preferências.',
+                      'Uso técnico: IP, navegador, sistema operacional, identificadores, cookies, analytics, logs, erros, performance, cache, auditoria e eventos antifraude.',
                       'Dados de terceiros: provedores de pagamento, provedores de identidade, profissionais, parceiros, fontes publicas, registros profissionais e autoridades quando necessario.',
                     ]
-              : isEs ? ['Identidad y contacto: nombre, correo, teléfono, CPF/CNPJ cuando corresponda, dirección, foto, idioma, ciudad, estado y país.', 'Cuenta y seguridad: inicio de sesión, invitaciones, restablecimientos de contraseña, MFA, sesiones, dispositivos, eventos de autenticación, intentos fallidos, bloqueos, roles y permisos.', 'Pagos y suscripciones: historial de compras, estado de pago, reembolsos, contracargos, recibos, tokens del procesador y referencias de transacción. No almacenamos números de tarjeta completos.', 'Comunicaciones: mensajes en la app, correo, SMS, WhatsApp, llamadas, soporte, adjuntos, consentimientos y preferencias.', 'Uso técnico: IP, navegador, sistema operativo, identificadores, cookies, analítica, registros, errores, rendimiento, caché, auditoría y eventos antifraude.', 'Datos de terceros: proveedores de pago, proveedores de identidad, profesionales, socios, fuentes públicas, registros profesionales y autoridades cuando sea necesario.']
+              : isEs ? ['Identidad y contacto: nombre, correo, teléfono, CPF/CNPJ cuando corresponda, dirección, foto, idioma, ciudad, estado y país.', 'Cuenta y seguridad: inicio de sesión, invitaciones, restablecimientos de contraseña, MFA, sesiones, dispositivos, eventos de autenticación, intentos fallidos, bloqueos, roles y permisos.', 'Pagos y suscripciones: historial de compras, estado de pago, reembolsos, contracargos, recibos, tokens del procesador y referências de transacción. No almacenamos números de tarjeta completos.', 'Comunicaciones: mensajes en la app, correo, SMS, WhatsApp, llamadas, soporte, adjuntos, consentimientos y preferências.', 'Uso técnico: IP, navegador, sistema operativo, identificadores, cookies, analítica, registros, errores, rendimiento, caché, auditoría y eventos antifraude.', 'Datos de terceros: proveedores de pago, proveedores de identidad, profesionales, socios, fuentes públicas, registros profesionales y autoridades cuando sea necesario.']
               : [
                       'Identity and contact: name, email, phone, CPF/CNPJ where applicable, address, photo, language, city, state, and country.',
                       `Brand-specific data: ${profile.sensitiveDataEn}.`,
@@ -101,13 +101,13 @@ export default function Privacy() {
                 isPt
                   ? [
                       'Operar a plataforma, contas, perfis, busca, agendamento, mensagens, pagamentos, avaliações, suporte e recursos do portal.',
-                      'Verificar identidade, elegibilidade, credenciais profissionais, permissao de acesso, relacionamento entre usuarios e prevencao de fraude.',
-                      'Processar pagamentos, assinaturas, reembolsos, disputas, chargebacks, recibos e obrigacoes fiscais.',
-                      'Aplicar seguranca: RLS, politicas de armazenamento, controles por papel, segregação por usuário, verificação de sessão, cache seguro, auditoria e resposta a incidentes.',
+                      'Verificar identidade, elegibilidade, credenciais profissionais, permissao de acesso, relacionamento entre usuários e prevencao de fraude.',
+                      'Processar pagamentos, assinaturas, reembolsos, disputas, chargebacks, recibos e obrigações fiscais.',
+                      'Aplicar segurança: RLS, politicas de armazenamento, controles por papel, segregação por usuário, verificação de sessão, cache seguro, auditoria e resposta a incidentes.',
                       'Melhorar qualidade, acessibilidade, localização, traduções, desempenho, confiabilidade, analytics e experiência do usuário.',
                       'Cumprir leis, ordens, regulamentos profissionais, direitos do consumidor, LGPD, regras das lojas de apps e solicitações validas de autoridades.',
                     ]
-              : isEs ? ['Operar la plataforma, las cuentas, los perfiles, la búsqueda, la agenda, la mensajería, los pagos, las reseñas, el soporte y las funciones del portal.', 'Verificar identidad, elegibilidad, credenciales profesionales, permisos de acceso, relaciones entre usuarios y prevención de fraude.', 'Procesar pagos, suscripciones, reembolsos, disputas, contracargos, recibos y obligaciones fiscales.', 'Aplicar seguridad: RLS, políticas de almacenamiento, control por roles, segregación de usuarios, verificación de sesiones, caché segura, auditoría y respuesta a incidentes.', 'Mejorar la calidad, la accesibilidad, la localización, las traducciones, el rendimiento, la fiabilidad, la analítica y la experiencia de usuario.', 'Cumplir leyes, órdenes, normas profesionales, derechos del consumidor, la LGPD, las reglas de las tiendas de aplicaciones y las solicitudes válidas de autoridades.']
+              : isEs ? ['Operar la plataforma, las cuentas, los perfiles, la búsqueda, la agenda, la mensajería, los pagos, las reseñas, el soporte y las funciones del portal.', 'Verificar identidad, elegibilidad, credenciales profesionales, permisos de acceso, relaciones entre usuários y prevención de fraude.', 'Procesar pagos, suscripciones, reembolsos, disputas, contracargos, recibos y obligaciones fiscales.', 'Aplicar seguridad: RLS, políticas de almacenamiento, control por roles, segregación de usuários, verificación de sesiones, caché segura, auditoría y respuesta a incidentes.', 'Mejorar la calidad, la accesibilidad, la localización, las traducciones, el rendimiento, la fiabilidad, la analítica y la experiência de usuário.', 'Cumplir leyes, órdenes, normas profesionales, derechos del consumidor, la LGPD, las reglas de las tiendas de aplicaciones y las solicitudes válidas de autoridades.']
               : [
                       'Operate the platform, accounts, profiles, search, scheduling, messaging, payments, reviews, support, and portal features.',
                       'Verify identity, eligibility, professional credentials, access permission, user relationships, and fraud prevention.',
@@ -126,9 +126,9 @@ export default function Privacy() {
                 isPt
                   ? [
                       'Execucao de contrato ou procedimentos preliminares solicitados por você.',
-                      'Cumprimento de obrigacao legal ou regulatoria.',
-                      'Consentimento, inclusive para marketing, cookies opcionais, permissoes de app e dados sensíveis quando exigido.',
-                      'Legitimo interesse para seguranca, prevencao de fraude, melhoria, suporte, auditoria e operação, sempre balanceado com seus direitos.',
+                      'Cumprimento de obrigação legal ou regulatoria.',
+                      'Consentimento, inclusive para marketing, cookies opcionais, permissões de app e dados sensíveis quando exigido.',
+                      'Legitimo interesse para segurança, prevencao de fraude, melhoria, suporte, auditoria e operação, sempre balanceado com seus direitos.',
                       'Exercicio regular de direitos em processos judiciais, administrativos ou arbitrais.',
                       'Proteção da vida, tutela da saúde ou proteção do crédito quando aplicável ao contexto.',
                     ]
@@ -155,12 +155,12 @@ export default function Privacy() {
                 isPt
                   ? [
                       'Com usuários e profissionais envolvidos na transação, somente conforme permissao, papel, finalidade e visibilidade da plataforma.',
-                      'Com provedores de pagamento, hospedagem, banco de dados, e-mail, SMS, WhatsApp, analytics, mapas, suporte, seguranca, armazenamento e automacao.',
+                      'Com provedores de pagamento, hospedagem, banco de dados, e-mail, SMS, WhatsApp, analytics, mapas, suporte, segurança, armazenamento e automação.',
                       'Com consultores, auditores, advogados, contadores, seguradoras, parceiros e autoridades quando necessario e permitido.',
-                      'Com lojas de apps, provedores de identidade e sistemas operacionais para seguranca, login, notificações, compras ou permissao de dispositivo.',
-                      'Em transferencia societaria, fusao, aquisicao ou reorganizacao, sob protecoes equivalentes.',
+                      'Com lojas de apps, provedores de identidade e sistemas operacionais para segurança, login, notificações, compras ou permissao de dispositivo.',
+                      'Em transferência societaria, fusao, aquisicao ou reorganização, sob proteções equivalentes.',
                     ]
-              : isEs ? ['Con los usuarios y profesionales involucrados en la transacción, solo según el permiso, el rol, la finalidad y la visibilidad de la plataforma.', 'Con proveedores de pago, alojamiento, base de datos, correo, SMS, WhatsApp, analítica, mapas, soporte, seguridad, almacenamiento y automatización.', 'Con asesores, auditores, abogados, contadores, aseguradoras, socios y autoridades cuando sea necesario y esté permitido.', 'Con tiendas de aplicaciones, proveedores de identidad y sistemas operativos para seguridad, inicio de sesión, notificaciones, compras o permisos del dispositivo.', 'En una transferencia societaria, fusión, adquisición o reorganización, bajo protecciones equivalentes.']
+              : isEs ? ['Con los usuários y profesionales involucrados en la transacción, solo según el permiso, el rol, la finalidad y la visibilidad de la plataforma.', 'Con proveedores de pago, alojamiento, base de datos, correo, SMS, WhatsApp, analítica, mapas, soporte, seguridad, almacenamiento y automatización.', 'Con asesores, auditores, abogados, contadores, aseguradoras, socios y autoridades cuando sea necesario y esté permitido.', 'Con tiendas de aplicaciones, proveedores de identidad y sistemas operativos para seguridad, inicio de sesión, notificaciones, compras o permisos del dispositivo.', 'En una transferência societaria, fusión, adquisición o reorganización, bajo protecciones equivalentes.']
               : [
                       'With users and professionals involved in the transaction, only according to permission, role, purpose, and platform visibility.',
                       'With payment, hosting, database, email, SMS, WhatsApp, analytics, maps, support, security, storage, and automation providers.',
@@ -172,7 +172,7 @@ export default function Privacy() {
             />
           </Section>
 
-          <Section title={isPt ? '6. Seguranca, RLS, limites de taxa, cache e limpeza de dados' : isEs ? '6. Seguridad, RLS, límites de tasa, caché y depuración de datos' : '6. Security, RLS, Rate Limits, Caching, and Scrubbing'}>
+          <Section title={isPt ? '6. Segurança, RLS, limites de taxa, cache e limpeza de dados' : isEs ? '6. Seguridad, RLS, límites de tasa, caché y depuración de datos' : '6. Security, RLS, Rate Limits, Caching, and Scrubbing'}>
             <BulletList
               items={
                 isPt
@@ -180,12 +180,12 @@ export default function Privacy() {
                       'Supabase e bancos similares devem manter RLS habilitado em tabelas privadas, com politicas por usuário, papel, equipe, dono, relacionamento e finalidade.',
                       'Service-role keys, secrets, tokens e variaveis sensíveis nunca devem ser expostos ao navegador, app cliente, logs ou screenshots.',
                       'Dados privados em portal, API ou app devem usar Cache-Control: no-store ou cache segmentado por usuário e inválido em logout, troca de papel, atualização sensivel ou revogação.',
-                      'Login, cadastro, redefinicao de senha, convite, MFA, upload, exportacao, pagamento, webhook, mensagens, IA, e-mail, SMS, API e outras rotas caras ou sujeitas a abuso devem ter limites de taxa, quotas, filas, desafios, bloqueios temporarios ou suspensao conforme o risco.',
+                      'Login, cadastro, redefinicao de senha, convite, MFA, upload, exportação, pagamento, webhook, mensagens, IA, e-mail, SMS, API e outras rotas caras ou sujeitas a abuso devem ter limites de taxa, quotas, filas, desafios, bloqueios temporarios ou suspensao conforme o risco.',
                       'Logs, traces de IA, analytics, ferramentas de suporte, dumps, relatórios e screenshots devem ser scrubbed ou mascarados antes de armazenamento, revisao ou compartilhamento.',
                       'Mensagens de erro de login devem ser genericas e não revelar qual credencial falhou nem se uma conta existe.',
-                      'Testes de seguranca, revisoes de RLS, verificacao de buckets, checagem de cache, varredura de segredos e validacao de permissao devem ocorrer antes de lancamentos e em ciclos recorrentes.',
+                      'Testes de segurança, revisoes de RLS, verificação de buckets, checagem de cache, varredura de segredos e validação de permissao devem ocorrer antes de lancamentos e em ciclos recorrentes.',
                     ]
-              : isEs ? ['Supabase y bases de datos similares deben mantener RLS activo en las tablas privadas, con políticas por usuario, rol, equipo, propietario, relación y finalidad.', 'Las claves de rol de servicio, los secretos, los tokens y las variables sensibles nunca deben exponerse al navegador, la aplicación cliente, los registros ni las capturas de pantalla.', 'Los datos privados del portal, la API o la aplicación deben usar Cache-Control: no-store o caché segmentada por usuario, e invalidarse al cerrar sesión, cambiar de rol, actualizar datos sensibles o revocar accesos.', 'El inicio de sesión, el registro, el restablecimiento de contraseña, las invitaciones, la MFA, las subidas, las exportaciones, los pagos, los webhooks, la mensajería, la IA, el correo, los SMS, la API y otras rutas costosas o propensas a abuso deben tener límites de tasa, cuotas, colas, desafíos, bloqueos temporales o suspensión según el riesgo.', 'Los registros, las trazas de IA, la analítica, las herramientas de soporte, los volcados, los informes y las capturas de pantalla deben depurarse o enmascararse antes de almacenarse, revisarse o compartirse.', 'Los mensajes de error de inicio de sesión deben ser genéricos y no deben revelar qué credencial falló ni si existe una cuenta.', 'Las pruebas de seguridad, la revisión de RLS, la verificación de buckets, los controles de caché, el escaneo de secretos y la validación de permisos deben realizarse antes de cada lanzamiento y de forma periódica.']
+              : isEs ? ['Supabase y bases de datos similares deben mantener RLS activo en las tablas privadas, con políticas por usuário, rol, equipo, propietario, relación y finalidad.', 'Las claves de rol de servicio, los secretos, los tokens y las variables sensibles nunca deben exponerse al navegador, la aplicación cliente, los registros ni las capturas de pantalla.', 'Los datos privados del portal, la API o la aplicación deben usar Cache-Control: no-store o caché segmentada por usuário, e invalidarse al cerrar sesión, cambiar de rol, actualizar datos sensibles o revocar accesos.', 'El inicio de sesión, el registro, el restablecimiento de contraseña, las invitaciones, la MFA, las subidas, las exportaciones, los pagos, los webhooks, la mensajería, la IA, el correo, los SMS, la API y otras rutas costosas o propensas a abuso deben tener límites de tasa, cuotas, colas, desafíos, bloqueos temporales o suspensión según el riesgo.', 'Los registros, las trazas de IA, la analítica, las herramientas de soporte, los volcados, los informes y las capturas de pantalla deben depurarse o enmascararse antes de almacenarse, revisarse o compartirse.', 'Los mensajes de error de inicio de sesión deben ser genéricos y no deben revelar qué credencial falló ni si existe una cuenta.', 'Las pruebas de seguridad, la revisión de RLS, la verificación de buckets, los controles de caché, el escaneo de secretos y la validación de permisos deben realizarse antes de cada lanzamiento y de forma periódica.']
               : [
                       'Supabase and similar databases must keep RLS enabled on private tables, with policies by user, role, team, owner, relationship, and purpose.',
                       'Service-role keys, secrets, tokens, and sensitive variables must never be exposed to the browser, client app, logs, or screenshots.',
@@ -202,14 +202,14 @@ export default function Privacy() {
           <Section title={isPt ? '7. Retenção, exclusão e direitos LGPD' : isEs ? '7. Conservación, eliminación y derechos LGPD' : '7. Retention, Deletion, and LGPD Rights'}>
             <p>
               {isPt
-                ? 'Retemos dados pelo tempo necessario para fornecer o serviço, cumprir leis, resolver disputas, prevenir fraude, manter registros fiscais, preservar seguranca e respeitar obrigações profissionais. Depois, dados devem ser excluidos, anonimizados ou arquivados com acesso restrito.' : isEs ? 'Conservamos los datos mientras sean necesarios para prestar el servicio, cumplir la ley, resolver controversias, prevenir fraude, mantener registros fiscales, preservar la seguridad y respetar obligaciones profesionales. Después, los datos deben eliminarse, anonimizarse o archivarse con acceso restringido.' : 'We retain data as long as needed to provide the service, comply with law, resolve disputes, prevent fraud, maintain tax records, preserve security, and respect professional obligations. After that, data should be deleted, anonymized, or archived with restricted access.'}
+                ? 'Retemos dados pelo tempo necessario para fornecer o serviço, cumprir leis, resolver disputas, prevenir fraude, manter registros fiscais, preservar segurança e respeitar obrigações profissionais. Depois, dados devem ser excluidos, anonimizados ou arquivados com acesso restrito.' : isEs ? 'Conservamos los datos mientras sean necesarios para prestar el servicio, cumplir la ley, resolver controversias, prevenir fraude, mantener registros fiscales, preservar la seguridad y respetar obligaciones profesionales. Después, los datos deben eliminarse, anonimizarse o archivarse con acceso restringido.' : 'We retain data as long as needed to provide the service, comply with law, resolve disputes, prevent fraud, maintain tax records, preserve security, and respect professional obligations. After that, data should be deleted, anonymized, or archived with restricted access.'}
             </p>
             <BulletList
               items={
                 isPt
                   ? [
                       'Você pode solicitar confirmação de tratamento, acesso, correção, anonimização, bloqueio, exclusão, portabilidade, informação sobre compartilhamento, revisao de decisoes automatizadas e revogação de consentimento.',
-                      'Exclusão de conta e dados pode ser limitada por retenções legais, fiscais, antifraude, seguranca, chargeback, disputa, auditoria e registros profissionais.',
+                      'Exclusão de conta e dados pode ser limitada por retenções legais, fiscais, antifraude, segurança, chargeback, disputa, auditoria e registros profissionais.',
                       `Para exercer direitos, contate ${profile.privacyEmail}. Você também pode apresentar reclamação a ANPD.`,
                     ]
               : isEs ? ['Puedes solicitar confirmación del tratamiento, acceso, corrección, anonimización, bloqueo, eliminación, portabilidad, información sobre la compartición, revisión de decisiones automatizadas y revocación del consentimiento.', 'La eliminación de la cuenta y de los datos puede estar limitada por la conservación exigida por motivos legales, fiscales, antifraude, de seguridad, de contracargos, de controversias, de auditoría y de registros profesionales.']
@@ -222,16 +222,16 @@ export default function Privacy() {
             />
           </Section>
 
-          <Section title={isPt ? '8. Cookies, permissoes de app e transferencias internacionais' : isEs ? '8. Cookies, permisos de la aplicación y transferencias internacionales' : '8. Cookies, App Permissions, and International Transfers'}>
+          <Section title={isPt ? '8. Cookies, permissões de app e transferências internacionais' : isEs ? '8. Cookies, permisos de la aplicación y transferências internacionales' : '8. Cookies, App Permissions, and International Transfers'}>
             <BulletList
               items={
                 isPt
                   ? [
-                      'Cookies essenciais operam login, seguranca, preferencia e funcionalidade. Cookies opcionais de analytics, marketing ou personalizacao devem respeitar consentimento quando exigido.',
-                      'Permissoes de app como camera, microfone, fotos, arquivos, notificações, localização e biometria sao solicitadas no contexto da funcionalidade e podem ser controladas no dispositivo.',
-                      'Dados podem ser processados fora do Brasil por provedores de nuvem e infraestrutura. Usamos contratos, controles de acesso e medidas tecnicas para proteger transferencias internacionais.',
+                      'Cookies essenciais operam login, segurança, preferência e funcionalidade. Cookies opcionais de analytics, marketing ou personalização devem respeitar consentimento quando exigido.',
+                      'Permissões de app como camera, microfone, fotos, arquivos, notificações, localização e biometria sao solicitadas no contexto da funcionalidade e podem ser controladas no dispositivo.',
+                      'Dados podem ser processados fora do Brasil por provedores de nuvem e infraestrutura. Usamos contratos, controles de acesso e medidas técnicas para proteger transferências internacionais.',
                     ]
-              : isEs ? ['Las cookies esenciales hacen funcionar el inicio de sesión, la seguridad, las preferencias y la funcionalidad. Las cookies opcionales de analítica, marketing o personalización deben respetar el consentimiento cuando se exija.', 'Los permisos de la aplicación como cámara, micrófono, fotos, archivos, notificaciones, ubicación y biometría se solicitan en contexto y pueden controlarse desde el dispositivo.', 'Los datos pueden tratarse fuera de Brasil por proveedores de nube e infraestructura. Usamos contratos, controles de acceso y medidas técnicas para proteger las transferencias internacionales.']
+              : isEs ? ['Las cookies esenciales hacen funcionar el inicio de sesión, la seguridad, las preferências y la funcionalidad. Las cookies opcionales de analítica, marketing o personalización deben respetar el consentimiento cuando se exija.', 'Los permisos de la aplicación como cámara, micrófono, fotos, archivos, notificaciones, ubicación y biometría se solicitan en contexto y pueden controlarse desde el dispositivo.', 'Los datos pueden tratarse fuera de Brasil por proveedores de nube e infraestructura. Usamos contratos, controles de acceso y medidas técnicas para proteger las transferências internacionales.']
               : [
                       'Essential cookies operate login, security, preference, and functionality. Optional analytics, marketing, or personalization cookies must respect consent where required.',
                       'App permissions such as camera, microphone, photos, files, notifications, location, and biometrics are requested in context and may be controlled on the device.',
@@ -244,7 +244,7 @@ export default function Privacy() {
           <Section title={isPt ? '9. Incidentes e contato' : isEs ? '9. Incidentes y contacto' : '9. Incidents and Contact'}>
             <p>
               {isPt
-                ? 'Se identificarmos incidente de seguranca com risco relevante a dados pessoais, avaliaremos impacto, conteremos o evento, registraremos evidencias, comunicaremos autoridades e titulares quando exigido, e ajustaremos controles para reduzir recorrência.' : isEs ? 'Si identificamos un incidente de seguridad con riesgo relevante para los datos personales, evaluamos el impacto, contenemos el evento, preservamos la evidencia, notificamos a las autoridades y a los titulares cuando corresponde, y ajustamos los controles para reducir la reincidencia.' : 'If we identify a security incident with relevant risk to personal data, we assess impact, contain the event, preserve evidence, notify authorities and data subjects where required, and adjust controls to reduce recurrence.'}
+                ? 'Se identificarmos incidente de segurança com risco relevante a dados pessoais, avaliaremos impacto, conteremos o evento, registraremos evidências, comunicaremos autoridades e titulares quando exigido, e ajustaremos controles para reduzir recorrência.' : isEs ? 'Si identificamos un incidente de seguridad con riesgo relevante para los datos personales, evaluamos el impacto, contenemos el evento, preservamos la evidência, notificamos a las autoridades y a los titulares cuando corresponde, y ajustamos los controles para reducir la reincidência.' : 'If we identify a security incident with relevant risk to personal data, we assess impact, contain the event, preserve evidence, notify authorities and data subjects where required, and adjust controls to reduce recurrence.'}
             </p>
             <BulletList
               items={

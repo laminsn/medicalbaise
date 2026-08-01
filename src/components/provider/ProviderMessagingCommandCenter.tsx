@@ -187,7 +187,7 @@ const MESSAGING_COPY = {
     name: 'Nombre',
     namePlaceholder: 'Confirmación de reserva',
     type: 'Tipo',
-    audience: 'Audiencia',
+    audience: 'Audiência',
     primaryChannel: 'Canal principal',
     clients: 'Clientes',
     leads: 'Prospectos',
@@ -229,7 +229,7 @@ const MESSAGING_COPY = {
       },
       cancellation: {
         title: 'Atualização de cancelamento',
-        purpose: 'Gerencia trabalhos cancelados ou reagendados sem perder o registro do cliente.',
+        purpose: 'Gerência trabalhos cancelados ou reagendados sem perder o registro do cliente.',
         body: 'Este serviço foi cancelado ou precisa ser reagendado. Use o portal Baise para escolher o próximo passo e manter o registro completo.',
       },
       follow_up: {
@@ -245,7 +245,7 @@ const MESSAGING_COPY = {
       review_request: {
         title: 'Pedido de avaliação',
         purpose: 'Pede uma avaliação verificada ligada ao histórico real do serviço.',
-        body: 'Obrigado por usar nosso serviço. Deixe uma avaliação verificada no Baise para que futuros clientes possam reservar com confianca.',
+        body: 'Obrigado por usar nosso serviço. Deixe uma avaliação verificada no Baise para que futuros clientes possam reservar com confiança.',
       },
       coupon: {
         title: 'Cupom ou oferta',

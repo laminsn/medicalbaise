@@ -64,7 +64,7 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
   sebraeWhatsappServices: {
     key: 'sebraeWhatsappServices',
     label: 'WhatsApp is the main communication channel for 80% of service businesses',
-    publisher: 'Agencia Sebrae de Noticias',
+    publisher: 'Agência Sebrae de Noticias',
     url: 'https://agenciasebrae.com.br/cultura-empreendedora/whatsapp-e-o-principal-meio-de-comunicação-para-80-dos-negócios-de-serviço/',
   },
   sebraePaidAds: {
@@ -95,7 +95,7 @@ export const BLOG_SOURCES: Record<string, BlogSource> = {
     key: 'medicalDemographics2025',
     label: 'Medical Demography in Brazil 2025',
     publisher: 'FMUSP, Ministry of Health, AMB',
-    url: 'https://www.fm.usp.br/fmusp/noticias/ministerio-da-saúde-fmusp-e-amb-lancam-a-demografia-medica-no-brasil-2025',
+    url: 'https://www.fm.usp.br/fmusp/noticias/ministerio-da-saúde-fmusp-e-amb-lancam-a-demografia-médica-no-brasil-2025',
   },
   ansSectorData2026: {
     key: 'ansSectorData2026',

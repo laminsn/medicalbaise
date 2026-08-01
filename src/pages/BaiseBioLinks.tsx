@@ -95,7 +95,7 @@ const appLanes: AppLane[] = [
     name: "Medical Baise",
     label: {
       en: "Find or offer trusted medical support",
-      pt: "Encontre ou ofereça suporte medico confiavel",
+      pt: "Encontre ou ofereça suporte médico confiavel",
     },
     description: {
       en: "Medical professionals, care navigation, appointment records, follow-ups, and secure history.",
@@ -103,7 +103,7 @@ const appLanes: AppLane[] = [
     },
     forProviders: {
       en: "Register to support patients with clearer communication, records, and follow-up workflows.",
-      pt: "Cadastre-se para apoiar pacientes com comunicacao, registros e acompanhamentos claros.",
+      pt: "Cadastre-se para apoiar pacientes com comunicação, registros e acompanhamentos claros.",
     },
     color: "#00b8d4",
     domain: "https://www.mdbaise.com",
@@ -166,10 +166,10 @@ const copy = {
   pt: {
     languageLabel: "Idioma",
     eyebrow: "Hub social Baise",
-    title: "Escolha o app Baise certo e cadastre-se onde confianca importa.",
+    title: "Escolha o app Baise certo e cadastre-se onde confiança importa.",
     subtitle:
       "Um link para Casa, Medical e Legal Baise. Quem precisa de serviços encontra suporte confiavel. Prestadores se cadastram para crescer com ferramentas, registros e visibilidade.",
-    trustLine: "Tres apps. Um padrão Baise para confianca, prova, pagamentos, registros e suporte.",
+    trustLine: "Tres apps. Um padrão Baise para confiança, prova, pagamentos, registros e suporte.",
     chooseApp: "Cadastre-se no app certo",
     providers: "Recursos para prestadores",
     users: "Soluções para quem precisa de serviços",
@@ -179,7 +179,7 @@ const copy = {
     providerResourceTitle: "Recursos de crescimento para prestadores",
     providerResourceDescription: "Marketing, faturas, avaliações, campanhas, pagamentos e operação de clientes.",
     userResourceTitle: "Guias para usuários de serviços",
-    userResourceDescription: "Como escolher, verificar, pagar, guardar registros e evitar experiencias confusas.",
+    userResourceDescription: "Como escolher, verificar, pagar, guardar registros e evitar experiências confusas.",
     promotionTitle: "Promocao premium atual",
     promotionDescription: "Give a month, get a month para indicações premium elegiveis.",
     portalTitle: "Entrar no portal",

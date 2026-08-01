@@ -373,7 +373,7 @@ export function LiveBroadcastDialog({
             </DialogTitle>
             <DialogDescription>
               {isStreaming 
-                ? tx('Broadcasting to your audience', 'Transmitindo para sua audiência', 'Transmitiendo para tu audiencia')
+                ? tx('Broadcasting to your audience', 'Transmitindo para sua audiência', 'Transmitiendo para tu audiência')
                 : tx('Start a live video stream for your followers', 'Inicie uma transmissão ao vivo para seus seguidores', 'Inicia una transmisión en vivo para tus seguidores')
               }
             </DialogDescription>

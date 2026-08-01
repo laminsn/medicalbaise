@@ -17,7 +17,7 @@ const TRUST_COPY = {
     eyebrow: 'Descubrimiento social de proveedores',
     title: 'Pública historias, transmite en vivo y presenta tus servicios de forma auténtica a quienes llegaron para descubrir y conocer proveedores.',
     subtitle: 'MD Baise reúne contenido social creado por proveedores con solicitudes de citas, relaciones con clientes y facturas, sin tratar las publicaciones públicas como asesoramiento médico.',
-    spotlight: 'Herramientas para una presencia auténtica',
+    spotlight: 'Herramientas para una presência auténtica',
     guidance: 'Muestra tu enfoque, espacio de trabajo, disponibilidad y novedades. No publiques datos privados de salud.',
     social: 'Historias y video en vivo',
     operations: 'Citas y CRM',

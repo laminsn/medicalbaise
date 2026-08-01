@@ -222,7 +222,7 @@ const PAYMENT_COPY = {
     serviceDescription: 'Descripción del servicio',
     servicePlaceholder: 'Alcance, entregables, puntos de inspección o detalles del servicio recurrente',
     planType: 'Tipo de plan',
-    cadence: 'Frecuencia',
+    cadence: 'Frecuência',
     total: 'Total',
     deposit: 'Deposito',
     payments: 'Pagos',

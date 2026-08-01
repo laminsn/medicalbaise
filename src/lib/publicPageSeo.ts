@@ -114,7 +114,7 @@ export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppK
     }),
     es: (app) => ({
       title: `Campaña de Influencers en Brasil | ${BRAND_SEO[app].name}`,
-      description: `Postúlate para ser influencer de ${BRAND_SEO[app].name} en Brasil. Influencers y creadores aprobados ganan R$150 por publicación aprobada, bono viral, comisiones rastreadas y ayudan a su audiencia a encontrar ${appAudience[app].es}.`,
+      description: `Postúlate para ser influencer de ${BRAND_SEO[app].name} en Brasil. Influencers y creadores aprobados ganan R$150 por publicación aprobada, bono viral, comisiones rastreadas y ayudan a su audiência a encontrar ${appAudience[app].es}.`,
       imageAlt: `Vista previa de la campaña de influencers de ${BRAND_SEO[app].name} con pagos y comisiones rastreadas.`,
     }),
   },
@@ -131,7 +131,7 @@ export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppK
     }),
     es: (app) => ({
       title: `Solicitud de Influencer Socio | ${BRAND_SEO[app].name}`,
-      description: `Completa tu solicitud como influencer socio de ${BRAND_SEO[app].name} con plataformas, seguidores, audiencia, encaje de campaña y datos de pago.`,
+      description: `Completa tu solicitud como influencer socio de ${BRAND_SEO[app].name} con plataformas, seguidores, audiência, encaje de campaña y datos de pago.`,
       imageAlt: `Vista previa de la solicitud de influencer socio de ${BRAND_SEO[app].name}.`,
     }),
   },
