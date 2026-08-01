@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -96,6 +97,7 @@ export function AppointmentCalendar({
   consultationDuration,
   teleconsultationAvailable,
 }: Props) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const { startConversation } = useStartConversation();
@@ -278,7 +280,7 @@ export function AppointmentCalendar({
         .insert({
           user_id: user.id,
           provider_id: doctorId,
-          title: 'Private medical appointment',
+          title: t('tools.privateMedicalAppointment', "Private medical appointment"),
           category_id: 'medical-care',
           status: 'scheduled',
           preferred_datetime: scheduledAt.toISOString(),
@@ -352,8 +354,8 @@ export function AppointmentCalendar({
             <CheckCircle2 className="h-10 w-10 text-green-500" />
           </div>
           <div>
-            <h3 className="text-xl font-bold">Appointment Confirmed</h3>
-            <p className="text-muted-foreground mt-1">Your booking has been sent to the doctor.</p>
+            <h3 className="text-xl font-bold">{t('tools.appointmentConfirmed', "Appointment Confirmed")}</h3>
+            <p className="text-muted-foreground mt-1">{t('tools.yourBookingHasBeenSent', "Your booking has been sent to the doctor.")}</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-5 w-full max-w-sm text-left space-y-3">
             <div className="flex items-center gap-3">
@@ -390,12 +392,8 @@ export function AppointmentCalendar({
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={handleAddToCalendar} className="gap-2">
-              <Calendar className="h-4 w-4" />
-              Add to Calendar
-            </Button>
-            <Button onClick={() => navigate(`/chat/${confirmed.conversationId}`)}>
-              View in Chat
-            </Button>
+              <Calendar className="h-4 w-4" />{t('tools.addToCalendar', "Add to Calendar")}</Button>
+            <Button onClick={() => navigate(`/chat/${confirmed.conversationId}`)}>{t('tools.viewInChat', "View in Chat")}</Button>
           </div>
         </div>
       </div>
@@ -407,9 +405,7 @@ export function AppointmentCalendar({
       {/* Date strip */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Select Date
-          </h4>
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('tools.selectDate', "Select Date")}</h4>
           <div className="flex gap-1">
             <Button
               variant="ghost"
@@ -472,9 +468,7 @@ export function AppointmentCalendar({
             Available Times — {formatDateLabel(selectedDate)}
           </h4>
           {availableSlots.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              No available slots for this day. Please choose another date.
-            </p>
+            <p className="text-sm text-muted-foreground py-4">{t('tools.noAvailableSlotsForThis', "No available slots for this day. Please choose another date.")}</p>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
               {availableSlots.map((slot) => (
@@ -500,13 +494,11 @@ export function AppointmentCalendar({
       {selectedDate && selectedSlot && (
         <div className="space-y-4 border border-border rounded-xl p-4 bg-card">
           <h4 className="font-semibold text-base flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-primary" />
-            Confirm Appointment
-          </h4>
+            <CheckCircle2 className="h-4 w-4 text-primary" />{t('tools.confirmAppointment', "Confirm Appointment")}</h4>
 
           {/* Appointment type */}
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Appointment type</p>
+            <p className="text-sm text-muted-foreground mb-2">{t('tools.appointmentType', "Appointment type")}</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setAppointmentType('in_person')}
@@ -517,9 +509,7 @@ export function AppointmentCalendar({
                     : 'border-border bg-background hover:border-primary/50',
                 ].join(' ')}
               >
-                <MapPin className="h-4 w-4" />
-                In-person
-              </button>
+                <MapPin className="h-4 w-4" />{t('tools.inPerson', "In-person")}</button>
               {teleconsultationAvailable && (
                 <button
                   onClick={() => setAppointmentType('teleconsult')}
@@ -530,9 +520,7 @@ export function AppointmentCalendar({
                       : 'border-border bg-background hover:border-primary/50',
                   ].join(' ')}
                 >
-                  <Video className="h-4 w-4" />
-                  Teleconsultation
-                </button>
+                  <Video className="h-4 w-4" />{t('tools.teleconsultation', "Teleconsultation")}</button>
               )}
             </div>
           </div>
@@ -545,7 +533,7 @@ export function AppointmentCalendar({
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Describe your symptoms or reason for the visit…"
+              placeholder={t('tools.describeYourSymptomsOrReason', "Describe your symptoms or reason for the visit…")}
               rows={3}
             />
           </div>
@@ -553,9 +541,7 @@ export function AppointmentCalendar({
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-start justify-between gap-4">
               <Label htmlFor="booking-appointment-communications" className="cursor-pointer">
-                <span className="block text-sm font-medium">
-                  Appointment confirmations and reminders
-                </span>
+                <span className="block text-sm font-medium">{t('tools.appointmentConfirmationsAndReminders', "Appointment confirmations and reminders")}</span>
                 <span className="mt-1 block text-xs font-normal leading-relaxed text-muted-foreground">
                   I agree to receive generic appointment confirmations, the default 24-hour and
                   1-hour reminders, follow-ups, and thank-you messages. Medical details stay in
@@ -568,9 +554,7 @@ export function AppointmentCalendar({
                 onCheckedChange={setAppointmentCommunications}
               />
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-              Review requests remain off unless you separately enable optional reviews in Settings.
-            </p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t('tools.reviewRequestsRemainOffUnless', "Review requests remain off unless you separately enable optional reviews in Settings.")}</p>
           </div>
 
           {/* Summary */}
@@ -600,21 +584,15 @@ export function AppointmentCalendar({
           <Button className="w-full gap-2" onClick={handleConfirm} disabled={submitting || !user}>
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Confirming…
-              </>
+                <Loader2 className="h-4 w-4 animate-spin" />{t('tools.confirming', "Confirming…")}</>
             ) : (
               <>
-                <CheckCircle2 className="h-4 w-4" />
-                Confirm Booking
-              </>
+                <CheckCircle2 className="h-4 w-4" />{t('tools.confirmBooking', "Confirm Booking")}</>
             )}
           </Button>
 
           {!user && (
-            <p className="text-xs text-center text-muted-foreground">
-              You need to be logged in to book an appointment.
-            </p>
+            <p className="text-xs text-center text-muted-foreground">{t('tools.youNeedToBeLogged', "You need to be logged in to book an appointment.")}</p>
           )}
         </div>
       )}

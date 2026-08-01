@@ -3030,5 +3030,24 @@
     "recommendedNextReads": "Recommended next reads",
     "keepBuildingClarity": "Keep building clarity",
     "browseAllGuides": "Browse all guides"
+  },
+  "tools": {
+    "describeYourSymptomsOrReason": "Describe your symptoms or reason for the visit…",
+    "privateMedicalAppointment": "Private medical appointment",
+    "appointmentConfirmed": "Appointment Confirmed",
+    "yourBookingHasBeenSent": "Your booking has been sent to the doctor.",
+    "addToCalendar": "Add to Calendar",
+    "viewInChat": "View in Chat",
+    "selectDate": "Select Date",
+    "noAvailableSlotsForThis": "No available slots for this day. Please choose another date.",
+    "confirmAppointment": "Confirm Appointment",
+    "appointmentType": "Appointment type",
+    "inPerson": "In-person",
+    "teleconsultation": "Teleconsultation",
+    "appointmentConfirmationsAndReminders": "Appointment confirmations and reminders",
+    "reviewRequestsRemainOffUnless": "Review requests remain off unless you separately enable optional reviews in Settings.",
+    "confirming": "Confirming…",
+    "confirmBooking": "Confirm Booking",
+    "youNeedToBeLogged": "You need to be logged in to book an appointment."
   }
 }

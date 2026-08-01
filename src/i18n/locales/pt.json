@@ -3030,5 +3030,24 @@
     "recommendedNextReads": "Próximas leituras recomendadas",
     "keepBuildingClarity": "Continue construindo clareza",
     "browseAllGuides": "Ver todos os guias"
+  },
+  "tools": {
+    "describeYourSymptomsOrReason": "Descreva seus sintomas ou o motivo da consulta…",
+    "privateMedicalAppointment": "Consulta médica particular",
+    "appointmentConfirmed": "Consulta confirmada",
+    "yourBookingHasBeenSent": "Seu agendamento foi enviado ao médico.",
+    "addToCalendar": "Adicionar ao calendário",
+    "viewInChat": "Ver na conversa",
+    "selectDate": "Escolher data",
+    "noAvailableSlotsForThis": "Nenhum horário disponível neste dia. Escolha outra data.",
+    "confirmAppointment": "Confirmar consulta",
+    "appointmentType": "Tipo de consulta",
+    "inPerson": "Presencial",
+    "teleconsultation": "Teleconsulta",
+    "appointmentConfirmationsAndReminders": "Confirmações e lembretes de consulta",
+    "reviewRequestsRemainOffUnless": "Os pedidos de avaliação ficam desativados a menos que você habilite as avaliações opcionais nas Configurações.",
+    "confirming": "Confirmando…",
+    "confirmBooking": "Confirmar agendamento",
+    "youNeedToBeLogged": "Você precisa estar logado para agendar uma consulta."
   }
 }
