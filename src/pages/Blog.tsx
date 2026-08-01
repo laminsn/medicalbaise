@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, BookOpen, Briefcase, Filter, Search, ShieldCheck, Users } from 'lucide-react';
@@ -12,18 +13,18 @@ import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
 const brandCopy = {
   casa: {
     name: 'Casa Baise',
-    title: 'Casa Baise Learning Library',
-    description: 'Educational guides for trusted home, property, and service support in Brazil.',
+    title: t('pageCopy.casaBaiseLearningLibrary', "Casa Baise Learning Library"),
+    description: t('pageCopy.educationalGuidesForTrustedHome', "Educational guides for trusted home, property, and service support in Brazil."),
   },
   legal: {
     name: 'Legal Baise',
-    title: 'Legal Baise Learning Library',
-    description: 'Educational guides for trusted legal, business, property, and service support in Brazil.',
+    title: t('pageCopy.legalBaiseLearningLibrary', "Legal Baise Learning Library"),
+    description: t('pageCopy.educationalGuidesForTrustedLegal', "Educational guides for trusted legal, business, property, and service support in Brazil."),
   },
   medical: {
     name: 'MD Baise',
-    title: 'MD Baise Learning Library',
-    description: 'Educational guides for trusted medical, wellness, and care support in Brazil.',
+    title: t('pageCopy.mdBaiseLearningLibrary', "MD Baise Learning Library"),
+    description: t('pageCopy.educationalGuidesForTrustedMedical', "Educational guides for trusted medical, wellness, and care support in Brazil."),
   },
 } as const;
 
@@ -82,9 +83,7 @@ const Blog = () => {
             <Badge className="mb-5 border-white/20 bg-white/10 text-white hover:bg-white/10">
               108 educational articles
             </Badge>
-            <h1 className="max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
-              Practical Baise guides for better providers and smarter service decisions.
-            </h1>
+            <h1 className="max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">{t('pageCopy.practicalBaiseGuidesForBetter', "Practical Baise guides for better providers and smarter service decisions.")}</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-white/75">
               A client-facing and provider-facing content library built around the way people actually search, compare,
               book, pay, document, review, and return for services in Brazil.
@@ -106,12 +105,9 @@ const Blog = () => {
           </div>
 
           <aside className="rounded-lg border border-white/15 bg-white/10 p-5 backdrop-blur">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Content mix</p>
-            <p className="mt-3 text-2xl font-semibold">Helpful first. Trust-building always.</p>
-            <p className="mt-3 text-sm leading-6 text-white/70">
-              The format follows the established education pattern: useful story, practical lessons, platform workflow,
-              supporting data, resources, and one clear next step.
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">{t('pageCopy.contentMix', "Content mix")}</p>
+            <p className="mt-3 text-2xl font-semibold">{t('pageCopy.helpfulFirstTrustBuildingAlways', "Helpful first. Trust-building always.")}</p>
+            <p className="mt-3 text-sm leading-6 text-white/70">{t('pageCopy.theFormatFollowsTheEstablished', "The format follows the established education pattern: useful story, practical lessons, platform workflow, supporting data, resources, and one clear next step.")}</p>
             <div className="mt-6 space-y-4">
               {BLOG_CONTENT_RATIO.map((item) => (
                 <div key={item.label}>
@@ -137,7 +133,7 @@ const Blog = () => {
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search by topic, niche, client need, campaign, invoice, doctor, lawyer..."
+                placeholder={t('pageCopy.searchByTopicNicheClient', "Search by topic, niche, client need, campaign, invoice, doctor, lawyer...")}
                 className="h-12 pl-11"
               />
             </div>
@@ -178,7 +174,7 @@ const Blog = () => {
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Showing {filteredPosts.length} articles</p>
-                <h2 className="text-2xl font-bold text-foreground">Education that turns searches into better decisions</h2>
+                <h2 className="text-2xl font-bold text-foreground">{t('pageCopy.educationThatTurnsSearchesInto', "Education that turns searches into better decisions")}</h2>
               </div>
             </div>
 
@@ -205,9 +201,7 @@ const Blog = () => {
                       {post.audience === 'provider' ? <Briefcase className="h-4 w-4" /> : <Users className="h-4 w-4" />}
                       <span>{post.readTime}</span>
                     </div>
-                    <Link to={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                      Read guide
-                      <ArrowRight className="h-4 w-4" />
+                    <Link to={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-sm font-semibold text-primary">{t('pageCopy.readGuide', "Read guide")}<ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
                 </article>
@@ -218,17 +212,14 @@ const Blog = () => {
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-lg border bg-card p-5 shadow-sm">
               <ShieldCheck className="h-8 w-8 text-primary" />
-              <h2 className="mt-4 text-xl font-bold">Turn learning into action.</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Providers can build campaigns, quotes, invoices, payments, reviews, and records. Clients can find trusted
-                help, compare proof, pay securely, and keep service history in one place.
-              </p>
+              <h2 className="mt-4 text-xl font-bold">{t('pageCopy.turnLearningIntoAction', "Turn learning into action.")}</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{t('pageCopy.providersCanBuildCampaignsQuotes', "Providers can build campaigns, quotes, invoices, payments, reviews, and records. Clients can find trusted help, compare proof, pay securely, and keep service history in one place.")}</p>
               <div className="mt-5 grid gap-3">
                 <Button asChild className="w-full">
-                  <Link to="/browse">Find trusted help</Link>
+                  <Link to="/browse">{t('pageCopy.findTrustedHelp', "Find trusted help")}</Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full">
-                  <Link to="/provider-dashboard">Provider dashboard</Link>
+                  <Link to="/provider-dashboard">{t('pageCopy.providerDashboard', "Provider dashboard")}</Link>
                 </Button>
                 <Button asChild variant="ghost" className="w-full">
                   {/* Medical mounts its learning centre (Learn.tsx) at /help.
