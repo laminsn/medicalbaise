@@ -1,7 +1,35 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
+
+/**
+ * These hooks fire toasts during core provider flows -- approving work,
+ * scheduling visits -- and were English for every user. Local picker rather
+ * than i18n keys because the hooks carry no other translated strings.
+ */
+const L: Record<string, { pt: string; es: string }> = {
+  'Approval Failed': { pt: 'Falha na aprovação', es: 'Error en la aprobación' },
+  'Delete Failed': { pt: 'Falha ao remover', es: 'Error al eliminar' },
+  'Media Deleted': { pt: 'Registro removido', es: 'Registro eliminado' },
+  'Media Uploaded': { pt: 'Registro enviado', es: 'Registro subido' },
+  'Rejection Failed': { pt: 'Falha ao solicitar ajustes', es: 'Error al solicitar cambios' },
+  'Upload Failed': { pt: 'Falha no envio', es: 'Error al subir' },
+  'Work Approved': { pt: 'Trabalho aprovado', es: 'Trabajo aprobado' },
+  'Work Rejected': { pt: 'Ajustes solicitados', es: 'Cambios solicitados' },
+  'Work media has been removed.': { pt: 'O registro do trabalho foi removido.', es: 'El registro del trabajo se eliminó.' },
+  'Work media has been uploaded for customer approval.': { pt: 'O registro do trabalho foi enviado para aprovação do cliente.', es: 'El registro del trabajo se envió para aprobación del cliente.' },
+  'You have approved this work.': { pt: 'Você aprovou este trabalho.', es: 'Has aprobado este trabajo.' },
+  'You have requested changes to this work.': { pt: 'Você solicitou ajustes neste trabalho.', es: 'Has solicitado cambios en este trabajo.' },
+};
+const say = (en: string, lang?: string) => {
+  const e = L[en];
+  if (!e) return en;
+  const l = (lang || '').toLowerCase();
+  return l.startsWith('pt') ? e.pt : l.startsWith('es') ? e.es : en;
+};
+
 
 export interface WorkApprovalMedia {
   id: string;
@@ -20,6 +48,7 @@ export interface WorkApprovalMedia {
 }
 
 export function useWorkApproval(activeJobId?: string) {
+  const { i18n } = useTranslation();
   const [media, setMedia] = useState<WorkApprovalMedia[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -144,8 +173,8 @@ export function useWorkApproval(activeJobId?: string) {
       }
 
       toast({
-        title: 'Media Uploaded',
-        description: 'Work media has been uploaded for customer approval.',
+        title: say('Media Uploaded', i18n.language),
+        description: say('Work media has been uploaded for customer approval.', i18n.language),
       });
 
       await fetchMedia();
@@ -153,7 +182,7 @@ export function useWorkApproval(activeJobId?: string) {
     } catch (error: any) {
 
       toast({
-        title: 'Upload Failed',
+        title: say('Upload Failed', i18n.language),
         description: error.message || 'Failed to upload media',
         variant: 'destructive',
       });
@@ -206,15 +235,15 @@ export function useWorkApproval(activeJobId?: string) {
       }
 
       toast({
-        title: 'Work Approved',
-        description: 'You have approved this work.',
+        title: say('Work Approved', i18n.language),
+        description: say('You have approved this work.', i18n.language),
       });
 
       await fetchMedia();
       return true;
     } catch (error: any) {
       toast({
-        title: 'Approval Failed',
+        title: say('Approval Failed', i18n.language),
         description: error.message || 'Failed to approve work',
         variant: 'destructive',
       });
@@ -266,15 +295,15 @@ export function useWorkApproval(activeJobId?: string) {
       }
 
       toast({
-        title: 'Work Rejected',
-        description: 'You have requested changes to this work.',
+        title: say('Work Rejected', i18n.language),
+        description: say('You have requested changes to this work.', i18n.language),
       });
 
       await fetchMedia();
       return true;
     } catch (error: any) {
       toast({
-        title: 'Rejection Failed',
+        title: say('Rejection Failed', i18n.language),
         description: error.message || 'Failed to reject work',
         variant: 'destructive',
       });
@@ -299,14 +328,14 @@ export function useWorkApproval(activeJobId?: string) {
       setMedia(prev => prev.filter(m => m.id !== mediaId));
       
       toast({
-        title: 'Media Deleted',
-        description: 'Work media has been removed.',
+        title: say('Media Deleted', i18n.language),
+        description: say('Work media has been removed.', i18n.language),
       });
 
       return true;
     } catch (error: any) {
       toast({
-        title: 'Delete Failed',
+        title: say('Delete Failed', i18n.language),
         description: error.message || 'Failed to delete media',
         variant: 'destructive',
       });

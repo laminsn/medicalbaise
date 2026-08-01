@@ -1,7 +1,32 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { addDays, addWeeks, addMonths, format } from 'date-fns';
+
+/**
+ * These hooks fire toasts during core provider flows -- approving work,
+ * scheduling visits -- and were English for every user. Local picker rather
+ * than i18n keys because the hooks carry no other translated strings.
+ */
+const L: Record<string, { pt: string; es: string }> = {
+  'Cancellation Failed': { pt: 'Falha ao cancelar', es: 'Error al cancelar' },
+  'Scheduling Failed': { pt: 'Falha no agendamento', es: 'Error al agendar' },
+  'Service Completed': { pt: 'Serviço concluído', es: 'Servicio completado' },
+  'Service Scheduled': { pt: 'Serviço agendado', es: 'Servicio agendado' },
+  'The service visit has been cancelled.': { pt: 'A visita do serviço foi cancelada.', es: 'La visita de servicio fue cancelada.' },
+  'The service visit has been marked as completed.': { pt: 'A visita do serviço foi marcada como concluída.', es: 'La visita de servicio se marcó como completada.' },
+  'Update Failed': { pt: 'Falha ao atualizar', es: 'Error al actualizar' },
+  'Visit Cancelled': { pt: 'Visita cancelada', es: 'Visita cancelada' },
+  'Your recurring service has been set up successfully.': { pt: 'Seu serviço recorrente foi configurado com sucesso.', es: 'Tu servicio recurrente se configuró correctamente.' },
+};
+const say = (en: string, lang?: string) => {
+  const e = L[en];
+  if (!e) return en;
+  const l = (lang || '').toLowerCase();
+  return l.startsWith('pt') ? e.pt : l.startsWith('es') ? e.es : en;
+};
+
 
 export interface ScheduledService {
   id: string;
@@ -59,6 +84,7 @@ interface CreateScheduledServiceParams {
 }
 
 export function useScheduledServices() {
+  const { i18n } = useTranslation();
   const [services, setServices] = useState<ScheduledService[]>([]);
   const [instances, setInstances] = useState<ServiceInstance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -207,8 +233,8 @@ export function useScheduledServices() {
       }
 
       toast({
-        title: 'Service Scheduled',
-        description: 'Your recurring service has been set up successfully.',
+        title: say('Service Scheduled', i18n.language),
+        description: say('Your recurring service has been set up successfully.', i18n.language),
       });
 
       await fetchServices();
@@ -216,7 +242,7 @@ export function useScheduledServices() {
     } catch (error: any) {
 
       toast({
-        title: 'Scheduling Failed',
+        title: say('Scheduling Failed', i18n.language),
         description: error.message || 'Failed to create scheduled service',
         variant: 'destructive',
       });
@@ -247,7 +273,7 @@ export function useScheduledServices() {
       return true;
     } catch (error: any) {
       toast({
-        title: 'Update Failed',
+        title: say('Update Failed', i18n.language),
         description: error.message || 'Failed to update service',
         variant: 'destructive',
       });
@@ -268,14 +294,14 @@ export function useScheduledServices() {
       if (error) throw error;
 
       toast({
-        title: 'Service Completed',
-        description: 'The service visit has been marked as completed.',
+        title: say('Service Completed', i18n.language),
+        description: say('The service visit has been marked as completed.', i18n.language),
       });
 
       return true;
     } catch (error: any) {
       toast({
-        title: 'Update Failed',
+        title: say('Update Failed', i18n.language),
         description: error.message || 'Failed to complete service',
         variant: 'destructive',
       });
@@ -297,14 +323,14 @@ export function useScheduledServices() {
       if (error) throw error;
 
       toast({
-        title: 'Visit Cancelled',
-        description: 'The service visit has been cancelled.',
+        title: say('Visit Cancelled', i18n.language),
+        description: say('The service visit has been cancelled.', i18n.language),
       });
 
       return true;
     } catch (error: any) {
       toast({
-        title: 'Cancellation Failed',
+        title: say('Cancellation Failed', i18n.language),
         description: error.message || 'Failed to cancel service',
         variant: 'destructive',
       });
