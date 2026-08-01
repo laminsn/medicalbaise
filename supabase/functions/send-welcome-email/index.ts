@@ -57,7 +57,12 @@ const APP_BRANDS = {
     domain: "legalbaise.com",
     url: "https://legalbaise.com",
     color: "#7c3aed",
-    from: "Legal Baise <support@legalbaise.com>",
+    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
+    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
+    // retry. Sending from the verified Baise domain with Legal Baise as the
+    // display name keeps this mailbox alive. Revert to
+    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
+    from: "Legal Baise <support@support.casabaise.com>",
     category: "trusted legal service providers",
   },
 } as const;
@@ -103,7 +108,7 @@ function getCopy(locale: LocaleKey, audience: Audience, brand: typeof APP_BRANDS
       return {
         subject: `Bem-vindo ao ${brand.name}`,
         heading: `${greeting}, seu espaco de prestador esta pronto`,
-        body: `Use o ${brand.name} para gerenciar solicitacoes, clientes, orcamentos, reservas, faturas, pagamentos, assinaturas, campanhas, avaliacoes, recibos e historico de servicos em um so portal.`,
+        body: `Use o ${brand.name} para gerenciar solicitações, clientes, orçamentos, reservas, faturas, pagamentos, assinaturas, campanhas, avaliações, recibos e histórico de serviços em um só portal.`,
         cta: "Abrir portal do prestador",
       };
     }
@@ -127,7 +132,7 @@ function getCopy(locale: LocaleKey, audience: Audience, brand: typeof APP_BRANDS
     return {
       subject: `Bem-vindo ao ${brand.name}`,
       heading: `${greeting}, sua conta esta pronta`,
-      body: `Use o ${brand.name} para encontrar ${brand.category}, enviar solicitacoes, acompanhar orcamentos, pagar com seguranca e manter faturas, recibos e historico de servicos em um so lugar.`,
+      body: `Use o ${brand.name} para encontrar ${brand.category}, enviar solicitações, acompanhar orçamentos, pagar com segurança e manter faturas, recibos e histórico de serviços em um só lugar.`,
       cta: "Encontrar prestadores",
     };
   }

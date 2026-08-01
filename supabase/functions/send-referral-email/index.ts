@@ -37,7 +37,12 @@ const APP_BRANDS = {
     domain: "legalbaise.com",
     url: "https://legalbaise.com",
     color: "#7c3aed",
-    from: "Legal Baise <support@legalbaise.com>",
+    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
+    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
+    // retry. Sending from the verified Baise domain with Legal Baise as the
+    // display name keeps this mailbox alive. Revert to
+    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
+    from: "Legal Baise <support@support.casabaise.com>",
   },
 } as const;
 
@@ -68,11 +73,11 @@ const safeReferralUrl = (value: string | undefined, fallback: string) => {
 function getCopy(locale: "en" | "es" | "pt", brandName: string, senderName: string) {
   if (locale === "pt") {
     return {
-      subject: `${senderName} convidou voce para ${brandName}`,
-      heading: "Encontre profissionais confiaveis ou cresca seu negocio",
-      body: `${senderName} enviou um convite para ${brandName}. Use a plataforma para encontrar prestadores verificados, gerenciar pedidos, pagamentos, faturas, recibos e historico de servicos em um so lugar.`,
+      subject: `${senderName} convidou você para ${brandName}`,
+      heading: "Encontre profissionais confiáveis ou cresca seu negócio",
+      body: `${senderName} enviou um convite para ${brandName}. Use a plataforma para encontrar prestadores verificados, gerenciar pedidos, pagamentos, faturas, recibos e histórico de serviços em um só lugar.`,
       cta: "Abrir convite",
-      footer: "Este convite foi enviado por um usuario Baise.",
+      footer: "Este convite foi enviado por um usuário Baise.",
     };
   }
 
@@ -82,7 +87,7 @@ function getCopy(locale: "en" | "es" | "pt", brandName: string, senderName: stri
       heading: "Encuentra proveedores confiables o haz crecer tu negocio",
       body: `${senderName} te envio una invitacion para ${brandName}. Usa la plataforma para encontrar proveedores verificados, gestionar solicitudes, pagos, facturas, recibos e historial de servicios en un solo lugar.`,
       cta: "Abrir invitacion",
-      footer: "Esta invitacion fue enviada por un usuario de Baise.",
+      footer: "Esta invitación fue enviada por un usuario de Baise.",
     };
   }
 

@@ -18,6 +18,8 @@ type CommunicationEvent = {
   id: string;
   provider_id: string;
   customer_id: string | null;
+  provider_calendar_event_id: string | null;
+  appointment_automation_kind: string | null;
   created_by: string;
   purpose: string;
   channel: "portal" | "email" | "whatsapp" | "push" | "sms";
@@ -64,6 +66,8 @@ const TWILIO_FROM_NUMBER = Deno.env.get("TWILIO_FROM_NUMBER");
 const TWILIO_WHATSAPP_FROM_NUMBER = Deno.env.get("TWILIO_WHATSAPP_FROM_NUMBER");
 const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN");
 const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
+const APPOINTMENT_CALLBACK_SECRET = Deno.env.get("APPOINTMENT_CALLBACK_SECRET");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 
 const APP_BRANDS = {
   casa: {
@@ -85,12 +89,16 @@ const APP_BRANDS = {
     domain: "legalbaise.com",
     url: "https://legalbaise.com",
     color: "#7c3aed",
-    from: "Legal Baise <support@legalbaise.com>",
+    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
+    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
+    // retry. Sending from the verified Baise domain with Legal Baise as the
+    // display name keeps this mailbox alive. Revert to
+    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
+    from: "Legal Baise <support@support.casabaise.com>",
   },
 } as const;
 
 const nowIso = () => new Date().toISOString();
-const dueFilter = `and(status.in.(queued,deferred,failed),or(scheduled_at.is.null,scheduled_at.lte.${nowIso()}),or(next_attempt_at.is.null,next_attempt_at.lte.${nowIso()}))`;
 
 const getBrand = (appKey?: string) => {
   if (appKey === "medical" || appKey === "legal" || appKey === "casa") return APP_BRANDS[appKey];
@@ -112,8 +120,55 @@ const normalizeSmsPhone = (phone: string) => {
 
 const normalizeWhatsAppPhone = (phone: string) => normalizeSmsPhone(phone).replace(/^\+/, "");
 
+const toHex = (bytes: ArrayBuffer) =>
+  Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
+
+const signAppointmentCallback = async (event: CommunicationEvent): Promise<string | null> => {
+  if (
+    !APPOINTMENT_CALLBACK_SECRET
+    || APPOINTMENT_CALLBACK_SECRET.length < 32
+    || !SUPABASE_URL
+    || !event.provider_calendar_event_id
+    || !event.customer_id
+    || !["confirmation", "reminder"].includes(event.appointment_automation_kind || "")
+  ) {
+    return null;
+  }
+
+  const expires = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60;
+  const payload = [
+    event.id,
+    event.provider_calendar_event_id,
+    event.customer_id,
+    String(expires),
+  ].join(".");
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(APPOINTMENT_CALLBACK_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = toHex(
+    await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload)),
+  );
+  const query = new URLSearchParams({
+    communication: event.id,
+    appointment: event.provider_calendar_event_id,
+    customer: event.customer_id,
+    expires: String(expires),
+    signature,
+  });
+  return `${SUPABASE_URL}/functions/v1/appointment-response?${query.toString()}`;
+};
+
 const buildEmailHtml = (brand: typeof APP_BRANDS.casa, subject: string, body: string, actionUrl: string) => {
-  const safeActionUrl = actionUrl.startsWith("/") ? `${brand.url}${actionUrl}` : brand.url;
+  const callbackBase = `${SUPABASE_URL}/functions/v1/appointment-response?`;
+  const safeActionUrl = actionUrl.startsWith("/")
+    ? `${brand.url}${actionUrl}`
+    : actionUrl.startsWith(callbackBase)
+      ? actionUrl
+      : brand.url;
   return `
 <!DOCTYPE html>
 <html>
@@ -130,7 +185,7 @@ const buildEmailHtml = (brand: typeof APP_BRANDS.casa, subject: string, body: st
           <h2 style="margin:0 0 16px;font-size:22px;">${escapeHtml(subject)}</h2>
           <p style="margin:0 0 24px;font-size:16px;color:#334155;">${escapeHtml(body)}</p>
           <div style="text-align:center;margin:32px 0;">
-            <a href="${safeActionUrl}" style="display:inline-block;background:${brand.color};color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">Open portal</a>
+            <a href="${escapeHtml(safeActionUrl)}" style="display:inline-block;background:${brand.color};color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:16px;">Open portal</a>
           </div>
           <p style="margin:24px 0 0;font-size:13px;color:#64748b;">
             Keep messages, receipts, signatures, files, and service history inside your Baise portal.
@@ -145,7 +200,14 @@ const buildEmailHtml = (brand: typeof APP_BRANDS.casa, subject: string, body: st
 </body></html>`;
 };
 
-async function sendEmail(to: string, subject: string, body: string, appKey: string, actionUrl: string): Promise<DeliveryResult> {
+async function sendEmail(
+  to: string,
+  subject: string,
+  body: string,
+  appKey: string,
+  actionUrl: string,
+  eventId: string,
+): Promise<DeliveryResult> {
   if (!RESEND_API_KEY) {
     return { ok: false, deferred: true, error: "Email service is not configured" };
   }
@@ -162,6 +224,7 @@ async function sendEmail(to: string, subject: string, body: string, appKey: stri
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Idempotency-Key": `provider-communication/${eventId}`,
     },
     body: JSON.stringify({
       from,
@@ -365,7 +428,14 @@ const isOptedOut = (
   prefs: NotificationPreferences | null,
   isTransactional: boolean,
 ) => {
-  if (!prefs) return false;
+  if (!prefs) {
+    return (
+      channel === "push"
+      || channel === "sms"
+      || channel === "whatsapp"
+      || (channel === "email" && !isTransactional)
+    );
+  }
   if (channel === "portal") return prefs.in_app_enabled === false;
   if (channel === "push") return prefs.push_enabled === false;
   if (channel === "sms") return prefs.sms_enabled !== true;
@@ -389,7 +459,14 @@ serve(async (req) => {
   try {
     const cronSecret = Deno.env.get("PROVIDER_WORKFLOW_CRON_SECRET");
     const requestSecret = req.headers.get("x-cron-secret");
-    const isCron = Boolean(cronSecret && requestSecret === cronSecret);
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const authorization = req.headers.get("authorization") || "";
+    const isServiceRoleCron = Boolean(
+      serviceRoleKey && authorization === `Bearer ${serviceRoleKey}`,
+    );
+    const isCron = Boolean(
+      isServiceRoleCron || (cronSecret && requestSecret === cronSecret),
+    );
     let providerIdFromAuth: string | null = null;
     let actorId: string | null = null;
 
@@ -398,7 +475,7 @@ serve(async (req) => {
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      serviceRoleKey,
       { auth: { persistSession: false } },
     );
 
@@ -421,20 +498,15 @@ serve(async (req) => {
       providerIdFromAuth = provider.id;
     }
 
-    let query = supabaseAdmin
-      .from("provider_communication_events")
-      .select("id, provider_id, customer_id, created_by, purpose, channel, subject, message_body, delivery_attempts, metadata, app_key, event_type, locale, is_transactional, delivery_policy, recipient_email, recipient_phone")
-      .or(dueFilter)
-      .order("scheduled_at", { ascending: true, nullsFirst: true })
-      .limit(limit);
-
-    if (body.providerId && isCron) {
-      query = query.eq("provider_id", body.providerId);
-    } else if (providerIdFromAuth) {
-      query = query.eq("provider_id", providerIdFromAuth);
-    }
-
-    const { data: events, error } = await query;
+    const targetProviderId =
+      body.providerId && isCron ? body.providerId : providerIdFromAuth;
+    const { data: events, error } = await supabaseAdmin.rpc(
+      "claim_due_provider_communication_events",
+      {
+        target_provider_id: targetProviderId,
+        target_limit: limit,
+      },
+    );
     if (error) throw error;
 
     let sent = 0;
@@ -444,21 +516,11 @@ serve(async (req) => {
 
     for (const event of (events || []) as CommunicationEvent[]) {
       const attemptStartedAt = nowIso();
-      const attempts = Number(event.delivery_attempts || 0) + 1;
+      const attempts = Number(event.delivery_attempts || 1);
       const subject = event.subject || "Baise update";
       const message = event.message_body || "Open Baise for the latest update.";
-      const actionUrl = metadataString(event.metadata, "action_url") || "/notifications";
+      let actionUrl = metadataString(event.metadata, "action_url") || "/notifications";
       const isTransactional = event.delivery_policy === "transactional" || event.is_transactional !== false;
-
-      await supabaseAdmin
-        .from("provider_communication_events")
-        .update({
-          status: "processing",
-          delivery_attempts: attempts,
-          last_attempt_at: attemptStartedAt,
-          delivery_error: null,
-        })
-        .eq("id", event.id);
 
       try {
         let profile: ProfileTarget | null = null;
@@ -480,8 +542,19 @@ serve(async (req) => {
           prefs = prefsData as NotificationPreferences | null;
         }
 
+        if (
+          ["email", "sms", "whatsapp"].includes(event.channel)
+          && ["confirmation", "reminder"].includes(event.appointment_automation_kind || "")
+        ) {
+          const callbackUrl = await signAppointmentCallback(event);
+          if (!callbackUrl) {
+            throw new Error("Appointment callback signing is not configured");
+          }
+          actionUrl = callbackUrl;
+        }
+
         if (isOptedOut(event.channel, prefs, isTransactional)) {
-          await supabaseAdmin
+          const { error: optOutUpdateError } = await supabaseAdmin
             .from("provider_communication_events")
             .update({
               status: "cancelled",
@@ -490,6 +563,7 @@ serve(async (req) => {
               delivery_error: `${event.channel}_opted_out`,
             })
             .eq("id", event.id);
+          if (optOutUpdateError) throw optOutUpdateError;
           skipped += 1;
           continue;
         }
@@ -498,7 +572,8 @@ serve(async (req) => {
 
         if (event.channel === "portal") {
           if (!event.customer_id) throw new Error("No customer account is attached to this portal event");
-          await supabaseAdmin.from("notifications").insert({
+          const { error: portalError } = await supabaseAdmin.from("notifications").upsert({
+            provider_communication_event_id: event.id,
             user_id: event.customer_id,
             title: subject,
             message,
@@ -511,12 +586,16 @@ serve(async (req) => {
               app_key: event.app_key,
               ...(event.metadata || {}),
             },
+          }, {
+            onConflict: "provider_communication_event_id",
+            ignoreDuplicates: true,
           });
+          if (portalError) throw portalError;
           result = { ok: true, deliveredVia: "portal" };
         } else if (event.channel === "email") {
           const email = event.recipient_email || profile?.email;
           if (!email) throw new Error("Recipient email is not available");
-          result = await sendEmail(email, subject, message, event.app_key, actionUrl);
+          result = await sendEmail(email, subject, message, event.app_key, actionUrl, event.id);
         } else if (event.channel === "push") {
           if (!event.customer_id) throw new Error("No customer account is attached to this push event");
           result = await sendPush(supabaseAdmin, event.customer_id, subject, message, actionUrl, {
@@ -527,19 +606,19 @@ serve(async (req) => {
           });
         } else if (event.channel === "sms") {
           const phone = event.recipient_phone || profile?.phone;
-          result = await sendSms(phone || "", `${subject}\n${message}`);
+          result = await sendSms(phone || "", `${subject}\n${message}\n${actionUrl}`);
         } else {
           const phone = event.recipient_phone || profile?.phone;
-          result = await sendWhatsApp(phone || "", `${subject}\n${message}`);
+          result = await sendWhatsApp(phone || "", `${subject}\n${message}\n${actionUrl}`);
         }
 
         if (!result.ok) {
-          const status = result.skipped ? "cancelled" : result.deferred || attempts < 3 ? "deferred" : "failed";
+          const status = result.skipped ? "cancelled" : attempts < 3 ? "deferred" : "failed";
           const nextAttemptAt = status === "deferred"
             ? new Date(Date.now() + attempts * 30 * 60 * 1000).toISOString()
             : null;
 
-          await supabaseAdmin
+          const { error: deliveryStateError } = await supabaseAdmin
             .from("provider_communication_events")
             .update({
               status,
@@ -548,7 +627,10 @@ serve(async (req) => {
               next_attempt_at: nextAttemptAt,
               delivery_error: (result.error || "Delivery did not complete").slice(0, 500),
             })
-            .eq("id", event.id);
+            .eq("id", event.id)
+            .eq("status", "processing")
+            .eq("delivery_attempts", attempts);
+          if (deliveryStateError) throw deliveryStateError;
 
           if (status === "failed") failed += 1;
           else if (status === "cancelled") skipped += 1;
@@ -556,7 +638,7 @@ serve(async (req) => {
           continue;
         }
 
-        await supabaseAdmin
+        const { data: finalizedEvent, error: finalizeError } = await supabaseAdmin
           .from("provider_communication_events")
           .update({
             status: "sent",
@@ -565,7 +647,16 @@ serve(async (req) => {
             external_message_id: result.externalId || null,
             delivery_error: null,
           })
-          .eq("id", event.id);
+          .eq("id", event.id)
+          .eq("status", "processing")
+          .eq("delivery_attempts", attempts)
+          .select("id")
+          .maybeSingle();
+        if (finalizeError) throw finalizeError;
+        if (!finalizedEvent) {
+          skipped += 1;
+          continue;
+        }
 
         await supabaseAdmin.rpc("log_provider_audit_event", {
           target_provider_id: event.provider_id,
@@ -592,7 +683,7 @@ serve(async (req) => {
           ? null
           : new Date(Date.now() + attempts * 30 * 60 * 1000).toISOString();
 
-        await supabaseAdmin
+        const { error: failureStateError } = await supabaseAdmin
           .from("provider_communication_events")
           .update({
             status,
@@ -601,7 +692,12 @@ serve(async (req) => {
             next_attempt_at: nextAttemptAt,
             delivery_error: messageText.slice(0, 500),
           })
-          .eq("id", event.id);
+          .eq("id", event.id)
+          .eq("status", "processing")
+          .eq("delivery_attempts", attempts);
+        if (failureStateError) {
+          console.error("Unable to persist provider communication failure state", failureStateError);
+        }
 
         await supabaseAdmin.rpc("log_provider_audit_event", {
           target_provider_id: event.provider_id,
