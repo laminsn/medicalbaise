@@ -2700,7 +2700,9 @@
       "a5": "You accept the rules on this page by ticking the boxes before you submit — and you can add a signature with your finger if you like. There is no separate contract afterwards.",
       "q6": "How much time will this take?",
       "a6": "Whatever you can give. We ask that you use the platform as you actually would, and tell us what breaks or confuses you."
-    }
+    },
+    "kicker": "Pilot Programme — {{count}} places",
+    "lede": "We are opening {{count}} places for professionals to test the full platform for 60 days. No cost and no real payments — the point is to find the problems before your clients do."
   },
   "medicalGated": {
     "mgSpecialOfferForOur": "Special Offer for Our Valued Followers!",

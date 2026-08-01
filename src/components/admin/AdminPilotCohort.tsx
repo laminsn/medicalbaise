@@ -29,6 +29,7 @@ type Application = {
   status: string; created_at: string; invite_id: string | null;
   consent_version: string | null; consented_at: string | null;
   signature_data_url: string | null;
+  email_confirmed_at: string | null;
 };
 type Invite = {
   id: string; app_key: string; label: string; intended_role: string; granted_tier: string | null;
@@ -272,6 +273,11 @@ export function AdminPilotCohort() {
                     <span className="font-medium">{a.full_name}</span>
                     <Badge variant="secondary">{APP_LABEL[a.app_key] || a.app_key}</Badge>
                     <Badge variant="outline">{a.intended_role}</Badge>
+                    {a.email_confirmed_at ? (
+                      <Badge className="bg-emerald-600 hover:bg-emerald-600">Email verified</Badge>
+                    ) : (
+                      <Badge variant="destructive">Email unverified</Badge>
+                    )}
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {a.email}{a.phone ? ` · ${a.phone}` : ''}{a.city ? ` · ${a.city}` : ''}
@@ -296,13 +302,22 @@ export function AdminPilotCohort() {
                     />
                   )}
                 </div>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  {!a.email_confirmed_at && (
+                    <p className="max-w-44 text-right text-xs text-muted-foreground">
+                      They have not clicked the confirmation link yet, so this address is unproven.
+                    </p>
+                  )}
+                  <div className="flex gap-2">
                   <Button size="sm" variant="outline" disabled={busy === a.id} onClick={() => void decline(a.id)}>
                     Decline
                   </Button>
                   <Button
                     size="sm"
-                    disabled={busy === a.id}
+                    // A code is an elevated production account. Issuing one against an
+                    // address nobody proved they control is how it ends up with the
+                    // wrong person -- a typo, or someone applying in another's name.
+                    disabled={busy === a.id || !a.email_confirmed_at}
                     onClick={() => void issueCodes(a.app_key, [{
                       label: a.full_name, intended_role: a.intended_role,
                       granted_tier: a.intended_role === 'provider' ? 'enterprise' : null,
@@ -313,6 +328,7 @@ export function AdminPilotCohort() {
                                    : <KeyRound className="mr-1.5 h-3.5 w-3.5" />}
                     Approve & issue code
                   </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

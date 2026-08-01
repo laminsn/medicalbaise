@@ -8,8 +8,8 @@ const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const COST_PER_EMAIL = 0.05; // R$0.05 per email
 
 const ALLOWED_ORIGINS = [
-  "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
+  "https://www.mdbaise.com",
   ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 

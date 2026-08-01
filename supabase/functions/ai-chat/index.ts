@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { AiProviderConfigurationError, requestAiChatCompletion } from "../_shared/ai-provider.ts";
 
 const ALLOWED_ORIGINS = [
-  "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
+  "https://www.mdbaise.com",
   ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
@@ -74,50 +75,22 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
-      return new Response(JSON.stringify({ error: "Service unavailable" }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const systemPrompt = `You are a helpful customer support assistant for Brasil Base, a service marketplace platform that connects customers with service providers in Brazil.
+    const systemPrompt = `You are the Medical Baise platform support assistant.
 
 Your role is to:
-- Help customers find and book services
-- Answer questions about how the platform works
-- Assist with account and billing inquiries
-- Provide information about provider tiers (Free, Pro, Elite, Enterprise)
-- Help resolve issues with jobs, bids, and quotes
-- Be friendly, professional, and helpful
+- Explain account, scheduling, messaging, billing, and provider-discovery features.
+- Keep answers concise, professional, and limited to platform support.
+- Never diagnose, recommend treatment, interpret symptoms, or request/repeat health information.
+- Tell users not to place symptoms, diagnoses, treatment details, insurance identifiers, or appointment details in chat.
+- For urgent or emergency concerns, direct the user to local emergency services.
+- If platform-specific information is unavailable, direct the user to Medical Baise support.`;
 
-Key platform features you should know:
-- Customers can post jobs and receive bids from providers
-- Customers can request quotes directly from providers
-- Providers have different subscription tiers with varying features
-- The platform supports both English and Portuguese
-- Video meetings can be scheduled between customers and providers
-- Recurring services can be scheduled
-
-Keep responses concise but helpful. If you don't know something specific, suggest contacting support or checking the relevant section of the platform.`;
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...sanitizedMessages,
-        ],
-        stream: true,
-      }),
+    const response = await requestAiChatCompletion({
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...sanitizedMessages,
+      ],
+      stream: true,
     });
 
     if (!response.ok) {
@@ -133,8 +106,7 @@ Keep responses concise but helpful. If you don't know something specific, sugges
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("AI provider request failed:", response.status);
       return new Response(
         JSON.stringify({ error: "AI service error" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -145,6 +117,12 @@ Keep responses concise but helpful. If you don't know something specific, sugges
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
+    if (error instanceof AiProviderConfigurationError) {
+      return new Response(JSON.stringify({ error: "Service unavailable" }), {
+        status: 503,
+        headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
+      });
+    }
     console.error("AI chat error:", error);
     return new Response(
       JSON.stringify({ error: "An internal error occurred" }),

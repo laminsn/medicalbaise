@@ -33,10 +33,19 @@ verify_jwt = true
 [functions.send-welcome-email]
 verify_jwt = false
 
+[functions.send-auth-email]
+verify_jwt = false
+
 [functions.create-provider-payment-plan]
 verify_jwt = true
 
 [functions.dispatch-provider-communication-events]
+verify_jwt = false
+
+[functions.dispatch-medical-appointment-lifecycle]
+verify_jwt = false
+
+[functions.medical-appointment-response]
 verify_jwt = false
 
 [functions.send-referral-email]

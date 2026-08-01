@@ -2700,7 +2700,9 @@
       "a5": "Aceptas las reglas en esta misma página marcando las casillas antes de enviar — y puedes firmar con el dedo si quieres. No hay otro contrato después.",
       "q6": "¿Cuánto tiempo me llevará?",
       "a6": "El que puedas dar. Te pedimos que uses la plataforma como lo harías de verdad y nos cuentes qué falla o confunde."
-    }
+    },
+    "kicker": "Programa Piloto — {{count}} plazas",
+    "lede": "Abrimos {{count}} plazas para que profesionales prueben la plataforma completa durante 60 días. Sin costo y sin pagos reales — la idea es encontrar los problemas antes que tus clientes."
   },
   "medicalGated": {
     "mgSpecialOfferForOur": "¡Oferta especial para quienes nos siguen!",

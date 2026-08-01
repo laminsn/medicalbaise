@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       active_jobs: {
@@ -2132,11 +2157,16 @@ export type Database = {
           city: string | null
           consent_lgpd: boolean
           consent_terms: boolean
+          consent_user_agent: string | null
           consent_version: string
           consented_at: string | null
           created_at: string
           device: string | null
           email: string
+          email_confirm_expires_at: string | null
+          email_confirm_sent_at: string | null
+          email_confirm_token_hash: string | null
+          email_confirmed_at: string | null
           full_name: string
           id: string
           intended_role: string
@@ -2149,6 +2179,8 @@ export type Database = {
           profession: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          signature_captured_at: string | null
+          signature_data_url: string | null
           status: string
           updated_at: string
           years_experience: number | null
@@ -2158,11 +2190,16 @@ export type Database = {
           city?: string | null
           consent_lgpd?: boolean
           consent_terms?: boolean
+          consent_user_agent?: string | null
           consent_version: string
           consented_at?: string | null
           created_at?: string
           device?: string | null
           email: string
+          email_confirm_expires_at?: string | null
+          email_confirm_sent_at?: string | null
+          email_confirm_token_hash?: string | null
+          email_confirmed_at?: string | null
           full_name: string
           id?: string
           intended_role: string
@@ -2175,6 +2212,8 @@ export type Database = {
           profession?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          signature_captured_at?: string | null
+          signature_data_url?: string | null
           status?: string
           updated_at?: string
           years_experience?: number | null
@@ -2184,11 +2223,16 @@ export type Database = {
           city?: string | null
           consent_lgpd?: boolean
           consent_terms?: boolean
+          consent_user_agent?: string | null
           consent_version?: string
           consented_at?: string | null
           created_at?: string
           device?: string | null
           email?: string
+          email_confirm_expires_at?: string | null
+          email_confirm_sent_at?: string | null
+          email_confirm_token_hash?: string | null
+          email_confirmed_at?: string | null
           full_name?: string
           id?: string
           intended_role?: string
@@ -2201,6 +2245,8 @@ export type Database = {
           profession?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          signature_captured_at?: string | null
+          signature_data_url?: string | null
           status?: string
           updated_at?: string
           years_experience?: number | null
@@ -2214,6 +2260,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pilot_issue_reports: {
+        Row: {
+          app_key: string
+          area: string | null
+          attachments: Json
+          body: string
+          created_at: string
+          id: string
+          metadata: Json
+          page_url: string | null
+          platform: Database["public"]["Enums"]["baise_platform"]
+          reporter_id: string
+          resolution_note: string | null
+          severity: string
+          status: string
+          title: string
+          triaged_at: string | null
+          triaged_by: string | null
+          updated_at: string
+          user_agent: string | null
+          viewport: string | null
+        }
+        Insert: {
+          app_key: string
+          area?: string | null
+          attachments?: Json
+          body: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          page_url?: string | null
+          platform: Database["public"]["Enums"]["baise_platform"]
+          reporter_id: string
+          resolution_note?: string | null
+          severity?: string
+          status?: string
+          title: string
+          triaged_at?: string | null
+          triaged_by?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          viewport?: string | null
+        }
+        Update: {
+          app_key?: string
+          area?: string | null
+          attachments?: Json
+          body?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          page_url?: string | null
+          platform?: Database["public"]["Enums"]["baise_platform"]
+          reporter_id?: string
+          resolution_note?: string | null
+          severity?: string
+          status?: string
+          title?: string
+          triaged_at?: string | null
+          triaged_by?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          viewport?: string | null
+        }
+        Relationships: []
       }
       platform_message_templates: {
         Row: {
@@ -8036,6 +8148,20 @@ export type Database = {
         Args: { target_app_key: string; target_code: string }
         Returns: string
       }
+      complete_testimonial_request: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
+      confirm_pilot_application_email: {
+        Args: { p_token: string }
+        Returns: {
+          app_key: string
+          full_name: string
+          locale: string
+          ok: boolean
+          outcome: string
+        }[]
+      }
       create_document_vault_item: {
         Args: {
           item_bucket_id?: string
@@ -8050,6 +8176,18 @@ export type Database = {
           target_provider_id: string
         }
         Returns: string
+      }
+      create_testimonial_request: {
+        Args: {
+          p_app_key?: string
+          p_customer_id: string
+          p_job_id?: string
+          p_provider_id: string
+          p_recipient_email?: string
+          p_recipient_name?: string
+          p_request_source?: string
+        }
+        Returns: Json
       }
       current_user_is_test_account: { Args: never; Returns: boolean }
       current_user_is_test_cohort_peer: {
@@ -8111,6 +8249,19 @@ export type Database = {
       issue_test_cohort_codes: {
         Args: { p_campaign_id: string; p_specs: Json }
         Returns: Json
+      }
+      list_testimonial_requests: {
+        Args: { p_provider_id: string }
+        Returns: {
+          fulfilled: boolean
+          id: string
+          last_sent_at: string
+          recipient_email: string
+          recipient_name: string
+          reminder_count: number
+          requested_at: string
+          status: string
+        }[]
       }
       log_audit_event: {
         Args: {
@@ -8298,7 +8449,23 @@ export type Database = {
           p_motivation?: string
           p_phone?: string
           p_profession?: string
+          p_signature?: string
+          p_user_agent?: string
           p_years_experience?: number
+        }
+        Returns: Json
+      }
+      submit_pilot_issue: {
+        Args: {
+          p_app_key: string
+          p_area?: string
+          p_attachments?: Json
+          p_body: string
+          p_page_url?: string
+          p_severity?: string
+          p_title: string
+          p_user_agent?: string
+          p_viewport?: string
         }
         Returns: Json
       }
@@ -8520,6 +8687,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

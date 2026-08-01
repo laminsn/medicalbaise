@@ -22,7 +22,6 @@ interface NotificationEmailRequest {
   providerId?: string;
   jobId?: string;
   activeJobId?: string;
-  googleReviewUrl?: string;
 }
 
 const VALID_TYPES = ["work_submitted", "work_approved", "work_rejected", "job_status_changed", "testimonial_request"];
@@ -77,12 +76,12 @@ const TESTIMONIAL_EMAIL_COPY = {
     greeting: "Hello",
     completed: (job: string, provider: string) =>
       `Your service <strong>${job}</strong>${provider ? ` with <strong>${provider}</strong>` : ""} has been completed.`,
-    intro: "If you had a good experience, you can help future clients choose with confidence and earn future service credit once approved.",
-    google: "<strong>Google review:</strong> R$50 future service credit after approval.",
-    video: "<strong>Video testimonial:</strong> R$100 future service credit after approval.",
-    maximum: "Maximum testimonial credit: R$150 per client.",
-    cta: "Submit testimonial",
-    finePrint: "Each client may receive one Google review credit and one video testimonial credit. Credits are reviewed before being applied to future services.",
+    intro: "If you choose, share honest feedback to help future clients make an informed decision.",
+    google: "<strong>Public review:</strong> Optional and never tied to a payment, credit, discount, or benefit.",
+    video: "<strong>Video testimonial:</strong> Optional and reviewed before publication.",
+    privacy: "Do not include symptoms, diagnoses, treatment, insurance information, or appointment details in public feedback.",
+    cta: "Share feedback",
+    finePrint: "Positive feedback is not required. Your decision whether to leave feedback does not affect your account, care, or access to Medical Baise.",
     thanks: "Thank you for using",
   },
   es: {
@@ -91,12 +90,12 @@ const TESTIMONIAL_EMAIL_COPY = {
     greeting: "Hola",
     completed: (job: string, provider: string) =>
       `Tu servicio <strong>${job}</strong>${provider ? ` con <strong>${provider}</strong>` : ""} fue completado.`,
-    intro: "Si tuviste una buena experiencia, puedes ayudar a futuros clientes a elegir con confianza y ganar crédito para servicios futuros después de la aprobación.",
-    google: "<strong>Reseña de Google:</strong> R$50 de crédito para servicios futuros después de la aprobación.",
-    video: "<strong>Vídeo testimonial:</strong> R$100 de crédito para servicios futuros después de la aprobación.",
-    maximum: "Crédito máximo por testimonios: R$150 por cliente.",
-    cta: "Enviar testimonio",
-    finePrint: "Cada cliente puede recibir un crédito por reseña de Google y un crédito por vídeo testimonial. Los créditos se revisan antes de aplicarse a servicios futuros.",
+    intro: "Si deseas, comparte comentarios honestos para ayudar a futuros clientes a tomar una decisión informada.",
+    google: "<strong>Reseña pública:</strong> Opcional y nunca vinculada a pagos, créditos, descuentos o beneficios.",
+    video: "<strong>Vídeo testimonial:</strong> Opcional y revisado antes de publicarse.",
+    privacy: "No incluyas síntomas, diagnósticos, tratamientos, datos del seguro ni detalles de la cita en comentarios públicos.",
+    cta: "Compartir comentarios",
+    finePrint: "No se requieren comentarios positivos. Tu decisión de dejar comentarios no afecta tu cuenta, atención o acceso a Medical Baise.",
     thanks: "Gracias por usar",
   },
   pt: {
@@ -105,12 +104,12 @@ const TESTIMONIAL_EMAIL_COPY = {
     greeting: "Olá",
     completed: (job: string, provider: string) =>
       `Seu serviço <strong>${job}</strong>${provider ? ` com <strong>${provider}</strong>` : ""} foi concluído.`,
-    intro: "Se você teve uma boa experiência, pode ajudar futuros clientes a escolher com confiança e ganhar crédito para serviços futuros após a aprovação.",
-    google: "<strong>Avaliação no Google:</strong> R$50 de crédito para serviços futuros após aprovação.",
-    video: "<strong>Vídeo depoimento:</strong> R$100 de crédito para serviços futuros após aprovação.",
-    maximum: "Crédito máximo por depoimentos: R$150 por cliente.",
-    cta: "Enviar depoimento",
-    finePrint: "Cada cliente pode receber um crédito por avaliação no Google e um crédito por vídeo depoimento. Os créditos são analisados antes de serem aplicados a serviços futuros.",
+    intro: "Se quiser, compartilhe um feedback honesto para ajudar futuros clientes a tomar uma decisão informada.",
+    google: "<strong>Avaliação pública:</strong> Opcional e nunca vinculada a pagamento, crédito, desconto ou benefício.",
+    video: "<strong>Vídeo depoimento:</strong> Opcional e revisado antes da publicação.",
+    privacy: "Não inclua sintomas, diagnósticos, tratamentos, dados do seguro ou detalhes da consulta em feedback público.",
+    cta: "Compartilhar feedback",
+    finePrint: "Feedback positivo não é obrigatório. A decisão de enviar feedback não afeta sua conta, atendimento ou acesso à Medical Baise.",
     thanks: "Obrigado por usar",
   },
 } as const;
@@ -219,7 +218,7 @@ const getEmailContent = (request: NotificationEmailRequest) => {
                   ${testimonialCopy.video}
                 </div>
               </div>
-              <p style="font-weight: 700;">${testimonialCopy.maximum}</p>
+              <p style="font-weight: 700;">${testimonialCopy.privacy}</p>
               <div style="text-align: center; margin: 28px 0;">
                 <a href="${testimonialUrl}" style="display: inline-block; background-color: ${brand.color}; color: white; padding: 14px 24px; text-decoration: none; border-radius: 8px; font-weight: 700;">${testimonialCopy.cta}</a>
               </div>
@@ -313,7 +312,6 @@ const handler = async (req: Request): Promise<Response> => {
         recipient_email: request.recipientEmail,
         recipient_name: request.recipientName,
         request_source: "service_completion",
-        google_review_url: request.googleReviewUrl || null,
         status: "sent",
         last_sent_at: new Date().toISOString(),
         metadata: {

@@ -6,8 +6,8 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const ALLOWED_ORIGINS = [
-  "https://medicalbaise.lovable.app",
   "https://mdbaise.com",
+  "https://www.mdbaise.com",
   ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
 ];
 
@@ -297,7 +297,7 @@ const getEmailTemplate = (campaignContent: typeof WEEKLY_CAMPAIGNS[0], providerN
   <div style="margin-top: 32px; padding: 20px; background: #047857; border-radius: 12px; text-align: center;">
     <p style="color: white; margin: 0 0 12px 0; font-size: 18px; font-weight: bold;">Ready to grow? 🚀</p>
     <p style="color: #d1fae5; margin: 0 0 16px 0;">Log in and apply these strategies today.</p>
-    <a href="https://medicalbaise.lovable.app/provider-dashboard" style="display: inline-block; background: white; color: #047857; padding: 12px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Open Dashboard →</a>
+    <a href="https://www.mdbaise.com/provider-dashboard" style="display: inline-block; background: white; color: #047857; padding: 12px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Open Dashboard →</a>
   </div>
 
   <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
@@ -316,6 +316,13 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Fail closed until every campaign statement and attributed quote has
+  // source evidence, Medical review, and release approval.
+  return new Response(JSON.stringify({ error: "Campaign library pending review" }), {
+    status: 503,
+    headers: { "Content-Type": "application/json", ...corsHeaders },
+  });
 
   try {
     // Verify this is called by an admin or by the Supabase cron scheduler.

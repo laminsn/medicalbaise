@@ -6,15 +6,12 @@
 // --- CORS Configuration ---
 
 const ALLOWED_ORIGINS = [
-  'https://casabaise.lovable.app',
   'https://casabaise.com',
   'https://www.casabaise.com',
-  'https://medicalbaise.lovable.app',
   'https://medicalbaise.com',
   'https://www.medicalbaise.com',
   'https://mdbaise.com',
   'https://www.mdbaise.com',
-  'https://legalbaise.lovable.app',
   'https://legalbaise.com',
   'https://www.legalbaise.com',
 ];
@@ -52,6 +49,7 @@ export function getCorsHeaders(req: Request): Record<string, string> {
     'X-Frame-Options': 'DENY',
     'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
     'X-Permitted-Cross-Domain-Policies': 'none',
+    'Cache-Control': 'no-store',
   };
 }
 
@@ -67,6 +65,13 @@ export async function authenticateRequest(req: Request): Promise<{
   user: { id: string; email: string };
   token: string;
 }> {
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || req.headers.get('cf-connecting-ip')
+    || 'unknown';
+  if (!serverRateLimit(`auth:${clientIp}`, 120, 60_000)) {
+    throw new AuthError('Too many requests', 429);
+  }
+
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
     throw new AuthError('No authorization header provided', 401);
@@ -115,6 +120,8 @@ export class AuthError extends Error {
 // --- Server-Side Rate Limiting (in-memory, per-instance) ---
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+
+// TODO(lamin): back rate limiting with Postgres/Upstash before relying on the caps on these destructive routes.
 
 /**
  * Simple in-memory rate limiter for edge functions.
@@ -201,7 +208,7 @@ export function isSafeUrl(url: string): boolean {
 /**
  * Validates and restricts the origin header to allowed domains for redirect URLs.
  */
-export function getSafeOrigin(req: Request, fallback: string = 'https://casabaise.lovable.app'): string {
+export function getSafeOrigin(req: Request, fallback: string = 'https://www.mdbaise.com'): string {
   const origin = req.headers.get('origin') || '';
   if (ALLOWED_ORIGINS.includes(origin)) {
     return origin;
@@ -274,19 +281,19 @@ export function rejectNonPostMethod(req: Request, corsHeaders: Record<string, st
 // --- WebAuthn Domain Validation ---
 
 const ALLOWED_RP_DOMAINS = [
-  'casabaise.lovable.app',
   'casabaise.com',
   'www.casabaise.com',
-  'medicalbaise.lovable.app',
   'medicalbaise.com',
   'www.medicalbaise.com',
   'mdbaise.com',
   'www.mdbaise.com',
-  'legalbaise.lovable.app',
   'legalbaise.com',
   'www.legalbaise.com',
-  'localhost',
 ];
+
+if (Deno.env.get('ENVIRONMENT') !== 'production') {
+  ALLOWED_RP_DOMAINS.push('localhost', '127.0.0.1');
+}
 
 /**
  * Returns a validated rpId for WebAuthn. Only allows known production domains
@@ -302,7 +309,7 @@ export function getValidatedRpId(req: Request): string {
   } catch {
     // invalid origin URL
   }
-  return 'localhost';
+  throw new AuthError('Origin not allowed', 403);
 }
 
 /**
@@ -313,7 +320,7 @@ export function getValidatedOrigin(req: Request): string {
   if (ALLOWED_ORIGINS.includes(origin)) {
     return origin;
   }
-  return 'http://localhost:8080';
+  throw new AuthError('Origin not allowed', 403);
 }
 
 // --- Error Handling ---
