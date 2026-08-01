@@ -54,37 +54,37 @@ type RefundDestination = 'original_payment_method' | 'service_credit' | 'interna
 const POS_PAYMENT_METHODS: { value: PosPaymentMethod; label: string; helper: string }[] = [
   {
     value: 'hosted_checkout',
-    label: 'Hosted checkout',
-    helper: 'Secure Stripe-hosted checkout with eligible wallet options.',
+    label: t('paymentsPage.hostedCheckout', "Hosted checkout"),
+    helper: t('paymentsPage.secureStripeHostedCheckout', "Secure Stripe-hosted checkout with eligible wallet options."),
   },
   {
     value: 'wallet',
-    label: 'Apple Pay / Google Pay',
-    helper: 'Wallet-ready checkout when enabled for the payment account.',
+    label: t('paymentsPage.applePayGooglePay', "Apple Pay / Google Pay"),
+    helper: t('paymentsPage.walletReadyCheckoutWhen', "Wallet-ready checkout when enabled for the payment account."),
   },
   {
     value: 'superwall_stripe',
-    label: 'Superwall + Stripe',
-    helper: 'In-app paywall route powered by Superwall with Stripe checkout, receipts, refunds, and ledger records.',
+    label: t('paymentsPage.superwallStripe', "Superwall + Stripe"),
+    helper: t('paymentsPage.inAppPaywallRoute', "In-app paywall route powered by Superwall with Stripe checkout, receipts, refunds, and ledger records."),
   },
   {
     value: 'pix',
-    label: 'Pix + card',
-    helper: 'Brazil-friendly checkout with Pix when enabled by the processor.',
+    label: t('paymentsPage.pixCard', "Pix + card"),
+    helper: t('paymentsPage.brazilFriendlyCheckoutWith', "Brazil-friendly checkout with Pix when enabled by the processor."),
   },
   {
     value: 'internal_balance',
-    label: 'Internal balance',
-    helper: 'Record a payment serviced from client credits or internal balance.',
+    label: t('paymentsPage.internalBalance', "Internal balance"),
+    helper: t('paymentsPage.recordAPaymentServiced', "Record a payment serviced from client credits or internal balance."),
   },
 ];
 
 const ACCOUNTING_FEATURES = [
-  'Unique invoice number and client ID for every transaction',
-  'Provider, service, subcontractor, milestone, and payment method links',
-  'Date, timestamp, service description, amount, refund, and credit trail',
-  'Company logo support with discreet Baise branding on receipt footer',
-  'Monthly, MTD, annual, and custom transaction export-ready data',
+  t('paymentsPage.uniqueInvoiceNumberAnd', "Unique invoice number and client ID for every transaction"),
+  t('paymentsPage.providerServiceSubcontractorMileston', "Provider, service, subcontractor, milestone, and payment method links"),
+  t('paymentsPage.dateTimestampServiceDescription', "Date, timestamp, service description, amount, refund, and credit trail"),
+  t('paymentsPage.companyLogoSupportWith', "Company logo support with discreet Baise branding on receipt footer"),
+  t('paymentsPage.monthlyMtdAnnualAnd', "Monthly, MTD, annual, and custom transaction export-ready data"),
 ];
 
 export default function Payments() {
@@ -174,7 +174,7 @@ export default function Payments() {
     toast.info(
       t(
         'payments.useStripePortal',
-        'Payment methods are managed through our secure payment processor.',
+        t('paymentsPage.paymentMethodsAreManaged', "Payment methods are managed through our secure payment processor."),
       ),
     );
     setShowAddPayment(false);
@@ -291,24 +291,16 @@ export default function Payments() {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold">{t('profile.payments')}</h1>
-                <p className="text-sm text-muted-foreground">
-                  POS checkout, refunds, internal balance, invoices, and provider accounting.
-                </p>
+                <p className="text-sm text-muted-foreground">{t('paymentsPage.posCheckoutRefundsInternal', "POS checkout, refunds, internal balance, invoices, and provider accounting.")}</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="gap-1">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Superwall + Stripe
-              </Badge>
+                <ShieldCheck className="h-3.5 w-3.5" />{t('paymentsPage.superwallStripe', "Superwall + Stripe")}</Badge>
               <Badge variant="secondary" className="gap-1">
-                <Receipt className="h-3.5 w-3.5" />
-                Invoice IDs
-              </Badge>
+                <Receipt className="h-3.5 w-3.5" />{t('paymentsPage.invoiceIds', "Invoice IDs")}</Badge>
               <Badge variant="secondary" className="gap-1">
-                <UsersRound className="h-3.5 w-3.5" />
-                Subcontractors
-              </Badge>
+                <UsersRound className="h-3.5 w-3.5" />{t('paymentsPage.subcontractors', "Subcontractors")}</Badge>
             </div>
           </div>
 
@@ -336,9 +328,7 @@ export default function Payments() {
                     <CreditCard className="h-4 w-4" />
                     {t('payments.paymentMethods')}
                   </CardTitle>
-                  <CardDescription>
-                    Card, Pix, Apple Pay, Google Pay, Superwall paywalls, and internal balance workflows are handled through secure checkout rails.
-                  </CardDescription>
+                  <CardDescription>{t('paymentsPage.cardPixApplePay', "Card, Pix, Apple Pay, Google Pay, Superwall paywalls, and internal balance workflows are handled through secure checkout rails.")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -365,16 +355,12 @@ export default function Payments() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <RefreshCcw className="h-4 w-4" />
-                    Refund or service credit
-                  </CardTitle>
-                  <CardDescription>
-                    Refund the original payment where possible, or credit the client account for future service.
-                  </CardDescription>
+                    <RefreshCcw className="h-4 w-4" />{t('paymentsPage.refundOrServiceCredit', "Refund or service credit")}</CardTitle>
+                  <CardDescription>{t('paymentsPage.refundTheOriginalPayment', "Refund the original payment where possible, or credit the client account for future service.")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="refund-transaction">Original transaction ID</Label>
+                    <Label htmlFor="refund-transaction">{t('paymentsPage.originalTransactionId', "Original transaction ID")}</Label>
                     <Input
                       id="refund-transaction"
                       value={refundTransactionId}
@@ -392,19 +378,19 @@ export default function Payments() {
                         step="0.01"
                         value={refundAmount}
                         onChange={(event) => setRefundAmount(event.target.value)}
-                        placeholder="Leave blank for full"
+                        placeholder={t('paymentsPage.leaveBlankForFull', "Leave blank for full")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Destination</Label>
+                      <Label>{t('paymentsPage.destination', "Destination")}</Label>
                       <Select value={refundDestination} onValueChange={(value) => setRefundDestination(value as RefundDestination)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="original_payment_method">Original payment method</SelectItem>
-                          <SelectItem value="service_credit">Service credit</SelectItem>
-                          <SelectItem value="internal_balance">Internal balance</SelectItem>
+                          <SelectItem value="original_payment_method">{t('paymentsPage.originalPaymentMethod', "Original payment method")}</SelectItem>
+                          <SelectItem value="service_credit">{t('paymentsPage.serviceCredit', "Service credit")}</SelectItem>
+                          <SelectItem value="internal_balance">{t('paymentsPage.internalBalance', "Internal balance")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -415,7 +401,7 @@ export default function Payments() {
                       id="refund-reason"
                       value={refundReason}
                       onChange={(event) => setRefundReason(event.target.value)}
-                      placeholder="Optional accounting note"
+                      placeholder={t('paymentsPage.optionalAccountingNote', "Optional accounting note")}
                     />
                   </div>
                   <Button onClick={handleProcessRefundOrCredit} disabled={isProcessingRefund} className="w-full">
@@ -430,26 +416,22 @@ export default function Payments() {
               <Card className="border-primary/30">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <BadgeDollarSign className="h-5 w-5 text-primary" />
-                    Provider POS checkout
-                  </CardTitle>
-                  <CardDescription>
-                    Create a branded invoice, client ID, ledger entry, and hosted payment session for on-site or remote collection.
-                  </CardDescription>
+                    <BadgeDollarSign className="h-5 w-5 text-primary" />{t('paymentsPage.providerPosCheckout', "Provider POS checkout")}</CardTitle>
+                  <CardDescription>{t('paymentsPage.createABrandedInvoice', "Create a branded invoice, client ID, ledger entry, and hosted payment session for on-site or remote collection.")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="pos-client-name">Client name</Label>
+                      <Label htmlFor="pos-client-name">{t('paymentsPage.clientName', "Client name")}</Label>
                       <Input
                         id="pos-client-name"
                         value={posClientName}
                         onChange={(event) => setPosClientName(event.target.value)}
-                        placeholder="Client or company"
+                        placeholder={t('paymentsPage.clientOrCompany', "Client or company")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="pos-client-email">Client email</Label>
+                      <Label htmlFor="pos-client-email">{t('paymentsPage.clientEmail', "Client email")}</Label>
                       <Input
                         id="pos-client-email"
                         type="email"
@@ -461,12 +443,12 @@ export default function Payments() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pos-service">Service description</Label>
+                    <Label htmlFor="pos-service">{t('paymentsPage.serviceDescription', "Service description")}</Label>
                     <Textarea
                       id="pos-service"
                       value={posServiceDescription}
                       onChange={(event) => setPosServiceDescription(event.target.value)}
-                      placeholder="Describe the service, materials, milestone, or on-site payment."
+                      placeholder={t('paymentsPage.describeTheServiceMaterials', "Describe the service, materials, milestone, or on-site payment.")}
                     />
                   </div>
 
@@ -488,7 +470,7 @@ export default function Payments() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label>Payment route</Label>
+                      <Label>{t('paymentsPage.paymentRoute', "Payment route")}</Label>
                       <Select value={posPaymentMethod} onValueChange={(value) => setPosPaymentMethod(value as PosPaymentMethod)}>
                         <SelectTrigger>
                           <SelectValue />
@@ -510,12 +492,12 @@ export default function Payments() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pos-release">Release benchmark</Label>
+                    <Label htmlFor="pos-release">{t('paymentsPage.releaseBenchmark', "Release benchmark")}</Label>
                     <Input
                       id="pos-release"
                       value={posReleaseBenchmark}
                       onChange={(event) => setPosReleaseBenchmark(event.target.value)}
-                      placeholder="Example: rough inspection approved, materials delivered, final walkthrough"
+                      placeholder={t('paymentsPage.exampleRoughInspectionApproved', "Example: rough inspection approved, materials delivered, final walkthrough")}
                     />
                   </div>
 
@@ -525,10 +507,8 @@ export default function Payments() {
                       onCheckedChange={(checked) => setPosCollectedBySubcontractor(Boolean(checked))}
                     />
                     <span>
-                      <span className="block font-medium">Collected on site by subcontractor</span>
-                      <span className="block text-muted-foreground">
-                        Customer-facing invoice keeps contractor branding while the ledger records the subcontractor collection route.
-                      </span>
+                      <span className="block font-medium">{t('paymentsPage.collectedOnSiteBy', "Collected on site by subcontractor")}</span>
+                      <span className="block text-muted-foreground">{t('paymentsPage.customerFacingInvoiceKeeps', "Customer-facing invoice keeps contractor branding while the ledger records the subcontractor collection route.")}</span>
                     </span>
                   </label>
 
@@ -539,10 +519,10 @@ export default function Payments() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Client ID</p>
-                      <p className="text-sm font-semibold">CLIENT-AUTO</p>
+                      <p className="text-sm font-semibold">{t('paymentsPage.clientAuto', "CLIENT-AUTO")}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Baise footer</p>
+                      <p className="text-xs text-muted-foreground">{t('paymentsPage.baiseFooter', "Baise footer")}</p>
                       <p className="text-sm font-semibold">Discreet</p>
                     </div>
                   </div>
@@ -558,14 +538,10 @@ export default function Payments() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <UsersRound className="h-4 w-4" />
-                      Subcontractor accounting
-                    </CardTitle>
+                      <UsersRound className="h-4 w-4" />{t('paymentsPage.subcontractorAccounting', "Subcontractor accounting")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm text-muted-foreground">
-                    <p>
-                      Assign subcontractors, collect payment without exposing the back-office role, and release balances against agreed benchmarks.
-                    </p>
+                    <p>{t('paymentsPage.assignSubcontractorsCollectPayment', "Assign subcontractors, collect payment without exposing the back-office role, and release balances against agreed benchmarks.")}</p>
                     <div className="grid grid-cols-2 gap-2">
                       {['Scope', 'Collection alias', 'Held funds', 'Release rule'].map((item) => (
                         <div key={item} className="rounded-lg border border-border p-3 font-medium text-foreground">
@@ -579,17 +555,11 @@ export default function Payments() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <Landmark className="h-4 w-4" />
-                      Books and ledger
-                    </CardTitle>
+                      <Landmark className="h-4 w-4" />{t('paymentsPage.booksAndLedger', "Books and ledger")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm text-muted-foreground">
-                    <p>
-                      Each payment action creates accounting records for provider balance, pending funds, credits, refunds, and subcontractor releases.
-                    </p>
-                    <Button variant="outline" className="w-full" onClick={() => navigate('/payouts')}>
-                      Manage payout methods
-                    </Button>
+                    <p>{t('paymentsPage.eachPaymentActionCreates', "Each payment action creates accounting records for provider balance, pending funds, credits, refunds, and subcontractor releases.")}</p>
+                    <Button variant="outline" className="w-full" onClick={() => navigate('/payouts')}>{t('paymentsPage.managePayoutMethods', "Manage payout methods")}</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -597,12 +567,8 @@ export default function Payments() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Calculator className="h-4 w-4" />
-                    Complete invoice requirements
-                  </CardTitle>
-                  <CardDescription>
-                    Built for proper accounting by provider, service, client, subcontractor, and transaction.
-                  </CardDescription>
+                    <Calculator className="h-4 w-4" />{t('paymentsPage.completeInvoiceRequirements', "Complete invoice requirements")}</CardTitle>
+                  <CardDescription>{t('paymentsPage.builtForProperAccounting', "Built for proper accounting by provider, service, client, subcontractor, and transaction.")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-2">
@@ -619,17 +585,11 @@ export default function Payments() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <History className="h-4 w-4" />
-                    Provider records
-                  </CardTitle>
-                  <CardDescription>
-                    Full invoices, receipts, exports, flexible plans, and transaction filters are available in the provider workspace below.
-                  </CardDescription>
+                    <History className="h-4 w-4" />{t('paymentsPage.providerRecords', "Provider records")}</CardTitle>
+                  <CardDescription>{t('paymentsPage.fullInvoicesReceiptsExports', "Full invoices, receipts, exports, flexible plans, and transaction filters are available in the provider workspace below.")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => document.getElementById('provider-payment-workspace')?.scrollIntoView({ behavior: 'smooth' })}>
-                    Open provider payment workspace
-                  </Button>
+                  <Button variant="outline" className="w-full" onClick={() => document.getElementById('provider-payment-workspace')?.scrollIntoView({ behavior: 'smooth' })}>{t('paymentsPage.openProviderPaymentWorkspace', "Open provider payment workspace")}</Button>
                 </CardContent>
               </Card>
             </div>
@@ -703,10 +663,7 @@ export default function Payments() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Card and wallet details are collected directly by the PCI-compliant processor. Baise stores accounting records,
-                invoice IDs, payment status, and ledger references, not raw card details.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('paymentsPage.cardAndWalletDetails', "Card and wallet details are collected directly by the PCI-compliant processor. Baise stores accounting records, invoice IDs, payment status, and ledger references, not raw card details.")}</p>
               <Button onClick={handleAddPaymentMethod} className="w-full">
                 {t('payments.addCard', 'Open secure payment setup')}
               </Button>
