@@ -6,6 +6,7 @@ export type LegalProfile = {
   privacyEmail: string;
   customerEn: string;
   customerPt: string;
+  customerEs: string;
   providerEn: string;
   providerPt: string;
   providerEs: string;
@@ -17,8 +18,10 @@ export type LegalProfile = {
   sensitiveDataEs: string;
   professionalBoundaryEn: string;
   professionalBoundaryPt: string;
+  professionalBoundaryEs: string;
   emergencyEn?: string;
   emergencyPt?: string;
+  emergencyEs?: string;
 };
 
 const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
@@ -41,6 +44,7 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     sensitiveDataEs: 'dirección del domicilio, historial de servicios, fotos, instrucciones de acceso, registros de pago, mensajes, reseñas, credenciales del proveedor y notas de seguridad',
     professionalBoundaryEn: 'Casa Baise is not a contractor, construction company, insurer, employer, or guarantor of a provider result. Providers are independent and responsible for licenses, permits, insurance, safety, pricing, and work quality.',
     professionalBoundaryPt: 'A Casa Baise não e empreiteira, construtora, seguradora, empregadora nem garantidora de resultado do prestador. Os prestadores sao independentes e responsaveis por licenças, alvaras, seguros, segurança, precos e qualidade do trabalho.',
+    professionalBoundaryEs: 'Casa Baise no es una empresa constructora, contratista, aseguradora, empleadora ni garante del resultado de un proveedor. Los proveedores son independientes y responsables de sus licencias, permisos, seguros, seguridad, precios y calidad del trabajo.',
   },
   legal: {
     appKey: 'legal',
@@ -61,6 +65,7 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     sensitiveDataEs: 'descripciones de casos, documentos jurídicos, información protegida por el secreto profesional, datos de identidad, registros de pago, mensajes, reseñas y credenciales profesionales',
     professionalBoundaryEn: 'Legal Baise is not a law firm, legal department, or legal representative. Legal advice, representation, deadlines, filings, and privileged counsel-client work are provided only by the independently licensed professional engaged by the client.',
     professionalBoundaryPt: 'A Legal Baise não e escritorio de advocacia, departamento jurídico nem representante legal. Consultoria jurídica, representação, prazos, petições e trabalho protegido por sigilo sao prestados apenas pelo profissional licenciado contratado pelo cliente.',
+    professionalBoundaryEs: 'Legal Baise no es un despacho de abogados, un departamento jurídico ni un representante legal. El asesoramiento jurídico, la representación, los plazos, las presentaciones y el trabajo amparado por el secreto profesional corresponden únicamente al profesional habilitado e independiente que el cliente contrate.',
   },
   medical: {
     appKey: 'medical',
@@ -81,8 +86,10 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     sensitiveDataEs: 'información de salud, síntomas, notas de consulta, metadatos de telesalud, datos de identidad, registros de pago, mensajes, reseñas y credenciales del profesional',
     professionalBoundaryEn: 'Medical Baise is not a clinic, hospital, emergency service, insurer, or healthcare provider. Medical decisions, diagnosis, treatment, prescriptions, records, and professional duties belong to the independently licensed provider engaged by the patient.',
     professionalBoundaryPt: 'A Medical Baise não e clinica, hospital, serviço de emergência, seguradora nem prestadora de serviços de saúde. Decisoes medicas, diagnostico, tratamento, prescrições, prontuarios e deveres profissionais pertencem ao profissional licenciado contratado pelo paciente.',
+    professionalBoundaryEs: 'Medical Baise no es una clínica, un hospital, un servicio de emergencias, una aseguradora ni un prestador de servicios de salud. Las decisiones médicas, el diagnóstico, el tratamiento, las recetas, las historias clínicas y los deberes profesionales corresponden al profesional de salud independiente y habilitado.',
     emergencyEn: 'Do not use Medical Baise for emergencies. In Brazil, call SAMU 192 or go to the nearest emergency service.',
     emergencyPt: 'Não use a Medical Baise para emergências. No Brasil, ligue para o SAMU 192 ou procure o pronto atendimento mais próximo.',
+    emergencyEs: 'No utilice Medical Baise para emergencias. En Brasil, llame al SAMU 192 o acuda al servicio de urgencias más cercano.',
   },
 };
 

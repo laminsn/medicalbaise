@@ -32,7 +32,7 @@ export default function Terms() {
   const profile = getLegalProfile();
   const isPt = (i18n.language || '').startsWith('pt');
   const isEs = (i18n.language || '').startsWith('es');
-  const provider = isPt ? profile.providerPt : profile.providerEn;
+  const provider = isPt ? profile.providerPt : isEs ? profile.providerEs : profile.providerEn;
 
   return (
     <AppLayout>
@@ -70,10 +70,10 @@ export default function Terms() {
           </Section>
 
           <Section title={isPt ? '2. Papel da plataforma e limites profissionais' : isEs ? '2. Papel de la plataforma y límites profesionales' : '2. Platform Role and Professional Boundaries'}>
-            <p>{isPt ? profile.professionalBoundaryPt : profile.professionalBoundaryEn}</p>
+            <p>{isPt ? profile.professionalBoundaryPt : isEs ? profile.professionalBoundaryEs : profile.professionalBoundaryEn}</p>
             {profile.emergencyEn && (
               <p className="font-semibold text-destructive">
-                {isPt ? profile.emergencyPt : profile.emergencyEn}
+                {isPt ? profile.emergencyPt : isEs ? profile.emergencyEs : profile.emergencyEn}
               </p>
             )}
             <BulletList
