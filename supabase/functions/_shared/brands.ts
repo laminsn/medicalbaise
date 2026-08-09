@@ -36,7 +36,7 @@ export const APP_BRANDS = {
     sendingDomain: "support.mdbaise.com",
     url: "https://mdbaise.com",
     origin: "https://www.mdbaise.com",
-    hosts: ["mdbaise.com", "www.mdbaise.com", "medicalbaise.com", "www.medicalbaise.com"],
+    hosts: ["mdbaise.com", "www.mdbaise.com"],
     color: "#00b8d4",
     colorDark: "#087b8c",
     from: "MD Baise <support@support.mdbaise.com>",
@@ -62,7 +62,9 @@ export const APP_BRANDS = {
 
 export const normalizeAppKey = (value?: string, fallback: AppKey = "casa"): AppKey => {
   const normalized = String(value || "").toLowerCase();
-  if (normalized === "medical" || normalized === "legal" || normalized === "casa") return normalized;
+  if (normalized === "medical" || normalized === "medical_baise") return "medical";
+  if (normalized === "legal" || normalized === "legal_baise") return "legal";
+  if (normalized === "casa" || normalized === "casa_baise") return "casa";
   return fallback;
 };
 

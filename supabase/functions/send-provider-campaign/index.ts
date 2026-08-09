@@ -1,274 +1,211 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { APP_BRANDS, reportResendFailure, senderWithDisplayName } from "../_shared/brands.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { APP_BRANDS, normalizeAppKey, reportResendSdkFailure, senderWithDisplayName } from "../_shared/brands.ts";
+import { getCorsHeaders, escapeHtml, sanitizeCampaignHtml, rejectNonPostMethod } from "../_shared/security.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const CAMPAIGN_BRAND = APP_BRANDS.medical;
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const COST_PER_EMAIL = 0.05; // R$0.05 per email
+const COST_PER_EMAIL = 0.05;
 
-const ALLOWED_ORIGINS = [
-  "https://mdbaise.com",
-  "https://www.mdbaise.com",
-  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
-];
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("Origin") || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers":
-      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-  };
-}
-
-const logStep = (step: string, details?: unknown) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : "";
-  console.log(`[PROVIDER-CAMPAIGN] ${step}${detailsStr}`);
-};
-
-/** Escape HTML entities to prevent XSS */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-/** Strip dangerous tags from provider HTML content (basic server-side sanitization) */
-function sanitizeEmailHtml(html: string): string {
-  // Remove script tags and event handlers
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^>]*>.*?<\/iframe>/gi, '')
-    .replace(/<object\b[^>]*>.*?<\/object>/gi, '')
-    .replace(/<embed\b[^>]*>/gi, '')
-    .replace(/<form\b[^>]*>.*?<\/form>/gi, '')
-    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/\bon\w+\s*=\s*[^\s>]*/gi, '')
-    .replace(/javascript\s*:/gi, '');
-}
-
-const wrapEmailHtml = (subject: string, htmlContent: string, providerName: string) => `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a; line-height: 1.6;">
-  <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #047857;">
-    <h1 style="margin: 0; color: #047857; font-size: 20px;">${escapeHtml(providerName)}</h1>
-  </div>
-  <div style="margin-top: 24px;">
-    ${sanitizeEmailHtml(htmlContent)}
-  </div>
-  <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
-    <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-      You're receiving this because you follow ${escapeHtml(providerName)} on MD Baise.
-    </p>
-  </div>
-</body>
-</html>
-`;
-
-const handler = async (req: Request): Promise<Response> => {
+serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const methodError = rejectNonPostMethod(req, corsHeaders);
+  if (methodError) return methodError;
 
-    // Authenticate user
+  try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData.user) throw new Error("Authentication failed");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const userId = userData.user.id;
-    logStep("User authenticated");
+    // Auth client to get the user
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+    if (userError || !user) throw new Error("Unauthorized");
 
-    // Get provider info and check subscription tier
-    const { data: provider, error: provError } = await supabase
-      .from("providers")
-      .select("id, business_name, subscription_tier, user_id")
-      .eq("user_id", userId)
-      .single();
+    // Service role client for admin operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    if (provError || !provider) throw new Error("Provider not found");
-
-    const tier = provider.subscription_tier;
-    if (tier !== "elite" && tier !== "enterprise") {
-      throw new Error("Email campaigns require Elite or Enterprise subscription");
-    }
-    logStep("Provider verified", { providerId: provider.id, tier });
-
-    // Parse request body
     const { campaignId } = await req.json();
-    if (!campaignId) throw new Error("Campaign ID required");
+    if (!campaignId || typeof campaignId !== "string") throw new Error("Missing campaignId");
+    // Validate UUID format to prevent injection
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(campaignId)) {
+      throw new Error("Campaign not found");
+    }
 
-    // Get campaign details
-    const { data: campaign, error: campError } = await supabase
+    // Get the campaign
+    const { data: campaign, error: campError } = await supabaseAuth
       .from("provider_email_campaigns")
       .select("*")
       .eq("id", campaignId)
-      .eq("provider_id", provider.id)
       .single();
 
     if (campError || !campaign) throw new Error("Campaign not found");
-    if (campaign.status !== "draft") throw new Error("Campaign already sent");
-    logStep("Campaign found", { subject: campaign.subject });
+    if (campaign.status === "sent") throw new Error("Campaign already sent");
 
-    // Get follower emails
-    const { data: followers, error: followError } = await supabase
-      .from("follows")
-      .select("follower_id")
-      .eq("following_provider_id", provider.id);
-
-    if (followError) throw new Error("Failed to fetch followers");
-    if (!followers || followers.length === 0) throw new Error("No followers to send to");
-
-    const followerIds = followers.map((f) => f.follower_id);
-    logStep("Followers found", { count: followerIds.length });
-
-    // Check credit balance
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("credits_balance")
-      .eq("user_id", userId)
+    // Verify provider is Elite or above
+    const { data: provider, error: provError } = await supabaseAdmin
+      .from("providers")
+      .select("id, subscription_tier, business_name, user_id, platform")
+      .eq("id", campaign.provider_id)
       .single();
 
-    const creditsBalance = profile?.credits_balance || 0;
-    const totalCost = followerIds.length * COST_PER_EMAIL;
+    if (provError || !provider) throw new Error("Provider not found");
+    if (provider.user_id !== user.id) throw new Error("Unauthorized");
 
-    if (creditsBalance < totalCost) {
-      throw new Error(
-        `Insufficient credits. Need R$${totalCost.toFixed(2)} (${followerIds.length} emails × R$${COST_PER_EMAIL}). Current balance: R$${creditsBalance.toFixed(2)}`
+    const tier = provider.subscription_tier || "free";
+    if (tier !== "elite" && tier !== "enterprise") {
+      throw new Error("Email campaigns require Elite or Enterprise tier");
+    }
+
+    // Get recipients based on type
+    let recipientEmails: string[] = [];
+
+    if (campaign.recipient_type === "followers") {
+      // Get follower user IDs
+      const { data: followers } = await supabaseAdmin
+        .from("follows")
+        .select("follower_id")
+        .eq("following_provider_id", campaign.provider_id);
+
+      if (followers && followers.length > 0) {
+        const followerIds = followers.map((f: any) => f.follower_id);
+        const { data: profiles } = await supabaseAdmin
+          .from("profiles")
+          .select("email")
+          .in("user_id", followerIds)
+          .not("email", "is", null);
+
+        recipientEmails = (profiles || []).map((p: any) => p.email).filter(Boolean);
+      }
+    } else if (campaign.recipient_type === "customers") {
+      // Get customers who have had active jobs with this provider
+      const { data: jobs } = await supabaseAdmin
+        .from("active_jobs")
+        .select("customer_id")
+        .eq("provider_id", provider.user_id);
+
+      if (jobs && jobs.length > 0) {
+        const customerIds = [...new Set(jobs.map((j: any) => j.customer_id))];
+        const { data: profiles } = await supabaseAdmin
+          .from("profiles")
+          .select("email")
+          .in("user_id", customerIds)
+          .not("email", "is", null);
+
+        recipientEmails = (profiles || []).map((p: any) => p.email).filter(Boolean);
+      }
+    }
+
+    // De-duplicate
+    recipientEmails = [...new Set(recipientEmails)];
+
+    if (recipientEmails.length === 0) {
+      // Update campaign as sent with 0 recipients
+      await supabaseAuth
+        .from("provider_email_campaigns")
+        .update({
+          status: "sent",
+          total_recipients: 0,
+          total_sent: 0,
+          total_cost: 0,
+          sent_at: new Date().toISOString(),
+        })
+        .eq("id", campaignId);
+
+      return new Response(
+        JSON.stringify({ success: true, sent: 0, cost: 0, message: "No recipients found" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    logStep("Credits check passed", { balance: creditsBalance, cost: totalCost });
 
-    // Mark campaign as sending
-    await supabase
+    const totalCost = recipientEmails.length * COST_PER_EMAIL;
+
+    // Payment is handled via Stripe checkout before this function is called
+    // No credit balance check needed
+
+    // Update campaign status to sending
+    await supabaseAuth
       .from("provider_email_campaigns")
-      .update({ status: "sending", total_recipients: followerIds.length })
+      .update({ status: "sending", total_recipients: recipientEmails.length })
       .eq("id", campaignId);
 
-    // Get follower email addresses
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, email, first_name")
-      .in("user_id", followerIds);
+    // Send emails in batches of 50
+    let sentCount = 0;
+    const batchSize = 50;
 
-    if (!profiles || profiles.length === 0) throw new Error("No follower profiles found");
-
-    const emailRecipients = profiles.filter((p) => p.email);
-    logStep("Email recipients", { count: emailRecipients.length });
-
-    let sent = 0;
-    let errors = 0;
-
-    // Send emails in batches of 10
-    const batchSize = 10;
-    for (let i = 0; i < emailRecipients.length; i += batchSize) {
-      const batch = emailRecipients.slice(i, i + batchSize);
-
-      const promises = batch.map(async (recipient) => {
-        try {
-          const from = senderWithDisplayName(`${provider.business_name} via ${CAMPAIGN_BRAND.name}`, CAMPAIGN_BRAND);
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from,
-              to: [recipient.email],
-              subject: campaign.subject,
-              html: wrapEmailHtml(campaign.subject, campaign.html_content, provider.business_name),
-            }),
+    for (let i = 0; i < recipientEmails.length; i += batchSize) {
+      const batch = recipientEmails.slice(i, i + batchSize);
+      
+      try {
+        // Send each email individually via Resend
+        // Escape provider business name in "from" and footer to prevent header injection
+        const safeBusinessName = escapeHtml(provider.business_name || "Provider");
+        const brand = APP_BRANDS[normalizeAppKey(provider.platform)];
+        const from = senderWithDisplayName(`${safeBusinessName} via ${brand.name}`, brand);
+        for (const email of batch) {
+          const result = await resend.emails.send({
+            from,
+            to: [email],
+            subject: escapeHtml(campaign.subject || ""),
+            html: `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                ${sanitizeCampaignHtml(campaign.body_html)}
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+                <p style="color: #888; font-size: 12px; text-align: center;">
+                  Sent by ${safeBusinessName} via ${brand.name}<br/>
+                  <a href="${brand.url}" style="color: #888;">${brand.domain}</a>
+                </p>
+              </div>
+            `,
           });
-
-          await reportResendFailure(res, from, "send-provider-campaign");
-
-          if (res.ok) {
-            sent++;
-          } else {
-            errors++;
-            const errText = await res.text();
-            console.error(`Failed to send email to recipient:`, errText);
-          }
-        } catch (err) {
-          errors++;
-          console.error(`Error sending email to recipient:`, err);
+          reportResendSdkFailure(result, from, "send-provider-campaign");
+          if (result.error) throw new Error(`Resend rejected provider campaign: ${result.error.message}`);
+          sentCount++;
         }
-      });
-
-      await Promise.all(promises);
+      } catch (batchError) {
+        console.error("Batch send error:", batchError);
+      }
     }
 
-    // Deduct credits atomically — use conditional update to prevent race conditions.
-    // Only deduct if balance is still sufficient (another request may have consumed credits).
-    const actualCost = sent * COST_PER_EMAIL;
-    const { data: deductResult, error: deductError } = await supabase
-      .from("profiles")
-      .update({ credits_balance: creditsBalance - actualCost })
-      .eq("user_id", userId)
-      .gte("credits_balance", actualCost)
-      .select("credits_balance")
-      .single();
-
-    if (deductError || !deductResult) {
-      logStep("WARNING: Credit deduction failed — possible race condition", { actualCost });
-    }
-
-    // Update campaign record
-    await supabase
+    // Update campaign as sent
+    await supabaseAuth
       .from("provider_email_campaigns")
       .update({
-        status: "completed",
-        emails_sent: sent,
-        emails_failed: errors,
-        total_cost: actualCost,
+        status: "sent",
+        total_sent: sentCount,
+        total_cost: sentCount * COST_PER_EMAIL,
         sent_at: new Date().toISOString(),
       })
       .eq("id", campaignId);
 
-    const result = {
-      campaignId,
-      subject: campaign.subject,
-      totalRecipients: emailRecipients.length,
-      emailsSent: sent,
-      emailsFailed: errors,
-      totalCost: actualCost,
-      remainingCredits: creditsBalance - actualCost,
-    };
-
-    logStep("Campaign complete", result);
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message });
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        sent: sentCount,
+        total_recipients: recipientEmails.length,
+        cost: sentCount * COST_PER_EMAIL,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    console.error("Campaign send error:", error);
+    // Only expose safe error messages to the client
+    const safeMessages = ["Unauthorized", "Campaign not found", "Campaign already sent", "Provider not found", "Missing campaignId", "Email campaigns require Elite or Enterprise tier"];
+    const clientMessage = safeMessages.includes(error.message) ? error.message : "An error occurred while sending the campaign";
+    return new Response(
+      JSON.stringify({ error: clientMessage }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
-};
-
-serve(handler);
+});

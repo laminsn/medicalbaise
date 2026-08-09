@@ -1,26 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppBrand, normalizeAppKey, reportResendFailure } from "../_shared/brands.ts";
+import { getCorsHeaders, escapeHtml, authenticateRequest, createErrorResponse, rejectNonPostMethod } from "../_shared/security.ts";
 
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-
-const ALLOWED_ORIGINS = [
-  "https://mdbaise.com",
-  "https://www.mdbaise.com",
-  ...(Deno.env.get("ENVIRONMENT") !== "production" ? ["http://localhost:8080"] : []),
-];
-
-function getCorsHeaders(req: Request) {
-  const origin = req.headers.get("Origin") || "";
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
-  return {
-    "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  };
-}
 
 interface AnalyticsData {
   totalViews: number;
@@ -30,10 +15,13 @@ interface AnalyticsData {
 }
 
 function generateEmailHTML(brand: AppBrand, businessName: string, data: AnalyticsData, frequency: string, dateRange: string): string {
+  // Escape all dynamic content to prevent HTML injection in emails
+  const safeBusinessName = escapeHtml(businessName);
+  const safeDateRange = escapeHtml(dateRange);
   const eventRows = Object.entries(data.eventBreakdown)
     .map(([event, count]) => `
       <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">${event}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e0e0e0;">${escapeHtml(event)}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: bold;">${count}</td>
       </tr>
     `)
@@ -133,40 +121,20 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const methodError = rejectNonPostMethod(req, corsHeaders);
+  if (methodError) return methodError;
+
   try {
-    // Verify the user is authenticated
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      console.error("No authorization header provided");
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
-
-    // Validate the JWT token and get user
-    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser();
-    if (authError || !user) {
-      console.error("Authentication failed:", authError);
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
-
-    console.log("User authenticated");
+    // Authenticate user using shared security utility
+    const { user } = await authenticateRequest(req);
 
     // Use service role client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { providerId, manual, appKey } = await req.json().catch(() => ({}));
-    const brand = APP_BRANDS[normalizeAppKey(appKey || Deno.env.get("BAISE_APP_KEY"), "medical")];
-
-    console.log("Starting analytics report send", { providerId, manual });
+    const brand = APP_BRANDS[normalizeAppKey(appKey || Deno.env.get("BAISE_APP_KEY"))];
+    
+    console.log("Starting analytics report send", { providerId, manual, requestedBy: user.id });
 
     // If providerId is specified, verify the user owns that provider
     if (providerId) {
@@ -228,14 +196,14 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (userSchedules.length === 0) {
-      console.log("No schedules to process");
+      console.log("No schedules to process for user", user.id);
       return new Response(JSON.stringify({ message: "No schedules to process" }), {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log(`Processing ${userSchedules.length} schedules`);
+    console.log(`Processing ${userSchedules.length} schedules for user ${user.id}`);
 
     const results = [];
 
@@ -341,11 +309,7 @@ const handler = async (req: Request): Promise<Response> => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: unknown) {
-    console.error("Error in send-analytics-report:", error);
-    return new Response(JSON.stringify({ error: "Analytics report failed" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    return createErrorResponse(error, corsHeaders, "SEND-ANALYTICS-REPORT");
   }
 };
 
