@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import type { TFunction } from 'i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +52,7 @@ import { toast } from 'sonner';
 type PosPaymentMethod = 'hosted_checkout' | 'card' | 'wallet' | 'pix' | 'internal_balance' | 'superwall_stripe';
 type RefundDestination = 'original_payment_method' | 'service_credit' | 'internal_balance';
 
-const POS_PAYMENT_METHODS: { value: PosPaymentMethod; label: string; helper: string }[] = [
+const buildPosPaymentMethods = (t: TFunction): { value: PosPaymentMethod; label: string; helper: string }[] => [
   {
     value: 'hosted_checkout',
     label: t('paymentsPage.hostedCheckout', "Hosted checkout"),
@@ -79,7 +80,7 @@ const POS_PAYMENT_METHODS: { value: PosPaymentMethod; label: string; helper: str
   },
 ];
 
-const ACCOUNTING_FEATURES = [
+const buildAccountingFeatures = (t: TFunction) => [
   t('paymentsPage.uniqueInvoiceNumberAnd', "Unique invoice number and client ID for every transaction"),
   t('paymentsPage.providerServiceSubcontractorMileston', "Provider, service, subcontractor, milestone, and payment method links"),
   t('paymentsPage.dateTimestampServiceDescription', "Date, timestamp, service description, amount, refund, and credit trail"),
@@ -92,6 +93,8 @@ export default function Payments() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  const posPaymentMethods = useMemo(() => buildPosPaymentMethods(t), [t]);
+  const accountingFeatures = useMemo(() => buildAccountingFeatures(t), [t]);
 
   const [showAddFunds, setShowAddFunds] = useState(false);
   const [showAddPayment, setShowAddPayment] = useState(false);
@@ -150,7 +153,7 @@ export default function Payments() {
     return `INV-${date}-AUTO`;
   }, []);
 
-  const activePosMethod = POS_PAYMENT_METHODS.find((method) => method.value === posPaymentMethod);
+  const activePosMethod = posPaymentMethods.find((method) => method.value === posPaymentMethod);
 
   const handleAddOnChange = (addOnId: string, selected: boolean) => {
     if (selected) {
@@ -476,7 +479,7 @@ export default function Payments() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {POS_PAYMENT_METHODS.map((method) => (
+                          {posPaymentMethods.map((method) => (
                             <SelectItem key={method.value} value={method.value}>
                               {method.label}
                             </SelectItem>
@@ -572,7 +575,7 @@ export default function Payments() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-2">
-                    {ACCOUNTING_FEATURES.map((feature) => (
+                    {accountingFeatures.map((feature) => (
                       <div key={feature} className="flex items-start gap-2 rounded-lg bg-muted/40 p-3 text-sm">
                         <FileText className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <span>{feature}</span>

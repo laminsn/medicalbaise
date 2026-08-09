@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import type { TFunction } from 'i18next';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +30,7 @@ type PrintableDashboardProps = {
   recordsChecklist: string[];
 };
 
-const audienceLabels = {
+const buildAudienceLabels = (t: TFunction) => ({
   provider: {
     badge: t('app.serviceProviderReport', "Service provider report"),
     footer: t('app.providerDashboardPrintoutForOperations', "Provider dashboard printout for operations, revenue review, client follow-up, and record keeping."),
@@ -37,7 +39,7 @@ const audienceLabels = {
     badge: t('app.serviceUserReport', "Service user report"),
     footer: t('app.clientDashboardPrintoutForService', "Client dashboard printout for service tracking, approvals, records, receipts, and follow-up."),
   },
-};
+});
 
 export function PrintableDashboard({
   brandName,
@@ -52,6 +54,7 @@ export function PrintableDashboard({
   recordsChecklist,
 }: PrintableDashboardProps) {
   const { t } = useTranslation();
+  const audienceLabels = useMemo(() => buildAudienceLabels(t), [t]);
   const generatedAt = new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
     timeStyle: 'short',

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation } from 'react-router-dom';
@@ -10,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { BAISE_BLOG_POSTS, BLOG_CONTENT_RATIO, BlogAudience, BlogNiche } from '@/content/baiseBlogPosts';
 import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
 
-const brandCopy = {
+const buildBrandCopy = (t: TFunction) => ({
   casa: {
     name: 'Casa Baise',
     title: t('pageCopy.casaBaiseLearningLibrary', "Casa Baise Learning Library"),
@@ -26,7 +27,7 @@ const brandCopy = {
     title: t('pageCopy.mdBaiseLearningLibrary', "MD Baise Learning Library"),
     description: t('pageCopy.educationalGuidesForTrustedMedical', "Educational guides for trusted medical, wellness, and care support in Brazil."),
   },
-} as const;
+} as const);
 
 const audienceFilters: Array<{ value: 'all' | BlogAudience; label: string }> = [
   { value: 'all', label: 'All posts' },
@@ -43,6 +44,8 @@ const nicheFilters: Array<{ value: 'all' | BlogNiche; label: string }> = [
 ];
 
 const Blog = () => {
+  const { t } = useTranslation();
+  const brandCopy = useMemo(() => buildBrandCopy(t), [t]);
   const location = useLocation();
   const appKey = getBaiseAppKey();
   const brand = brandCopy[appKey];

@@ -34,6 +34,7 @@ const hasProviderError = () => {
 };
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const recoveryIntent = useRef(getRecoveryIntent());
   const [state, setState] = useState<RecoveryState>("checking");
   const [password, setPassword] = useState("");

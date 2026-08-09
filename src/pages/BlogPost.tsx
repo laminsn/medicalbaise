@@ -15,6 +15,7 @@ const brandNames = {
 } as const;
 
 const BlogPost = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const post = getBlogPostBySlug(slug);

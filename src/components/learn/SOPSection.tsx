@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { TFunction } from 'i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ interface SOPSectionProps {
   searchQuery: string;
 }
 
-const sopCategories = [
+const buildSopCategories = (t: TFunction) => [
   { id: 'all', label: t('sop.allSops', "All SOPs") },
   { id: 'patient', label: t('sop.patientProcedures', "Patient Procedures") },
   { id: 'provider', label: t('sop.providerProcedures', "Provider Procedures") },
@@ -23,7 +24,7 @@ const sopCategories = [
   { id: 'emergency', label: t('sop.emergency', "Emergency") },
 ];
 
-const sops = [
+const buildSops = (t: TFunction) => [
   {
     id: 1,
     title: t('sop.patientAppointmentBookingSop', "Patient Appointment Booking SOP"),
@@ -387,7 +388,9 @@ const sops = [
 ];
 
 export function SOPSection({ searchQuery }: SOPSectionProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const sopCategories = useMemo(() => buildSopCategories(t), [t]);
+  const sops = useMemo(() => buildSops(t), [t]);
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSOP, setSelectedSOP] = useState<typeof sops[0] | null>(null);
