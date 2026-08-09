@@ -98,7 +98,7 @@ export default function Pricing() {
   return (
     <>
       <Helmet>
-        <title>{t('pricing.title')} - Brasil Base</title>
+        <title>{t('pricing.title')} - MD Baise</title>
         <meta name="description" content={t('pricing.subtitle')} />
       </Helmet>
       <AppLayout showNav={false}>

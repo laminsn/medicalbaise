@@ -17,7 +17,7 @@ const gettingStartedGuides = [
   {
     id: 1,
     title: 'Create Your Account',
-    description: 'Set up your MDBaise account as a patient or healthcare provider',
+    description: 'Set up your MD Baise account as a patient or healthcare provider',
     icon: UserPlus,
     duration: '3 min',
     category: 'Account',
@@ -185,7 +185,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
           </div>
           <div className="flex-1">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              {isPt ? 'Bem-vindo ao MDBaise!' : isEs ? '¡Bienvenido a MDBaise!' : 'Welcome to MDBaise!'}
+              {isPt ? 'Bem-vindo ao MD Baise!' : isEs ? '¡Bienvenido a MD Baise!' : 'Welcome to MD Baise!'}
             </h2>
             <p className="text-muted-foreground mb-4">
               {isPt

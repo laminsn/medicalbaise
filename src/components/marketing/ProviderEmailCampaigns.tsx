@@ -320,7 +320,7 @@ export function ProviderEmailCampaigns() {
             <div className="rounded-lg border border-border bg-white dark:bg-card p-4">
               <p className="text-xs font-medium text-muted-foreground mb-2">{t('medicalGated.mgEmailPreview', "Email Preview")}</p>
               <div className="border-b border-border pb-2 mb-3">
-                <p className="text-xs text-muted-foreground">From: {providerName} via MDBaise</p>
+                <p className="text-xs text-muted-foreground">From: {providerName} via MD Baise</p>
                 <p className="font-semibold text-sm">{subject || '(No subject)'}</p>
               </div>
               <div

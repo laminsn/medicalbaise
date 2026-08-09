@@ -208,7 +208,7 @@ export default function Integrations() {
   return (
     <>
       <Helmet>
-        <title>{t('integrations.title')} - Brasil Base</title>
+        <title>{t('integrations.title')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 max-w-4xl mx-auto">

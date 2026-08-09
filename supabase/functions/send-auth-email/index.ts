@@ -1,6 +1,6 @@
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
+import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
 
-type AppKey = "casa" | "medical" | "legal";
 type ActionType =
   | "signup"
   | "recovery"
@@ -40,54 +40,9 @@ interface AuthHookPayload {
   };
 }
 
-interface Brand {
-  name: string;
-  domain: string;
-  origin: string;
-  hosts: readonly string[];
-  color: string;
-  colorDark: string;
-  from: string;
-  supportEmail: string;
-}
+type Brand = AppBrand;
 
-const BRANDS: Record<AppKey, Brand> = {
-  casa: {
-    name: "Casa Baise",
-    domain: "casabaise.com",
-    origin: "https://www.casabaise.com",
-    hosts: ["casabaise.com", "www.casabaise.com"],
-    color: "#1dbf73",
-    colorDark: "#047857",
-    from: "Casa Baise Security <support@support.casabaise.com>",
-    supportEmail: "support@casabaise.com",
-  },
-  medical: {
-    name: "Medical Baise",
-    domain: "mdbaise.com",
-    origin: "https://www.mdbaise.com",
-    hosts: ["mdbaise.com", "www.mdbaise.com", "medicalbaise.com", "www.medicalbaise.com"],
-    color: "#00b8d4",
-    colorDark: "#087b8c",
-    from: "Medical Baise Security <support@support.mdbaise.com>",
-    supportEmail: "support@mdbaise.com",
-  },
-  legal: {
-    name: "Legal Baise",
-    domain: "legalbaise.com",
-    origin: "https://www.legalbaise.com",
-    hosts: ["legalbaise.com", "www.legalbaise.com"],
-    color: "#7c3aed",
-    colorDark: "#5b21b6",
-    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
-    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
-    // retry. Sending from the verified Baise domain with Legal Baise as the
-    // display name keeps this mailbox alive. Revert to
-    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
-    from: "Legal Baise Security <support@support.casabaise.com>",
-    supportEmail: "support@legalbaise.com",
-  },
-};
+const BRANDS = APP_BRANDS;
 
 const ACTION_COPY: Record<ActionType, {
   subject: (brand: Brand) => string;
@@ -404,7 +359,7 @@ const sendEmail = async ({
       "Idempotency-Key": `auth-email/${action}/${tokenHash}`,
     },
     body: JSON.stringify({
-      from: brand.from,
+      from: brand.securityFrom,
       to: [to],
       reply_to: brand.supportEmail,
       subject: copy.subject(brand),
@@ -415,6 +370,8 @@ const sendEmail = async ({
       },
     }),
   });
+
+  await reportResendFailure(response, brand.securityFrom, "send-auth-email");
 
   if (!response.ok) {
     console.error("[send-auth-email] delivery rejected", { status: response.status, action });

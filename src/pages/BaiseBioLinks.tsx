@@ -92,7 +92,7 @@ const appLanes: AppLane[] = [
   },
   {
     key: "medical",
-    name: "Medical Baise",
+    name: "MD Baise",
     label: {
       en: "Find or offer trusted medical support",
       pt: "Encontre ou ofereça suporte médico confiavel",
@@ -161,7 +161,7 @@ const copy = {
     blogTitle: "Fresh practical guides",
     metaTitle: "Baise Links | Casa, Medical and Legal registration hub",
     metaDescription:
-      "Register for Casa Baise, Medical Baise, or Legal Baise from one shared social bio hub with resources for service providers and solutions for service users.",
+      "Register for Casa Baise, MD Baise, or Legal Baise from one shared social bio hub with resources for service providers and solutions for service users.",
   },
   pt: {
     languageLabel: "Idioma",
@@ -193,7 +193,7 @@ const copy = {
     blogTitle: "Guias praticos recentes",
     metaTitle: "Links Baise | Hub Casa, Medical e Legal",
     metaDescription:
-      "Cadastre-se no Casa Baise, Medical Baise ou Legal Baise por um único hub social com recursos para prestadores e soluções para usuários.",
+      "Cadastre-se no Casa Baise, MD Baise ou Legal Baise por um único hub social com recursos para prestadores e soluções para usuários.",
   },
 } as const;
 

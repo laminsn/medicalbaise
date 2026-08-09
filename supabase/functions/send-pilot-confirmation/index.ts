@@ -8,6 +8,8 @@
 // Required secret: RESEND_API_KEY.
 // Deployed with verify_jwt = false because the pilot form is public.
 
+import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
+
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -32,41 +34,15 @@ const CORS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-type AppKey = "casa" | "medical" | "legal";
 type Locale = "pt" | "es" | "en";
 
-const BRANDS: Record<AppKey, { name: string; url: string; color: string; from: string; support: string }> = {
-  casa: {
-    name: "Casa Baise",
-    url: "https://www.casabaise.com",
-    color: "#1dbf73",
-    from: "Casa Baise <support@support.casabaise.com>",
-    support: "support@casabaise.com",
-  },
-  medical: {
-    name: "Medical Baise",
-    url: "https://www.mdbaise.com",
-    color: "#00b8d4",
-    from: "Medical Baise <support@support.mdbaise.com>",
-    support: "support@casabaise.com",
-  },
-  legal: {
-    name: "Legal Baise",
-    url: "https://www.legalbaise.com",
-    color: "#7c3aed",
-    // legalbaise.com is not a verified Resend domain, so mail from it 403s.
-    // Sent from the verified Baise sender with Legal Baise as the display name
-    // until the DNS records for legalbaise.com are added and verified.
-    from: "Legal Baise <support@support.casabaise.com>",
-    support: "support@casabaise.com",
-  },
-};
+const BRANDS = APP_BRANDS;
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
-function copyFor(locale: Locale, brand: typeof BRANDS.casa, name: string) {
+function copyFor(locale: Locale, brand: AppBrand, name: string) {
   const first = (name || "").trim().split(/\s+/)[0] || "";
   if (locale === "pt") {
     return {
@@ -87,7 +63,7 @@ function copyFor(locale: Locale, brand: typeof BRANDS.casa, name: string) {
       cta: "Confirmar meu e-mail",
       ctaNote: "O link vale por 7 dias.",
       ignore: "Se voc\u00ea n\u00e3o se inscreveu, ignore este e-mail \u2014 nada acontece sem a confirma\u00e7\u00e3o.",
-      footer: `Dúvidas? Responda este e-mail ou escreva para ${brand.support}.`,
+      footer: `Dúvidas? Responda este e-mail ou escreva para ${brand.supportEmail}.`,
       sig: "Equipe Baise",
     };
   }
@@ -110,7 +86,7 @@ function copyFor(locale: Locale, brand: typeof BRANDS.casa, name: string) {
       cta: "Confirmar mi correo",
       ctaNote: "El enlace vale por 7 d\u00edas.",
       ignore: "Si no te inscribiste, ignora este correo \u2014 nada ocurre sin la confirmaci\u00f3n.",
-      footer: `¿Dudas? Responde a este correo o escribe a ${brand.support}.`,
+      footer: `¿Dudas? Responde a este correo o escribe a ${brand.supportEmail}.`,
       sig: "Equipo Baise",
     };
   }
@@ -132,12 +108,12 @@ function copyFor(locale: Locale, brand: typeof BRANDS.casa, name: string) {
     cta: "Confirm my email",
     ctaNote: "The link is valid for 7 days.",
     ignore: "If you did not apply, ignore this email \u2014 nothing happens without the confirmation.",
-    footer: `Questions? Reply to this email or write to ${brand.support}.`,
+    footer: `Questions? Reply to this email or write to ${brand.supportEmail}.`,
     sig: "The Baise team",
   };
 }
 
-function buildHtml(brand: typeof BRANDS.casa, c: ReturnType<typeof copyFor>, locale: Locale, confirmUrl: string) {
+function buildHtml(brand: AppBrand, c: ReturnType<typeof copyFor>, locale: Locale, confirmUrl: string) {
   const rules = c.rules
     .map((r) => `<li style="margin:0 0 10px;">${escapeHtml(r)}</li>`)
     .join("");
@@ -257,6 +233,8 @@ Deno.serve(async (req) => {
         html: buildHtml(brand, c, locale, confirmUrl),
       }),
     });
+
+    await reportResendFailure(res, brand.from, "send-pilot-confirmation");
 
     if (!res.ok) {
       const detail = await res.text();

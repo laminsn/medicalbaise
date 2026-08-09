@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webPush from "npm:web-push@3.6.7";
+import { type AppBrand, getAppBrand, reportResendFailure } from "../_shared/brands.ts";
 import {
   authenticateRequest,
   createErrorResponse,
@@ -69,41 +70,9 @@ const WHATSAPP_PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
 const APPOINTMENT_CALLBACK_SECRET = Deno.env.get("APPOINTMENT_CALLBACK_SECRET");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 
-const APP_BRANDS = {
-  casa: {
-    name: "Casa Baise",
-    domain: "casabaise.com",
-    url: "https://casabaise.com",
-    color: "#1dbf73",
-    from: "Casa Baise <support@support.casabaise.com>",
-  },
-  medical: {
-    name: "Medical Baise",
-    domain: "medicalbaise.com",
-    url: "https://medicalbaise.com",
-    color: "#00b8d4",
-    from: "Medical Baise <support@support.mdbaise.com>",
-  },
-  legal: {
-    name: "Legal Baise",
-    domain: "legalbaise.com",
-    url: "https://legalbaise.com",
-    color: "#7c3aed",
-    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
-    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
-    // retry. Sending from the verified Baise domain with Legal Baise as the
-    // display name keeps this mailbox alive. Revert to
-    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
-    from: "Legal Baise <support@support.casabaise.com>",
-  },
-} as const;
-
 const nowIso = () => new Date().toISOString();
 
-const getBrand = (appKey?: string) => {
-  if (appKey === "medical" || appKey === "legal" || appKey === "casa") return APP_BRANDS[appKey];
-  return APP_BRANDS.casa;
-};
+const getBrand = (appKey?: string) => getAppBrand(appKey);
 
 const metadataString = (metadata: Record<string, unknown> | null, key: string) => {
   const value = metadata?.[key];
@@ -162,7 +131,7 @@ const signAppointmentCallback = async (event: CommunicationEvent): Promise<strin
   return `${SUPABASE_URL}/functions/v1/appointment-response?${query.toString()}`;
 };
 
-const buildEmailHtml = (brand: typeof APP_BRANDS.casa, subject: string, body: string, actionUrl: string) => {
+const buildEmailHtml = (brand: AppBrand, subject: string, body: string, actionUrl: string) => {
   const callbackBase = `${SUPABASE_URL}/functions/v1/appointment-response?`;
   const safeActionUrl = actionUrl.startsWith("/")
     ? `${brand.url}${actionUrl}`
@@ -213,11 +182,7 @@ async function sendEmail(
   }
 
   const brand = getBrand(appKey);
-  const configuredFromName = Deno.env.get("BAISE_EMAIL_FROM_NAME");
-  const configuredFromAddress = Deno.env.get("BAISE_EMAIL_FROM_ADDRESS");
-  const from = configuredFromName && configuredFromAddress
-    ? `${configuredFromName} <${configuredFromAddress}>`
-    : brand.from;
+  const from = brand.from;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -233,6 +198,8 @@ async function sendEmail(
       html: buildEmailHtml(brand, subject, body, actionUrl),
     }),
   });
+
+  await reportResendFailure(res, from, "dispatch-provider-communication-events");
 
   if (!res.ok) {
     return { ok: false, error: `Resend error ${res.status}: ${(await res.text()).slice(0, 240)}` };

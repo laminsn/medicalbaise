@@ -82,7 +82,7 @@ export default function Payouts() {
   return (
     <>
       <Helmet>
-        <title>{isPt ? 'Pagamentos - Brasil Base' : isEs ? 'Cobros - Brasil Base' : 'Payouts - Brasil Base'}</title>
+        <title>{isPt ? 'Pagamentos - MD Baise' : isEs ? 'Cobros - MD Baise' : 'Payouts - MD Baise'}</title>
       </Helmet>
       <AppLayout>
         <div className="container mx-auto px-4 py-6 max-w-4xl">

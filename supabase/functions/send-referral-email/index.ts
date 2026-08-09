@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { APP_BRANDS, type AppBrand, reportResendFailure } from "../_shared/brands.ts";
 import {
   authenticateRequest,
   createErrorResponse,
@@ -16,35 +17,6 @@ type ReferralEmailBody = {
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-const APP_BRANDS = {
-  casa: {
-    name: "Casa Baise",
-    domain: "casabaise.com",
-    url: "https://casabaise.com",
-    color: "#1dbf73",
-    from: "Casa Baise <support@support.casabaise.com>",
-  },
-  medical: {
-    name: "Medical Baise",
-    domain: "medicalbaise.com",
-    url: "https://medicalbaise.com",
-    color: "#00b8d4",
-    from: "Medical Baise <support@support.mdbaise.com>",
-  },
-  legal: {
-    name: "Legal Baise",
-    domain: "legalbaise.com",
-    url: "https://legalbaise.com",
-    color: "#7c3aed",
-    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
-    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
-    // retry. Sending from the verified Baise domain with Legal Baise as the
-    // display name keeps this mailbox alive. Revert to
-    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
-    from: "Legal Baise <support@support.casabaise.com>",
-  },
-} as const;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -101,7 +73,7 @@ function getCopy(locale: "en" | "es" | "pt", brandName: string, senderName: stri
 }
 
 function buildEmailHtml(
-  brand: typeof APP_BRANDS.casa,
+  brand: AppBrand,
   copy: ReturnType<typeof getCopy>,
   referralUrl: string,
 ) {
@@ -203,6 +175,8 @@ serve(async (req) => {
         html: buildEmailHtml(brand, copy, referralUrl),
       }),
     });
+
+    await reportResendFailure(res, brand.from, "send-referral-email");
 
     if (!res.ok) {
       return new Response(JSON.stringify({ error: "Referral email send failed" }), {

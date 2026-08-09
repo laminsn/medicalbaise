@@ -25,7 +25,7 @@ const db = supabase as any;
 
 const brandName = {
   casa: 'Casa Baise',
-  medical: 'Medical Baise',
+  medical: 'MD Baise',
   legal: 'Legal Baise',
 } as const;
 
@@ -40,7 +40,7 @@ const brandCopy = {
     title: 'Your trusted medical support invitation is ready.',
     body: 'Use this invite to find trusted medical support, keep records organized, and manage service history from one secure Baise account.',
     primary: 'Create your account',
-    secondary: 'Explore Medical Baise',
+    secondary: 'Explore MD Baise',
   },
   legal: {
     title: 'Your trusted legal support invitation is ready.',

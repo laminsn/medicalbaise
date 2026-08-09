@@ -461,7 +461,7 @@ export function PartnerCampaignCommandCenter() {
   const locale = getLocaleKey(i18n.resolvedLanguage || i18n.language);
   const copy = COPY[locale] as PartnerCopy;
   const appKey = getBaiseAppKey();
-  const brandName = appKey === 'medical' ? 'Medical Baise' : appKey === 'legal' ? 'Legal Baise' : 'Casa Baise';
+  const brandName = appKey === 'medical' ? 'MD Baise' : appKey === 'legal' ? 'Legal Baise' : 'Casa Baise';
   const qrRef = useRef<HTMLDivElement>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [applications, setApplications] = useState<PartnerApplication[]>([]);

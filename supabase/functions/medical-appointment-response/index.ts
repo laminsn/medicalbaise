@@ -52,11 +52,11 @@ const renderPage = (
   form?: { token: string; button: string },
 ): string => `<!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medical Baise</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MD Baise</title></head>
 <body style="margin:0;background:#f4f7f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#102a2e">
   <main style="max-width:560px;margin:48px auto;padding:0 16px">
     <section style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.08)">
-      <header style="padding:24px;background:#00b8d4;color:#fff;font-size:22px;font-weight:800">Medical Baise</header>
+      <header style="padding:24px;background:#00b8d4;color:#fff;font-size:22px;font-weight:800">MD Baise</header>
       <div style="padding:28px">
         <h1 style="font-size:22px;margin:0 0 14px">${escapeHtml(title)}</h1>
         <p style="line-height:1.6;color:#475569">${escapeHtml(message)}</p>
@@ -69,7 +69,7 @@ const renderPage = (
           </form>
         ` : ""}
         <p style="margin-top:24px;font-size:13px;line-height:1.5;color:#64748b">
-          No medical details are displayed here. Sign in to the secure Medical Baise portal for appointment information.
+          No medical details are displayed here. Sign in to the secure MD Baise portal for appointment information.
         </p>
       </div>
     </section>
@@ -90,7 +90,7 @@ const getConfiguration = () => {
 serve(async (request) => {
   if (request.method !== "GET" && request.method !== "POST") {
     return new Response(
-      renderPage("Unable to continue", "Use the secure link from your Medical Baise message."),
+      renderPage("Unable to continue", "Use the secure link from your MD Baise message."),
       { status: 404, headers: securityHeaders },
     );
   }
@@ -98,7 +98,7 @@ serve(async (request) => {
   const configuration = getConfiguration();
   if (!configuration) {
     return new Response(
-      renderPage("Temporarily unavailable", "Please sign in to the secure portal or contact Medical Baise support."),
+      renderPage("Temporarily unavailable", "Please sign in to the secure portal or contact MD Baise support."),
       { status: 503, headers: securityHeaders },
     );
   }

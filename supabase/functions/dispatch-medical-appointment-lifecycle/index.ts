@@ -128,7 +128,7 @@ const buildEmailHtml = (
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="padding:24px 12px">
     <tr><td align="center">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:16px;overflow:hidden">
-        <tr><td style="background:#00b8d4;color:#fff;padding:24px 28px"><strong style="font-size:22px">Medical Baise</strong></td></tr>
+        <tr><td style="background:#00b8d4;color:#fff;padding:24px 28px"><strong style="font-size:22px">MD Baise</strong></td></tr>
         <tr><td style="padding:28px">
           <h1 style="font-size:22px;margin:0 0 16px">${escapeHtml(subject)}</h1>
           <p style="line-height:1.6;margin:0 0 22px">${escapeHtml(body)}</p>
@@ -136,7 +136,7 @@ const buildEmailHtml = (
           <p><a href="${escapeHtml(portalUrl)}" style="color:#007f91;font-weight:700">Open the secure portal</a></p>
           <p style="font-size:13px;line-height:1.5;color:#64748b;margin-top:26px">
             Medical information is intentionally excluded from email. If you did not expect this message,
-            do not use its response buttons; sign in directly or contact Medical Baise support.
+            do not use its response buttons; sign in directly or contact MD Baise support.
           </p>
           <p style="font-size:12px;color:#64748b">
             Appointment communications can be changed at any time in Settings.

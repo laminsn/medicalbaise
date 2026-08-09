@@ -131,7 +131,7 @@ function productTieIn(post: BaiseBlogPost) {
   if (post.niche === 'medical') {
     return {
       productKey: 'medical_premium_access',
-      productName: 'Medical Baise Premium Access',
+      productName: 'MD Baise Premium Access',
       ctaLabel: 'Find trusted medical support',
       ctaPath: '/auth?mode=signup',
       valueReason:

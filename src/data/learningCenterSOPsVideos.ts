@@ -16,15 +16,15 @@ export const sops: SOP[] = [
     lastUpdated: '2024-12-01',
     category: 'patient',
     department: 'Patient Services',
-    overview: 'Standard procedure for patients to search, select, and book appointments with healthcare providers on the MDBaise platform.',
-    scope: 'All registered patients seeking medical consultations through MDBaise.',
+    overview: 'Standard procedure for patients to search, select, and book appointments with healthcare providers on the MD Baise platform.',
+    scope: 'All registered patients seeking medical consultations through MD Baise.',
     responsibilities: [
       'Patient: Provide accurate health information, select appropriate provider, complete booking process, arrive/join on time',
       'System: Display accurate availability, process payments securely, send confirmations and reminders',
       'Provider: Maintain current availability calendar, honor booked appointments, communicate any changes promptly'
     ],
     steps: [
-      { step: 1, title: 'Account Access', description: 'Log into MDBaise account using registered email and password, or use Google/social login.', notes: 'Reset password via "Forgot Password" if needed. Create account if new user.', timeEstimate: '30 seconds' },
+      { step: 1, title: 'Account Access', description: 'Log into MD Baise account using registered email and password, or use Google/social login.', notes: 'Reset password via "Forgot Password" if needed. Create account if new user.', timeEstimate: '30 seconds' },
       { step: 2, title: 'Provider Search', description: 'Use search bar or browse categories to find healthcare providers by specialty, name, or condition.', notes: 'Apply filters for location, availability, insurance, and ratings.', timeEstimate: '1-3 minutes' },
       { step: 3, title: 'Profile Review', description: 'Review provider profile including credentials, experience, reviews, services, and pricing.', notes: 'Look for verified badge indicating credential confirmation.', timeEstimate: '2-5 minutes' },
       { step: 4, title: 'Service Selection', description: 'Choose the specific service needed from the provider\'s offerings.', notes: 'Note consultation type options: in-person vs teleconsultation.', timeEstimate: '30 seconds' },
@@ -51,7 +51,7 @@ export const sops: SOP[] = [
     category: 'patient',
     department: 'Patient Services',
     overview: 'Standard procedure for patients to prepare for, join, and participate in video consultations with healthcare providers.',
-    scope: 'All patients with scheduled teleconsultation appointments on MDBaise.',
+    scope: 'All patients with scheduled teleconsultation appointments on MD Baise.',
     responsibilities: [
       'Patient: Prepare equipment, create appropriate environment, join on time, communicate clearly',
       'Provider: Join on time, maintain professional setting, document consultation, provide summary',
@@ -84,8 +84,8 @@ export const sops: SOP[] = [
     lastUpdated: '2024-12-05',
     category: 'provider',
     department: 'Provider Operations',
-    overview: 'Standard procedure for new healthcare providers to create, configure, and verify their professional profile on MDBaise.',
-    scope: 'All healthcare providers registering on MDBaise platform.',
+    overview: 'Standard procedure for new healthcare providers to create, configure, and verify their professional profile on MD Baise.',
+    scope: 'All healthcare providers registering on MD Baise platform.',
     responsibilities: [
       'Provider: Submit accurate information, upload valid credentials, maintain current profile, respond to verification requests',
       'Verification Team: Review credentials within 5 business days, request clarification if needed, approve or reject with reasoning',
@@ -123,7 +123,7 @@ export const sops: SOP[] = [
     category: 'provider',
     department: 'Provider Operations',
     overview: 'Standard procedure for providers to manage their appointment availability, schedule changes, and time-off periods.',
-    scope: 'All active providers with published profiles on MDBaise.',
+    scope: 'All active providers with published profiles on MD Baise.',
     responsibilities: [
       'Provider: Maintain accurate availability, update schedule promptly, honor booked appointments',
       'System: Display real-time availability, prevent double-booking, sync calendar updates',
@@ -156,7 +156,7 @@ export const sops: SOP[] = [
     category: 'admin',
     department: 'Finance',
     overview: 'Standard procedure for processing patient payments, calculating fees, and disbursing provider payouts.',
-    scope: 'All financial transactions processed through MDBaise platform.',
+    scope: 'All financial transactions processed through MD Baise platform.',
     responsibilities: [
       'Patient: Maintain valid payment method, authorize payments, report issues promptly',
       'Provider: Complete consultations, confirm service delivery, verify payout amounts',
@@ -191,7 +191,7 @@ export const sops: SOP[] = [
     category: 'admin',
     department: 'Finance',
     overview: 'Standard procedure for handling patient refund requests due to cancellations, no-shows, or service issues.',
-    scope: 'All refund requests submitted through MDBaise platform.',
+    scope: 'All refund requests submitted through MD Baise platform.',
     responsibilities: [
       'Patient: Submit refund request with valid reason, provide supporting information',
       'Provider: Respond to disputes, honor cancellation policies',
@@ -226,7 +226,7 @@ export const sops: SOP[] = [
     category: 'emergency',
     department: 'Safety & Compliance',
     overview: 'Standard procedure for identifying and responding to medical emergencies during teleconsultations or platform interactions.',
-    scope: 'All emergency situations identified during patient-provider interactions on MDBaise.',
+    scope: 'All emergency situations identified during patient-provider interactions on MD Baise.',
     responsibilities: [
       'Provider: Recognize emergency signs, guide patient, contact emergency services if needed, document incident',
       'Patient/Caregiver: Follow instructions, provide location, call emergency services when directed',
@@ -241,7 +241,7 @@ export const sops: SOP[] = [
       { step: 5, title: 'Stay Connected', description: 'Maintain video/audio connection as long as possible. Document timeline and instructions given.', notes: 'If connection drops, try to reconnect. Record what happened.', timeEstimate: 'Until resolved' },
       { step: 6, title: 'Emergency Handoff', description: 'When emergency services arrive, provide relevant medical history to responders if possible.', notes: 'Offer to speak with paramedics if helpful.', timeEstimate: 'As needed' },
       { step: 7, title: 'Incident Documentation', description: 'Complete incident report within 24 hours via Provider Dashboard > Incidents.', notes: 'Include: timeline, symptoms, instructions given, outcome.', timeEstimate: '15-30 minutes' },
-      { step: 8, title: 'Follow-Up', description: 'If appropriate and possible, follow up on patient status. Report to MDBaise support team.', notes: 'Maintain confidentiality. Debrief if needed for personal wellbeing.', timeEstimate: 'Next business day' }
+      { step: 8, title: 'Follow-Up', description: 'If appropriate and possible, follow up on patient status. Report to MD Baise support team.', notes: 'Maintain confidentiality. Debrief if needed for personal wellbeing.', timeEstimate: 'Next business day' }
     ],
     qualityChecks: [
       'Emergency services contacted within 2 minutes of recognition',
@@ -262,7 +262,7 @@ export const sops: SOP[] = [
     category: 'admin',
     department: 'Information Security',
     overview: 'Standard procedure for protecting patient health information (PHI) and ensuring LGPD/HIPAA compliance across all platform operations.',
-    scope: 'All users and systems handling patient data on MDBaise.',
+    scope: 'All users and systems handling patient data on MD Baise.',
     responsibilities: [
       'All Users: Follow data handling protocols, report suspicious activity, complete security training',
       'IT Team: Maintain security infrastructure, monitor for threats, respond to incidents',
@@ -297,7 +297,7 @@ export const sops: SOP[] = [
     category: 'provider',
     department: 'Provider Operations',
     overview: 'Standard procedure for providers to professionally respond to patient reviews and maintain reputation.',
-    scope: 'All provider responses to patient reviews on MDBaise.',
+    scope: 'All provider responses to patient reviews on MD Baise.',
     responsibilities: [
       'Provider: Respond professionally to all reviews, address concerns constructively',
       'Quality Team: Monitor responses for policy compliance, mediate disputes',
@@ -573,8 +573,8 @@ export const sops: SOP[] = [
 export const videos: Video[] = [
   {
     id: 1,
-    title: 'Welcome to MDBaise: Complete Platform Overview',
-    description: 'A comprehensive introduction to all the features and capabilities of the MDBaise platform. Perfect for new users who want to understand everything available.',
+    title: 'Welcome to MD Baise: Complete Platform Overview',
+    description: 'A comprehensive introduction to all the features and capabilities of the MD Baise platform. Perfect for new users who want to understand everything available.',
     category: 'quickstart',
     duration: '12:30',
     views: 45200,
@@ -622,7 +622,7 @@ export const videos: Video[] = [
   {
     id: 4,
     title: 'Provider Dashboard Masterclass',
-    description: 'For healthcare providers: maximize your presence, manage your practice efficiently, and grow your patient base on MDBaise.',
+    description: 'For healthcare providers: maximize your presence, manage your practice efficiently, and grow your patient base on MD Baise.',
     category: 'features',
     duration: '18:00',
     views: 15200,
@@ -654,7 +654,7 @@ export const videos: Video[] = [
   },
   {
     id: 6,
-    title: 'Managing Your Medical History on MDBaise',
+    title: 'Managing Your Medical History on MD Baise',
     description: 'Keep track of appointments, prescriptions, test results, and health records all in one secure place.',
     category: 'features',
     duration: '8:00',
@@ -686,7 +686,7 @@ export const videos: Video[] = [
   {
     id: 8,
     title: 'Provider Success: Growing Your Patient Base',
-    description: 'Proven strategies for healthcare providers to grow their practice and attract more patients on MDBaise.',
+    description: 'Proven strategies for healthcare providers to grow their practice and attract more patients on MD Baise.',
     category: 'tips',
     duration: '11:00',
     views: 9500,
@@ -716,7 +716,7 @@ export const videos: Video[] = [
   {
     id: 10,
     title: 'Payment & Insurance Guide',
-    description: 'Everything you need to know about payments, insurance acceptance, receipts, and refunds on MDBaise.',
+    description: 'Everything you need to know about payments, insurance acceptance, receipts, and refunds on MD Baise.',
     category: 'features',
     duration: '7:45',
     views: 21300,
@@ -731,7 +731,7 @@ export const videos: Video[] = [
   {
     id: 11,
     title: 'Mobile App Features & Navigation',
-    description: 'Get the most out of the MDBaise mobile experience. App-specific features, notifications, and on-the-go booking.',
+    description: 'Get the most out of the MD Baise mobile experience. App-specific features, notifications, and on-the-go booking.',
     category: 'quickstart',
     duration: '6:00',
     views: 16400,
@@ -807,7 +807,7 @@ export const videos: Video[] = [
   {
     id: 16,
     title: 'Understanding HIPAA: Your Data Privacy Rights',
-    description: 'Learn how MDBaise protects your medical information with HIPAA-compliant security measures.',
+    description: 'Learn how MD Baise protects your medical information with HIPAA-compliant security measures.',
     category: 'features',
     duration: '8:30',
     views: 8900,

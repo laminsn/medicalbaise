@@ -269,7 +269,7 @@ export default function JobsMarketplace() {
     return (
       <>
         <Helmet>
-          <title>{t('jobs.jobMarketplace')} - Medical Baise</title>
+          <title>{t('jobs.jobMarketplace')} - MD Baise</title>
         </Helmet>
         <AppLayout>
           <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
@@ -292,7 +292,7 @@ export default function JobsMarketplace() {
   return (
     <>
       <Helmet>
-        <title>{t('jobs.jobMarketplace')} - Medical Baise</title>
+        <title>{t('jobs.jobMarketplace')} - MD Baise</title>
         <meta name="description" content={t('jobs.findOpportunities')} />
       </Helmet>
       <AppLayout>

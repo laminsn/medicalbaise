@@ -56,7 +56,7 @@ const db = supabase as any;
 
 const brandName = {
   casa: 'Casa Baise',
-  medical: 'Medical Baise',
+  medical: 'MD Baise',
   legal: 'Legal Baise',
 } as const;
 

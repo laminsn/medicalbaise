@@ -336,7 +336,7 @@ export default function DoctorProfile() {
   return (
     <>
       <Helmet>
-        <title>Dr. {doctor.business_name} - {specialtyName} | MDBaise</title>
+        <title>Dr. {doctor.business_name} - {specialtyName} | MD Baise</title>
         <meta name="description" content={tagline} />
       </Helmet>
       

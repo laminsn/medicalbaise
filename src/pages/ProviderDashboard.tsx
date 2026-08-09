@@ -122,7 +122,7 @@ export default function ProviderDashboard() {
     return (
       <AppLayout>
         <Helmet>
-          <title>{t('dashboard.title')} | Brasil Base</title>
+          <title>{t('dashboard.title')} | MD Baise</title>
         </Helmet>
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto text-center">
@@ -144,13 +144,13 @@ export default function ProviderDashboard() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('dashboard.title')} | Brasil Base</title>
+        <title>{t('dashboard.title')} | MD Baise</title>
         <meta name="description" content={t('dashboard.description')} />
       </Helmet>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
         <DashboardCommandCenter
-          eyebrow="Medical Baise"
+          eyebrow="MD Baise"
           title={t('dashboard.title', 'My Dashboard')}
           description={t('dashboard.subtitle', 'Run your healthcare practice workspace: appointments, patient requests, services, messaging, and growth tools.')}
           badge={`${tierLabel(providerTier)} ${t('common.tier', 'tier')}`}
@@ -250,7 +250,7 @@ export default function ProviderDashboard() {
         />
 
         <PrintableDashboard
-          brandName="Medical Baise"
+          brandName="MD Baise"
           audience="provider"
           title={t('providerDashboard.pd.pdPrintableProviderDashboard', "Printable provider dashboard")}
           subtitle={t('providerDashboard.pd.pdAConciseHealthcareOperations', "A concise healthcare operations report: appointment activity, revenue visibility, patient follow-up, records, and growth readiness in one printable view.")}

@@ -1,10 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { APP_BRANDS, type AppKey, reportResendFailure } from "../_shared/brands.ts";
 import { getCorsHeaders, authenticateRequest, createErrorResponse, escapeHtml, isSafeUrl, rejectNonPostMethod } from "../_shared/security.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-type AppKey = "casa" | "medical" | "legal";
 type LocaleKey = "en" | "es" | "pt";
 
 interface NotificationEmailRequest {
@@ -26,35 +26,6 @@ interface NotificationEmailRequest {
 }
 
 const VALID_TYPES = ["work_submitted", "work_approved", "work_rejected", "job_status_changed", "testimonial_request"];
-
-const APP_BRANDS = {
-  casa: {
-    name: "Casa Baise",
-    domain: "casabaise.com",
-    url: "https://casabaise.com",
-    color: "#047857",
-    from: "Casa Baise <support@support.casabaise.com>",
-  },
-  medical: {
-    name: "Medical Baise",
-    domain: "mdbaise.com",
-    url: "https://mdbaise.com",
-    color: "#00b8d4",
-    from: "Medical Baise <support@support.mdbaise.com>",
-  },
-  legal: {
-    name: "Legal Baise",
-    domain: "legalbaise.com",
-    url: "https://legalbaise.com",
-    color: "#7c3aed",
-    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
-    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
-    // retry. Sending from the verified Baise domain with Legal Baise as the
-    // display name keeps this mailbox alive. Revert to
-    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
-    from: "Legal Baise <support@support.casabaise.com>",
-  },
-} as const;
 
 const getAppKey = (appKey?: string): AppKey => {
   if (appKey === "medical" || appKey === "legal" || appKey === "casa") return appKey;
@@ -371,6 +342,8 @@ const handler = async (req: Request): Promise<Response> => {
         html: emailContent.html,
       }),
     });
+
+    await reportResendFailure(res, brand.from, "send-notification-email");
 
     if (!res.ok) {
       console.error("[SEND-NOTIFICATION] Resend API error:", res.status);

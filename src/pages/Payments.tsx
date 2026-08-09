@@ -283,7 +283,7 @@ export default function Payments() {
   return (
     <>
       <Helmet>
-        <title>{t('profile.payments')} - Baise</title>
+        <title>{t('profile.payments')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="mx-auto max-w-6xl px-4 py-6 pb-24">

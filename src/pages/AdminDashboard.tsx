@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   return (
     <>
       <Helmet>
-        <title>{t('admin.title')} | MDBaise</title>
+        <title>{t('admin.title')} | MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-7xl mx-auto">

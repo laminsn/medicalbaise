@@ -34,7 +34,7 @@ const buildSops = (t: TFunction) => [
     category: 'patient',
     department: t('sop.patientServices', "Patient Services"),
     icon: Calendar,
-    overview: t('sop.standardProcedureForPatientsTo', "Standard procedure for patients to book appointments with healthcare providers on the MDBaise platform."),
+    overview: t('sop.standardProcedureForPatientsTo', "Standard procedure for patients to book appointments with healthcare providers on the MD Baise platform."),
     scope: t('sop.allRegisteredPatientsSeekingMedical', "All registered patients seeking medical consultations."),
     responsibilities: [
       t('sop.patientProvideAccurateInformationAnd', "Patient: Provide accurate information and arrive on time"),
@@ -45,7 +45,7 @@ const buildSops = (t: TFunction) => [
       {
         step: 1,
         title: t('sop.accessThePlatform', "Access the Platform"),
-        description: t('sop.logIntoYourMdbaiseAccount', "Log into your MDBaise account using registered credentials."),
+        description: t('sop.logIntoYourMdbaiseAccount', "Log into your MD Baise account using registered credentials."),
         notes: t('sop.ifYouDonTHave', "If you don\\'t have an account, complete registration first (see SOP-PAT-000)."),
       },
       {
@@ -167,7 +167,7 @@ const buildSops = (t: TFunction) => [
     department: t('sop.providerOperations', "Provider Operations"),
     icon: Users,
     overview: t('sop.standardProcedureForHealthcareProviders', "Standard procedure for healthcare providers to create and optimize their professional profile."),
-    scope: t('sop.allNewHealthcareProvidersJoining', "All new healthcare providers joining the MDBaise platform."),
+    scope: t('sop.allNewHealthcareProvidersJoining', "All new healthcare providers joining the MD Baise platform."),
     responsibilities: [
       t('sop.providerSubmitAccurateCredentialsAnd', "Provider: Submit accurate credentials and maintain profile"),
       t('sop.verificationTeamReviewAndValidate', "Verification Team: Review and validate credentials within 5 business days"),
@@ -233,7 +233,7 @@ const buildSops = (t: TFunction) => [
     department: t('sop.finance', "Finance"),
     icon: CreditCard,
     overview: t('sop.standardProcedureForProcessingPayments', "Standard procedure for processing payments, refunds, and provider payouts."),
-    scope: t('sop.allFinancialTransactionsOnThe', "All financial transactions on the MDBaise platform."),
+    scope: t('sop.allFinancialTransactionsOnThe', "All financial transactions on the MD Baise platform."),
     responsibilities: [
       t('sop.patientMaintainValidPaymentMethod', "Patient: Maintain valid payment method on file"),
       t('sop.providerCompleteConsultationsToTrigger', "Provider: Complete consultations to trigger payment release"),

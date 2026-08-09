@@ -1,9 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { APP_BRANDS, reportResendFailure, senderWithDisplayName } from "../_shared/brands.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const ACADEMY_BRAND = APP_BRANDS.medical;
+const ACADEMY_FROM = senderWithDisplayName("MD Baise Academy", ACADEMY_BRAND);
 
 const ALLOWED_ORIGINS = [
   "https://mdbaise.com",
@@ -285,7 +288,7 @@ const getEmailTemplate = (campaignContent: typeof WEEKLY_CAMPAIGNS[0], providerN
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a; line-height: 1.6;">
   <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #047857;">
-    <h1 style="margin: 0; color: #047857; font-size: 24px;">MDBaise Provider Academy</h1>
+    <h1 style="margin: 0; color: #047857; font-size: 24px;">MD Baise Provider Academy</h1>
     <p style="color: #666; margin-top: 4px; font-size: 14px;">Weekly Growth Strategies for Top Providers</p>
   </div>
 
@@ -302,7 +305,7 @@ const getEmailTemplate = (campaignContent: typeof WEEKLY_CAMPAIGNS[0], providerN
 
   <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
     <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-      You're receiving this because you're a registered provider on MDBaise.<br>
+      You're receiving this because you're a registered provider on MD Baise.<br>
       These strategies are designed to help you grow your practice.
     </p>
   </div>
@@ -401,7 +404,10 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Failed to fetch profiles: ${profileError.message}`);
     }
 
-    const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) || []);
+    type ProviderProfile = { user_id: string; email: string | null; first_name: string | null };
+    const profileMap = new Map<string, ProviderProfile>(
+      (profiles || []).map((profile: ProviderProfile) => [profile.user_id, profile]),
+    );
 
     let sent = 0;
     let errors = 0;
@@ -425,12 +431,14 @@ const handler = async (req: Request): Promise<Response> => {
               Authorization: `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: "MDBaise Academy <onboarding@resend.dev>",
+              from: ACADEMY_FROM,
               to: [profile.email],
               subject: campaign.subject,
               html: getEmailTemplate(campaign, providerName),
             }),
           });
+
+          await reportResendFailure(res, ACADEMY_FROM, "send-weekly-campaign");
 
           if (res.ok) {
             sent++;

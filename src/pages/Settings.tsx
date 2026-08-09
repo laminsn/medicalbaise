@@ -112,7 +112,7 @@ export default function Settings() {
   return (
     <>
       <Helmet>
-        <title>{t('profile.settings')} - Brasil Base</title>
+        <title>{t('profile.settings')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-lg mx-auto">

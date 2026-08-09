@@ -85,7 +85,7 @@ export const gettingStartedGuides: GettingStartedGuide[] = [
   {
     id: 1,
     title: 'Create Your Account',
-    description: 'Set up your MDBaise account as a patient or healthcare provider in minutes',
+    description: 'Set up your MD Baise account as a patient or healthcare provider in minutes',
     duration: '3 min',
     steps: 5,
     category: 'Account',
@@ -405,14 +405,14 @@ export const faqs: FAQ[] = [
   // Account FAQs
   {
     id: 1,
-    question: 'How do I create an account on MDBaise?',
+    question: 'How do I create an account on MD Baise?',
     answer: 'To create an account, click the "Join" button in the top right corner of the homepage. You can sign up using your email address or connect with your Google account. Fill in your basic information including name, email, and phone number, then verify your email to activate your account. The entire process takes less than 2 minutes.',
     category: 'account',
     relatedArticles: ['Profile Setup', 'Account Verification']
   },
   {
     id: 2,
-    question: 'Can I use MDBaise without creating an account?',
+    question: 'Can I use MD Baise without creating an account?',
     answer: 'Yes, you can browse doctor profiles, view specialties, read reviews, and explore the platform without an account. However, to book appointments, message providers, save favorites, or leave reviews, you will need to create a free account. This ensures secure communication and appointment management.',
     category: 'account'
   },
@@ -436,7 +436,7 @@ export const faqs: FAQ[] = [
   },
   {
     id: 6,
-    question: 'Is my personal information secure on MDBaise?',
+    question: 'Is my personal information secure on MD Baise?',
     answer: 'Yes, we take data security very seriously. All personal and medical information is encrypted using industry-standard protocols. We comply with LGPD (Brazil\'s General Data Protection Law) and follow HIPAA guidelines. We never sell or share your personal information with third parties without your explicit consent.',
     category: 'account'
   },
@@ -483,7 +483,7 @@ export const faqs: FAQ[] = [
   {
     id: 13,
     question: 'What payment methods are accepted?',
-    answer: 'MDBaise accepts major credit cards (Visa, Mastercard, American Express, Elo), debit cards, and PIX for instant payment in Brazil. Some providers may also accept insurance - check their profile for a list of accepted insurance plans. All payments are processed securely through encrypted connections.',
+    answer: 'MD Baise accepts major credit cards (Visa, Mastercard, American Express, Elo), debit cards, and PIX for instant payment in Brazil. Some providers may also accept insurance - check their profile for a list of accepted insurance plans. All payments are processed securely through encrypted connections.',
     category: 'payments'
   },
   {
@@ -500,8 +500,8 @@ export const faqs: FAQ[] = [
   },
   {
     id: 16,
-    question: 'Can I use my health insurance on MDBaise?',
-    answer: 'Many providers on MDBaise accept health insurance. Check the provider\'s profile under "Accepted Insurance" to see which plans they work with. If your insurance is accepted, you may only need to pay your copay. Contact your insurance provider to understand your coverage for telemedicine and in-person consultations.',
+    question: 'Can I use my health insurance on MD Baise?',
+    answer: 'Many providers on MD Baise accept health insurance. Check the provider\'s profile under "Accepted Insurance" to see which plans they work with. If your insurance is accepted, you may only need to pay your copay. Contact your insurance provider to understand your coverage for telemedicine and in-person consultations.',
     category: 'payments'
   },
   {
@@ -558,14 +558,14 @@ export const faqs: FAQ[] = [
   // Provider FAQs
   {
     id: 25,
-    question: 'How do I become a provider on MDBaise?',
+    question: 'How do I become a provider on MD Baise?',
     answer: 'Click "Join" on the homepage and select "Healthcare Provider". Complete your professional profile including your CRM number, specialty, medical school, and graduation year. Upload required documents for verification (CRM certificate, diploma, specialty certifications). Once approved (typically 2-5 business days), you can start accepting appointments.',
     category: 'providers'
   },
   {
     id: 26,
     question: 'What are the fees for providers?',
-    answer: 'MDBaise offers tiered subscription plans: FREE (up to 5 appointments/month, basic profile), PRO ($49/month - unlimited appointments, priority placement, analytics), and ELITE ($99/month - all PRO features plus verified badge, featured placement, advanced marketing tools). A small transaction fee (5-10% depending on plan) applies to completed appointments.',
+    answer: 'MD Baise offers tiered subscription plans: FREE (up to 5 appointments/month, basic profile), PRO ($49/month - unlimited appointments, priority placement, analytics), and ELITE ($99/month - all PRO features plus verified badge, featured placement, advanced marketing tools). A small transaction fee (5-10% depending on plan) applies to completed appointments.',
     category: 'providers'
   },
   {
@@ -660,8 +660,8 @@ export const faqs: FAQ[] = [
   // HIPAA & Security FAQs
   {
     id: 41,
-    question: 'How does MDBaise protect my medical information (HIPAA)?',
-    answer: 'MDBaise implements comprehensive HIPAA-compliant security measures: all communications use end-to-end encryption, data is encrypted at rest using AES-256, we maintain detailed audit logs of all data access, access is strictly role-based, and we conduct regular security audits. Our systems comply with both Brazilian LGPD and US HIPAA regulations.',
+    question: 'How does MD Baise protect my medical information (HIPAA)?',
+    answer: 'MD Baise implements comprehensive HIPAA-compliant security measures: all communications use end-to-end encryption, data is encrypted at rest using AES-256, we maintain detailed audit logs of all data access, access is strictly role-based, and we conduct regular security audits. Our systems comply with both Brazilian LGPD and US HIPAA regulations.',
     category: 'security'
   },
   {
@@ -796,11 +796,11 @@ export const tutorials: Tutorial[] = [
   {
     id: 1,
     title: 'Complete Guide to Booking Your First Appointment',
-    description: 'Learn how to search for doctors, compare profiles, and book your first appointment on MDBaise step by step.',
+    description: 'Learn how to search for doctors, compare profiles, and book your first appointment on MD Baise step by step.',
     category: 'patients',
     difficulty: 'Beginner',
     duration: '5 min read',
-    prerequisites: ['Active MDBaise account'],
+    prerequisites: ['Active MD Baise account'],
     outcomes: ['Successfully book an appointment', 'Understand the booking process', 'Know how to prepare for your visit'],
     steps: [
       {
@@ -937,7 +937,7 @@ export const tutorials: Tutorial[] = [
   {
     id: 3,
     title: 'Mastering Teleconsultation: Complete Guide',
-    description: 'Everything patients and providers need to know about conducting effective video consultations on MDBaise.',
+    description: 'Everything patients and providers need to know about conducting effective video consultations on MD Baise.',
     category: 'patients',
     difficulty: 'Intermediate',
     duration: '8 min read',
@@ -965,7 +965,7 @@ export const tutorials: Tutorial[] = [
       {
         step: 4,
         title: 'Join the Waiting Room (5 Minutes Early)',
-        content: 'Log into MDBaise and go to "My Appointments". Find your teleconsultation and click "Join Call". Allow browser permissions for camera and microphone when prompted. You\'ll enter a virtual waiting room where you can preview your video and audio. The doctor will admit you when ready.',
+        content: 'Log into MD Baise and go to "My Appointments". Find your teleconsultation and click "Join Call". Allow browser permissions for camera and microphone when prompted. You\'ll enter a virtual waiting room where you can preview your video and audio. The doctor will admit you when ready.',
         tips: ['Joining early gives you time to troubleshoot any issues', 'Use the preview to adjust lighting and position'],
         warnings: ['Don\'t be alarmed if you wait a few minutes - the doctor may be finishing with another patient']
       },
@@ -1050,13 +1050,13 @@ export const tutorials: Tutorial[] = [
     category: 'patients',
     difficulty: 'Beginner',
     duration: '4 min read',
-    prerequisites: ['Active MDBaise account'],
+    prerequisites: ['Active MD Baise account'],
     outcomes: ['Navigate dashboard efficiently', 'Manage all appointments', 'Track medical history'],
     steps: [
       {
         step: 1,
         title: 'Access Your Dashboard',
-        content: 'Click on your profile avatar in the top right corner, or go directly to "Profile" in the navigation. Your dashboard is the central hub for all your MDBaise activity. It displays upcoming appointments, recent messages, health history, and personalized recommendations.',
+        content: 'Click on your profile avatar in the top right corner, or go directly to "Profile" in the navigation. Your dashboard is the central hub for all your MD Baise activity. It displays upcoming appointments, recent messages, health history, and personalized recommendations.',
         tips: ['Bookmark your dashboard for quick access', 'The dashboard updates in real-time']
       },
       {
@@ -1104,7 +1104,7 @@ export const tutorials: Tutorial[] = [
       {
         step: 1,
         title: 'Understanding the Social Feed',
-        content: 'The Social Feed is MDBaise\'s content platform where providers share health tips, educational content, and updates. Patients can follow providers, like, and comment on posts. Great content increases your visibility and helps patients discover your practice.',
+        content: 'The Social Feed is MD Baise\'s content platform where providers share health tips, educational content, and updates. Patients can follow providers, like, and comment on posts. Great content increases your visibility and helps patients discover your practice.',
         tips: ['Consistent posting builds audience over time', 'Educational content performs best']
       },
       {

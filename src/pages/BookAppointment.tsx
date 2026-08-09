@@ -92,7 +92,7 @@ export default function BookAppointment() {
     <>
       <Helmet>
         <title>
-          {t('appointments.bookWith', 'Book with')} {provider.business_name} - Brasil Base
+          {t('appointments.bookWith', 'Book with')} {provider.business_name} - MD Baise
         </title>
       </Helmet>
       <AppLayout>

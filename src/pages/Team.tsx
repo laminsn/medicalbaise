@@ -160,7 +160,7 @@ export default function Team() {
   return (
     <>
       <Helmet>
-        <title>{t('team.title')} - Brasil Base</title>
+        <title>{t('team.title')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 max-w-4xl mx-auto">

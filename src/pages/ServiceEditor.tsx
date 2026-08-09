@@ -344,7 +344,7 @@ export default function ServiceEditor() {
   return (
     <>
       <Helmet>
-        <title>{isNewService ? t('services.addService', 'Add Service') : t('services.editService', 'Edit Service')} - Brasil Base</title>
+        <title>{isNewService ? t('services.addService', 'Add Service') : t('services.editService', 'Edit Service')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-lg mx-auto">

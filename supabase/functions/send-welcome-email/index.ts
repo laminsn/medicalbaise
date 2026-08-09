@@ -3,9 +3,9 @@
 // Required secrets: RESEND_API_KEY and WELCOME_HOOK_SECRET.
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
 import { escapeHtml } from "../_shared/security.ts";
 
-type AppKey = "casa" | "medical" | "legal";
 type LocaleKey = "en" | "es" | "pt";
 type Audience = "client" | "provider";
 
@@ -35,38 +35,6 @@ interface AuthUsersInsertPayload {
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const WELCOME_HOOK_SECRET = Deno.env.get("WELCOME_HOOK_SECRET");
 
-const APP_BRANDS = {
-  casa: {
-    name: "Casa Baise",
-    domain: "casabaise.com",
-    url: "https://casabaise.com",
-    color: "#1dbf73",
-    from: "Casa Baise <support@support.casabaise.com>",
-    category: "trusted home and business service providers",
-  },
-  medical: {
-    name: "Medical Baise",
-    domain: "medicalbaise.com",
-    url: "https://medicalbaise.com",
-    color: "#00b8d4",
-    from: "Medical Baise <support@support.mdbaise.com>",
-    category: "trusted healthcare and wellness service providers",
-  },
-  legal: {
-    name: "Legal Baise",
-    domain: "legalbaise.com",
-    url: "https://legalbaise.com",
-    color: "#7c3aed",
-    // INTERIM: legalbaise.com and support.legalbaise.com are not verified in
-    // Resend, so anything sent from them 403s and never leaves -- no bounce, no
-    // retry. Sending from the verified Baise domain with Legal Baise as the
-    // display name keeps this mailbox alive. Revert to
-    // support@support.legalbaise.com the moment the DKIM/SPF records verify.
-    from: "Legal Baise <support@support.casabaise.com>",
-    category: "trusted legal service providers",
-  },
-} as const;
-
 function pickAppKey(meta: AuthUsersInsertPayload["record"]["raw_user_meta_data"]): AppKey {
   const raw = String(meta?.app_key || meta?.signup_app || Deno.env.get("BAISE_APP_KEY") || "casa").toLowerCase();
   if (raw === "medical" || raw === "legal" || raw === "casa") return raw;
@@ -95,7 +63,7 @@ function pickFirstName(meta: AuthUsersInsertPayload["record"]["raw_user_meta_dat
   return fullName.split(" ")[0] || "";
 }
 
-function getCopy(locale: LocaleKey, audience: Audience, brand: typeof APP_BRANDS.casa, firstName: string) {
+function getCopy(locale: LocaleKey, audience: Audience, brand: AppBrand, firstName: string) {
   const name = firstName.trim();
   const greeting = locale === "pt"
     ? name ? `Oi ${name}` : "Bem-vindo"
@@ -154,7 +122,7 @@ function getCopy(locale: LocaleKey, audience: Audience, brand: typeof APP_BRANDS
   };
 }
 
-function buildEmail(brand: typeof APP_BRANDS.casa, copy: ReturnType<typeof getCopy>, locale: LocaleKey) {
+function buildEmail(brand: AppBrand, copy: ReturnType<typeof getCopy>, locale: LocaleKey) {
   const portalLabel = locale === "pt" ? "Portal seguro Baise" : locale === "es" ? "Portal seguro Baise" : "Secure Baise portal";
 
   return `
@@ -258,6 +226,8 @@ serve(async (req: Request): Promise<Response> => {
       html: buildEmail(brand, copy, locale),
     }),
   });
+
+  await reportResendFailure(res, brand.from, "send-welcome-email");
 
   if (!res.ok) {
     const body = await res.text();

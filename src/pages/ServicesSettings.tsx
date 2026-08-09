@@ -180,7 +180,7 @@ export default function ServicesSettings() {
   return (
     <>
       <Helmet>
-        <title>{t('services.title', 'My Services')} - Brasil Base</title>
+        <title>{t('services.title', 'My Services')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-lg mx-auto">

@@ -21,7 +21,7 @@ import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/public
 
 const brandName = {
   casa: 'Casa Baise',
-  medical: 'Medical Baise',
+  medical: 'MD Baise',
   legal: 'Legal Baise',
 } as const;
 

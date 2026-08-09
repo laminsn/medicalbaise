@@ -214,7 +214,7 @@ export default function ProfileEdit() {
   return (
     <>
       <Helmet>
-        <title>{t('profile.editProfile')} - Brasil Base</title>
+        <title>{t('profile.editProfile')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24 max-w-lg mx-auto">

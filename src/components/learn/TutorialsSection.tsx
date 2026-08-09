@@ -25,7 +25,7 @@ const tutorials = [
   {
     id: 1,
     title: 'Complete Guide to Booking Your First Appointment',
-    description: 'Learn how to search for doctors, compare profiles, and book your first appointment on MDBaise.',
+    description: 'Learn how to search for doctors, compare profiles, and book your first appointment on MD Baise.',
     category: 'patients',
     difficulty: 'Beginner',
     duration: '5 min read',
@@ -122,7 +122,7 @@ const tutorials = [
   {
     id: 3,
     title: 'Mastering Teleconsultation',
-    description: 'Everything you need to know about conducting and joining video consultations on MDBaise.',
+    description: 'Everything you need to know about conducting and joining video consultations on MD Baise.',
     category: 'patients',
     difficulty: 'Intermediate',
     duration: '6 min read',
@@ -225,7 +225,7 @@ const tutorials = [
   {
     id: 6,
     title: 'Building Your Provider Reputation',
-    description: 'Strategies for earning positive reviews and building a strong professional presence on MDBaise.',
+    description: 'Strategies for earning positive reviews and building a strong professional presence on MD Baise.',
     category: 'providers',
     difficulty: 'Advanced',
     duration: '7 min read',
@@ -253,7 +253,7 @@ const tutorials = [
       },
       {
         title: 'Share Your Expertise',
-        content: 'Post educational content, go live with health tips, and engage with the MDBaise community.',
+        content: 'Post educational content, go live with health tips, and engage with the MD Baise community.',
         screenshot: '/placeholder.svg',
       },
     ],

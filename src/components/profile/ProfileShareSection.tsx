@@ -83,7 +83,7 @@ export function ProfileShareSection({ handle, referralCode }: ProfileShareSectio
     {
       name: 'E-mail',
       icon: <Mail className="w-5 h-5" />,
-      action: () => window.open(`mailto:?subject=${encodeURIComponent('MDBaise')}&body=${encodeURIComponent(fullShareText)}`, '_self'),
+      action: () => window.open(`mailto:?subject=${encodeURIComponent('MD Baise')}&body=${encodeURIComponent(fullShareText)}`, '_self'),
     },
     {
       name: 'QR',
@@ -96,7 +96,7 @@ export function ProfileShareSection({ handle, referralCode }: ProfileShareSectio
       icon: <Share2 className="w-5 h-5" />,
       action: () => {
         if (navigator.share) {
-          navigator.share({ title: 'MDBaise', text: shareMessage, url: shareUrl });
+          navigator.share({ title: 'MD Baise', text: shareMessage, url: shareUrl });
         } else {
           handleCopyLink();
         }

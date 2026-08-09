@@ -71,7 +71,7 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
   },
   medical: {
     appKey: 'medical',
-    brandName: 'Medical Baise',
+    brandName: 'MD Baise',
     website: 'medicalbaise.com',
     supportEmail: 'suporte@medicalbaise.com',
     privacyEmail: 'privacidade@medicalbaise.com',
@@ -87,12 +87,12 @@ const profiles: Record<LegalProfile['appKey'], LegalProfile> = {
     sensitiveDataEn: 'health information, symptoms, appointment notes, telehealth metadata, identity data, payment records, messages, reviews, provider credentials, and care-related files',
     sensitiveDataPt: 'informações de saúde, sintomas, notas de consulta, metadados de telessaude, dados de identidade, registros de pagamento, mensagens, avaliações, credenciais profissionais e arquivos relacionados ao atendimento',
     sensitiveDataEs: 'información de salud, síntomas, notas de consulta, metadatos de telesalud, datos de identidad, registros de pago, mensajes, reseñas y credenciales del profesional',
-    professionalBoundaryEn: 'Medical Baise is not a clinic, hospital, emergency service, insurer, or healthcare provider. Medical decisions, diagnosis, treatment, prescriptions, records, and professional duties belong to the independently licensed provider engaged by the patient.',
-    professionalBoundaryPt: 'A Medical Baise não e clinica, hospital, serviço de emergência, seguradora nem prestadora de serviços de saúde. Decisoes medicas, diagnostico, tratamento, prescrições, prontuarios e deveres profissionais pertencem ao profissional licenciado contratado pelo paciente.',
-    professionalBoundaryEs: 'Medical Baise no es una clínica, un hospital, un servicio de emergencias, una aseguradora ni un prestador de servicios de salud. Las decisiones médicas, el diagnóstico, el tratamiento, las recetas, las historias clínicas y los deberes profesionales corresponden al profesional de salud independiente y habilitado.',
-    emergencyEn: 'Do not use Medical Baise for emergencies. In Brazil, call SAMU 192 or go to the nearest emergency service.',
-    emergencyPt: 'Não use a Medical Baise para emergências. No Brasil, ligue para o SAMU 192 ou procure o pronto atendimento mais próximo.',
-    emergencyEs: 'No utilice Medical Baise para emergencias. En Brasil, llame al SAMU 192 o acuda al servicio de urgencias más cercano.',
+    professionalBoundaryEn: 'MD Baise is not a clinic, hospital, emergency service, insurer, or healthcare provider. Medical decisions, diagnosis, treatment, prescriptions, records, and professional duties belong to the independently licensed provider engaged by the patient.',
+    professionalBoundaryPt: 'A MD Baise não e clinica, hospital, serviço de emergência, seguradora nem prestadora de serviços de saúde. Decisoes medicas, diagnostico, tratamento, prescrições, prontuarios e deveres profissionais pertencem ao profissional licenciado contratado pelo paciente.',
+    professionalBoundaryEs: 'MD Baise no es una clínica, un hospital, un servicio de emergencias, una aseguradora ni un prestador de servicios de salud. Las decisiones médicas, el diagnóstico, el tratamiento, las recetas, las historias clínicas y los deberes profesionales corresponden al profesional de salud independiente y habilitado.',
+    emergencyEn: 'Do not use MD Baise for emergencies. In Brazil, call SAMU 192 or go to the nearest emergency service.',
+    emergencyPt: 'Não use a MD Baise para emergências. No Brasil, ligue para o SAMU 192 ou procure o pronto atendimento mais próximo.',
+    emergencyEs: 'No utilice MD Baise para emergencias. En Brasil, llame al SAMU 192 o acuda al servicio de urgencias más cercano.',
   },
 };
 

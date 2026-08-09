@@ -122,24 +122,24 @@ export function minimumNecessaryCopy(
 ): { subject: string; body: string; isMarketing: boolean } {
   const copy = {
     en: {
-      confirmation_request: ["Please confirm a Medical Baise appointment", "An appointment response is requested. No medical details are included in this message."],
-      reminder: ["Upcoming Medical Baise appointment", "You have an upcoming appointment. Sign in to the secure portal for details or changes."],
-      follow_up: ["Medical Baise follow-up", "A private follow-up is available. Sign in to the secure portal to review it."],
-      thank_you: ["Thank you from Medical Baise", "Thank you for using Medical Baise. Your private appointment record remains available in the secure portal."],
+      confirmation_request: ["Please confirm a MD Baise appointment", "An appointment response is requested. No medical details are included in this message."],
+      reminder: ["Upcoming MD Baise appointment", "You have an upcoming appointment. Sign in to the secure portal for details or changes."],
+      follow_up: ["MD Baise follow-up", "A private follow-up is available. Sign in to the secure portal to review it."],
+      thank_you: ["Thank you from MD Baise", "Thank you for using MD Baise. Your private appointment record remains available in the secure portal."],
       review_request: ["Share optional feedback", "If you choose, share honest feedback. Do not include symptoms, diagnoses, treatment, insurance information, or appointment details in a public review."],
     },
     pt: {
-      confirmation_request: ["Confirme uma consulta na Medical Baise", "Uma resposta sobre a consulta foi solicitada. Nenhum detalhe médico está incluído nesta mensagem."],
-      reminder: ["Próxima consulta na Medical Baise", "Você tem uma próxima consulta. Entre no portal seguro para ver detalhes ou alterações."],
-      follow_up: ["Acompanhamento da Medical Baise", "Um acompanhamento privado está disponível. Entre no portal seguro para consultá-lo."],
-      thank_you: ["Obrigado por usar a Medical Baise", "Obrigado por usar a Medical Baise. Seu registro privado continua disponível no portal seguro."],
+      confirmation_request: ["Confirme uma consulta na MD Baise", "Uma resposta sobre a consulta foi solicitada. Nenhum detalhe médico está incluído nesta mensagem."],
+      reminder: ["Próxima consulta na MD Baise", "Você tem uma próxima consulta. Entre no portal seguro para ver detalhes ou alterações."],
+      follow_up: ["Acompanhamento da MD Baise", "Um acompanhamento privado está disponível. Entre no portal seguro para consultá-lo."],
+      thank_you: ["Obrigado por usar a MD Baise", "Obrigado por usar a MD Baise. Seu registro privado continua disponível no portal seguro."],
       review_request: ["Compartilhe feedback opcional", "Se quiser, compartilhe uma avaliação honesta. Não inclua sintomas, diagnósticos, tratamentos, dados de seguro ou detalhes da consulta em uma avaliação pública."],
     },
     es: {
-      confirmation_request: ["Confirma una cita en Medical Baise", "Se solicitó una respuesta sobre la cita. Este mensaje no incluye detalles médicos."],
-      reminder: ["Próxima cita en Medical Baise", "Tienes una próxima cita. Ingresa al portal seguro para ver detalles o cambios."],
-      follow_up: ["Seguimiento de Medical Baise", "Hay un seguimiento privado disponible. Ingresa al portal seguro para consultarlo."],
-      thank_you: ["Gracias por usar Medical Baise", "Gracias por usar Medical Baise. Tu registro privado sigue disponible en el portal seguro."],
+      confirmation_request: ["Confirma una cita en MD Baise", "Se solicitó una respuesta sobre la cita. Este mensaje no incluye detalles médicos."],
+      reminder: ["Próxima cita en MD Baise", "Tienes una próxima cita. Ingresa al portal seguro para ver detalles o cambios."],
+      follow_up: ["Seguimiento de MD Baise", "Hay un seguimiento privado disponible. Ingresa al portal seguro para consultarlo."],
+      thank_you: ["Gracias por usar MD Baise", "Gracias por usar MD Baise. Tu registro privado sigue disponible en el portal seguro."],
       review_request: ["Comparte comentarios opcionales", "Si deseas, comparte una reseña honesta. No incluyas síntomas, diagnósticos, tratamientos, datos del seguro ni detalles de la cita en una reseña pública."],
     },
   } as const;

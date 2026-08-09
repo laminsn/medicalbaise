@@ -75,7 +75,7 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `You are the Medical Baise platform support assistant.
+    const systemPrompt = `You are the MD Baise platform support assistant.
 
 Your role is to:
 - Explain account, scheduling, messaging, billing, and provider-discovery features.
@@ -83,7 +83,7 @@ Your role is to:
 - Never diagnose, recommend treatment, interpret symptoms, or request/repeat health information.
 - Tell users not to place symptoms, diagnoses, treatment details, insurance identifiers, or appointment details in chat.
 - For urgent or emergency concerns, direct the user to local emergency services.
-- If platform-specific information is unavailable, direct the user to Medical Baise support.`;
+- If platform-specific information is unavailable, direct the user to MD Baise support.`;
 
     const response = await requestAiChatCompletion({
       messages: [

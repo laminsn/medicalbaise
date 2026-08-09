@@ -15,7 +15,7 @@ type Locale = "pt" | "es" | "en";
 
 const BRANDS: Record<AppKey, { name: string; url: string; color: string }> = {
   casa: { name: "Casa Baise", url: "https://www.casabaise.com", color: "#1dbf73" },
-  medical: { name: "Medical Baise", url: "https://www.mdbaise.com", color: "#00b8d4" },
+  medical: { name: "MD Baise", url: "https://www.mdbaise.com", color: "#00b8d4" },
   legal: { name: "Legal Baise", url: "https://www.legalbaise.com", color: "#7c3aed" },
 };
 

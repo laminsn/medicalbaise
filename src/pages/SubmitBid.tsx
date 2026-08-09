@@ -146,7 +146,7 @@ export default function SubmitBid() {
   return (
     <>
       <Helmet>
-        <title>{t('jobs.submitProposal')} - Brasil Base</title>
+        <title>{t('jobs.submitProposal')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24">

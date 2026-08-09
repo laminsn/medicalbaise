@@ -174,7 +174,7 @@ export function AnalyticsReportScheduler() {
     setSendingTest(true);
     try {
       const { error } = await supabase.functions.invoke('send-analytics-report', {
-        body: { providerId, manual: true },
+        body: { providerId, manual: true, appKey: import.meta.env.VITE_BAISE_APP },
       });
 
       if (error) throw error;

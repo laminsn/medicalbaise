@@ -28,7 +28,7 @@ export function HIPAADisclaimer() {
 
         <div className="space-y-3 text-sm text-muted-foreground mb-6">
           <p>
-            <strong className="text-foreground">{t('pageCopy.medicalBaiseIsAHealthcare', "Medical Baise is a healthcare professional marketplace.")}</strong>{t('pageCopy.weConnectPatientsWithVerified', "We connect patients with verified healthcare providers.")}</p>
+            <strong className="text-foreground">{t('pageCopy.medicalBaiseIsAHealthcare', "MD Baise is a healthcare professional marketplace.")}</strong>{t('pageCopy.weConnectPatientsWithVerified', "We connect patients with verified healthcare providers.")}</p>
           <p>{t('pageCopy.forYourProtectionPleaseBe', "For your protection, please be aware:")}</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>{t('pageCopy.thisPlatformIs', "This platform is")}<strong>not</strong> an Electronic Health Records (EHR) system</li>
@@ -37,7 +37,7 @@ export function HIPAADisclaimer() {
             <li>{t('pageCopy.healthcareProvidersShouldMaintainTheir', "Healthcare providers should maintain their own HIPAA-compliant record systems")}</li>
             <li>{t('pageCopy.appointmentRecordsOnThisPlatform', "Appointment records on this platform are for scheduling purposes only")}</li>
           </ul>
-          <p>{t('pageCopy.medicalBaiseCompliesWithLgpd', "Medical Baise complies with LGPD (Lei Geral de Proteção de Dados) and follows HIPAA best practices for data security. For questions about data handling, see our")}<a href="/privacy" className="text-primary hover:underline">{t('pageCopy.privacyPolicy', "Privacy Policy")}</a>.
+          <p>{t('pageCopy.medicalBaiseCompliesWithLgpd', "MD Baise complies with LGPD (Lei Geral de Proteção de Dados) and follows HIPAA best practices for data security. For questions about data handling, see our")}<a href="/privacy" className="text-primary hover:underline">{t('pageCopy.privacyPolicy', "Privacy Policy")}</a>.
           </p>
         </div>
 

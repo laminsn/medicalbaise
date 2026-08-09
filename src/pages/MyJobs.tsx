@@ -121,7 +121,7 @@ export default function MyJobs() {
     return (
       <>
         <Helmet>
-          <title>{t('jobs.myJobs')} - Brasil Base</title>
+          <title>{t('jobs.myJobs')} - MD Baise</title>
         </Helmet>
         <AppLayout>
           <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
@@ -162,7 +162,7 @@ export default function MyJobs() {
   return (
     <>
       <Helmet>
-        <title>{t('jobs.myJobs')} - Brasil Base</title>
+        <title>{t('jobs.myJobs')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24">

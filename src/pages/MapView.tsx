@@ -107,7 +107,7 @@ const MapView = () => {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('map.pageTitle')} | Brasil Base</title>
+        <title>{t('map.pageTitle')} | MD Baise</title>
         <meta name="description" content={t('map.pageDescription')} />
       </Helmet>
 

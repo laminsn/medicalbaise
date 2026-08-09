@@ -105,7 +105,7 @@
   },
 
   "baise-group": {
-    "_business": "Casa / Legal / Medical Baise (shared)",
+    "_business": "Casa / Legal / MD Baise (shared)",
     "youtube":        { "channel_id": null, "channel_url": null, "verified": false, "note": "@Baise resolves but is NOT ours (Lamin 2026-07-23). AWAITING real channel." },
     "latest_episode": { "enabled": true, "endpoint": "/api/latest-episode" },
     "listen": {

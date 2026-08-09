@@ -37,7 +37,7 @@ export default function Learn() {
               <span className="text-sm text-cyan-400 font-medium">{isPt ? 'Central de aprendizado' : isEs ? 'Centro de aprendizaje' : 'Learning Center'}</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              {isPt ? 'Academia MDBaise' : isEs ? 'Academia MDBaise' : 'MDBaise Academy'}
+              {isPt ? 'Academia MD Baise' : isEs ? 'Academia MD Baise' : 'MD Baise Academy'}
             </h1>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               {isPt

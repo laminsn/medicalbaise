@@ -102,7 +102,7 @@ export default function CustomerDashboard() {
     return (
       <AppLayout>
         <Helmet>
-          <title>{t('customerDashboard.title')} | Brasil Base</title>
+          <title>{t('customerDashboard.title')} | MD Baise</title>
         </Helmet>
         <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto text-center">
@@ -124,13 +124,13 @@ export default function CustomerDashboard() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('customerDashboard.title')} | Brasil Base</title>
+        <title>{t('customerDashboard.title')} | MD Baise</title>
         <meta name="description" content={t('customerDashboard.description')} />
       </Helmet>
 
       <div className="container mx-auto px-4 py-6 space-y-6">
         <DashboardCommandCenter
-          eyebrow="Medical Baise"
+          eyebrow="MD Baise"
           title={t('customerDashboard.title', 'My Dashboard')}
           description={t('customerDashboard.subtitle', 'Track appointments, healthcare service requests, approvals, and provider conversations from one workspace.')}
           badge={counts?.approvals ? `${counts.approvals} pending approval${counts.approvals === 1 ? '' : 's'}` : t('customerDashboard.cc.allClear', "All clear")}
@@ -238,7 +238,7 @@ export default function CustomerDashboard() {
         />
 
         <PrintableDashboard
-          brandName="Medical Baise"
+          brandName="MD Baise"
           audience="client"
           title={t('customerDashboard.cc.printablePatientDashboard', "Printable patient dashboard")}
           subtitle={t('customerDashboard.cc.aCleanClientReport', "A clean client report for healthcare service tracking: active requests, scheduled visits, approvals, receipts, follow-up, and records in one printable view.")}

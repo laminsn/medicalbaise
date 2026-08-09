@@ -262,7 +262,7 @@ export default function ProviderProfile() {
   return (
     <>
       <Helmet>
-        <title>{provider.business_name} - Brasil Base</title>
+        <title>{provider.business_name} - MD Baise</title>
         <meta name="description" content={provider.tagline} />
       </Helmet>
       

@@ -1,9 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { APP_BRANDS, reportResendFailure, senderWithDisplayName } from "../_shared/brands.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const CAMPAIGN_BRAND = APP_BRANDS.medical;
 
 const COST_PER_EMAIL = 0.05; // R$0.05 per email
 
@@ -68,7 +70,7 @@ const wrapEmailHtml = (subject: string, htmlContent: string, providerName: strin
   </div>
   <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
     <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-      You're receiving this because you follow ${escapeHtml(providerName)} on MDBaise.
+      You're receiving this because you follow ${escapeHtml(providerName)} on MD Baise.
     </p>
   </div>
 </body>
@@ -183,6 +185,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       const promises = batch.map(async (recipient) => {
         try {
+          const from = senderWithDisplayName(`${provider.business_name} via ${CAMPAIGN_BRAND.name}`, CAMPAIGN_BRAND);
           const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
@@ -190,12 +193,14 @@ const handler = async (req: Request): Promise<Response> => {
               Authorization: `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: `${provider.business_name} via MDBaise <onboarding@resend.dev>`,
+              from,
               to: [recipient.email],
               subject: campaign.subject,
               html: wrapEmailHtml(campaign.subject, campaign.html_content, provider.business_name),
             }),
           });
+
+          await reportResendFailure(res, from, "send-provider-campaign");
 
           if (res.ok) {
             sent++;

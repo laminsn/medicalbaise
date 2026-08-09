@@ -271,7 +271,7 @@ export default function JobDetails() {
   return (
     <>
       <Helmet>
-        <title>{job.title} - Brasil Base</title>
+        <title>{job.title} - MD Baise</title>
         <meta name="description" content={job.description.substring(0, 160)} />
       </Helmet>
       <AppLayout>

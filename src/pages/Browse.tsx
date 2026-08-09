@@ -356,7 +356,7 @@ export default function Browse() {
   return (
     <AppLayout>
       <Helmet>
-        <title>{t('browse.title', 'Browse Medical Professionals')} - Medical Baise</title>
+        <title>{t('browse.title', 'Browse Medical Professionals')} - MD Baise</title>
         <meta name="description" content={t('browse.metaDescription', 'Find verified doctors, specialists, and healthcare providers near you. Compare ratings, reviews, and fees.')} />
       </Helmet>
       <div className="px-4 py-4">

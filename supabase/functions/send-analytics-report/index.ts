@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { APP_BRANDS, type AppBrand, normalizeAppKey, reportResendFailure } from "../_shared/brands.ts";
 
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -28,7 +29,7 @@ interface AnalyticsData {
   eventBreakdown: Record<string, number>;
 }
 
-function generateEmailHTML(businessName: string, data: AnalyticsData, frequency: string, dateRange: string): string {
+function generateEmailHTML(brand: AppBrand, businessName: string, data: AnalyticsData, frequency: string, dateRange: string): string {
   const eventRows = Object.entries(data.eventBreakdown)
     .map(([event, count]) => `
       <tr>
@@ -89,7 +90,7 @@ function generateEmailHTML(businessName: string, data: AnalyticsData, frequency:
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center;">
             <p style="color: #999; font-size: 12px; margin: 0;">
-              This is an automated report from Brasil Base.<br>
+              This is an automated report from ${brand.name}.<br>
               To manage your report settings, visit your Provider Dashboard.
             </p>
           </div>
@@ -100,7 +101,7 @@ function generateEmailHTML(businessName: string, data: AnalyticsData, frequency:
   `;
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
+async function sendEmail(brand: AppBrand, to: string, subject: string, html: string) {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -108,12 +109,14 @@ async function sendEmail(to: string, subject: string, html: string) {
       Authorization: `Bearer ${resendApiKey}`,
     },
     body: JSON.stringify({
-      from: "Brasil Base <onboarding@resend.dev>",
+      from: brand.from,
       to: [to],
       subject,
       html,
     }),
   });
+
+  await reportResendFailure(response, brand.from, "send-analytics-report");
 
   if (!response.ok) {
     const error = await response.text();
@@ -160,7 +163,8 @@ const handler = async (req: Request): Promise<Response> => {
     // Use service role client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { providerId, manual } = await req.json().catch(() => ({}));
+    const { providerId, manual, appKey } = await req.json().catch(() => ({}));
+    const brand = APP_BRANDS[normalizeAppKey(appKey || Deno.env.get("BAISE_APP_KEY"), "medical")];
 
     console.log("Starting analytics report send", { providerId, manual });
 
@@ -300,9 +304,10 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Send email
         const emailResponse = await sendEmail(
+          brand,
           schedule.email,
           `Your ${schedule.frequency === "weekly" ? "Weekly" : "Monthly"} Analytics Report - ${provider.business_name}`,
-          generateEmailHTML(provider.business_name, analyticsData, schedule.frequency, dateRange)
+          generateEmailHTML(brand, provider.business_name, analyticsData, schedule.frequency, dateRange)
         );
 
         console.log("Email sent successfully:", emailResponse);

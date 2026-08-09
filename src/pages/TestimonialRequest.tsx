@@ -34,7 +34,7 @@ type TestimonialRequestProps = {
 
 const brandName = {
   casa: 'Casa Baise',
-  medical: 'Medical Baise',
+  medical: 'MD Baise',
   legal: 'Legal Baise',
 } as const;
 

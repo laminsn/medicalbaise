@@ -9,7 +9,7 @@ import { getBaiseAppKey } from '@/lib/providerCommunication';
 
 const brandTitle = {
   casa: 'Casa Baise',
-  medical: 'Medical Baise',
+  medical: 'MD Baise',
   legal: 'Legal Baise',
 } as const;
 

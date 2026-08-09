@@ -13,7 +13,7 @@ type RecoveryState = "checking" | "ready" | "invalid" | "saving" | "complete";
 const APP_KEY = String(import.meta.env.VITE_BAISE_APP || "medical").toLowerCase();
 const BRANDS = {
   casa: { name: "Casa Baise", securityEmail: "support@casabaise.com" },
-  medical: { name: "Medical Baise", securityEmail: "support@mdbaise.com" },
+  medical: { name: "MD Baise", securityEmail: "support@mdbaise.com" },
   legal: { name: "Legal Baise", securityEmail: "support@legalbaise.com" },
 } as const;
 const brand = BRANDS[APP_KEY as keyof typeof BRANDS] || BRANDS.medical;

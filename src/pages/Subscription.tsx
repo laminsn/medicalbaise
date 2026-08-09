@@ -257,7 +257,7 @@ export default function Subscription() {
   return (
     <>
       <Helmet>
-        <title>{t('subscription.title', 'Subscription')} - Brasil Base</title>
+        <title>{t('subscription.title', 'Subscription')} - MD Baise</title>
       </Helmet>
       <AppLayout>
         <div className="px-4 py-6 pb-24">

@@ -21,8 +21,8 @@ const videoCategories = [
 const videos = [
   {
     id: 1,
-    title: 'MDBaise Platform Overview',
-    description: 'A comprehensive introduction to all the features and capabilities of the MDBaise platform.',
+    title: 'MD Baise Platform Overview',
+    description: 'A comprehensive introduction to all the features and capabilities of the MD Baise platform.',
     category: 'quickstart',
     duration: '8:45',
     views: 12500,
@@ -101,7 +101,7 @@ const videos = [
   {
     id: 8,
     title: 'Provider Pro Tips: Winning More Patients',
-    description: 'Proven strategies to grow your patient base on MDBaise.',
+    description: 'Proven strategies to grow your patient base on MD Baise.',
     category: 'tips',
     duration: '9:15',
     views: 4500,
