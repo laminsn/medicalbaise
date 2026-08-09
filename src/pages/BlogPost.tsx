@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BarChart3, BookOpen, CheckCircle2, ExternalLink, FileText, ShieldCheck } from 'lucide-react';
+import { BlogShareRail } from '@/components/blog/BlogShareRail';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ const BlogPost = () => {
 
   return (
     <AppLayout>
+      <BlogShareRail url={canonicalUrl} title={post.title} slug={post.slug} />
       <Helmet>
         <title>{post.title} | {brandName}</title>
         <meta name="description" content={post.deck} />

@@ -1,0 +1,227 @@
+/**
+ * Empire share kit — styles.
+ *
+ * ON BRAND WITHOUT FORKING: every colour is read from the host blog's own CSS
+ * custom properties, each with a hard fallback. One layout, only the colours
+ * swap — the same principle as branded-summary-standard.md. Two token-naming
+ * conventions are supported because the Brainwash surfaces disagree: the static
+ * render uses --yellow/--ink-2, the Next.js site uses --blog-yellow/--blog-deep.
+ *
+ * STANDS OUT: solid surface, 2px ink border, hard offset shadow in the brand
+ * accent. Bold editorial, high contrast — not chrome, not a tooltip.
+ *
+ * PLACEMENT: left rail on wide screens only. The right rail is the sticky opt-in
+ * CTA's, and the article column is centred at max-width 1140px. The rail is 64px
+ * wide and sits at left:20px with a ~12px gap, so it needs 96px of free gutter
+ * each side: 1140 + 2*96 = 1332, rounded to a 1340px breakpoint. Measured, not
+ * guessed — the first attempt used 1276px and overlapped the article by 23px.
+ * Below the breakpoint it docks to the bottom, above the consent banner, and
+ * yields when the footer comes into view.
+ */
+
+.ek-share {
+  /* --- token bridge: host tokens -> internal names, with real fallbacks --- */
+  --ek-accent:  var(--yellow,   var(--blog-yellow, #FFD400));
+  --ek-ink:     var(--ink-2,    var(--blog-deep,   #141210));
+  --ek-surface: var(--card,     var(--blog-card,   #ffffff));
+  --ek-hair:    var(--hair,     var(--blog-hair,   #e7e2d6));
+  --ek-muted:   var(--muted,    var(--blog-muted,  #6b6559));
+  --ek-sans:    var(--sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, sans-serif);
+  --ek-share-consent: 0px;
+
+  position: fixed;
+  z-index: 900; /* above the sticky header (20); below the skip-link (1000) */
+  font-family: var(--ek-sans);
+  display: flex;
+  gap: 8px;
+  background: var(--ek-surface);
+  border: 2px solid var(--ek-ink);
+  opacity: 0;
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+.ek-share[hidden] { display: none !important; }
+.ek-share.is-visible { opacity: 1; transform: none; }
+
+/* Yield: footer in view, or nothing to sit above. Pointer-events off so a
+   faded-out control can never swallow a tap meant for the footer beneath it. */
+.ek-share.is-yielding { opacity: 0; pointer-events: none; }
+
+.ek-share__label {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ek-muted);
+  white-space: nowrap;
+}
+
+.ek-share__row { display: flex; gap: 2px; }
+
+.ek-share__btn {
+  /* 44px is the accessible minimum touch target, not a design preference. */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ek-ink);
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.ek-share__btn:hover,
+.ek-share__btn:focus-visible {
+  background: var(--ek-accent);
+  color: var(--ek-ink);
+  transform: translateY(-1px);
+}
+
+.ek-share__btn.is-done { background: var(--ek-accent); }
+
+.ek-share__icon { width: 20px; height: 20px; fill: currentColor; display: block; }
+
+/* Tooltip. Desktop only — on the docked bar there is no room and the icons
+   carry an aria-label anyway. */
+.ek-share__tip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--ek-ink);
+  color: var(--ek-surface);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .14s ease, transform .14s ease;
+}
+
+.ek-share__btn:hover .ek-share__tip,
+.ek-share__btn:focus-visible .ek-share__tip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* The live region announces "Copied" to screen readers; it must never occupy
+   layout when empty (the same defect .form-status:empty already fixes). */
+.ek-share__status {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ------------------------------------------------- docked bar (default, <1340px) */
+
+.ek-share {
+  left: 50%;
+  bottom: calc(16px + var(--ek-share-consent, 0px));
+  transform: translateX(-50%) translateY(14px);
+  flex-direction: row;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 100px;
+  box-shadow: 0 4px 0 var(--ek-accent), 0 10px 24px rgba(0, 0, 0, .18);
+  max-width: calc(100vw - 24px);
+}
+
+.ek-share.is-visible { transform: translateX(-50%) translateY(0); }
+
+.ek-share__tip { display: none; }
+
+/* Overflow control. On one row at phone width the last buttons clip off-screen
+   and become unreachable — which is how `copy`, the only route to Instagram and
+   TikTok, silently disappears. Anything the kit marked as overflow is hidden
+   here and remains reachable through the native share sheet. The vertical rail
+   has room for all of them, so this rule lives only in the docked regime. */
+.ek-share__btn[data-ek-docked-hidden] { display: none; }
+
+@media (max-width: 420px) {
+  .ek-share { gap: 6px; padding: 6px 10px; }
+  .ek-share__btn { width: 40px; height: 40px; }
+  .ek-share__label { font-size: 9px; letter-spacing: .12em; }
+}
+
+/* Below ~360px even the capped row plus a word is tight. The icons are
+   self-evident and every one carries an aria-label, so the word yields first. */
+@media (max-width: 359px) {
+  .ek-share__label { display: none; }
+}
+
+/* ------------------------------------------------- left rail (wide screens) */
+
+@media (min-width: 1340px) {
+  .ek-share {
+    left: 20px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%) translateX(-14px);
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 8px 10px;
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--ek-accent);
+    max-width: none;
+  }
+
+  .ek-share.is-visible { transform: translateY(-50%) translateX(0); }
+
+  .ek-share__row { flex-direction: column; gap: 4px; }
+  .ek-share__label { writing-mode: horizontal-tb; font-size: 9.5px; }
+  .ek-share__tip { display: block; }
+
+  /* Undo the docked overflow cap. A vertical rail has unbounded room, so every
+     target shows here — the cap exists only to stop a one-row bar from clipping
+     its last buttons off a phone screen. */
+  .ek-share__btn[data-ek-docked-hidden] { display: inline-flex; }
+
+  /* The footer yield is a small-screen concern — the rail never overlaps
+     content at this width, so keep it visible all the way down. */
+  .ek-share.is-yielding { opacity: 1; pointer-events: auto; }
+}
+
+/* ------------------------------------------------- motion + contrast prefs */
+
+@media (prefers-reduced-motion: reduce) {
+  .ek-share,
+  .ek-share__btn,
+  .ek-share__tip { transition: none !important; }
+  .ek-share { transform: translateX(-50%) !important; }
+}
+
+@media (min-width: 1340px) and (prefers-reduced-motion: reduce) {
+  .ek-share { transform: translateY(-50%) !important; }
+}
+
+@media (prefers-contrast: more) {
+  .ek-share__btn { border: 1px solid var(--ek-ink); }
+}
+
+@media print {
+  .ek-share { display: none !important; }
+}
+
+/* Set by the mount when the heading is the thing that does not fit — a
+   translated label is 5 characters in English and 12 in Portuguese, and the
+   buttons matter more than the word. Every button keeps its aria-label. */
+.ek-share.is-tight .ek-share__label { display: none; }
