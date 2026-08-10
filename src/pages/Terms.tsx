@@ -188,7 +188,48 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '7. IA, automação e decisoes humanas' : isEs ? '7. IA, automatización y decisiones humanas' : '7. AI, Automation, and Human Decisions'}>
+            {/* DRAFT - for licensed-attorney review before this ships. Added 2026-08-10.
+                Jurisdiction: BR (LGPD, consumer law) for the PT/ES markets; confirm with counsel
+                before deploying. Do not deploy this section until it is cleared. */}
+            <Section title={isPt ? '7. Assédio, discriminação e segurança pessoal' : isEs ? '7. Acoso, discriminación y seguridad personal' : '7. Anti-harassment, discrimination and personal safety'}>
+              <BulletList
+                items={
+                  isPt
+                    ? [
+                        'Esta política se aplica a todos na plataforma — clientes, prestadores de serviço e qualquer pessoa que atue em nome deles — e vale em mensagens, avaliações, chamadas, vídeo e presencialmente em um serviço ou atendimento.',
+                        'Assédio, intimidação, perseguição, investidas ou atenção sexual não desejada, ameaças e linguagem abusiva ou degradante são proibidos, independentemente de a pessoa atingida se manifestar no momento.',
+                        'É proibida a discriminação por raça, cor, etnia, origem nacional, religião, sexo, identidade ou expressão de gênero, orientação sexual, idade, deficiência, gravidez, estado civil ou familiar, ou qualquer outra característica protegida pela legislação aplicável.',
+                        'Qualquer uma das partes pode denunciar condutas que violem esta política pelo canal de suporte no aplicativo ou pelo endereço de contato indicado nestes termos. Não é necessário comprovar a violação para denunciar de boa-fé.',
+                        'Violações confirmadas resultam em advertência, suspensão ou remoção permanente da plataforma, conforme a gravidade e o histórico. Condutas que envolvam ameaça, violência, coação sexual ou suspeita de crime resultam em remoção imediata e podem ser comunicadas às autoridades competentes.',
+                        'Retaliação contra quem denuncia de boa-fé, ou contra quem participa de uma apuração, é em si uma violação desta política e recebe o mesmo tratamento.',
+                        'As denúncias e os dados pessoais nelas contidos são tratados conforme nossa Política de Privacidade e a legislação de proteção de dados aplicável, e são compartilhados apenas com quem precisa deles para apurar os fatos ou cumprir obrigação legal.',
+                        'Se você estiver em perigo imediato, acione primeiro os serviços de emergência locais. A plataforma não é um serviço de emergência e não pode intervir em uma situação em curso.',
+                      ]
+                : isEs ? [
+                        'Esta política se aplica a todas las personas en la plataforma — clientes, proveedores de servicios y cualquiera que actúe en su nombre — y rige en mensajes, reseñas, llamadas, video y en persona durante un servicio o una cita.',
+                        'Se prohíben el acoso, la intimidación, el hostigamiento, las insinuaciones o la atención sexual no deseada, las amenazas y el lenguaje abusivo o degradante, con independencia de que la persona afectada se manifieste en el momento.',
+                        'Se prohíbe la discriminación por raza, color, etnia, origen nacional, religión, sexo, identidad o expresión de género, orientación sexual, edad, discapacidad, embarazo, estado civil o familiar, o cualquier otra característica protegida por la legislación aplicable.',
+                        'Cualquiera de las partes puede denunciar conductas que infrinjan esta política mediante el canal de soporte de la aplicación o la dirección de contacto indicada en estos términos. No es necesario probar la infracción para denunciarla de buena fe.',
+                        'Las infracciones confirmadas conllevan una advertencia, la suspensión o la expulsión permanente de la plataforma, según la gravedad y los antecedentes. Las conductas que impliquen amenazas, violencia, coacción sexual o un presunto delito conllevan la expulsión inmediata y pueden comunicarse a las autoridades competentes.',
+                        'Las represalias contra quien denuncia de buena fe, o contra quien participa en una investigación, constituyen por sí mismas una infracción de esta política y reciben el mismo tratamiento.',
+                        'Las denuncias y los datos personales que contienen se tratan conforme a nuestra Política de Privacidad y a la legislación de protección de datos aplicable, y solo se comparten con quienes los necesitan para investigar o para cumplir una obligación legal.',
+                        'Si te encuentras en peligro inmediato, contacta primero con los servicios de emergencia locales. La plataforma no es un servicio de emergencia y no puede intervenir en una situación en curso.',
+                      ]
+                : [
+                        'This policy applies to everyone on the platform — customers, service providers, and anyone acting on their behalf — and it applies in messages, reviews, calls, video, and in person at a job or appointment.',
+                        'Harassment, intimidation, stalking, unwanted sexual attention or advances, threats, and abusive or degrading language are prohibited, whether or not the person targeted objects at the time.',
+                        'Discrimination is prohibited on the basis of race, colour, ethnicity, national origin, religion, sex, gender identity or expression, sexual orientation, age, disability, pregnancy, marital or family status, or any other characteristic protected by applicable law.',
+                        'Either party may report conduct that breaches this policy using the in-app support channel or the contact address in these terms. You do not need to prove a breach before reporting it in good faith.',
+                        'Confirmed breaches result in a warning, suspension, or permanent removal from the platform, according to severity and history. Conduct involving threats, violence, sexual coercion, or a suspected crime results in immediate removal and may be reported to the competent authorities.',
+                        'Retaliation against a person who reports in good faith, or who takes part in a review, is itself a breach of this policy and is treated the same way.',
+                        'Reports and the personal data in them are handled under our Privacy Policy and applicable data-protection law, and are shared only with those who need them to investigate or to meet a legal obligation.',
+                        'If you are in immediate danger, contact your local emergency services first. The platform is not an emergency service and cannot intervene in a situation as it happens.',
+                      ]
+                }
+              />
+            </Section>
+
+          <Section title={isPt ? '8. IA, automação e decisoes humanas' : isEs ? '8. IA, automatización y decisiones humanas' : '8. AI, Automation, and Human Decisions'}>
             <p>
               {isPt
                 ? 'Recursos de IA podem ajudar com triagem, busca, resumo, suporte, qualidade, risco, segurança, classificação, traducao e produtividade. A IA não substitui julgamento profissional, revisao humana, obrigações legais ou decisoes de segurança.' : isEs ? 'Las funciones de IA pueden apoyar la clasificación, la búsqueda, los resúmenes, el soporte, la calidad, el riesgo, la seguridad, la traducción y la productividad. La IA no sustituye el criterio profesional, la revisión humana, las obligaciones legales ni las decisiones de seguridad.' : 'AI features may assist with triage, search, summaries, support, quality, risk, security, classification, translation, and productivity. AI does not replace professional judgment, human review, legal obligations, or security decisions.'}
@@ -199,7 +240,7 @@ export default function Terms() {
             </p>
           </Section>
 
-          <Section title={isPt ? '8. Apps Apple, Google Play e exclusão de conta' : isEs ? '8. Aplicaciones de Apple, Google Play y eliminación de cuenta' : '8. Apple Apps, Google Play, and Account Deletion'}>
+          <Section title={isPt ? '9. Apps Apple, Google Play e exclusão de conta' : isEs ? '9. Aplicaciones de Apple, Google Play y eliminación de cuenta' : '9. Apple Apps, Google Play, and Account Deletion'}>
             <BulletList
               items={
                 isPt
@@ -218,7 +259,7 @@ export default function Terms() {
             />
           </Section>
 
-          <Section title={isPt ? '9. Lei aplicável, disputas e contato' : isEs ? '9. Ley aplicable, controversias y contacto' : '9. Governing Law, Disputes, and Contact'}>
+          <Section title={isPt ? '10. Lei aplicável, disputas e contato' : isEs ? '10. Ley aplicable, controversias y contacto' : '10. Governing Law, Disputes, and Contact'}>
             <p>
               {isPt
                 ? 'Estes Termos sao regidos pelas leis da Republica Federativa do Brasil, sem prejuizo de direitos obrigatorios do consumidor e regras profissionais aplicaveis. Disputas devem ser tentadas primeiro por suporte, mediação operacional e resolucao de boa-fe.' : isEs ? 'Estos Términos se rigen por las leyes de la República Federativa de Brasil, sin limitar los derechos irrenunciables del consumidor ni las normas profesionales aplicables. Las controversias deben intentarse primero por soporte, mediación operativa y resolución de buena fe.' : 'These Terms are governed by the laws of the Federative Republic of Brazil, without limiting mandatory consumer rights and applicable professional rules. Disputes should first be attempted through support, operational mediation, and good-faith resolution.'}
