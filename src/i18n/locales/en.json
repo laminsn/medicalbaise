@@ -1152,16 +1152,22 @@
     "goHome": "Go to home"
   },
   "promo": {
-    "badge": "April Promotion",
+    "badge": "{{month}} Promotion",
     "title": "25% OFF your first service",
-    "description": "Use code APRIL2026 and save up to R$100",
+    "description": "Use code {{code}} and save up to R$100",
     "cta": "Book now",
     "providerTitle": "Are you a service provider?",
     "providerDescription": "Join our network and connect with customers looking for your services.",
     "providerCta": "Become a Provider",
     "customerTitle": "Need something done?",
     "customerDescription": "Post a job and receive competitive bids from trusted professionals.",
-    "customerCta": "Post a Job"
+    "customerCta": "Post a Job",
+    "newProviders": "New Providers: First 14 Days FREE!",
+    "annualPlans": "Annual Plans: Get 2 Months FREE!",
+    "announcementBanner": "Promotional announcements",
+    "currentMonth": "August",
+    "currentSpecial": "{{month}} Special: First Transaction Fee Waived!",
+    "currentPromoCode": "AUGUST2026"
   },
   "providerProfile": {
     "reviews": "reviews",

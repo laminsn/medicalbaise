@@ -35,7 +35,7 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-card border-b border-border">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
         {/* Logo */}
-        <Link to="/" className="flex min-w-0 items-center gap-2">
+        <Link to="/discover" className="flex min-w-0 items-center gap-2">
           <div className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-primary to-black flex items-center justify-center">
             <span className="text-lg font-bold text-primary-foreground">MD</span>
           </div>

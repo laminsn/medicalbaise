@@ -198,7 +198,7 @@ export default function PilotRecruit({ defaultLocale }: PilotRecruitProps) {
             {/* NOT localizedPublicPath: only blog/pilot/influencer/testimonial/
                 give-a-month/bio/links have /pt and /es routes. Home and /privacy
                 do not, so prefixing the locale 404s. */}
-            <Link to="/">
+            <Link to="/discover">
               {t('pilot.backHome', 'Voltar ao início')}
             </Link>
           </Button>

@@ -19,7 +19,7 @@ const NotFound = () => {
         <p className="mb-4 text-xl text-muted-foreground">
           {isPt ? "Ops! Página não encontrada" : isEs ? "Vaya, página no encontrada" : "Oops! Page not found"}
         </p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
+        <a href="/discover" className="text-primary underline hover:text-primary/90">
           {isPt ? "Voltar para a página inicial" : isEs ? "Volver al inicio" : "Return to Home"}
         </a>
       </div>

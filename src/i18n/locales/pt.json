@@ -1152,16 +1152,22 @@
     "goHome": "Ir para o início"
   },
   "promo": {
-    "badge": "Promoção de Abril",
+    "badge": "Promoção de {{month}}",
     "title": "25% OFF no primeiro serviço",
-    "description": "Use o código ABRIL2026 e economize até R$100",
+    "description": "Use o código {{code}} e economize até R$100",
     "cta": "Agendar agora",
     "providerTitle": "Você é um prestador de serviços?",
     "providerDescription": "Junte-se à nossa rede e conecte-se com clientes que procuram seus serviços.",
     "providerCta": "Seja um Profissional",
     "customerTitle": "Precisa de algum serviço?",
     "customerDescription": "Publique um trabalho e receba propostas competitivas de profissionais de confiança.",
-    "customerCta": "Publicar Trabalho"
+    "customerCta": "Publicar Trabalho",
+    "newProviders": "Novos Profissionais: Primeiros 14 Dias GRÁTIS!",
+    "annualPlans": "Planos Anuais: Ganhe 2 Meses GRÁTIS!",
+    "announcementBanner": "Anúncios promocionais",
+    "currentMonth": "Agosto",
+    "currentSpecial": "Especial de {{month}}: Primeira Taxa de Transação Dispensada!",
+    "currentPromoCode": "AUGUST2026"
   },
   "providerProfile": {
     "reviews": "avaliações",

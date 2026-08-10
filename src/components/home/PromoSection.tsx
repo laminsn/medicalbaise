@@ -16,7 +16,7 @@ export function PromoSection() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-2">
             <Gift className="w-5 h-5" />
-            <span className="text-sm font-medium opacity-90">{t('promo.badge')}</span>
+            <span className="text-sm font-medium opacity-90">{t('promo.badge', { month: t('promo.currentMonth') })}</span>
           </div>
           
           <h3 className="text-xl font-bold mb-2">
@@ -24,7 +24,7 @@ export function PromoSection() {
           </h3>
           
           <p className="text-sm opacity-90 mb-4">
-            {t('promo.description')}
+            {t('promo.description', { code: t('promo.currentPromoCode') })}
           </p>
           
           <Link to="/browse">

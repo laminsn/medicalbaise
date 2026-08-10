@@ -96,7 +96,7 @@ export default function CategoryDetail() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-primary transition-colors">{t('nav.home')}</Link>
+          <Link to="/discover" className="hover:text-primary transition-colors">{t('nav.home')}</Link>
           <span>/</span>
           <Link to="/categories" className="hover:text-primary transition-colors">
             {t('categories.allCategories', 'Categories')}

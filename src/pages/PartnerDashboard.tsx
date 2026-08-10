@@ -39,7 +39,7 @@ export default function PartnerDashboard() {
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex min-h-16 max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center justify-between gap-4">
-            <Link to="/" className="min-w-0">
+            <Link to="/discover" className="min-w-0">
               <span className="block text-sm font-semibold text-muted-foreground">{brand}</span>
               <span className="block truncate text-xl font-semibold tracking-tight">Partner Portal</span>
             </Link>

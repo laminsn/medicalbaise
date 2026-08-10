@@ -15,7 +15,7 @@ export function MobileNav() {
     : 'U';
 
   const NAV_ITEMS = [
-    { path: '/', icon: Home, label: t('nav.home') },
+    { path: '/discover', icon: Home, label: t('nav.home') },
     { path: '/browse', icon: Search, label: t('nav.browse') },
     { path: '/feed', icon: Clapperboard, label: t('nav.feed') },
     { path: '/post-job', icon: PlusCircle, label: t('nav.postJob') },
