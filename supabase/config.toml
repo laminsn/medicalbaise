@@ -56,3 +56,19 @@ verify_jwt = false
 
 [functions.email-unsubscribe]
 verify_jwt = false
+
+# Agent spine (§3.1, §3.2, §3.6). All four authenticate by API key or a single-use
+# token rather than a Supabase JWT, so verify_jwt must be false and the gate is
+# _shared/api-auth.ts (api-v1, mcp-server), the CRON_SECRET (request-fanout), or the
+# token digest (request-response).
+[functions.api-v1]
+verify_jwt = false
+
+[functions.mcp-server]
+verify_jwt = false
+
+[functions.request-fanout]
+verify_jwt = false
+
+[functions.request-response]
+verify_jwt = false
