@@ -40,8 +40,11 @@ export function AgentConnectSection({ tone = "light" }: { tone?: "light" | "dark
 
   const styles = isDark
     ? {
-        section: "py-16",
-        sectionStyle: { borderTop: "1px solid hsl(0 0% 18%)" },
+        // On the hub landing this is the FIRST section, directly under the nav, so
+        // the divider goes at the bottom — a top border there reads as a stray line
+        // rather than a separator.
+        section: "pt-10 pb-14",
+        sectionStyle: { borderBottom: "1px solid hsl(0 0% 18%)" },
         heading: "text-white",
         body: "text-white/60",
         badge: "border-white/20 bg-white/5 text-white/70",
