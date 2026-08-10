@@ -3151,5 +3151,19 @@
     "saveTemplate": "Salvar modelo",
     "noTemplatesYet": "Nenhum modelo ainda.",
     "use": "Usar"
+  },
+  "agentConnect": {
+    "title": "Conecte seus agentes de IA",
+    "previewBadge": "Prévia",
+    "description": "Chaves com escopo do prestador permitem que um assistente de IA leia e escreva seus registros Baise em seu nome, com os escopos que você escolher e a validade que você definir.",
+    "notLiveNotice": "Este endpoint ainda não está ativo. Você pode gerar uma chave hoje e deixá-la pronta, mas nada irá aceitá-la até que a API de agentes seja lançada. Não vamos fingir o contrário.",
+    "tabMcp": "Configuração MCP",
+    "tabApi": "Chave de API",
+    "mcpHelp": "Adicione isto à configuração do seu cliente MCP e substitua o espaço reservado por uma chave que você gerou.",
+    "apiHelp": "Ou chame a API diretamente usando a chave como bearer token.",
+    "clientsTitle": "Destinado a",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "cta": "Gerenciar suas chaves de API"
   }
 }

@@ -3151,5 +3151,19 @@
     "saveTemplate": "Save Template",
     "noTemplatesYet": "No templates yet.",
     "use": "Use"
+  },
+  "agentConnect": {
+    "title": "Connect your AI agents",
+    "previewBadge": "Preview",
+    "description": "Provider-scoped keys let an AI assistant read and write your Baise records on your behalf, with the scopes you choose and an expiry you set.",
+    "notLiveNotice": "This endpoint is not live yet. You can generate a key today and keep it ready, but nothing will accept it until the agent API ships. We will not pretend otherwise.",
+    "tabMcp": "MCP config",
+    "tabApi": "API key",
+    "mcpHelp": "Add this to your MCP client configuration, then replace the placeholder with a key you generated.",
+    "apiHelp": "Or call the API directly with the key as a bearer token.",
+    "clientsTitle": "Intended for",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "cta": "Manage your API keys"
   }
 }

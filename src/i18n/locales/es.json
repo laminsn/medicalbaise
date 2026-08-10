@@ -3151,5 +3151,19 @@
     "saveTemplate": "Guardar plantilla",
     "noTemplatesYet": "Aún no hay plantillas.",
     "use": "Usar"
+  },
+  "agentConnect": {
+    "title": "Conecte sus agentes de IA",
+    "previewBadge": "Vista previa",
+    "description": "Las claves con alcance del proveedor permiten que un asistente de IA lea y escriba sus registros de Baise en su nombre, con los alcances que elija y la caducidad que establezca.",
+    "notLiveNotice": "Este endpoint aún no está activo. Puede generar una clave hoy y tenerla lista, pero nada la aceptará hasta que se lance la API de agentes. No vamos a fingir lo contrario.",
+    "tabMcp": "Configuración MCP",
+    "tabApi": "Clave de API",
+    "mcpHelp": "Agregue esto a la configuración de su cliente MCP y reemplace el marcador de posición por una clave que haya generado.",
+    "apiHelp": "O llame a la API directamente usando la clave como bearer token.",
+    "clientsTitle": "Destinado a",
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "cta": "Administrar sus claves de API"
   }
 }
