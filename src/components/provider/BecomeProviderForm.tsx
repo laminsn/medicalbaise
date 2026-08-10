@@ -1138,7 +1138,7 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                   type="file"
                   accept=".pdf,.jpg,.jpeg,.png"
                   multiple
-                  onChange={(e) => form.setValue('credential_documents', e.target.files)}
+                  onChange={handleCertificationUpload}
                   className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                 />
               </div>
