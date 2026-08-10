@@ -2,6 +2,13 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, normalizeAppKey, reportResendSdkFailure, senderWithDisplayName } from "../_shared/brands.ts";
+import {
+  getOrCreateUnsubscribeToken,
+  isSuppressed,
+  normalizeEmail,
+  unsubscribeFooter,
+  unsubscribeHeaders,
+} from "../_shared/email-consent.ts";
 import { getCorsHeaders, escapeHtml, sanitizeCampaignHtml, rejectNonPostMethod } from "../_shared/security.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -108,7 +115,7 @@ serve(async (req) => {
     }
 
     // De-duplicate
-    recipientEmails = [...new Set(recipientEmails)];
+    recipientEmails = [...new Set(recipientEmails.map(normalizeEmail).filter(Boolean))];
 
     if (recipientEmails.length === 0) {
       // Update campaign as sent with 0 recipients
@@ -147,17 +154,24 @@ serve(async (req) => {
     for (let i = 0; i < recipientEmails.length; i += batchSize) {
       const batch = recipientEmails.slice(i, i + batchSize);
       
-      try {
-        // Send each email individually via Resend
-        // Escape provider business name in "from" and footer to prevent header injection
-        const safeBusinessName = escapeHtml(provider.business_name || "Provider");
-        const brand = APP_BRANDS[normalizeAppKey(provider.platform)];
-        const from = senderWithDisplayName(`${safeBusinessName} via ${brand.name}`, brand);
-        for (const email of batch) {
+      // Send each email individually via Resend.
+      // Escape provider business name in "from" and footer to prevent header injection.
+      const safeBusinessName = escapeHtml(provider.business_name || "Provider");
+      const brandKey = normalizeAppKey(provider.platform);
+      const brand = APP_BRANDS[brandKey];
+      const from = senderWithDisplayName(`${safeBusinessName} via ${brand.name}`, brand);
+      for (const email of batch) {
+        try {
+          const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, email, brandKey);
+          if (await isSuppressed(supabaseAdmin, email, brandKey, "promotions")) {
+            console.info("[send-provider-campaign] Recipient suppressed", { campaignId });
+            continue;
+          }
           const result = await resend.emails.send({
             from,
             to: [email],
             subject: escapeHtml(campaign.subject || ""),
+            headers: unsubscribeHeaders(unsubscribeToken, brand),
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 ${sanitizeCampaignHtml(campaign.body_html)}
@@ -166,15 +180,19 @@ serve(async (req) => {
                   Sent by ${safeBusinessName} via ${brand.name}<br/>
                   <a href="${brand.url}" style="color: #888;">${brand.domain}</a>
                 </p>
+                ${unsubscribeFooter(unsubscribeToken, brand, "en", "marketing")}
               </div>
             `,
           });
           reportResendSdkFailure(result, from, "send-provider-campaign");
           if (result.error) throw new Error(`Resend rejected provider campaign: ${result.error.message}`);
           sentCount++;
+        } catch (recipientError) {
+          console.error("[send-provider-campaign] Recipient send blocked or failed", {
+            campaignId,
+            error: recipientError instanceof Error ? recipientError.message : String(recipientError),
+          });
         }
-      } catch (batchError) {
-        console.error("Batch send error:", batchError);
       }
     }
 

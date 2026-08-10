@@ -1,5 +1,7 @@
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
+import { getOrCreateUnsubscribeToken, unsubscribeFooter } from "../_shared/email-consent.ts";
 
 type ActionType =
   | "signup"
@@ -255,12 +257,14 @@ const renderEmail = ({
   actionUrl,
   token,
   detail,
+  consentFooter,
 }: {
   brand: Brand;
   action: ActionType;
   actionUrl: string;
   token: string;
   detail?: string;
+  consentFooter: string;
 }) => {
   const copy = ACTION_COPY[action];
   const isCodeOnly = action === "reauthentication" || action === "email";
@@ -316,6 +320,7 @@ const renderEmail = ({
             <td style="border-top:1px solid #e5e7eb;background:#f9fafb;padding:22px 34px;color:#6b7280;font-size:12px;line-height:1.6;">
               Sent securely by <strong style="color:#374151;">${brand.name}</strong><br>
               ${brand.domain} · <a href="mailto:${brand.supportEmail}" style="color:${brand.colorDark};">${brand.supportEmail}</a>
+              ${consentFooter}
             </td>
           </tr>
         </table>
@@ -333,6 +338,7 @@ const sendEmail = async ({
   token,
   redirectTo,
   detail,
+  appKey,
 }: {
   to: string;
   brand: Brand;
@@ -341,6 +347,7 @@ const sendEmail = async ({
   token: string;
   redirectTo: string;
   detail?: string;
+  appKey: AppKey;
 }) => {
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) {
@@ -351,6 +358,21 @@ const sendEmail = async ({
   const copy = ACTION_COPY[action];
   const isNotification = NOTIFICATION_TYPES.has(action);
   const actionUrl = isNotification ? "" : verifyUrl(tokenHash, action, redirectTo);
+  let consentFooter = "";
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") || "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
+      { auth: { persistSession: false } },
+    );
+    const unsubscribeToken = await getOrCreateUnsubscribeToken(admin, to, appKey);
+    consentFooter = unsubscribeFooter(unsubscribeToken, brand, "en", "transactional");
+  } catch (error) {
+    console.error("[send-auth-email] Preference link unavailable; continuing transactional send", {
+      action,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -363,7 +385,7 @@ const sendEmail = async ({
       to: [to],
       reply_to: brand.supportEmail,
       subject: copy.subject(brand),
-      html: renderEmail({ brand, action, actionUrl, token, detail }),
+      html: renderEmail({ brand, action, actionUrl, token, detail, consentFooter }),
       text: `${copy.heading}\n\n${copy.intro(brand)}${detail ? `\n${detail}` : ""}\n\n${isNotification ? "Review your account immediately if you do not recognize this change." : action === "reauthentication" || action === "email" ? `Security code: ${token}` : `Continue: ${actionUrl}`}\n\nIf this wasn't you, do not use this link or code. Contact ${brand.supportEmail}.`,
       headers: {
         "X-Entity-Ref-ID": crypto.randomUUID(),
@@ -430,6 +452,7 @@ Deno.serve(async (request) => {
           token: emailData.token,
           redirectTo,
           detail,
+          appKey,
         }));
       }
 
@@ -442,6 +465,7 @@ Deno.serve(async (request) => {
           token: emailData.token_new || emailData.token,
           redirectTo,
           detail,
+          appKey,
         }));
       }
 
@@ -454,6 +478,7 @@ Deno.serve(async (request) => {
           token: emailData.token_new || emailData.token,
           redirectTo,
           detail,
+          appKey,
         }));
       }
 
@@ -467,6 +492,7 @@ Deno.serve(async (request) => {
         token: emailData.token,
         redirectTo,
         detail,
+        appKey,
       });
     }
 

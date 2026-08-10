@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webPush from "npm:web-push@3.6.7";
-import { type AppBrand, getAppBrand, reportResendFailure } from "../_shared/brands.ts";
+import { type AppBrand, getAppBrand, normalizeAppKey, reportResendFailure } from "../_shared/brands.ts";
+import { getOrCreateUnsubscribeToken, unsubscribeFooter } from "../_shared/email-consent.ts";
 import {
   authenticateRequest,
   createErrorResponse,
@@ -131,7 +132,13 @@ const signAppointmentCallback = async (event: CommunicationEvent): Promise<strin
   return `${SUPABASE_URL}/functions/v1/appointment-response?${query.toString()}`;
 };
 
-const buildEmailHtml = (brand: AppBrand, subject: string, body: string, actionUrl: string) => {
+const buildEmailHtml = (
+  brand: AppBrand,
+  subject: string,
+  body: string,
+  actionUrl: string,
+  consentFooter: string,
+) => {
   const callbackBase = `${SUPABASE_URL}/functions/v1/appointment-response?`;
   const safeActionUrl = actionUrl.startsWith("/")
     ? `${brand.url}${actionUrl}`
@@ -162,6 +169,7 @@ const buildEmailHtml = (brand: AppBrand, subject: string, body: string, actionUr
         </td></tr>
         <tr><td style="background:#f7f7f7;padding:16px 32px;font-size:12px;color:#888888;text-align:center;">
           ${escapeHtml(brand.name)} · ${escapeHtml(brand.domain)}
+          ${consentFooter}
         </td></tr>
       </table>
     </td></tr>
@@ -170,19 +178,32 @@ const buildEmailHtml = (brand: AppBrand, subject: string, body: string, actionUr
 };
 
 async function sendEmail(
+  admin: ReturnType<typeof createClient>,
   to: string,
   subject: string,
   body: string,
   appKey: string,
   actionUrl: string,
   eventId: string,
+  locale: string,
 ): Promise<DeliveryResult> {
   if (!RESEND_API_KEY) {
     return { ok: false, deferred: true, error: "Email service is not configured" };
   }
 
-  const brand = getBrand(appKey);
+  const brandKey = normalizeAppKey(appKey);
+  const brand = getBrand(brandKey);
   const from = brand.from;
+  let consentFooter = "";
+  try {
+    const token = await getOrCreateUnsubscribeToken(admin, to, brandKey);
+    consentFooter = unsubscribeFooter(token, brand, locale, "transactional");
+  } catch (error) {
+    console.error("[dispatch-provider-communication-events] Preference link unavailable; continuing transactional send", {
+      eventId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -195,7 +216,7 @@ async function sendEmail(
       from,
       to: [to],
       subject,
-      html: buildEmailHtml(brand, subject, body, actionUrl),
+      html: buildEmailHtml(brand, subject, body, actionUrl, consentFooter),
     }),
   });
 
@@ -562,7 +583,16 @@ serve(async (req) => {
         } else if (event.channel === "email") {
           const email = event.recipient_email || profile?.email;
           if (!email) throw new Error("Recipient email is not available");
-          result = await sendEmail(email, subject, message, event.app_key, actionUrl, event.id);
+          result = await sendEmail(
+            supabaseAdmin,
+            email,
+            subject,
+            message,
+            event.app_key,
+            actionUrl,
+            event.id,
+            event.locale,
+          );
         } else if (event.channel === "push") {
           if (!event.customer_id) throw new Error("No customer account is attached to this push event");
           result = await sendPush(supabaseAdmin, event.customer_id, subject, message, actionUrl, {

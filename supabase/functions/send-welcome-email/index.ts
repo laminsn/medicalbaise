@@ -3,7 +3,9 @@
 // Required secrets: RESEND_API_KEY and WELCOME_HOOK_SECRET.
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
+import { getOrCreateUnsubscribeToken, unsubscribeFooter } from "../_shared/email-consent.ts";
 import { escapeHtml } from "../_shared/security.ts";
 
 type LocaleKey = "en" | "es" | "pt";
@@ -122,7 +124,7 @@ function getCopy(locale: LocaleKey, audience: Audience, brand: AppBrand, firstNa
   };
 }
 
-function buildEmail(brand: AppBrand, copy: ReturnType<typeof getCopy>, locale: LocaleKey) {
+function buildEmail(brand: AppBrand, copy: ReturnType<typeof getCopy>, locale: LocaleKey, consentFooter: string) {
   const portalLabel = locale === "pt" ? "Portal seguro Baise" : locale === "es" ? "Portal seguro Baise" : "Secure Baise portal";
 
   return `
@@ -149,6 +151,7 @@ function buildEmail(brand: AppBrand, copy: ReturnType<typeof getCopy>, locale: L
         </td></tr>
         <tr><td style="background:#f7f7f7;padding:16px 32px;font-size:12px;color:#888888;text-align:center;">
           ${escapeHtml(brand.name)} · ${escapeHtml(brand.domain)}
+          ${consentFooter}
         </td></tr>
       </table>
     </td></tr>
@@ -212,6 +215,20 @@ serve(async (req: Request): Promise<Response> => {
   const locale = pickLanguage(meta?.languages);
   const audience = pickAudience(meta);
   const copy = getCopy(locale, audience, brand, pickFirstName(meta));
+  let consentFooter = "";
+  try {
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") || "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
+      { auth: { persistSession: false } },
+    );
+    const token = await getOrCreateUnsubscribeToken(admin, email, appKey);
+    consentFooter = unsubscribeFooter(token, brand, locale, "transactional");
+  } catch (error) {
+    console.error("[send-welcome-email] Preference link unavailable; continuing transactional send", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -223,7 +240,7 @@ serve(async (req: Request): Promise<Response> => {
       from: brand.from,
       to: [email],
       subject: copy.subject,
-      html: buildEmail(brand, copy, locale),
+      html: buildEmail(brand, copy, locale, consentFooter),
     }),
   });
 

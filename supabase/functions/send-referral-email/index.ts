@@ -2,6 +2,13 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppBrand, reportResendFailure } from "../_shared/brands.ts";
 import {
+  getOrCreateUnsubscribeToken,
+  isSuppressed,
+  normalizeEmail,
+  unsubscribeFooter,
+  unsubscribeHeaders,
+} from "../_shared/email-consent.ts";
+import {
   authenticateRequest,
   createErrorResponse,
   escapeHtml,
@@ -76,6 +83,7 @@ function buildEmailHtml(
   brand: AppBrand,
   copy: ReturnType<typeof getCopy>,
   referralUrl: string,
+  consentFooter: string,
 ) {
   return `
 <!DOCTYPE html>
@@ -99,6 +107,7 @@ function buildEmailHtml(
         </td></tr>
         <tr><td style="background:#f7f7f7;padding:16px 32px;font-size:12px;color:#888888;text-align:center;">
           ${escapeHtml(brand.name)} · ${escapeHtml(brand.domain)}
+          ${consentFooter}
         </td></tr>
       </table>
     </td></tr>
@@ -126,7 +135,7 @@ serve(async (req) => {
 
     const { user, token } = await authenticateRequest(req);
     const body = (await req.json()) as ReferralEmailBody;
-    const recipientEmail = String(body.recipientEmail || "").trim().toLowerCase();
+    const recipientEmail = normalizeEmail(String(body.recipientEmail || ""));
 
     if (!emailRegex.test(recipientEmail)) {
       return new Response(JSON.stringify({ error: "A valid recipient email is required" }), {
@@ -135,7 +144,7 @@ serve(async (req) => {
       });
     }
 
-    if (recipientEmail === user.email.toLowerCase()) {
+    if (recipientEmail === normalizeEmail(user.email)) {
       return new Response(JSON.stringify({ error: "You cannot send a referral invite to your own email" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -161,6 +170,12 @@ serve(async (req) => {
     const senderName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "A Baise member";
     const referralUrl = safeReferralUrl(body.referralLink, `${brand.url}/ref/${encodeURIComponent(referralCode)}`);
     const copy = getCopy(locale, brand.name, senderName);
+    const unsubscribeToken = await getOrCreateUnsubscribeToken(supabaseAdmin, recipientEmail, appKey);
+    if (await isSuppressed(supabaseAdmin, recipientEmail, appKey, "referral")) {
+      return new Response(JSON.stringify({ ok: true, suppressed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -172,7 +187,13 @@ serve(async (req) => {
         from: brand.from,
         to: [recipientEmail],
         subject: copy.subject,
-        html: buildEmailHtml(brand, copy, referralUrl),
+        html: buildEmailHtml(
+          brand,
+          copy,
+          referralUrl,
+          unsubscribeFooter(unsubscribeToken, brand, locale, "marketing"),
+        ),
+        headers: unsubscribeHeaders(unsubscribeToken, brand),
       }),
     });
 

@@ -1,6 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppBrand, normalizeAppKey, reportResendFailure } from "../_shared/brands.ts";
+import {
+  getOrCreateUnsubscribeToken,
+  isSuppressed,
+  normalizeEmail,
+  unsubscribeFooter,
+  unsubscribeHeaders,
+} from "../_shared/email-consent.ts";
 import { getCorsHeaders, escapeHtml, authenticateRequest, createErrorResponse, rejectNonPostMethod } from "../_shared/security.ts";
 
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
@@ -89,7 +96,19 @@ function generateEmailHTML(brand: AppBrand, businessName: string, data: Analytic
   `;
 }
 
-async function sendEmail(brand: AppBrand, to: string, subject: string, html: string) {
+async function sendEmail(
+  client: ReturnType<typeof createClient>,
+  brandKey: "casa" | "medical" | "legal",
+  brand: AppBrand,
+  to: string,
+  subject: string,
+  html: string,
+) {
+  const email = normalizeEmail(to);
+  const unsubscribeToken = await getOrCreateUnsubscribeToken(client, email, brandKey);
+  if (await isSuppressed(client, email, brandKey, "analytics")) return null;
+  const consentFooter = unsubscribeFooter(unsubscribeToken, brand, "en", "marketing");
+  const htmlWithFooter = html.replace("</body>", `${consentFooter}</body>`);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -98,9 +117,10 @@ async function sendEmail(brand: AppBrand, to: string, subject: string, html: str
     },
     body: JSON.stringify({
       from: brand.from,
-      to: [to],
+      to: [email],
       subject,
-      html,
+      html: htmlWithFooter,
+      headers: unsubscribeHeaders(unsubscribeToken, brand),
     }),
   });
 
@@ -132,7 +152,8 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { providerId, manual, appKey } = await req.json().catch(() => ({}));
-    const brand = APP_BRANDS[normalizeAppKey(appKey || Deno.env.get("BAISE_APP_KEY"))];
+    const brandKey = normalizeAppKey(appKey || Deno.env.get("BAISE_APP_KEY"));
+    const brand = APP_BRANDS[brandKey];
     
     console.log("Starting analytics report send", { providerId, manual, requestedBy: user.id });
 
@@ -272,13 +293,17 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Send email
         const emailResponse = await sendEmail(
+          supabase,
+          brandKey,
           brand,
           schedule.email,
           `Your ${schedule.frequency === "weekly" ? "Weekly" : "Monthly"} Analytics Report - ${provider.business_name}`,
           generateEmailHTML(brand, provider.business_name, analyticsData, schedule.frequency, dateRange)
         );
 
-        console.log("Email sent successfully:", emailResponse);
+        console.log(emailResponse ? "Email sent successfully" : "Analytics email suppressed", {
+          providerId: provider.id,
+        });
 
         // Calculate next send date
         const nextSendAt = new Date();
@@ -297,7 +322,7 @@ const handler = async (req: Request): Promise<Response> => {
           })
           .eq("id", schedule.id);
 
-        results.push({ providerId: provider.id, success: true });
+        results.push({ providerId: provider.id, success: true, suppressed: emailResponse === null });
       } catch (err) {
         console.error("Error processing schedule:", err);
         results.push({ providerId: schedule.provider_id, success: false, error: String(err) });

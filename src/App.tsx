@@ -73,6 +73,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -151,6 +152,7 @@ const App = () => (
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/unsubscribe" element={<Unsubscribe />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/categories" element={<Categories />} />
                     <Route path="/categories/:categoryId" element={<CategoryDetail />} />

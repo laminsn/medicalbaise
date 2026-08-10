@@ -19,6 +19,7 @@ import { useFaceAuth } from '@/hooks/useFaceAuth';
 import { useToast } from '@/hooks/use-toast';
 import { AccountDeletionCard } from '@/components/account/AccountDeletion';
 import { AppointmentLifecycleSettings } from '@/components/appointments/AppointmentLifecycleSettings';
+import { EmailPreferencesPanel } from '@/components/settings/EmailPreferencesPanel';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -35,7 +36,6 @@ export default function Settings() {
   const { checkEnrollment, removeFaceEnrollment } = useFaceAuth();
 
   const [notifications, setNotifications] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
   const [providerId, setProviderId] = useState<string | null>(null);
   const [isPro, setIsPro] = useState(false);
   const [faceEnrolled, setFaceEnrolled] = useState(false);
@@ -249,12 +249,14 @@ export default function Settings() {
                   </Label>
                   <Switch
                     id="email-notifications"
-                    checked={emailNotifications}
-                    onCheckedChange={setEmailNotifications}
+                    checked
+                    disabled
                   />
                 </div>
               </CardContent>
             </Card>
+
+            <EmailPreferencesPanel />
 
             <AppointmentLifecycleSettings
               userId={user.id}

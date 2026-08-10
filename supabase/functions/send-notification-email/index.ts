@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { APP_BRANDS, type AppKey, reportResendFailure } from "../_shared/brands.ts";
+import { getOrCreateUnsubscribeToken, unsubscribeFooter } from "../_shared/email-consent.ts";
 import { getCorsHeaders, authenticateRequest, createErrorResponse, escapeHtml, isSafeUrl, rejectNonPostMethod } from "../_shared/security.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -327,7 +328,17 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailContent = getEmailContent(request);
-    const brand = getBrand(request.appKey);
+    const appKey = getAppKey(request.appKey);
+    const brand = APP_BRANDS[appKey];
+    let consentFooter = "";
+    try {
+      const token = await getOrCreateUnsubscribeToken(supabaseAdmin, request.recipientEmail, appKey);
+      consentFooter = unsubscribeFooter(token, brand, getLocale(request.locale), "transactional");
+    } catch (error) {
+      console.error("[SEND-NOTIFICATION] Preference link unavailable; continuing transactional send", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -339,7 +350,7 @@ const handler = async (req: Request): Promise<Response> => {
         from: brand.from,
         to: [request.recipientEmail],
         subject: emailContent.subject,
-        html: emailContent.html,
+        html: `${emailContent.html}${consentFooter}`,
       }),
     });
 

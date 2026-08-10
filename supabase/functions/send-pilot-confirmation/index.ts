@@ -9,6 +9,8 @@
 // Deployed with verify_jwt = false because the pilot form is public.
 
 import { APP_BRANDS, type AppBrand, type AppKey, reportResendFailure } from "../_shared/brands.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { getOrCreateUnsubscribeToken, unsubscribeFooter } from "../_shared/email-consent.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -113,7 +115,13 @@ function copyFor(locale: Locale, brand: AppBrand, name: string) {
   };
 }
 
-function buildHtml(brand: AppBrand, c: ReturnType<typeof copyFor>, locale: Locale, confirmUrl: string) {
+function buildHtml(
+  brand: AppBrand,
+  c: ReturnType<typeof copyFor>,
+  locale: Locale,
+  confirmUrl: string,
+  consentFooter: string,
+) {
   const rules = c.rules
     .map((r) => `<li style="margin:0 0 10px;">${escapeHtml(r)}</li>`)
     .join("");
@@ -152,6 +160,7 @@ function buildHtml(brand: AppBrand, c: ReturnType<typeof copyFor>, locale: Local
         <tr><td style="padding:20px 32px 28px;border-top:1px solid #e5e7eb;color:#64748b;font-size:13px;">
           <p style="margin:0 0 6px;">${escapeHtml(c.footer)}</p>
           <p style="margin:0;">${escapeHtml(c.sig)}</p>
+          ${consentFooter}
         </td></tr>
       </table>
     </td></tr>
@@ -222,6 +231,16 @@ Deno.serve(async (req) => {
     // confirmation, so tampering with these only changes what the clicker sees.
     const confirmUrl = `${SUPABASE_URL}/functions/v1/confirm-pilot-email` +
       `?t=${encodeURIComponent(token)}&l=${locale}&a=${appKey}`;
+    let consentFooter = "";
+    try {
+      const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+      const unsubscribeToken = await getOrCreateUnsubscribeToken(admin, email, appKey);
+      consentFooter = unsubscribeFooter(unsubscribeToken, brand, locale, "transactional");
+    } catch (error) {
+      console.error("[send-pilot-confirmation] Preference link unavailable; continuing transactional send", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -230,7 +249,7 @@ Deno.serve(async (req) => {
         from: brand.from,
         to: [email],
         subject: c.subject,
-        html: buildHtml(brand, c, locale, confirmUrl),
+        html: buildHtml(brand, c, locale, confirmUrl, consentFooter),
       }),
     });
 
