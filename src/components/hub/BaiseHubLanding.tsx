@@ -47,6 +47,8 @@ const IN_APP_TARGET = '/discover';
 const RAW_APP = ((import.meta.env.VITE_BAISE_APP ?? 'casa') as string).trim().toLowerCase();
 const CURRENT_APP: BaiseApp =
   RAW_APP === 'medical' || RAW_APP === 'legal' ? RAW_APP : 'casa';
+import { AgentConnectSection } from '@/components/home/AgentConnectSection';
+
 const CURRENT_ACCENT = APP_ACCENTS[CURRENT_APP];
 
 const BG = 'hsl(0 0% 7%)'; // matches each app's --background dark token (#121212)
@@ -379,6 +381,8 @@ export default function BaiseHubLanding() {
               ))}
             </div>
           </section>
+
+          <AgentConnectSection tone="dark" />
 
           <SocialProofSection />
 

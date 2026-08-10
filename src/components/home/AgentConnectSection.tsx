@@ -26,9 +26,37 @@ import { Check, Copy, Terminal } from 'lucide-react';
 
 const CLIENTS = ['Claude Desktop', 'Claude Code', 'ChatGPT', 'Codex', 'VS Code', 'Cursor'];
 
-export function AgentConnectSection() {
+/**
+ * `tone` exists because this section appears on two pages with different grounds:
+ * /discover uses the app's light design tokens, while the Baise Hub landing at "/"
+ * is a hardcoded dark surface (hsl(0 0% 7%)). Rendering the token-based light styling
+ * on the dark page produced an obvious foreign block, so the chrome switches while
+ * the terminal panel — already dark in both — stays put.
+ */
+export function AgentConnectSection({ tone = "light" }: { tone?: "light" | "dark" } = {}) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState<string | null>(null);
+  const isDark = tone === "dark";
+
+  const styles = isDark
+    ? {
+        section: "py-16",
+        sectionStyle: { borderTop: "1px solid hsl(0 0% 18%)" },
+        heading: "text-white",
+        body: "text-white/60",
+        badge: "border-white/20 bg-white/5 text-white/70",
+        chip: "border-white/15 bg-white/[0.03] text-white/70",
+        label: "text-white/70",
+      }
+    : {
+        section: "border-t bg-muted/30 py-16",
+        sectionStyle: undefined,
+        heading: "",
+        body: "text-muted-foreground",
+        badge: "",
+        chip: "",
+        label: "",
+      };
 
   const appKey = getBaiseAppKey();
   const appUrl = getBaiseAppUrl();
@@ -46,9 +74,12 @@ export function AgentConnectSection() {
     }
   }
 }`,
-      api: `curl ${appUrl}/api/v1/records \\
-  -H "Authorization: Bearer baise_ai_YOUR_KEY_HERE" \\
-  -H "Content-Type: application/json"`,
+      // A route that actually exists in api-v1. An invented path here would be the
+      // same defect this section exists to avoid, one level down: copyable, plausible,
+      // and wrong. The pretty /api/v1 and /mcp hosts still need a rewrite in front of
+      // the edge functions before the preview framing comes off (RESTORE-RUNBOOK §5l).
+      api: `curl "${appUrl}/api/v1/providers/search?query=plumber&limit=5" \\
+  -H "Authorization: Bearer baise_ai_YOUR_KEY_HERE"`,
     }),
     [appUrl, serverName],
   );
@@ -84,15 +115,15 @@ export function AgentConnectSection() {
   );
 
   return (
-    <section className="border-t bg-muted/30 py-16">
+    <section className={styles.section} style={styles.sectionStyle}>
       <div className="container mx-auto max-w-4xl px-4">
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Terminal className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold sm:text-3xl">{t('agentConnect.title')}</h2>
-          <Badge variant="secondary">{t('agentConnect.previewBadge')}</Badge>
+          <h2 className={`text-2xl font-bold sm:text-3xl ${styles.heading}`}>{t('agentConnect.title')}</h2>
+          <Badge variant="secondary" className={styles.badge}>{t('agentConnect.previewBadge')}</Badge>
         </div>
 
-        <p className="mb-4 text-muted-foreground">{t('agentConnect.description')}</p>
+        <p className={`mb-4 ${styles.body}`}>{t('agentConnect.description')}</p>
 
         {/* The honesty gate. Do not remove until a verification endpoint exists. */}
         <div
@@ -108,20 +139,20 @@ export function AgentConnectSection() {
             <TabsTrigger value="api">{t('agentConnect.tabApi')}</TabsTrigger>
           </TabsList>
           <TabsContent value="mcp" className="mt-4 space-y-3">
-            <p className="text-sm text-muted-foreground">{t('agentConnect.mcpHelp')}</p>
+            <p className={`text-sm ${styles.body}`}>{t('agentConnect.mcpHelp')}</p>
             {renderSnippet('mcp', snippets.mcp)}
           </TabsContent>
           <TabsContent value="api" className="mt-4 space-y-3">
-            <p className="text-sm text-muted-foreground">{t('agentConnect.apiHelp')}</p>
+            <p className={`text-sm ${styles.body}`}>{t('agentConnect.apiHelp')}</p>
             {renderSnippet('api', snippets.api)}
           </TabsContent>
         </Tabs>
 
         <div className="mb-8">
-          <p className="mb-3 text-sm font-medium">{t('agentConnect.clientsTitle')}</p>
+          <p className={`mb-3 text-sm font-medium ${styles.label}`}>{t('agentConnect.clientsTitle')}</p>
           <div className="flex flex-wrap gap-2">
             {CLIENTS.map((client) => (
-              <Badge key={client} variant="outline">
+              <Badge key={client} variant="outline" className={styles.chip}>
                 {client}
               </Badge>
             ))}
