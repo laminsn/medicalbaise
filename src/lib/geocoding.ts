@@ -13,7 +13,7 @@
 
 const VIACEP_BASE = 'https://viacep.com.br/ws';
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
-const APP_USER_AGENT = 'BaiseGroup/1.0 (https://casabaise.com)';
+const APP_USER_AGENT = 'BaiseGroup/1.0 (https://mdbaise.com)';
 
 export interface CepLookupResult {
   cep: string;
