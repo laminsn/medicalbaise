@@ -6,6 +6,7 @@ type Mode = "request" | "recover" | "staff-close" | "purge";
 type Payload = { appContext?: string; reason?: string; immediate?: boolean; targetUserId?: string };
 const APPS = new Set(["casa", "medical", "legal"]);
 const DAY = 86_400_000;
+const API_KEY_CLOSURE_MARKER = "account_closure_request_id";
 
 function safeEqual(leftValue: string | null | undefined, rightValue: string | null | undefined) {
   const left = new TextEncoder().encode(leftValue || "");
@@ -27,6 +28,83 @@ function adminClient() {
 async function audit(admin: ReturnType<typeof adminClient>, values: Record<string, unknown>) {
   const { error } = await admin.from("account_deletion_audit").insert(values);
   if (error) throw error;
+}
+
+function metadataObject(metadata: unknown): Record<string, unknown> {
+  return metadata && typeof metadata === "object" && !Array.isArray(metadata)
+    ? metadata as Record<string, unknown>
+    : {};
+}
+
+async function providerIdsForUser(admin: ReturnType<typeof adminClient>, userId: string) {
+  const { data, error } = await admin.from("providers").select("id").eq("user_id", userId);
+  if (error) throw error;
+  return (data || []).map((provider) => provider.id);
+}
+
+/**
+ * Agent API keys are destroyed at purge by the FK chain
+ * auth.users -> providers -> provider_ai_api_keys (both ON DELETE CASCADE).
+ *
+ * They are NOT covered during the 30-day recovery window, so a user who has asked
+ * to be deleted would keep a working credential for a month. Nothing verifies these
+ * keys today, but that changes the moment the API/MCP verification middleware ships
+ * — so revoke on request, restore on recover.
+ *
+ * Revocation is marked in `metadata` with the closure's request id so recovery
+ * restores only the keys this closure took. A key the provider revoked by hand
+ * beforehand must stay revoked.
+ */
+async function revokeProviderApiKeysForClosure(admin: ReturnType<typeof adminClient>, userId: string, requestId: string) {
+  const providerIds = await providerIdsForUser(admin, userId);
+  if (!providerIds.length) return 0;
+  const { data: keys, error } = await admin.from("provider_ai_api_keys").select("id,metadata").in("provider_id", providerIds).eq("status", "active");
+  if (error) throw error;
+
+  const revoked: Array<{ id: string; metadata: Record<string, unknown> }> = [];
+  try {
+    for (const key of keys || []) {
+      const originalMetadata = metadataObject(key.metadata);
+      const { data: updated, error: updateError } = await admin.from("provider_ai_api_keys").update({
+        status: "revoked",
+        revoked_at: new Date().toISOString(),
+        metadata: { ...originalMetadata, [API_KEY_CLOSURE_MARKER]: requestId },
+      }).eq("id", key.id).eq("status", "active").select("id").maybeSingle();
+      if (updateError) throw updateError;
+      if (updated) revoked.push({ id: key.id, metadata: originalMetadata });
+    }
+    return revoked.length;
+  } catch (revokeError) {
+    for (const key of revoked) {
+      const { error: rollbackError } = await admin.from("provider_ai_api_keys").update({
+        status: "active",
+        revoked_at: null,
+        metadata: key.metadata,
+      }).eq("id", key.id).eq("status", "revoked").contains("metadata", { [API_KEY_CLOSURE_MARKER]: requestId });
+      if (rollbackError) console.error("[account-delete-request] API key rollback failed", key.id);
+    }
+    throw revokeError;
+  }
+}
+
+async function restoreProviderApiKeysForClosure(admin: ReturnType<typeof adminClient>, userId: string, requestId: string) {
+  const providerIds = await providerIdsForUser(admin, userId);
+  if (!providerIds.length) return 0;
+  const { data: keys, error } = await admin.from("provider_ai_api_keys").select("id,metadata").in("provider_id", providerIds).eq("status", "revoked").contains("metadata", { [API_KEY_CLOSURE_MARKER]: requestId });
+  if (error) throw error;
+
+  let restored = 0;
+  for (const key of keys || []) {
+    const { [API_KEY_CLOSURE_MARKER]: _marker, ...metadata } = metadataObject(key.metadata);
+    const { data: updated, error: updateError } = await admin.from("provider_ai_api_keys").update({
+      status: "active",
+      revoked_at: null,
+      metadata,
+    }).eq("id", key.id).eq("status", "revoked").contains("metadata", { [API_KEY_CLOSURE_MARKER]: requestId }).select("id").maybeSingle();
+    if (updateError) throw updateError;
+    if (updated) restored++;
+  }
+  return restored;
 }
 
 async function lifecycleEmail(admin: ReturnType<typeof adminClient>, userId: string, kind: "scheduled" | "winback" | "recovered" | "closed", purgeAt?: string, app = "casa", userDataOverride?: { user?: { email?: string } }) {
@@ -104,8 +182,16 @@ export function serveAccountLifecycle(mode: Mode) {
           if (error.code === "23505") return response({ status: "already_scheduled" }, 409, headers);
           throw error;
         }
+        let revokedKeyCount: number;
+        try {
+          revokedKeyCount = await revokeProviderApiKeysForClosure(admin, user.id, data.id);
+        } catch (revokeError) {
+          const { error: cancelError } = await admin.from("account_deletion_requests").update({ status: "cancelled" }).eq("id", data.id).eq("status", "pending_deletion");
+          if (cancelError) console.error("[account-delete-request] request cancellation failed", data.id);
+          throw revokeError;
+        }
         await admin.from("profiles").update({ deletion_state: "pending_deletion", status: "pending_deletion" }).eq("user_id", user.id);
-        await audit(admin, { request_id: data.id, user_id: user.id, actor_id: user.id, action: "request", app_context: app, metadata: { identity_wide: true } });
+        await audit(admin, { request_id: data.id, user_id: user.id, actor_id: user.id, action: "request", app_context: app, metadata: { identity_wide: true, api_keys_revoked: revokedKeyCount } });
         await lifecycleEmail(admin, user.id, "scheduled", data.scheduled_purge_at, app);
         return response({ status: "pending_deletion", scheduledPurgeAt: data.scheduled_purge_at, identityWide: true }, 200, headers);
       }
@@ -113,9 +199,12 @@ export function serveAccountLifecycle(mode: Mode) {
       if (mode === "recover") {
         const { data } = await admin.from("account_deletion_requests").select("id,scheduled_purge_at,app_context").eq("user_id", user.id).eq("status", "pending_deletion").gt("scheduled_purge_at", new Date().toISOString()).order("requested_at", { ascending: false }).limit(1).maybeSingle();
         if (!data) throw new AuthError("No recoverable account was found", 404);
-        await admin.from("account_deletion_requests").update({ status: "recovered", recovered_at: new Date().toISOString() }).eq("id", data.id).eq("user_id", user.id);
-        await admin.from("profiles").update({ deletion_state: "active", status: "active" }).eq("user_id", user.id);
-        await audit(admin, { request_id: data.id, user_id: user.id, actor_id: user.id, action: "recover", app_context: data.app_context, metadata: { winback_cancelled: true } });
+        const restoredKeyCount = await restoreProviderApiKeysForClosure(admin, user.id, data.id);
+        const { error: requestError } = await admin.from("account_deletion_requests").update({ status: "recovered", recovered_at: new Date().toISOString() }).eq("id", data.id).eq("user_id", user.id);
+        if (requestError) throw requestError;
+        const { error: profileError } = await admin.from("profiles").update({ deletion_state: "active", status: "active" }).eq("user_id", user.id);
+        if (profileError) throw profileError;
+        await audit(admin, { request_id: data.id, user_id: user.id, actor_id: user.id, action: "recover", app_context: data.app_context, metadata: { winback_cancelled: true, api_keys_restored: restoredKeyCount } });
         await lifecycleEmail(admin, user.id, "recovered", undefined, data.app_context || app);
         return response({ status: "active" }, 200, headers);
       }
