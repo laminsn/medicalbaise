@@ -188,9 +188,11 @@ export default function Terms() {
             />
           </Section>
 
-            {/* DRAFT - for licensed-attorney review before this ships. Added 2026-08-10.
-                Jurisdiction: BR (LGPD, consumer law) for the PT/ES markets; confirm with counsel
-                before deploying. Do not deploy this section until it is cleared. */}
+            {/* Anti-harassment policy. Added 2026-08-10, approved by Lamin 2026-08-10.
+                Owner-approved for production; a licensed-attorney review is still recommended
+                for the BR jurisdiction (LGPD, consumer law) covering the PT/ES markets.
+                The reporting route named here depends on the support@ mailboxes actually
+                receiving mail -- see the commit for the open gate. */}
             <Section title={isPt ? '7. Assédio, discriminação e segurança pessoal' : isEs ? '7. Acoso, discriminación y seguridad personal' : '7. Anti-harassment, discrimination and personal safety'}>
               <BulletList
                 items={
