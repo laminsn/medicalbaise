@@ -3153,17 +3153,38 @@
     "use": "Use"
   },
   "agentConnect": {
-    "title": "Connect your AI agents",
+    "eyebrow": "MCP + API",
+    "title": "Connect your agents",
     "previewBadge": "Preview",
-    "description": "Provider-scoped keys let an AI assistant read and write your Baise records on your behalf, with the scopes you choose and an expiry you set.",
-    "notLiveNotice": "This endpoint is not live yet. You can generate a key today and keep it ready, but nothing will accept it until the agent API ships. We will not pretend otherwise.",
+    "lead": "Your agents can now find human staff for all of your needs — and hire, brief and follow up with them without you in the loop.",
+    "benefits": {
+      "bookings": {
+        "title": "Your agent handles the booking",
+        "body": "It files the request, reads the replies and confirms the job while you are doing something else."
+      },
+      "findProviders": {
+        "title": "It finds the right provider, not just any provider",
+        "body": "Search by trade and location, then rank on rating, reviews and verification before anyone is contacted."
+      },
+      "routing": {
+        "title": "Requests route themselves",
+        "body": "Eligible providers are invited automatically, and each one can accept, decline or refer it onward."
+      },
+      "anywhere": {
+        "title": "Works where you already work",
+        "body": "One config in Claude, ChatGPT, Codex, VS Code or Cursor. Paste it once and your assistant is connected."
+      }
+    },
+    "notLiveNotice": "Preview — the agent endpoint is not accepting keys yet.",
+    "primaryCta": "Create your account",
     "tabMcp": "MCP config",
     "tabApi": "API key",
-    "mcpHelp": "Add this to your MCP client configuration, then replace the placeholder with a key you generated.",
-    "apiHelp": "Or call the API directly with the key as a bearer token.",
-    "clientsTitle": "Intended for",
+    "mcpHelp": "Paste into your MCP client",
     "copy": "Copy",
-    "copied": "Copied!",
-    "cta": "Manage your API keys"
+    "copied": "Copied",
+    "apiBody": "Prefer to call the API directly? Your key is generated from your account dashboard — scoped to what you choose, with an expiry you set, and revocable at any time.",
+    "apiScopes": "Read access by default. Booking and messaging permissions are opt-in per key.",
+    "apiCta": "Register or manage your account",
+    "clientsTitle": "Works with"
   }
 }

@@ -3153,17 +3153,38 @@
     "use": "Usar"
   },
   "agentConnect": {
-    "title": "Conecte sus agentes de IA",
+    "eyebrow": "MCP + API",
+    "title": "Conecte sus agentes",
     "previewBadge": "Vista previa",
-    "description": "Las claves con alcance del proveedor permiten que un asistente de IA lea y escriba sus registros de Baise en su nombre, con los alcances que elija y la caducidad que establezca.",
-    "notLiveNotice": "Este endpoint aún no está activo. Puede generar una clave hoy y tenerla lista, pero nada la aceptará hasta que se lance la API de agentes. No vamos a fingir lo contrario.",
+    "lead": "Sus agentes ya pueden encontrar profesionales humanos para todo lo que necesite — y contratarlos, instruirlos y darles seguimiento sin depender de usted.",
+    "benefits": {
+      "bookings": {
+        "title": "Su agente gestiona la reserva",
+        "body": "Envía la solicitud, lee las respuestas y confirma el trabajo mientras usted hace otra cosa."
+      },
+      "findProviders": {
+        "title": "Encuentra al proveedor adecuado, no a cualquiera",
+        "body": "Busca por oficio y zona, y ordena por valoración, reseñas y verificación antes de contactar a nadie."
+      },
+      "routing": {
+        "title": "Las solicitudes se enrutan solas",
+        "body": "Los proveedores elegibles reciben la invitación automáticamente y cada uno puede aceptar, rechazar o derivarla."
+      },
+      "anywhere": {
+        "title": "Funciona donde usted ya trabaja",
+        "body": "Una configuración en Claude, ChatGPT, Codex, VS Code o Cursor. Péguela una vez y su asistente queda conectado."
+      }
+    },
+    "notLiveNotice": "Vista previa — el endpoint aún no acepta claves.",
+    "primaryCta": "Cree su cuenta",
     "tabMcp": "Configuración MCP",
     "tabApi": "Clave de API",
-    "mcpHelp": "Agregue esto a la configuración de su cliente MCP y reemplace el marcador de posición por una clave que haya generado.",
-    "apiHelp": "O llame a la API directamente usando la clave como bearer token.",
-    "clientsTitle": "Destinado a",
+    "mcpHelp": "Péguelo en su cliente MCP",
     "copy": "Copiar",
-    "copied": "¡Copiado!",
-    "cta": "Administrar sus claves de API"
+    "copied": "Copiado",
+    "apiBody": "¿Prefiere llamar a la API directamente? Su clave se genera desde el panel de su cuenta — con los alcances que elija, la caducidad que establezca y revocación en cualquier momento.",
+    "apiScopes": "Acceso de lectura por defecto. Los permisos de reserva y mensajería son opcionales por clave.",
+    "apiCta": "Regístrese o acceda a su cuenta",
+    "clientsTitle": "Compatible con"
   }
 }

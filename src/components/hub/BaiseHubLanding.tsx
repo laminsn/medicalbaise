@@ -333,8 +333,6 @@ export default function BaiseHubLanding() {
         </header>
 
         <main className="relative z-10 flex-1 flex flex-col">
-          <AgentConnectSection tone="dark" />
-
           {/* Hero */}
           <section className="px-4 sm:px-6 pt-16 md:pt-24 pb-10 md:pb-14 text-center max-w-5xl mx-auto">
             <p
@@ -383,6 +381,8 @@ export default function BaiseHubLanding() {
               ))}
             </div>
           </section>
+
+          <AgentConnectSection tone="dark" />
 
           <SocialProofSection />
 
