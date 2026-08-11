@@ -402,3 +402,24 @@
     background-position: 128% 0, 0 0;
   }
 }
+
+/* Provider-feed phone: a continuous vertical scroll.
+   The track holds the cards twice and moves by exactly -50%, so when the
+   animation restarts the second copy is already where the first began and the
+   loop has no visible seam. Duplicating the cards is what makes that true —
+   translating a single set would snap back. */
+.baise-feed-track {
+  display: flex;
+  flex-direction: column;
+  animation: baise-feed-scroll 24s linear infinite;
+  will-change: transform;
+}
+
+@keyframes baise-feed-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baise-feed-track { animation: none; }
+}

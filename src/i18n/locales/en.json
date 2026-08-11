@@ -389,6 +389,29 @@
     },
     "providerIntro": {
       "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start."
+    },
+    "feedPhone": {
+      "appName": "Baise",
+      "live": "Live",
+      "verified": "Verified",
+      "doctor": {
+        "name": "Dra. Marina Alves",
+        "trade": "General practice · São Paulo",
+        "rating": "4.9",
+        "alt": "Doctor smiling in her clinic during a live session"
+      },
+      "lawyer": {
+        "name": "Dr. Rafael Menezes",
+        "trade": "Real estate law · Rio de Janeiro",
+        "rating": "4.8",
+        "alt": "Lawyer smiling in his office holding an open case file"
+      },
+      "builder": {
+        "name": "Bruno Carvalho",
+        "trade": "Carpentry & finishing · Niterói",
+        "rating": "5.0",
+        "alt": "Carpenter smiling beside a cabinet he has just built"
+      }
     }
   },
   "auth": {

@@ -28,6 +28,7 @@ const RAW_APP = ((import.meta.env.VITE_BAISE_APP ?? 'casa') as string).trim().to
 const CURRENT_APP: BaiseApp =
   RAW_APP === 'medical' || RAW_APP === 'legal' ? RAW_APP : 'casa';
 import { AgentConnectSection } from '@/components/home/AgentConnectSection';
+import { ProviderFeedPhone } from '@/components/hub/ProviderFeedPhone';
 
 const CURRENT_ACCENT = APP_ACCENTS[CURRENT_APP];
 
@@ -443,7 +444,7 @@ function ProviderIntroBlock() {
 
   return (
     <section className="relative px-4 sm:px-6 pt-4 pb-8 md:pb-10">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         {/* Plain white rather than the accent colour the other section eyebrows
             use: this block was the hero, and white keeps it from reading as a
             second one. */}
@@ -469,7 +470,7 @@ function SocialProofSection() {
       className="relative px-4 sm:px-6 pb-12 md:pb-16"
       aria-label={t('hub.socialProof.ariaLabel')}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div
           className="relative rounded-2xl p-5 pt-24 md:p-7 md:pt-8"
           style={{
@@ -481,13 +482,18 @@ function SocialProofSection() {
         >
           <FloatingRatingCard />
 
-          <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
-            <div>
-              <p
-                className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
-                style={{ color: CURRENT_ACCENT }}
-              >
-                {t('hub.socialProof.eyebrow')}
+          {/* Phone on the left, the whole "built for service providers" block
+              pushed to the right. Below lg they stack, phone first. */}
+          <div className="grid gap-8 lg:grid-cols-[290px_1fr] lg:items-center lg:gap-10">
+            <ProviderFeedPhone accent={CURRENT_ACCENT} />
+
+            <div className="grid gap-6">
+              <div>
+                <p
+                  className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
+                  style={{ color: CURRENT_ACCENT }}
+                >
+                  {t('hub.socialProof.eyebrow')}
               </p>
               <h2 className="mb-4 text-2xl font-bold tracking-tight text-white md:text-[32px]">
                 {t('hub.socialProof.title')}
@@ -541,6 +547,7 @@ function SocialProofSection() {
                   </article>
                 );
               })}
+              </div>
             </div>
           </div>
         </div>

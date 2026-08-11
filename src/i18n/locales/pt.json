@@ -389,6 +389,29 @@
     },
     "providerIntro": {
       "subtitle": "Encontre profissionais verificados em residencial, saúde e jurídico — todos no padrão Baise Group. Escolha uma plataforma abaixo para começar."
+    },
+    "feedPhone": {
+      "appName": "Baise",
+      "live": "Ao vivo",
+      "verified": "Verificado",
+      "doctor": {
+        "name": "Dra. Marina Alves",
+        "trade": "Clínica geral · São Paulo",
+        "rating": "4,9",
+        "alt": "Médica sorrindo em seu consultório durante uma transmissão ao vivo"
+      },
+      "lawyer": {
+        "name": "Dr. Rafael Menezes",
+        "trade": "Direito imobiliário · Rio de Janeiro",
+        "rating": "4,8",
+        "alt": "Advogado sorrindo em seu escritório com uma pasta aberta"
+      },
+      "builder": {
+        "name": "Bruno Carvalho",
+        "trade": "Marcenaria e acabamento · Niterói",
+        "rating": "5,0",
+        "alt": "Marceneiro sorrindo ao lado de um armário que acabou de construir"
+      }
     }
   },
   "auth": {
