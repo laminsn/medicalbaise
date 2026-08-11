@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -300,21 +301,18 @@ export default function BaiseHubLanding() {
         <main className="relative z-10 flex-1 flex flex-col">
           {/* Hero */}
           <section className="px-4 sm:px-6 pt-16 md:pt-24 pb-10 md:pb-14 text-center max-w-5xl mx-auto">
-            <p
-              className="mb-7 text-[11px] font-semibold uppercase tracking-[0.18em]"
-              style={{ color: CURRENT_ACCENT }}
-            >
-              {t('hub.heroBadge')}
-            </p>
-            <h1 className="text-[40px] sm:text-[56px] md:text-[76px] font-extrabold text-white tracking-[-0.035em] mb-6 leading-[0.98]">
-              {t('hub.hero.titlePart1')}{' '}
+            {/* The badge, the old title and the old subtitle now live in
+                ProviderIntroBlock, directly above the social-proof section. */}
+            <h1 className="text-[40px] sm:text-[56px] md:text-[76px] font-extrabold tracking-[-0.035em] mb-6 leading-[0.98]">
               <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage: `linear-gradient(120deg, ${APP_ACCENTS.casa}, ${APP_ACCENTS.medical}, ${APP_ACCENTS.legal})`,
-                }}
+                className="baise-hero-shimmer"
+                style={
+                  {
+                    '--baise-hero-gradient': `linear-gradient(120deg, ${APP_ACCENTS.casa}, ${APP_ACCENTS.medical}, ${APP_ACCENTS.legal})`,
+                  } as CSSProperties
+                }
               >
-                {t('hub.hero.titlePart2')}
+                {t('hub.hero.title')}
               </span>
             </h1>
             <p className="text-base md:text-xl text-white/65 max-w-2xl mx-auto leading-relaxed">
@@ -348,6 +346,8 @@ export default function BaiseHubLanding() {
           </section>
 
           <AgentConnectSection tone="dark" />
+
+          <ProviderIntroBlock />
 
           <SocialProofSection />
 
@@ -427,6 +427,35 @@ function AppCardsSection() {
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The hero's previous badge, title and subtitle. Moved here, directly above the
+ * social-proof section, when the hero became the Baise Group promise.
+ * Plain white and sized like the other section headers on the page: no gradient
+ * and no shimmer, so it reads as a section header rather than a second hero.
+ */
+function ProviderIntroBlock() {
+  const { t } = useTranslation();
+
+  return (
+    <section className="relative px-4 sm:px-6 pt-4 pb-8 md:pb-10">
+      <div className="mx-auto max-w-6xl">
+        {/* Plain white rather than the accent colour the other section eyebrows
+            use: this block was the hero, and white keeps it from reading as a
+            second one. */}
+        <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em] text-white/70">
+          {t('hub.heroBadge')}
+        </p>
+        <h2 className="max-w-3xl text-[26px] sm:text-[32px] md:text-[38px] font-bold tracking-tight text-white leading-[1.1]">
+          {t('hub.hero.titlePart1')} {t('hub.hero.titlePart2')}
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm md:text-base leading-relaxed text-white/60">
+          {t('hub.providerIntro.subtitle')}
+        </p>
       </div>
     </section>
   );

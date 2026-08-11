@@ -126,9 +126,10 @@
     "hero": {
       "titlePart1": "Three platforms.",
       "titlePart2": "One promise.",
-      "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start.",
+      "subtitle": "The only place where service providers and clients interact organically. Find and provide services for every need.",
       "ctaFind": "Find trusted pros",
-      "ctaProvider": "Grow your service business"
+      "ctaProvider": "Grow your service business",
+      "title": "The only way to get things done."
     },
     "casa": {
       "title": "Casa Baise",
@@ -385,6 +386,9 @@
       "title": "Payment brands users recognize before they click pay.",
       "subtitle": "Trusted payment signals help clients feel safer at checkout and help providers close more jobs with fewer doubts at the final step.",
       "ariaLabel": "Accepted payment methods"
+    },
+    "providerIntro": {
+      "subtitle": "Find verified professionals across home, health, and law — all held to the Baise Group standard. Pick a platform below to start."
     }
   },
   "auth": {

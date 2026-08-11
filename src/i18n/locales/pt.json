@@ -126,9 +126,10 @@
     "hero": {
       "titlePart1": "Três plataformas.",
       "titlePart2": "Uma promessa.",
-      "subtitle": "Encontre profissionais verificados em residencial, saúde e jurídico — todos no padrão Baise Group. Escolha uma plataforma abaixo para começar.",
+      "subtitle": "O único lugar onde prestadores e clientes se encontram de forma orgânica. Encontre e ofereça serviços para todas as necessidades.",
       "ctaFind": "Encontrar profissionais confiáveis",
-      "ctaProvider": "Crescer meu negócio de serviços"
+      "ctaProvider": "Crescer meu negócio de serviços",
+      "title": "O único jeito de resolver tudo."
     },
     "casa": {
       "title": "Casa Baise",
@@ -385,6 +386,9 @@
       "title": "Marcas de pagamento que os usuários reconhecem antes de pagar.",
       "subtitle": "Sinais de pagamento confiáveis ajudam clientes a se sentirem mais seguros e ajudam prestadores a fechar mais trabalhos com menos dúvidas no final.",
       "ariaLabel": "Métodos de pagamento aceitos"
+    },
+    "providerIntro": {
+      "subtitle": "Encontre profissionais verificados em residencial, saúde e jurídico — todos no padrão Baise Group. Escolha uma plataforma abaixo para começar."
     }
   },
   "auth": {

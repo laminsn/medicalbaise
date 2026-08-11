@@ -364,3 +364,41 @@
     transform: translateX(-50%);
   }
 }
+
+/* Hero title shimmer.
+   Two background layers clipped to the text: layer 2 is the green-to-purple
+   gradient and never moves, so the ramp stays exactly as designed; layer 1 is a
+   soft light band that travels across it. `alternate` sends it left-to-right,
+   then back, on a continuous loop.
+   The gradient itself comes from the component as --baise-hero-gradient so
+   APP_ACCENTS stays the single source of truth for the colours. */
+.baise-hero-shimmer {
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.42) 46%,
+      rgba(255, 255, 255, 0.42) 53%,
+      transparent 67%
+    ),
+    var(--baise-hero-gradient);
+  background-size: 230% 100%, 100% 100%;
+  background-position: 128% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: baise-hero-shimmer 6.5s ease-in-out infinite alternate;
+}
+
+@keyframes baise-hero-shimmer {
+  from { background-position: 128% 0, 0 0; }
+  to   { background-position: -28% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .baise-hero-shimmer {
+    animation: none;
+    background-position: 128% 0, 0 0;
+  }
+}
