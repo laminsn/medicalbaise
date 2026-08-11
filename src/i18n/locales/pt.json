@@ -204,7 +204,8 @@
       "testimonials": "Depoimentos",
       "specialOffers": "Ofertas especiais",
       "terms": "Termos",
-      "privacy": "Privacidade"
+      "privacy": "Privacidade",
+      "developers": "Para desenvolvedores"
     },
     "pros": {
       "eyebrow": "Conteúdo que converte",
@@ -3155,7 +3156,7 @@
   "agentConnect": {
     "eyebrow": "MCP + API",
     "title": "Conecte seus agentes",
-    "previewBadge": "Prévia",
+    "previewBadge": "Em breve",
     "lead": "Seus agentes agora encontram profissionais humanos para tudo o que você precisa — e contratam, orientam e acompanham sem depender de você.",
     "benefits": {
       "bookings": {
@@ -3175,7 +3176,7 @@
         "body": "Uma configuração no Claude, ChatGPT, Codex, VS Code ou Cursor. Cole uma vez e seu assistente está conectado."
       }
     },
-    "notLiveNotice": "Prévia — o endpoint ainda não aceita chaves.",
+    "notLiveNotice": "Em breve — o endpoint ainda não aceita chaves.",
     "primaryCta": "Criar sua conta",
     "tabMcp": "Configuração MCP",
     "tabApi": "Chave de API",
@@ -3185,6 +3186,78 @@
     "apiBody": "Prefere chamar a API diretamente? Sua chave é gerada no painel da sua conta — com os escopos que você escolher, a validade que definir e revogação a qualquer momento.",
     "apiScopes": "Acesso de leitura por padrão. Permissões de agendamento e mensagens são opcionais por chave.",
     "apiCta": "Cadastre-se ou acesse sua conta",
-    "clientsTitle": "Compatível com"
+    "clientsTitle": "Compatível com",
+    "devLink": "Ver o guia para desenvolvedores"
+  },
+  "developers": {
+    "metaTitle": "Para desenvolvedores — acesso MCP e API | Baise",
+    "metaDescription": "Conecte Claude, ChatGPT, Codex, VS Code ou Cursor ao Baise via MCP, ou chame a API REST diretamente. Chaves com escopo, validade e revogação.",
+    "eyebrow": "Para desenvolvedores",
+    "title": "Dê ao seu agente uma forma de contratar pessoas.",
+    "subtitle": "O Baise expõe seu marketplace pelo Model Context Protocol e por uma API REST, para que um assistente possa buscar prestadores, enviar um pedido e cuidar das respostas sem ninguém repassando mensagens.",
+    "cta": "Criar sua conta",
+    "comingSoon": "Em breve — ainda não aceita chaves",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "snippetHelp": "Adicione ao seu cliente MCP",
+    "whatMcp": {
+      "title": "O que é o MCP, em resumo",
+      "body": "O Model Context Protocol é um padrão aberto que permite a um assistente de IA chamar ferramentas externas. O assistente pergunta ao servidor o que ele faz, o servidor responde com a lista de ferramentas e seus parâmetros, e a partir daí o assistente pode chamá-las diretamente.",
+      "body2": "Isso importa aqui porque elimina o copiar e colar. Em vez de você ler uma lista de prestadores e digitar uma mensagem, seu assistente lê a lista e envia o pedido sozinho — dentro da ferramenta que você já usa."
+    },
+    "clients": {
+      "title": "Com o que funciona",
+      "body": "Qualquer ferramenta compatível com MCP conecta usando a configuração ao lado. Qualquer uma que envie um cabeçalho HTTP pode usar a API REST."
+    },
+    "how": {
+      "title": "Como vai funcionar",
+      "account": {
+        "title": "Crie uma conta",
+        "body": "As chaves pertencem a uma conta — de prestador ou de cliente. Ambas podem tê-las."
+      },
+      "key": {
+        "title": "Gere uma chave",
+        "body": "Escolha os escopos e a validade. Leitura por padrão; escrita é opcional por chave."
+      },
+      "connect": {
+        "title": "Cole a configuração",
+        "body": "Um bloco JSON no seu cliente MCP, ou um cabeçalho bearer nas suas chamadas."
+      },
+      "work": {
+        "title": "Deixe trabalhar",
+        "body": "Seu assistente busca, envia pedidos e lê as respostas conforme elas chegam."
+      }
+    },
+    "tools": {
+      "title": "As ferramentas do seu agente",
+      "body": "Cada ferramenta exige um escopo. Um agente só enxerga as ferramentas que sua chave pode chamar, então nunca planeja com base em algo que não tem.",
+      "colTool": "Ferramenta",
+      "colScope": "Escopo exigido",
+      "note": "Uma chave de cliente envia pedidos e lê os próprios. Uma chave de prestador responde a convites e gerencia os próprios serviços. A mesma chave nunca faz as duas coisas."
+    },
+    "security": {
+      "title": "Como as chaves são protegidas",
+      "body": "Uma chave é uma credencial que age na sua conta, e é tratada como tal.",
+      "scoped": {
+        "title": "Com escopo",
+        "body": "A chave carrega apenas as permissões que você concedeu. Escrita nunca vem por padrão."
+      },
+      "expiring": {
+        "title": "Com validade",
+        "body": "Defina a validade ao criar. Passado esse momento, a chave para de funcionar."
+      },
+      "revocable": {
+        "title": "Revogável",
+        "body": "Revogue no painel e ela para na próxima requisição — não há cache para esperar."
+      },
+      "isolated": {
+        "title": "Isolada por produto",
+        "body": "Uma chave emitida em um produto Baise não lê outro. O limite é imposto no servidor, não pelo seu código."
+      }
+    },
+    "close": {
+      "title": "Comece a construir antes",
+      "body": "O endpoint ainda não aceita chaves. Crie sua conta agora e sua chave estará pronta no dia da abertura."
+    }
   }
 }

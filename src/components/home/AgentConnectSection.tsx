@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
-import { CalendarCheck, Check, Copy, Search, Sparkles, Workflow } from 'lucide-react';
 
 /**
  * "Connect your agents" — a sales surface for the MCP + API capability.
@@ -22,12 +21,10 @@ import { CalendarCheck, Check, Copy, Search, Sparkles, Workflow } from 'lucide-r
 
 const CLIENTS = ['Claude', 'ChatGPT', 'Codex', 'VS Code', 'Cursor'];
 
-const BENEFITS = [
-  { icon: CalendarCheck, key: 'bookings' },
-  { icon: Search, key: 'findProviders' },
-  { icon: Workflow, key: 'routing' },
-  { icon: Sparkles, key: 'anywhere' },
-] as const;
+// No icon set here, deliberately. A row of small outline glyphs beside feature
+// bullets is the house style of every generated marketing page; the accent rule
+// below carries the same structure without borrowing that look.
+const BENEFITS = ['bookings', 'findProviders', 'routing', 'anywhere'] as const;
 
 export function AgentConnectSection({ tone = 'light' }: { tone?: 'light' | 'dark' } = {}) {
   const { t } = useTranslation();
@@ -115,15 +112,12 @@ export function AgentConnectSection({ tone = 'light' }: { tone?: 'light' | 'dark
             <p className={`mb-6 text-base ${s.lead}`}>{t('agentConnect.lead')}</p>
 
             <ul className="mb-7 space-y-4">
-              {BENEFITS.map(({ icon: Icon, key }) => (
-                <li key={key} className="flex gap-3">
-                  <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0 text-primary" aria-hidden="true" />
-                  <div>
-                    <p className={`text-sm font-semibold ${s.benefitTitle}`}>
-                      {t(`agentConnect.benefits.${key}.title`)}
-                    </p>
-                    <p className={`text-sm ${s.body}`}>{t(`agentConnect.benefits.${key}.body`)}</p>
-                  </div>
+              {BENEFITS.map((key) => (
+                <li key={key} className="border-l-2 border-primary/60 pl-4">
+                  <p className={`text-sm font-semibold ${s.benefitTitle}`}>
+                    {t(`agentConnect.benefits.${key}.title`)}
+                  </p>
+                  <p className={`text-sm ${s.body}`}>{t(`agentConnect.benefits.${key}.body`)}</p>
                 </li>
               ))}
             </ul>
@@ -132,8 +126,15 @@ export function AgentConnectSection({ tone = 'light' }: { tone?: 'light' | 'dark
               <Button asChild size="lg">
                 <Link to="/auth?mode=signup">{t('agentConnect.primaryCta')}</Link>
               </Button>
-              <span className={`text-xs ${s.note}`}>{t('agentConnect.notLiveNotice')}</span>
+              <Link
+                to="/developers"
+                className={`text-sm font-medium underline-offset-4 hover:underline ${s.lead}`}
+              >
+                {t('agentConnect.devLink')}
+              </Link>
             </div>
+
+            <p className={`mt-3 text-xs ${s.note}`}>{t('agentConnect.notLiveNotice')}</p>
           </div>
 
           {/* Right — the screen */}
@@ -171,7 +172,6 @@ export function AgentConnectSection({ tone = 'light' }: { tone?: 'light' | 'dark
                     className="h-7 shrink-0 gap-1.5 text-xs"
                     onClick={copySnippet}
                   >
-                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                     {copied ? t('agentConnect.copied') : t('agentConnect.copy')}
                   </Button>
                 </div>

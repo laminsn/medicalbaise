@@ -204,7 +204,8 @@
       "testimonials": "Testimonials",
       "specialOffers": "Special Offers",
       "terms": "Terms",
-      "privacy": "Privacy"
+      "privacy": "Privacy",
+      "developers": "For developers"
     },
     "pros": {
       "eyebrow": "Content that converts",
@@ -3155,7 +3156,7 @@
   "agentConnect": {
     "eyebrow": "MCP + API",
     "title": "Connect your agents",
-    "previewBadge": "Preview",
+    "previewBadge": "Coming Soon",
     "lead": "Your agents can now find human staff for all of your needs — and hire, brief and follow up with them without you in the loop.",
     "benefits": {
       "bookings": {
@@ -3175,7 +3176,7 @@
         "body": "One config in Claude, ChatGPT, Codex, VS Code or Cursor. Paste it once and your assistant is connected."
       }
     },
-    "notLiveNotice": "Preview — the agent endpoint is not accepting keys yet.",
+    "notLiveNotice": "Coming soon — the agent endpoint is not accepting keys yet.",
     "primaryCta": "Create your account",
     "tabMcp": "MCP config",
     "tabApi": "API key",
@@ -3185,6 +3186,78 @@
     "apiBody": "Prefer to call the API directly? Your key is generated from your account dashboard — scoped to what you choose, with an expiry you set, and revocable at any time.",
     "apiScopes": "Read access by default. Booking and messaging permissions are opt-in per key.",
     "apiCta": "Register or manage your account",
-    "clientsTitle": "Works with"
+    "clientsTitle": "Works with",
+    "devLink": "Read the developer guide"
+  },
+  "developers": {
+    "metaTitle": "For developers — MCP and API access | Baise",
+    "metaDescription": "Connect Claude, ChatGPT, Codex, VS Code or Cursor to Baise over MCP, or call the REST API directly. Scoped, expiring, revocable keys.",
+    "eyebrow": "For developers",
+    "title": "Give your agent a way to hire people.",
+    "subtitle": "Baise exposes its marketplace over the Model Context Protocol and a REST API, so an assistant can search providers, file a request, and handle the replies without a human relaying messages.",
+    "cta": "Create your account",
+    "comingSoon": "Coming soon — not accepting keys yet",
+    "copy": "Copy",
+    "copied": "Copied",
+    "snippetHelp": "Add to your MCP client",
+    "whatMcp": {
+      "title": "What MCP is, briefly",
+      "body": "The Model Context Protocol is an open standard for letting an AI assistant call external tools. The assistant asks the server what it can do, the server answers with a list of tools and their inputs, and from then on the assistant can call them directly.",
+      "body2": "It matters here because it removes the copy-and-paste step. Instead of you reading a provider list and typing a message, your assistant reads the list and sends the request itself — inside whatever tool you already work in."
+    },
+    "clients": {
+      "title": "What it works with",
+      "body": "Anything that speaks MCP can connect with the config on the right. Anything that can send an HTTP header can use the REST API instead."
+    },
+    "how": {
+      "title": "How it will work",
+      "account": {
+        "title": "Create an account",
+        "body": "Keys belong to an account — a provider account or a client account. Both can hold them."
+      },
+      "key": {
+        "title": "Generate a key",
+        "body": "Choose the scopes and an expiry. Read access by default; write is opt-in per key."
+      },
+      "connect": {
+        "title": "Paste the config",
+        "body": "One JSON block in your MCP client, or one bearer header on your API calls."
+      },
+      "work": {
+        "title": "Let it work",
+        "body": "Your assistant searches, files requests, and reads responses as they come back."
+      }
+    },
+    "tools": {
+      "title": "The tools your agent gets",
+      "body": "Each tool requires a scope. An agent only sees the tools its key is allowed to call, so it never plans around a capability it does not have.",
+      "colTool": "Tool",
+      "colScope": "Required scope",
+      "note": "A client key files requests and reads its own. A provider key responds to invitations and manages its own services. The same key never does both."
+    },
+    "security": {
+      "title": "How keys are protected",
+      "body": "A key is a credential that acts on your account, so it is treated like one.",
+      "scoped": {
+        "title": "Scoped",
+        "body": "A key carries only the permissions you granted it. Write access is never granted by default."
+      },
+      "expiring": {
+        "title": "Expiring",
+        "body": "Set an expiry when you create it. Past that moment the key stops working."
+      },
+      "revocable": {
+        "title": "Revocable",
+        "body": "Revoke from your dashboard and it stops on the next request — there is no cache to wait out."
+      },
+      "isolated": {
+        "title": "Product-isolated",
+        "body": "A key issued on one Baise product cannot read another. The boundary is enforced on the server, not by your code."
+      }
+    },
+    "close": {
+      "title": "Build against it early",
+      "body": "The endpoint is not accepting keys yet. Create an account now and your key will be waiting the day it opens."
+    }
   }
 }

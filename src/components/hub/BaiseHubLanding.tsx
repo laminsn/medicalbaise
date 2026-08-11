@@ -1,28 +1,7 @@
-import type { ComponentType, SVGProps } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  BadgeCheck,
-  BarChart3,
-  CalendarClock,
-  ClipboardCheck,
-  Gauge,
-  Handshake,
-  Mail,
-  MessageCircle,
-  Percent,
-  ReceiptText,
-  Sparkles,
-  Radio,
-  Video,
-  PenSquare,
-  Megaphone,
-  ArrowRight,
-  TrendingUp,
-  Users,
-  WalletCards,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -68,7 +47,6 @@ const PAYMENT_LOGOS = [
 ];
 
 type LandingFeature = {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
   titleKey: string;
   bodyKey: string;
   to?: string;
@@ -124,59 +102,48 @@ const PLATFORM_SCREENSHOTS = [
 
 const BUSINESS_FEATURES: LandingFeature[] = [
   {
-    icon: Users,
     titleKey: 'hub.providerFeatures.clientAcquisition.title',
     bodyKey: 'hub.providerFeatures.clientAcquisition.body',
   },
   {
-    icon: Megaphone,
     titleKey: 'hub.providerFeatures.marketing.title',
     bodyKey: 'hub.providerFeatures.marketing.body',
   },
   {
-    icon: WalletCards,
     titleKey: 'hub.providerFeatures.payments.title',
     bodyKey: 'hub.providerFeatures.payments.body',
   },
   {
-    icon: CalendarClock,
     titleKey: 'hub.providerFeatures.flexiblePayments.title',
     bodyKey: 'hub.providerFeatures.flexiblePayments.body',
   },
   {
-    icon: ClipboardCheck,
     titleKey: 'hub.providerFeatures.serviceProof.title',
     bodyKey: 'hub.providerFeatures.serviceProof.body',
   },
   {
-    icon: Mail,
     titleKey: 'hub.providerFeatures.messaging.title',
     bodyKey: 'hub.providerFeatures.messaging.body',
   },
   {
-    icon: Percent,
     titleKey: 'hub.providerFeatures.offers.title',
     bodyKey: 'hub.providerFeatures.offers.body',
   },
   {
-    icon: MessageCircle,
     titleKey: 'hub.providerFeatures.reviews.title',
     bodyKey: 'hub.providerFeatures.reviews.body',
   },
   {
-    icon: Handshake,
     titleKey: 'hub.providerFeatures.referrals.title',
     bodyKey: 'hub.providerFeatures.referrals.body',
     to: '/influencer-partners',
     ctaKey: 'hub.providerFeatures.referrals.cta',
   },
   {
-    icon: ReceiptText,
     titleKey: 'hub.providerFeatures.records.title',
     bodyKey: 'hub.providerFeatures.records.body',
   },
   {
-    icon: BarChart3,
     titleKey: 'hub.providerFeatures.dashboard.title',
     bodyKey: 'hub.providerFeatures.dashboard.body',
   },
@@ -184,17 +151,14 @@ const BUSINESS_FEATURES: LandingFeature[] = [
 
 const UPGRADE_FEATURES: LandingFeature[] = [
   {
-    icon: TrendingUp,
     titleKey: 'hub.providerFeatures.socialAnalytics.title',
     bodyKey: 'hub.providerFeatures.socialAnalytics.body',
   },
   {
-    icon: BadgeCheck,
     titleKey: 'hub.providerFeatures.verifiedBadge.title',
     bodyKey: 'hub.providerFeatures.verifiedBadge.body',
   },
   {
-    icon: Gauge,
     titleKey: 'hub.providerFeatures.performance.title',
     bodyKey: 'hub.providerFeatures.performance.body',
   },
@@ -207,6 +171,7 @@ const HUB_FOOTER_LINKS = [
   { to: '/give-a-month-get-a-month', labelKey: 'hub.footer.referrals', fallback: 'Referrals' },
   { to: '/testimonial-request', labelKey: 'hub.footer.testimonials', fallback: 'Testimonials' },
   { to: '/pricing', labelKey: 'hub.footer.specialOffers', fallback: 'Special Offers' },
+  { to: '/developers', labelKey: 'hub.footer.developers', fallback: 'For developers' },
   { to: '/terms', labelKey: 'hub.footer.terms', fallback: 'Terms' },
   { to: '/privacy', labelKey: 'hub.footer.privacy', fallback: 'Privacy' },
 ];
@@ -707,21 +672,16 @@ function BusinessOperatingSection() {
         >
           <div className="baise-provider-benefit-track flex w-max gap-3">
             {repeatedProviderBenefits.map((feature, index) => {
-              const Icon = feature.icon;
               return (
                 <article
                   key={`${feature.titleKey}-${index}`}
                   className="w-[244px] shrink-0 rounded-xl border border-white/10 bg-black/24 p-3.5"
                 >
                   <span
-                    className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl"
-                    style={{
-                      backgroundColor: `${CURRENT_ACCENT}22`,
-                      border: `1px solid ${CURRENT_ACCENT}33`,
-                    }}
-                  >
-                    <Icon className="h-4 w-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
-                  </span>
+                    className="mb-3 block h-0.5 w-7 rounded-full"
+                    style={{ backgroundColor: CURRENT_ACCENT }}
+                    aria-hidden="true"
+                  />
                   <h3 className="mb-2 text-[15px] font-bold tracking-tight text-white">
                     {t(feature.titleKey)}
                   </h3>
@@ -789,27 +749,22 @@ function ProfessionalContentSection() {
 
             <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
               <FeaturePill
-                icon={Radio}
                 label={t('hub.pros.goLive.label')}
                 desc={t('hub.pros.goLive.desc')}
               />
               <FeaturePill
-                icon={Video}
                 label={t('hub.pros.stream.label')}
                 desc={t('hub.pros.stream.desc')}
               />
               <FeaturePill
-                icon={PenSquare}
                 label={t('hub.pros.post.label')}
                 desc={t('hub.pros.post.desc')}
               />
               <FeaturePill
-                icon={Sparkles}
                 label={t('hub.pros.stories.label')}
                 desc={t('hub.pros.stories.desc')}
               />
               <FeaturePill
-                icon={Megaphone}
                 label={t('hub.pros.promote.label')}
                 desc={t('hub.pros.promote.desc')}
               />
@@ -1003,12 +958,11 @@ function FloatingRatingCard() {
 }
 
 interface FeaturePillProps {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
   desc: string;
 }
 
-function FeaturePill({ icon: Icon, label, desc }: FeaturePillProps) {
+function FeaturePill({ label, desc }: FeaturePillProps) {
   return (
     <div
       className="relative rounded-xl p-3.5 transition-all duration-300 hover:bg-white/[0.03]"
@@ -1017,15 +971,11 @@ function FeaturePill({ icon: Icon, label, desc }: FeaturePillProps) {
         border: '1px solid hsl(0 0% 16%)',
       }}
     >
-      <div
-        className="inline-flex items-center justify-center w-8 h-8 rounded-lg mb-2.5"
-        style={{
-          backgroundColor: `${CURRENT_ACCENT}22`,
-          border: `1px solid ${CURRENT_ACCENT}33`,
-        }}
-      >
-        <Icon className="w-4 h-4" style={{ color: CURRENT_ACCENT }} aria-hidden="true" />
-      </div>
+      <span
+        className="block h-0.5 w-6 rounded-full mb-2.5"
+        style={{ backgroundColor: CURRENT_ACCENT }}
+        aria-hidden="true"
+      />
       <p className="font-semibold text-white text-[13px] tracking-tight mb-1">{label}</p>
       <p className="text-[11.5px] text-white/55 leading-snug">{desc}</p>
     </div>

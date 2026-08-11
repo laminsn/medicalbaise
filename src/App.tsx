@@ -16,6 +16,7 @@ import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { AttributionTracker } from "@/components/analytics/AttributionTracker";
 import { PilotModeBanner } from "@/components/pilot/PilotModeBanner";
 const BaiseHubLanding = lazy(() => import("./components/hub/BaiseHubLanding"));
+const Developers = lazy(() => import("./pages/Developers"));
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
@@ -148,6 +149,7 @@ const App = () => (
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/" element={<BaiseHubLanding />} />
+                    <Route path="/developers" element={<Developers />} />
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
