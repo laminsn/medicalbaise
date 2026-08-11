@@ -487,7 +487,6 @@ function SocialProofSection() {
           <div className="grid gap-8 lg:grid-cols-[290px_1fr] lg:items-center lg:gap-10">
             <ProviderFeedPhone accent={CURRENT_ACCENT} />
 
-            <div className="grid gap-6">
               <div>
                 <p
                   className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.18em]"
@@ -502,9 +501,10 @@ function SocialProofSection() {
                 {t('hub.socialProof.subtitle')}
               </p>
             </div>
+          </div>
 
-            <div className="grid gap-3 md:grid-cols-3 lg:gap-4">
-              {REVIEW_CARDS.map((review, index) => {
+          <div className="mt-8 grid gap-3 md:grid-cols-3 lg:gap-4">
+            {REVIEW_CARDS.map((review, index) => {
                 const floatClass =
                   index === 0
                     ? 'md:translate-y-3 md:-rotate-1'
@@ -546,9 +546,7 @@ function SocialProofSection() {
                     </div>
                   </article>
                 );
-              })}
-              </div>
-            </div>
+            })}
           </div>
         </div>
       </div>
