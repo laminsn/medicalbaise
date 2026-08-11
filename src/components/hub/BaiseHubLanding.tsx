@@ -484,7 +484,7 @@ function SocialProofSection() {
 
           {/* Phone on the left, the whole "built for service providers" block
               pushed to the right. Below lg they stack, phone first. */}
-          <div className="grid gap-8 lg:grid-cols-[290px_1fr] lg:items-center lg:gap-10">
+          <div className="grid gap-8 lg:grid-cols-[300px_1fr] lg:items-center lg:gap-10">
             <ProviderFeedPhone accent={CURRENT_ACCENT} />
 
               <div>
