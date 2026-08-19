@@ -130,7 +130,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
                         limit: LIFESTYLE_TRANSACTION_LIMIT,
                       })}`,
                     }
-                  : { strong: t('seekerPricing.unlimited'), label: t('seekerPricing.unlimitedFee') };
+                  : { strong: t('seekerPricing.unlimited'), label: t('seekerPricing.perTransaction') };
 
             return (
               <article
