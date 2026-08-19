@@ -77,6 +77,12 @@ const JobsRedirect = () => {
   return <Navigate to={`/job/${id}`} replace />;
 };
 
+// Alias /login → /auth so typed URLs and in-app links hit the real Google login.
+const LoginRedirect = () => {
+  const { search } = useLocation();
+  return <Navigate to={`/auth${search}`} replace />;
+};
+
 const queryClient = new QueryClient();
 
 // Component to initialize message notifications and session security
@@ -141,6 +147,7 @@ const App = () => (
                     <Route path="/" element={<BaiseHubLanding />} />
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/login" element={<LoginRedirect />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/categories" element={<Categories />} />
