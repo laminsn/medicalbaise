@@ -36,6 +36,7 @@ const PLANS = [
     pillKey: 'seekerPricing.bestForRepeat' as const,
     featured: true,
     featureKeys: [
+      'zeroPerTransaction',
       'everythingInFlex',
       'noBookingFee',
       'processingIncluded',
@@ -56,17 +57,10 @@ const PLANS = [
     pillKey: null,
     featured: false,
     featureKeys: [
-      'everythingInLifestyle',
-      'unlimitedServices',
-      'noBookingFee',
-      'processingIncluded',
       'prioritySupport',
-      'predictableCosts',
-      'trustSignals',
-      'scheduleMessage',
-      'invoicesTogether',
-      'escalationPaths',
-      'representativeWhenNeeded',
+      'priorityOffers',
+      'topProviders',
+      'seenFirst',
     ],
   },
 ];
@@ -128,7 +122,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
             const lifestyleUsed = currentPlan === 'lifestyle' ? transactionsUsed : 0;
             const feeCallout =
               plan.id === 'flex'
-                ? { strong: '5%', label: t('seekerPricing.feeMin') }
+                ? { strong: '5%', label: t('seekerPricing.feeMinShort') }
                 : plan.id === 'lifestyle'
                   ? {
                       strong: t('seekerPricing.usedCount', {

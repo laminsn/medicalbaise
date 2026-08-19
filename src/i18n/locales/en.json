@@ -1836,20 +1836,22 @@
     "feeMin": "R$27 minimum on completed services",
     "feeMinShort": "R$27 min",
     "eightTx": "8 completed paid services",
+    "eightIncluded": "8 included / month",
+    "perTransaction": "per transaction",
     "unlimited": "Unlimited",
     "unlimitedFee": "completed paid services",
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "Browse and request services freely. The Baise fee applies only after a service is completed."
+        "description": "5% per transaction."
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "8 completed paid services each month for repeat bookings."
+        "description": "0% per transaction. 8 included / month."
       },
       "project": {
         "name": "Project",
-        "description": "Unlimited completed paid services for ongoing care work."
+        "description": "Unlimited."
       }
     },
     "features": {
@@ -1858,6 +1860,7 @@
       "noMonthlyCharge": "No monthly subscription",
       "eightPaidServices": "8 completed paid services per month",
       "zeroFee": "0% platform fee on those services",
+      "zeroPerTransaction": "0% per transaction.",
       "monthlyBilling": "Billed monthly in Brazilian reais",
       "unlimitedServices": "Unlimited completed paid services",
       "noBrowseFee": "No fee to browse or request a quote",
@@ -1875,7 +1878,10 @@
       "everythingInLifestyle": "Everything in Lifestyle",
       "noBookingFee": "Pay no Baise booking fee",
       "processingIncluded": "Include standard card processing on eligible bookings",
-      "prioritySupport": "Receive priority booking support",
+      "prioritySupport": "Priority support.",
+      "priorityOffers": "Priority offers.",
+      "topProviders": "Access to top-performing service providers.",
+      "seenFirst": "Be seen first when you post a request.",
       "predictableCosts": "Keep monthly service costs more predictable",
       "trustSignals": "Compare provider profiles and trust signals",
       "invoicesTogether": "Keep invoices, receipts and payment history together",

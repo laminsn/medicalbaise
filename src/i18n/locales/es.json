@@ -1836,20 +1836,22 @@
     "feeMin": "Mínimo de R$27 en servicios completados",
     "feeMinShort": "mín. R$27",
     "eightTx": "8 servicios pagos completados",
+    "eightIncluded": "8 incluidas / mes",
+    "perTransaction": "por transacción",
     "unlimited": "Ilimitado",
     "unlimitedFee": "servicios pagos completados",
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "Explora y solicita servicios libremente. El cargo Baise solo se aplica después de completar el servicio."
+        "description": "5% por transacción."
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "8 servicios pagos completados cada mes para reservas recurrentes."
+        "description": "0% por transacción. 8 incluidas / mes."
       },
       "project": {
         "name": "Project",
-        "description": "Servicios pagos completados ilimitados para el cuidado continuo."
+        "description": "Ilimitado."
       }
     },
     "features": {
@@ -1858,6 +1860,7 @@
       "noMonthlyCharge": "Sin suscripción mensual",
       "eightPaidServices": "8 servicios pagos completados por mes",
       "zeroFee": "0% de tarifa de plataforma en esos servicios",
+      "zeroPerTransaction": "0% por transacción.",
       "monthlyBilling": "Facturación mensual en reales brasileños",
       "unlimitedServices": "Servicios pagos completados ilimitados",
       "noBrowseFee": "Sin cargo por explorar o pedir cotización",
@@ -1875,7 +1878,10 @@
       "everythingInLifestyle": "Todo lo de Lifestyle",
       "noBookingFee": "No pagues cargo de reserva Baise",
       "processingIncluded": "Incluye el procesamiento estándar de tarjeta en reservas elegibles",
-      "prioritySupport": "Recibe soporte prioritario para reservas",
+      "prioritySupport": "Soporte prioritario.",
+      "priorityOffers": "Ofertas prioritarias.",
+      "topProviders": "Acceso a los proveedores con mejor desempeño.",
+      "seenFirst": "Aparece primero cuando publicas una solicitud.",
       "predictableCosts": "Mantén más predecibles los costos mensuales de servicios",
       "trustSignals": "Compara perfiles de proveedores y señales de confianza",
       "invoicesTogether": "Mantén juntos facturas, recibos e historial de pagos",
