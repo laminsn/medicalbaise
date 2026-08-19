@@ -51,7 +51,7 @@ export function AdminAllUsers() {
     try {
       let query = supabase
         .from('profiles')
-        .select('id, user_id, first_name, last_name, email, phone, user_type, status, handle, bio, city, state, credits_balance, created_at, last_login_at, referral_code', { count: 'exact' });
+        .select('id, user_id, first_name, last_name, email, phone, user_type, status, handle, bio, city, state, credits_balance, created_at, referral_code', { count: 'exact' });
 
       if (search && search.trim()) {
         const safe = sanitizePostgrestValue(search);

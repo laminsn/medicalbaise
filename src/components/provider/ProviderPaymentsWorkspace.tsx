@@ -931,7 +931,9 @@ export function ProviderPaymentsWorkspace() {
                         <span className="text-xs text-muted-foreground">{new Date(transaction.created_at).toLocaleString()}</span>
                       </div>
                       <p className="truncate font-medium">
-                        {invoice?.invoice_number || transaction.metadata?.invoice_number || transaction.id}
+                        {invoice?.invoice_number
+                          || (typeof transaction.metadata?.invoice_number === 'string' ? transaction.metadata.invoice_number : undefined)
+                          || transaction.id}
                       </p>
                       <p className="truncate text-sm text-muted-foreground">
                         {invoice?.service_description || transaction.transaction_type}
@@ -939,7 +941,11 @@ export function ProviderPaymentsWorkspace() {
                     </div>
                     <div className="flex flex-col items-start gap-2 md:items-end">
                       <p className="font-bold">{formatPrice(Number(transaction.amount || 0))}</p>
-                      <p className="text-xs text-muted-foreground">{invoice?.client_display_id || transaction.metadata?.client_display_id || copy.noClientId}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {invoice?.client_display_id
+                          || (typeof transaction.metadata?.client_display_id === 'string' ? transaction.metadata.client_display_id : undefined)
+                          || copy.noClientId}
+                      </p>
                       <Button variant="outline" size="sm" onClick={() => handleDownloadReceipt(transaction, invoice)}>
                         <Download className="mr-2 h-4 w-4" />
                         {copy.downloadReceipt}

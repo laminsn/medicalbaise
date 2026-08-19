@@ -50,6 +50,7 @@ declare module "*/share-kit.mjs" {
     revealAt?: number;
     footer?: Element | null;
     footerSelector?: string;
+    obstacleSelector?: string;
     consentSelector?: string;
     beaconUrl?: string;
     copyFailed?: string;

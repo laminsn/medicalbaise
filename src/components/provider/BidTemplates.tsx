@@ -100,24 +100,24 @@ export function BidTemplates({ onSelect, mode = 'manage' }: BidTemplatesProps) {
         <p className="text-xs text-muted-foreground">{t('app.noTemplatesYet', "No templates yet.")}</p>
       )}
 
-      {templates.map((t) => (
+      {templates.map((template) => (
         <div
-          key={t.id}
+          key={template.id}
           className="border border-border rounded-lg p-3 hover:border-primary/30 transition-colors"
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium">{t.name}</span>
+            <span className="text-sm font-medium">{template.name}</span>
             <div className="flex gap-1">
               {mode === 'select' && onSelect && (
-                <Button size="sm" variant="ghost" onClick={() => onSelect(t.content)}>
+                <Button size="sm" variant="ghost" onClick={() => onSelect(template.content)}>
                   <Copy className="w-3 h-3 mr-1" />{t('app.use', "Use")}</Button>
               )}
-              <Button size="sm" variant="ghost" onClick={() => deleteTemplate(t.id)}>
+              <Button size="sm" variant="ghost" onClick={() => deleteTemplate(template.id)}>
                 <Trash2 className="w-3 h-3 text-destructive" />
               </Button>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground line-clamp-2">{t.content}</p>
+          <p className="text-xs text-muted-foreground line-clamp-2">{template.content}</p>
         </div>
       ))}
     </div>

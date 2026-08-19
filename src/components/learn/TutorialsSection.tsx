@@ -268,20 +268,20 @@ export function TutorialsSection({ searchQuery }: TutorialsSectionProps) {
   const [selectedTutorial, setSelectedTutorial] = useState<typeof tutorials[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const tutorialCategoryLabels: Record<string, { en: string; pt: string }> = {
+  const tutorialCategoryLabels: Record<string, { en: string; pt: string; es: string }> = {
     all: { en: 'All Tutorials', pt: 'Todos os tutoriais', es: 'Todos los tutoriales' },
     patients: { en: 'For Patients', pt: 'Para pacientes', es: 'Para pacientes' },
     providers: { en: 'For Providers', pt: 'Para profissionais', es: 'Para profesionales' },
     advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },
   };
 
-  const audienceLabels: Record<string, { en: string; pt: string }> = {
+  const audienceLabels: Record<string, { en: string; pt: string; es: string }> = {
     patients: { en: 'patients', pt: 'pacientes', es: 'pacientes' },
     providers: { en: 'providers', pt: 'profissionais', es: 'profesionales' },
     advanced: { en: 'advanced', pt: 'avançado', es: 'avanzado' },
   };
 
-  const difficultyLabels: Record<string, { en: string; pt: string }> = {
+  const difficultyLabels: Record<string, { en: string; pt: string; es: string }> = {
     Beginner: { en: 'Beginner', pt: 'Iniciante', es: 'Principiante' },
     Intermediate: { en: 'Intermediate', pt: 'Intermediário', es: 'Intermedio' },
     Advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },

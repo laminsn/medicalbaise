@@ -101,7 +101,9 @@
     "discard": "Desechar",
     "invalidRequest": "Solicitud no válida.",
     "and": "y",
-    "viewProfile": "Ver perfil"
+    "viewProfile": "Ver perfil",
+    "retry": "Intentar de nuevo",
+    "success": "Ajustes guardados"
   },
   "nav": {
     "home": "Hogar",
@@ -115,7 +117,8 @@
     "map": "Mapa",
     "feed": "Alimentar",
     "help": "Ayuda",
-    "menu": "Menú"
+    "menu": "Menú",
+    "blog": "Blog"
   },
   "hub": {
     "metaTitle": "Baise Group — Una red de confianza para servicios del hogar, salud y legales en Brasil",
@@ -458,7 +461,12 @@
     "resetError": "No se pudo enviar el enlace de restablecimiento. Inténtalo de nuevo.",
     "resetSent": "Enlace de restablecimiento enviado. Revisa tu correo.",
     "termsOfService": "Términos de servicio",
-    "termsRequired": "Debes aceptar los Términos de servicio y la Política de privacidad."
+    "termsRequired": "Debes aceptar los Términos de servicio y la Política de privacidad.",
+    "genericSignInError": "No pudimos completar el inicio de sesión. Inténtalo de nuevo.",
+    "genericSignupResult": "Si la dirección se puede usar, enviamos el siguiente paso. También puedes iniciar sesión o restablecer la contraseña.",
+    "resetSentDescription": "Si hay una cuenta con ese correo, llegará en breve un enlace seguro de restablecimiento.",
+    "timeoutError": "La conexión tardó demasiado. Revisa tu internet e intenta entrar de nuevo.",
+    "wrongBrowserError": "Abre el enlace en el mismo navegador donde empezaste el inicio de sesión. Los toques dentro de WhatsApp suelen abrir otro navegador."
   },
   "header": {
     "login": "Iniciar sesión",
@@ -631,7 +639,15 @@
     "warranty": "Garantía",
     "warrantyPlaceholder": "por ejemplo, garantía de 90 días",
     "yourPrice": "Tu precio",
-    "yourProposal": "Tu propuesta"
+    "yourProposal": "Tu propuesta",
+    "bestMatches": "Mejores coincidencias",
+    "clientOpportunityCenter": "Centro de oportunidades",
+    "findNextClient": "Encuentra tu próximo cliente",
+    "loadError": "No pudimos cargar las oportunidades. Inténtalo de nuevo.",
+    "lowCompetition": "Baja competencia",
+    "newToday": "Nuevos hoy",
+    "pipelineValue": "Valor abierto",
+    "quickFilters": "Filtros rápidos de oportunidad"
   },
   "postJob": {
     "title": "Solicitar cita",
@@ -1231,7 +1247,8 @@
     "specialOffers": "Ofertas especiales",
     "contact": "Contacto",
     "copyright": "© 2024 MD Baise. Todos los derechos reservados.",
-    "rights": "Todos los derechos reservados."
+    "rights": "Todos los derechos reservados.",
+    "label": "Pie de página"
   },
   "errors": {
     "somethingWentWrong": "algo salió mal",
@@ -1285,6 +1302,7 @@
     "verified": "Verificado",
     "providerResponse": "La respuesta del doctor.",
     "helpful": "Útil",
+    "client": "Cliente",
     "feed": "Actualizaciones",
     "noFeedPosts": "Aún no hay actualizaciones",
     "noFeedPostsDesc": "Este médico aún no ha compartido ninguna actualización.",
@@ -1468,7 +1486,15 @@
     "noCreditedReferrals": "Aún no hay referencias acreditadas",
     "noPendingReferrals": "No hay referencias pendientes",
     "noReferralsYet": "Aún no hay referencias",
-    "pendingUser": "Usuario pendiente"
+    "pendingUser": "Usuario pendiente",
+    "emailPlaceholder": "Enviar enlace de referido por correo",
+    "emailRequired": "Correo obligatorio",
+    "emailRequiredDescription": "Ingresa el correo que debe recibir tu enlace de referido.",
+    "emailSendError": "No se pudo enviar el correo de referido",
+    "emailSent": "Correo de referido enviado",
+    "emailSentDescription": "Tu correo de referido se envió y se añadió al seguimiento.",
+    "noReferrals": "Aún no hay referidos. ¡Comparte tu código para empezar a ganar!",
+    "sendEmail": "Enviar correo"
   },
   "favorites": {
     "title": "Favoritos",
@@ -1569,7 +1595,10 @@
     "titlePlaceholder": "por ejemplo, gran servicio",
     "uploadTitle": "Subir vídeo testimonio",
     "uploading": "Subiendo...",
-    "uploadDescription": "Comparte tu experiencia con {{provider}}"
+    "uploadDescription": "Comparte tu experiencia con {{provider}}",
+    "privateCta": "Enviar comentario privado",
+    "privateDescription": "Por privacidad médica, los comentarios enviados en esta página no se publican en el perfil.",
+    "privateTitle": "Comentario privado"
   },
   "workApproval": {
     "approve": "Aprobar",
@@ -1599,7 +1628,16 @@
     "title": "Aprobación de obra",
     "upload": "Subir para aprobación",
     "uploadWork": "Subir trabajo para aprobación",
-    "uploading": "Subiendo..."
+    "uploading": "Subiendo...",
+    "clearSignature": "Borrar rúbrica",
+    "noSignoffs": "No hay rúbricas de cliente pendientes ahora.",
+    "signError": "No se pudo guardar la rúbrica.",
+    "signHere": "Rubrica aquí",
+    "signOff": "Confirmar rúbrica",
+    "signSuccess": "Rúbrica guardada.",
+    "signatureRequired": "Añade tu rúbrica primero.",
+    "signerName": "Tu nombre",
+    "signoffsTitle": "Rúbricas del cliente"
   },
   "scheduling": {
     "title": "Servicios programados",
@@ -2137,7 +2175,44 @@
     "requestMessageTitle": "Solicitud de cita",
     "requestSent": "Solicitud de cita enviada.",
     "sendRequest": "Enviar solicitud",
-    "bookWith": "Reservar con"
+    "bookWith": "Reservar con",
+    "lifecycle": {
+      "addReminder": "Añadir recordatorio",
+      "channelError": "Activa mensajes seguros en la app, correo o desactiva las comunicaciones de cita.",
+      "consent": "Recibir comunicaciones de cita",
+      "consentDescription": "Acepto recibir confirmaciones, recordatorios, seguimientos y agradecimientos con lo mínimo necesario. Puedo cancelarlo en cualquier momento.",
+      "consentSaved": "Las comunicaciones de cita están activas. Los detalles médicos permanecen en el portal seguro.",
+      "email": "Email",
+      "emailDescription": "Recibe un correo genérico de la marca con un enlace seguro al portal.",
+      "followUp": "Recordatorios de seguimiento y mensajes de agradecimiento",
+      "followUpDescription": "Recibe mensajes genéricos posteriores a la cita, sin detalles médicos.",
+      "hours": "horas",
+      "hoursBefore": "Horas antes de la cita",
+      "inApp": "Mensajes seguros en la app",
+      "inAppDescription": "Recibe actualizaciones genéricas de la cita después de iniciar sesión.",
+      "offsetError": "Usa horarios de recordatorio únicos entre 15 minutos y 7 días.",
+      "optOutSaved": "Las comunicaciones de cita están desactivadas y los mensajes en cola se cancelaron.",
+      "patientTitle": "Comunicaciones de cita",
+      "privacy": "Los mensajes nunca incluyen síntomas, diagnósticos, tratamiento, seguro ni notas de la cita. Los detalles quedan en el portal seguro.",
+      "providerEnabled": "Activar mensajes del ciclo de la cita",
+      "providerEnabledDescription": "Solo los pacientes que acepten explícitamente pueden recibir estos mensajes.",
+      "providerFollowUp": "Seguimiento y mensajes de agradecimiento",
+      "providerFollowUpDescription": "Valores predeterminados: agradecimiento a las 2 horas y seguimiento a las 24 horas.",
+      "providerReviews": "Solicitud neutra de reseña",
+      "providerReviewsDescription": "Se envía a las 48 horas solo si el paciente lo acepta por separado. Sin recompensas ni créditos.",
+      "providerTitle": "Automatización de citas del profesional",
+      "reminderTimes": "Horarios de recordatorio antes de la cita",
+      "reminders": "Recordatorios de cita",
+      "remindersDescription": "El valor predeterminado de los profesionales es 24 horas y 1 hora antes de la cita.",
+      "reviews": "Solicitudes opcionales de reseña",
+      "reviewsDescription": "Las solicitudes de reseña son neutras, sin incentivo y opcionales. No compartas detalles médicos en público.",
+      "save": "Guardar ajustes de comunicación de citas",
+      "saveError": "No se activaron los ajustes de comunicación de citas. Inténtalo de nuevo.",
+      "timezone": "Zona horaria IANA",
+      "timezoneNote": "Los horarios usan la zona del profesional. Los instantes guardados mantienen coherente el horario de verano.",
+      "twoWay": "Confirmación bidireccional",
+      "twoWayDescription": "Los pacientes pueden confirmar, rechazar o pedir un nuevo horario en una página de respuesta firmada."
+    }
   },
   "doctorProfile": {
     "loading": "Cargando perfil de médico...",
@@ -2185,6 +2260,8 @@
     "verifiedActive": "Verificado y activo",
     "alsoAcceptsSelfPay": "También acepta pacientes que pagan por cuenta propia",
     "verifiedPatient": "Paciente verificado",
+    "patient": "Paciente",
+    "minutes": "min",
     "quality": "Calidad",
     "professionalism": "Profesionalismo",
     "punctuality": "Puntualidad",
@@ -2376,7 +2453,7 @@
       "pdTrackedFromCompletedCare": "Calculado a partir de atenciones completadas y registros de pago.",
       "pdUpdateSpecialtiesPricingAvailabili": "Actualiza especialidades, precios, disponibilidad y comprobantes antes de promocionar servicios.",
       "pdUniqueInvoiceAndClient": "Factura e identificador únicos por cada atención pagada.",
-      "pdSignaturesApprovalNotesService": "Firmas, notas de aprobación, descripciones de servicio y fechas."
+      "pdSignaturesApprovalNotesService": "Rúbricas, notas de aprobación, descripciones de servicio y fechas."
     }
   },
   "stories": {
@@ -2392,7 +2469,10 @@
     "startingCamera": "Iniciando cámara...",
     "typeSomething": "Escribe algo...",
     "typeText": "Escribe texto",
-    "yourStory": "tu historia"
+    "yourStory": "tu historia",
+    "retryCamera": "La cámara no se inició — toca para reintentar",
+    "tapToStart": "Toca para iniciar la cámara",
+    "zoomUnsupported": "Esta cámara no expone controles de zoom"
   },
   "medicalCategories": {
     "general-practice": {
@@ -2766,9 +2846,9 @@
     "signNote": "Al enviar aceptas los términos anteriores. Guardamos la fecha, la versión de los términos y tu firma como registro.",
     "signature": {
       "title": "Tu firma",
-      "label": "Firma con el dedo o el ratón",
+      "label": "Rúbrica con el dedo o el ratón",
       "hint": "Opcional — firma con el dedo o el ratón.",
-      "done": "Firma registrada.",
+      "done": "Rúbrica registrada.",
       "clear": "Borrar"
     },
     "errors": {
@@ -3286,5 +3366,125 @@
       "title": "Empiece a construir antes",
       "body": "El endpoint aún no acepta claves. Cree su cuenta ahora y su clave estará lista el día que abra."
     }
+  },
+  "partner": {
+    "dashboardTitle": "Campañas de socios"
+  },
+  "pilotBanner": {
+    "cta": "¿Encontraste un problema? Repórtalo aquí →",
+    "label": "MODO DE PRUEBA — Programa piloto",
+    "text": "Ningún pago es real y tu cuenta no aparece ante clientes reales."
+  },
+  "pilotIssue": {
+    "area": "¿Dónde ocurrió?",
+    "areaPlaceholder": "Ej.: facturas, propuestas, chat",
+    "autoCapture": "También enviamos la página, el navegador y el tamaño de pantalla para agilizar la corrección.",
+    "detail": "Detalles",
+    "detailPlaceholder": "Qué hiciste, qué esperabas y qué ocurrió.",
+    "errors": {
+      "body": "Cuéntanos un poco más sobre lo que ocurrió.",
+      "generic": "No se pudo enviar el reporte.",
+      "notTester": "Solo las cuentas de prueba pueden reportar problemas aquí.",
+      "rate": "Demasiados reportes seguidos. Inténtalo de nuevo en una hora.",
+      "title": "Pon un título un poco más descriptivo.",
+      "tooBig": "Archivo demasiado grande (máx. 100 MB): {{name}}"
+    },
+    "evidence": "Capturas, fotos o grabación de pantalla",
+    "evidenceHint": "Hasta {{max}} archivos, 100 MB cada uno. Solo tú y nuestro equipo pueden verlos.",
+    "privacy": "No envíes datos reales de clientes, pacientes o casos. Usa solo información ficticia.",
+    "sent": "Reporte enviado. Gracias — nuestro equipo ya fue notificado.",
+    "sev": {
+      "blocker": "Bloquea todo — no puedo continuar",
+      "idea": "Idea / sugerencia",
+      "major": "Grave — estorba mucho",
+      "minor": "Menor — detalle visual",
+      "normal": "Normal"
+    },
+    "severity": "Gravedad",
+    "submit": "Enviar reporte",
+    "subtitle": "Cuanto más detalle, más rápido lo corregimos. Adjunta una captura o grabación si puedes.",
+    "title": "Reportar un problema",
+    "what": "¿Qué ocurrió?",
+    "whatPlaceholder": "Resúmelo en una línea"
+  },
+  "pilotStart": {
+    "badge": "Programa piloto",
+    "checklistLede": "No es obligatorio y no tiene que ser hoy. Es solo una guía de lo que más nos ayuda.",
+    "checklistTitle": "Qué queremos ver probado",
+    "ctask1": "Publica una solicitud de servicio",
+    "ctask2": "Busca profesionales en Explorar",
+    "ctask3": "Habla con un profesional",
+    "ctask4": "Reporta el primer problema que encuentres",
+    "go": "Ir",
+    "h1": "Tu cuenta de prueba está activa",
+    "lede": "Tienes acceso profesional completo. Usa la plataforma como lo harías de verdad y cuéntanos todo lo que se rompa, confunda o irrite. Para eso estás aquí.",
+    "metaTitle": "Bienvenido al piloto",
+    "reportBody": "La franja amarilla de arriba aparece en todas las páginas. Haz clic en “Repórtalo aquí” cuando quieras — puedes adjuntar capturas y grabaciones. Va directo a nuestro equipo.",
+    "reportTitle": "Cómo reportar un problema",
+    "rule1Body": "Tu cuenta está marcada [TEST] y solo aparece ante otros testers. Ningún cliente real te encontrará ni te contratará.",
+    "rule1Title": "Eres invisible",
+    "rule2Body": "No hay un método de pago conectado. Facturas, saldos y pagos se simulan y se marcan como tales.",
+    "rule2Title": "Ningún dinero es real",
+    "rule3Body": "Nunca ingreses datos reales de clientes, pacientes, casos, CPF, CNPJ o banco. Inventa todo — eso es lo esperado.",
+    "rule3Title": "Solo datos ficticios",
+    "rulesTitle": "Tres cosas que debes saber",
+    "settings": "Ajustar mi perfil",
+    "start": "Empezar a probar",
+    "task1": "Completa tu perfil y tus servicios",
+    "task2": "Mira a los otros testers en Explorar",
+    "task3": "Encuentra un trabajo y envía una propuesta",
+    "task4": "Habla con otro tester",
+    "task5": "Crea una factura y márcala como pagada (simulado)",
+    "task6": "Reporta el primer problema que encuentres",
+    "thanks": "Gracias por reservar tiempo para esto. Cada problema que encuentres es uno que un cliente real no verá.",
+    "until": "Tu acceso dura hasta {{date}}."
+  },
+  "testCohort": {
+    "activate": "Activar acceso",
+    "businessName": "Nombre del negocio (prueba)",
+    "businessPlaceholder": "Ej.: Fontanero Silva",
+    "check": "Verificar",
+    "codeLabel": "Código de prueba",
+    "duration": "Duración: {{days}} días",
+    "errors": {
+      "alreadyTester": "Tu cuenta ya forma parte del programa de pruebas.",
+      "expired": "Este código expiró.",
+      "generic": "No se pudo activar el código.",
+      "inactive": "El programa de pruebas no está activo en este momento.",
+      "invalid": "Código inválido. Verifícalo e inténtalo de nuevo.",
+      "rateLimited": "Demasiados intentos. Inténtalo de nuevo en una hora.",
+      "realAccount": "Tu cuenta ya tiene una suscripción activa y no puede convertirse en cuenta de prueba.",
+      "revoked": "Este código fue revocado. Habla con el equipo.",
+      "used": "Este código ya fue utilizado.",
+      "wrongApp": "Este código pertenece a otra aplicación Baise."
+    },
+    "grants": "Este código concede:",
+    "markerNote": "El prefijo [TEST] se añadirá automáticamente.",
+    "roleClient": "Cliente",
+    "roleProvider": "Prestador de servicio",
+    "signIn": "Entrar",
+    "signInFirst": "Entra en tu cuenta para activar un código de prueba.",
+    "subtitle": "Ingresa el código de un solo uso que recibiste. Tu cuenta se marcará como de prueba y solo será visible para otros testers.",
+    "success": "Acceso de prueba activado.",
+    "syntheticDataWarning": "Usa solo datos ficticios. No ingreses datos reales de clientes, pacientes, casos o pagos.",
+    "title": "Acceso de prueba"
+  },
+  "testimonialTrack": {
+    "askFrom": "Pedir a un cliente",
+    "cancelled": "Cancelado",
+    "done": "Recibido",
+    "empty": "Aún no hay solicitudes. Después de terminar un trabajo, pide un testimonio — eso es lo que más ayuda a que te elijan.",
+    "errors": {
+      "generic": "No se pudo enviar la solicitud.",
+      "noCustomer": "Cliente no encontrado."
+    },
+    "opened": "Abierto",
+    "reminded": "Recordatorio enviado — sin crear una nueva solicitud.",
+    "reminders": "{{n}} recordatorio(s)",
+    "requestedOn": "Solicitado el {{date}}",
+    "sent": "Solicitud de testimonio enviada.",
+    "subtitle": "Pide un testimonio a quien ya atendiste y sigue lo que ocurrió. Reenviar no crea una solicitud nueva — se convierte en un recordatorio.",
+    "title": "Solicitudes de testimonio",
+    "waiting": "En espera"
   }
 }
