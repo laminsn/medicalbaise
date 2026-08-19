@@ -17,7 +17,9 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    // AuthCallback owns the sole PKCE exchange via exchangeCodeForSession.
+    // Leaving this true plus that call consumes the verifier twice (Legal toast).
+    detectSessionInUrl: false,
     flowType: 'pkce',
     storageKey: 'baise-auth-token',
   },
