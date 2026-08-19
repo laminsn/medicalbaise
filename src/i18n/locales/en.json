@@ -1860,6 +1860,7 @@
       "noMonthlyCharge": "No monthly subscription",
       "eightPaidServices": "8 completed paid services per month",
       "zeroFee": "0% platform fee on those services",
+      "zeroPerTransaction": "0% per transaction.",
       "monthlyBilling": "Billed monthly in Brazilian reais",
       "unlimitedServices": "Unlimited completed paid services",
       "noBrowseFee": "No fee to browse or request a quote",
