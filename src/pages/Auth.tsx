@@ -31,6 +31,7 @@ import {
   getRemainingAttempts,
   formatLockoutTime,
 } from '@/lib/security';
+import { buildGoogleInviteRedirectTo, inviteResumePath, isWellFormedInviteToken, persistInviteToken } from '@/lib/clientInvite';
 
 const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
 
@@ -38,7 +39,10 @@ export default function Auth() {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get('invite');
+  const invitePath = isWellFormedInviteToken(inviteToken) ? inviteResumePath(inviteToken) : null;
+  const [isSignUp, setIsSignUp] = useState(() => isWellFormedInviteToken(inviteToken));
   const [showPassword, setShowPassword] = useState(false);
   const [showFaceAuth, setShowFaceAuth] = useState(false);
   const [showFaceLoginInfo, setShowFaceLoginInfo] = useState(false);
@@ -81,7 +85,12 @@ export default function Auth() {
   const { signUp, signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (inviteToken && isWellFormedInviteToken(inviteToken)) {
+      persistInviteToken(inviteToken);
+    }
+  }, [inviteToken]);
 
   // AuthCallback redirects failures back here with ?error=. Without this the
   // user was returned to a blank login form and told nothing at all.
@@ -131,7 +140,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: buildGoogleInviteRedirectTo(inviteToken, window.location.origin),
           queryParams: {
             prompt: 'select_account',
           },
@@ -164,7 +173,7 @@ export default function Auth() {
 
   const handleFaceAuthSuccess = () => {
     toast({ title: t('auth.welcomeBack') + '!' });
-    navigate('/');
+    navigate(invitePath || '/');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -270,7 +279,7 @@ export default function Auth() {
           toast({
             title: t('auth.welcomeBack') + '!',
           });
-          navigate('/');
+          navigate(invitePath || '/');
         }
       }
     } finally {

@@ -13,6 +13,7 @@ import { DashboardVisualKpis } from '@/components/dashboard/DashboardVisualKpis'
 import { PrintableDashboard } from '@/components/dashboard/PrintableDashboard';
 import { ScheduledServicesSection } from '@/components/scheduling/ScheduledServicesSection';
 import { ClientTransactionHistory } from '@/components/payments/ClientTransactionHistory';
+import { ClientInviteStatusCard } from '@/components/dashboard/ClientInviteStatusCard';
 import { ClientInsightSurvey } from '@/components/products/ClientInsightSurvey';
 import { ClientProductAddOns } from '@/components/products/ClientProductAddOns';
 import JobLocationMap from '@/components/map/JobLocationMap';
@@ -327,6 +328,7 @@ export default function CustomerDashboard() {
           </TabsList>
 
           <TabsContent value="jobs" className="space-y-6">
+            <ClientInviteStatusCard />
             <ActiveJobsSection onSelectJob={setSelectedJobId} />
           </TabsContent>
 

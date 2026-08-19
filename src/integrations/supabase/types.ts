@@ -3284,6 +3284,201 @@ export type Database = {
           },
         ]
       }
+      provider_client_invite_items: {
+        Row: {
+          amount: number | null
+          approval_status: string
+          approved_at: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          invite_id: string
+          paid_at: string | null
+          payment_status: string
+          provider_id: string
+          service_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          approval_status?: string
+          approved_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          invite_id: string
+          paid_at?: string | null
+          payment_status?: string
+          provider_id: string
+          service_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          approval_status?: string
+          approved_at?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          invite_id?: string
+          paid_at?: string | null
+          payment_status?: string
+          provider_id?: string
+          service_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_client_invite_items_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "provider_client_invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_client_invite_items_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_client_invite_redeem_attempts: {
+        Row: {
+          app_key: string | null
+          created_at: string
+          id: string
+          outcome: string
+          user_id: string | null
+        }
+        Insert: {
+          app_key?: string | null
+          created_at?: string
+          id?: string
+          outcome: string
+          user_id?: string | null
+        }
+        Update: {
+          app_key?: string | null
+          created_at?: string
+          id?: string
+          outcome?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      provider_client_invite_sends: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          invite_id: string
+          invited_by: string
+          provider_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          id?: string
+          invite_id: string
+          invited_by: string
+          provider_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          invite_id?: string
+          invited_by?: string
+          provider_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_client_invite_sends_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "provider_client_invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_client_invite_sends_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_client_invites: {
+        Row: {
+          app_key: string
+          created_at: string
+          expires_at: string
+          id: string
+          invited_by: string
+          metadata: Json
+          provider_id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          revoked_at: string | null
+          status: string
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          app_key: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          metadata?: Json
+          provider_id: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
+          status?: string
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          app_key?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          metadata?: Json
+          provider_id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
+          status?: string
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_client_invites_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "provider_client_invites_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       provider_client_portal_invites: {
         Row: {
           claimed_at: string | null
@@ -8106,6 +8301,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      approve_client_invite_item: {
+        Args: { p_decision: string; p_item_id: string }
+        Returns: Json
+      }
       approve_client_testimonial_reward: {
         Args: { target_reward_id: string }
         Returns: {
@@ -8240,7 +8439,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      hash_client_invite_token: { Args: { p_token: string }; Returns: string }
       hash_cohort_code: { Args: { p_code: string }; Returns: string }
+      is_allowed_client_invite_app_key: {
+        Args: { p_app_key: string }
+        Returns: boolean
+      }
+      client_invite_is_participant: {
+        Args: { p_invite_id: string }
+        Returns: boolean
+      }
+      client_invite_token_well_formed: {
+        Args: { p_token: string }
+        Returns: boolean
+      }
+      mint_client_invite: {
+        Args: { p_app_key: string; p_service_ids?: string[] }
+        Returns: Json
+      }
       increment_user_credits_balance: {
         Args: { credit_amount: number; target_user_id: string }
         Returns: undefined
@@ -8306,6 +8522,10 @@ export type Database = {
         Returns: string
       }
       normalize_referral_code: { Args: { input_code: string }; Returns: string }
+      preview_client_invite: {
+        Args: { p_app_key: string; p_token: string }
+        Returns: Json
+      }
       preview_test_cohort_code: {
         Args: { p_app_key: string; p_code: string }
         Returns: Json
@@ -8346,6 +8566,10 @@ export type Database = {
         }
         Returns: number
       }
+      record_client_invite_send: {
+        Args: { p_channel: string; p_invite_id: string }
+        Returns: Json
+      }
       record_signup_attribution: {
         Args: {
           raw_metadata?: Json
@@ -8366,8 +8590,16 @@ export type Database = {
         }
         Returns: string
       }
+      redeem_client_invite: {
+        Args: { p_app_key: string; p_token: string }
+        Returns: Json
+      }
       redeem_test_cohort_code: {
         Args: { p_app_key: string; p_business_name?: string; p_code: string }
+        Returns: Json
+      }
+      request_client_invite_payment: {
+        Args: { p_item_id: string }
         Returns: Json
       }
       refresh_partner_campaign_membership_metrics: {
@@ -8400,8 +8632,16 @@ export type Database = {
           partner_user_id: string
         }[]
       }
+      revoke_client_invite: {
+        Args: { p_invite_id: string }
+        Returns: Json
+      }
       revoke_test_cohort_invite: {
         Args: { p_invite_id: string }
+        Returns: Json
+      }
+      settle_client_invite_payment: {
+        Args: { p_item_id: string; p_status: string }
         Returns: Json
       }
       safe_partner_integer: { Args: { raw_value: string }; Returns: number }

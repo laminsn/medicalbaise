@@ -75,6 +75,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const ClientInviteWelcome = lazy(() => import("./pages/ClientInviteWelcome"));
 
 // Redirect component for legacy plural jobs route.
 const JobsRedirect = () => {
@@ -122,13 +123,13 @@ const campaignLandingPaths = new Set([
 
 const CampaignAwareHIPAADisclaimer = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/invite/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <HIPAADisclaimer />;
 };
 
 const CampaignAwareNotificationPermissionBanner = () => {
   const { pathname } = useLocation();
-  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
+  if (campaignLandingPaths.has(pathname) || pathname.startsWith("/ref/") || pathname.startsWith("/pt/ref/") || pathname.startsWith("/es/ref/") || pathname.startsWith("/invite/") || pathname.startsWith("/blog") || pathname.startsWith("/pt/blog") || pathname.startsWith("/es/blog")) return null;
   return <NotificationPermissionBanner />;
 };
 
@@ -153,6 +154,8 @@ const App = () => (
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
+                    <Route path="/invite/:token" element={<ClientInviteWelcome />} />
+                    <Route path="/invite" element={<ClientInviteWelcome />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/unsubscribe" element={<Unsubscribe />} />
                     <Route path="/browse" element={<Browse />} />
