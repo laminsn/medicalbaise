@@ -1,18 +1,10 @@
--- Isolated medical Stripe webhook idempotency. Persists Stripe event.id only.
--- service_role writes; no client policies.
+-- DO NOT APPLY from this medicalbaise tree.
+-- Isolated `stripe_webhook_events` (id PK) was never applied. Do not CREATE it.
+--
+-- Shared-safe CREATE lives on Casa and is apply-once against the one live
+-- Supabase project. Persist table is public.stripe_events (event_id PK),
+-- service_role-only. MD webhook insert is already unified to that table.
+--
+-- Shannon/Sentry review required before any SQL apply. Do not SHIP.
 
-CREATE TABLE IF NOT EXISTS public.stripe_webhook_events (
-  id text PRIMARY KEY,
-  event_type text NOT NULL,
-  received_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_stripe_webhook_events_type
-  ON public.stripe_webhook_events(event_type, received_at DESC);
-
-ALTER TABLE public.stripe_webhook_events ENABLE ROW LEVEL SECURITY;
-
-REVOKE ALL ON TABLE public.stripe_webhook_events FROM PUBLIC;
-REVOKE ALL ON TABLE public.stripe_webhook_events FROM anon;
-REVOKE ALL ON TABLE public.stripe_webhook_events FROM authenticated;
-GRANT ALL ON TABLE public.stripe_webhook_events TO service_role;
+SELECT 1;
