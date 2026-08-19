@@ -16,8 +16,7 @@ const PLANS = [
     id: 'flex' as const,
     dataPlan: 'Flex',
     monthly: 'R$0',
-    bookingFee: '5%',
-    bookingLabelKey: 'seekerPricing.feeMin',
+    pillKey: 'seekerPricing.defaultPill' as const,
     featured: false,
     featureKeys: [
       'noBrowseFee',
@@ -37,11 +36,9 @@ const PLANS = [
     id: 'lifestyle' as const,
     dataPlan: 'Lifestyle',
     monthly: 'R$99',
-    bookingFee: '0%',
-    bookingLabelKey: 'seekerPricing.eightTx',
+    pillKey: 'seekerPricing.featuredPill' as const,
     featured: true,
     featureKeys: [
-      'usedOfLimit',
       'everythingInFlex',
       'noBookingFee',
       'processingIncluded',
@@ -59,8 +56,7 @@ const PLANS = [
     id: 'project' as const,
     dataPlan: 'Project',
     monthly: 'R$499',
-    bookingFee: '0%',
-    bookingLabelKey: 'seekerPricing.unlimitedFee',
+    pillKey: null,
     featured: false,
     featureKeys: [
       'everythingInLifestyle',
@@ -140,20 +136,27 @@ export default function SeekerPricing() {
             <div className="seeker-pricing-grid">
               {PLANS.map((plan) => {
                 const isCurrentPlan = plan.id === currentPlan;
-                const features = plan.featureKeys.map((feature) =>
-                  feature === 'usedOfLimit'
-                    ? t('seekerPricing.usedOfLimit', {
-                        used: currentPlan === 'lifestyle' ? transactionCount : 0,
-                        limit: LIFESTYLE_TRANSACTION_LIMIT,
-                      })
-                    : t(`seekerPricing.features.${feature}`),
-                );
+                const features = plan.featureKeys.map((feature) => t(`seekerPricing.features.${feature}`));
+                const lifestyleUsed = currentPlan === 'lifestyle' ? transactionCount : 0;
+                const feeCallout =
+                  plan.id === 'flex'
+                    ? { strong: '5%', label: t('seekerPricing.feeMinShort') }
+                    : plan.id === 'lifestyle'
+                      ? {
+                          strong: t('seekerPricing.usedCount', {
+                            used: lifestyleUsed,
+                            limit: LIFESTYLE_TRANSACTION_LIMIT,
+                          }),
+                          label: t('seekerPricing.usedCountLabel'),
+                        }
+                      : { strong: t('seekerPricing.unlimited'), label: t('seekerPricing.unlimitedFee') };
 
                 return (
                   <article
                     key={plan.id}
                     className={`plan-card ${plan.featured ? 'featured' : ''}`}
                     data-plan={plan.dataPlan}
+                    data-slug={plan.id}
                   >
                     <div className="plan-card-top">
                       <div>
@@ -163,12 +166,12 @@ export default function SeekerPricing() {
                           <small>{t('seekerPricing.perMonth')}</small>
                         </strong>
                       </div>
-                      {plan.featured && <b>{t('seekerPricing.bestForRepeat')}</b>}
+                      {plan.pillKey && <b>{t(plan.pillKey)}</b>}
                     </div>
                     <p>{t(`seekerPricing.plans.${plan.id}.description`)}</p>
                     <div className="fee-callout">
-                      <strong>{plan.bookingFee}</strong>
-                      <span>{t(plan.bookingLabelKey)}</span>
+                      <strong>{feeCallout.strong}</strong>
+                      <span>{feeCallout.label}</span>
                     </div>
                     <div className="plan-benefit-count">
                       <span>{t('seekerPricing.includedBenefits')}</span>

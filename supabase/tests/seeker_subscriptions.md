@@ -78,10 +78,12 @@ Do not rewrite provider `TIER_BY_PRODUCT_ID`. Inherited Casa `prod_TwTA…` mapp
 
 ## UI
 
-- Visual source of truth: https://baiseapps.vercel.app/pricing seeker `plan-card` chrome (type, spacing, BRL `R$0` / `R$99` / `R$499`, fee callout). Avis owns tokens.
+- Visual source of truth: https://baiseapps.vercel.app/pricing seeker `plan-card` chrome. Avis owns tokens. Do not invent a new catalog.
+- Locked trio, BRL never USD×5.05: Flex `R$0` accent `--casa #1dbf73` Default pill fee-callout `5%` / `R$27 min`; Lifestyle `R$99` accent `--influencer #f3ff3b` Featured, `{used} / 8` **only** in the existing fee-callout (no tick bar); Project `R$499` accent `--legal #7c3aed` fee-callout Unlimited.
+- Live type/spacing: Plus Jakarta, radius 22px, padding 30px, price `clamp(52px,6vw,78px)`, fee-callout 31px / 78px / radius 13px, grid gap 14px, three-up.
 - Pay as you go / Baise+ names are replaced by Flex / Lifestyle / Project. Slugs remain `flex|lifestyle|project`.
 - `/seeker-pricing` + `seekerPricing.*` in `en` / `es` / `pt`.
-- Lifestyle `used/8` is `transaction_count` from the server SELECT list.
+- Lifestyle `{used} / 8` is `transaction_count` from the server SELECT list, rendered in `.fee-callout` only.
 - `/pricing` and other provider pages stay provider-only.
 - Checkout does not change `user_type` or provider tier.
 

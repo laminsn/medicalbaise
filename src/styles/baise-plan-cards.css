@@ -1,4 +1,4 @@
-/* Ported from https://baiseapps.vercel.app/pricing seeker plan-card chrome. Avis owns these tokens. */
+/* Cloned from https://baiseapps.vercel.app/pricing seeker plan-card chrome. Avis owns these tokens. */
 
 .seeker-pricing-source {
   --bg: #0a0a0b;
@@ -11,6 +11,9 @@
   --influencer: #f3ff3b;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   color: #f7f8f6;
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 .seeker-pricing-source .pricing-seeker {
@@ -58,7 +61,7 @@
 
 .seeker-pricing-source .seeker-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -87,7 +90,14 @@
 }
 
 .seeker-pricing-source .plan-card[data-plan='Project'] {
-  --plan-accent: var(--medical);
+  --plan-accent: var(--legal);
+  background:
+    radial-gradient(circle at 100% 0, rgba(124, 58, 237, 0.19), transparent 38%),
+    linear-gradient(155deg, #19181f, #0e0f11 70%);
+}
+
+.seeker-pricing-source .plan-card[data-plan='Project']::after {
+  background: var(--legal);
 }
 
 .seeker-pricing-source .plan-card::before {
@@ -215,7 +225,7 @@
 .seeker-pricing-source .plan-benefit-count span {
   color: #777d78;
   font-size: 8px;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
