@@ -305,6 +305,19 @@
   cursor: default;
 }
 
+.seeker-pricing-source .seeker-pricing-footnote {
+  margin: 22px 0 0;
+  color: #9da29d;
+  font-size: 12px;
+  text-align: center;
+}
+
+.seeker-pricing-source.nested .pricing-seeker {
+  margin-top: 0;
+  padding: 28px 18px;
+  border-radius: 22px;
+}
+
 @media (max-width: 1160px) {
   .seeker-pricing-source .pricing-section-heading {
     grid-template-columns: 1fr;

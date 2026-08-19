@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SeekerPlanCards } from '@/components/pricing/SeekerPlanCards';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
@@ -57,13 +59,30 @@ const PLANS = [
 ];
 
 export default function Pricing() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { tier: currentTier, startCheckout } = useSubscription();
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const requestedAudience = searchParams.get('audience');
+  const [audience, setAudience] = useState<'seekers' | 'providers'>(
+    requestedAudience === 'seeker' ? 'seekers' : 'providers',
+  );
+
+  useEffect(() => {
+    if (requestedAudience === 'seeker') {
+      setAudience('seekers');
+      return;
+    }
+    if (requestedAudience === 'provider') {
+      setAudience('providers');
+      return;
+    }
+    if (profile?.user_type === 'customer') setAudience('seekers');
+  }, [profile?.user_type, requestedAudience]);
 
   const handleSelectPlan = async (plan: typeof PLANS[number]) => {
     if (!user) {
@@ -110,6 +129,17 @@ export default function Pricing() {
         </div>
 
         <div className="px-4 py-6 pb-24">
+          <Tabs value={audience} onValueChange={(value) => setAudience(value as 'seekers' | 'providers')}>
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="seekers">{t('pricing.forSeekers')}</TabsTrigger>
+              <TabsTrigger value="providers">{t('pricing.forProviders')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="seekers" className="mt-0">
+              <SeekerPlanCards nested />
+            </TabsContent>
+
+            <TabsContent value="providers" className="mt-0">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2">{t('pricing.choosePlan')}</h2>
             <p className="text-muted-foreground">{t('pricing.subtitle')}</p>
@@ -196,6 +226,8 @@ export default function Pricing() {
           <p className="text-center text-xs text-muted-foreground mt-6">
             {t('pricing.cancelAnytime')}
           </p>
+            </TabsContent>
+          </Tabs>
         </div>
       </AppLayout>
     </>

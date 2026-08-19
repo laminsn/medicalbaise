@@ -1769,6 +1769,8 @@
     "planSelected": "Plan seleccionado",
     "paymentComingSoon": "Próximamente la integración de pagos",
     "cancelAnytime": "Cancele en cualquier momento. Sin tarifas ocultas.",
+    "forSeekers": "Para pacientes",
+    "forProviders": "Para prestadores",
     "plans": {
       "free": {
         "name": "Gratis",
