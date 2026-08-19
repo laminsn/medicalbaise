@@ -77,7 +77,7 @@ const JobsRedirect = () => {
   return <Navigate to={`/job/${id}`} replace />;
 };
 
-// Alias /login → /auth so typed URLs and in-app links hit the real Google login.
+// Alias typed login/signup URLs → /auth so they hit the real Google login, not the 404.
 const LoginRedirect = () => {
   const { search } = useLocation();
   return <Navigate to={`/auth${search}`} replace />;
@@ -148,6 +148,10 @@ const App = () => (
                     <Route path="/discover" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/login" element={<LoginRedirect />} />
+                    <Route path="/signin" element={<LoginRedirect />} />
+                    <Route path="/sign-in" element={<LoginRedirect />} />
+                    <Route path="/log-in" element={<LoginRedirect />} />
+                    <Route path="/signup" element={<LoginRedirect />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/browse" element={<Browse />} />
                     <Route path="/categories" element={<Categories />} />

@@ -20,7 +20,11 @@
     }
   ],
   "redirects": [
-    { "source": "/login", "destination": "/auth", "permanent": false }
+    { "source": "/login", "destination": "/auth", "permanent": false },
+    { "source": "/signin", "destination": "/auth", "permanent": false },
+    { "source": "/sign-in", "destination": "/auth", "permanent": false },
+    { "source": "/log-in", "destination": "/auth", "permanent": false },
+    { "source": "/signup", "destination": "/auth", "permanent": false }
   ],
   "rewrites": [
     {
