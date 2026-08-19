@@ -5,12 +5,51 @@ export const SEEKER_STRIPE_PLANS = ["lifestyle", "project"] as const;
 export type SeekerStripePlan = (typeof SEEKER_STRIPE_PLANS)[number];
 export type SeekerPlan = "flex" | SeekerStripePlan;
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 type RpcClient = {
   rpc: (
     fn: "try_consume_seeker_transaction",
     args: { app_key: string; user_id: string },
   ) => Promise<{ data: boolean | null; error: { message?: string } | null }>;
 };
+
+type ProfileLookupClient = {
+  from: (table: "profiles") => {
+    select: (columns: "user_id") => {
+      eq: (column: "email", value: string) => {
+        maybeSingle: () => Promise<{ data: { user_id: string } | null }>;
+      };
+    };
+  };
+};
+
+export function isSeekerUserId(value: unknown): value is string {
+  return typeof value === "string" && UUID_RE.test(value);
+}
+
+function emailHint(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const email = value.trim().toLowerCase();
+  return email.includes("@") ? email : null;
+}
+
+export function clientEmailFromMetadata(metadata: unknown): string | null {
+  if (!metadata || typeof metadata !== "object") return null;
+  return emailHint((metadata as { client_email?: unknown }).client_email);
+}
+
+export async function resolveSeekerUserId(
+  supabase: ProfileLookupClient,
+  input: { customerId?: string | null; email?: string | null },
+): Promise<string | null> {
+  if (isSeekerUserId(input.customerId)) return input.customerId;
+  const email = emailHint(input.email);
+  if (!email) return null;
+  const { data } = await supabase.from("profiles").select("user_id").eq("email", email).maybeSingle();
+  return isSeekerUserId(data?.user_id) ? data.user_id : null;
+}
 
 export function requireMedicalAppKey(): string {
   const key = String(Deno.env.get("BAISE_APP_KEY") || "").toLowerCase();

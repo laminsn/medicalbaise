@@ -5,8 +5,10 @@ import { getCorsHeaders } from "../_shared/security.ts";
 import {
   MEDICAL_APP_KEY,
   SEEKER_ROLE,
+  clientEmailFromMetadata,
   consumeSeekerPaidTransaction,
   isSeekerStripePlan,
+  resolveSeekerUserId,
 } from "../_shared/seekerSubscriptions.ts";
 
 const TIER_BY_PRODUCT_ID: Record<string, string> = {
@@ -55,22 +57,34 @@ async function markProviderPosPaid(
 
   if (transactionError) throw transactionError;
 
+  const { data: existingInvoice } = await supabaseAdmin
+    .from("provider_invoices")
+    .select("customer_id, metadata")
+    .eq("id", invoiceId)
+    .maybeSingle();
+
+  const seekerUserId = await resolveSeekerUserId(supabaseAdmin, {
+    customerId: existingInvoice?.customer_id,
+    email:
+      clientEmailFromMetadata(existingInvoice?.metadata)
+      || session.customer_email
+      || session.customer_details?.email
+      || metadata.client_email
+      || null,
+  });
+
   const { error: invoiceError } = await supabaseAdmin
     .from("provider_invoices")
     .update({
       payment_status: "paid",
       paid_at: new Date().toISOString(),
+      ...(seekerUserId && !existingInvoice?.customer_id ? { customer_id: seekerUserId } : {}),
     })
     .eq("id", invoiceId);
 
   if (invoiceError) throw invoiceError;
 
-  const { data: paidInvoice } = await supabaseAdmin
-    .from("provider_invoices")
-    .select("customer_id")
-    .eq("id", invoiceId)
-    .maybeSingle();
-  await consumeSeekerPaidTransaction(supabaseAdmin, paidInvoice?.customer_id);
+  await consumeSeekerPaidTransaction(supabaseAdmin, seekerUserId);
 
   await supabaseAdmin.from("provider_ledger_entries").insert({
     provider_id: providerId,
@@ -236,25 +250,51 @@ async function markProviderPaymentPlanItemPaid(
     })
     .eq("id", planId);
 
+  const { data: plan } = await supabaseAdmin
+    .from("provider_payment_plans")
+    .select("customer_id, created_by, title, metadata")
+    .eq("id", planId)
+    .maybeSingle();
+
   if (invoiceId) {
+    const { data: existingInvoice } = await supabaseAdmin
+      .from("provider_invoices")
+      .select("customer_id, metadata")
+      .eq("id", invoiceId)
+      .maybeSingle();
+    const seekerUserId = await resolveSeekerUserId(supabaseAdmin, {
+      customerId: existingInvoice?.customer_id || plan?.customer_id,
+      email:
+        clientEmailFromMetadata(existingInvoice?.metadata)
+        || clientEmailFromMetadata(plan?.metadata)
+        || session.customer_email
+        || session.customer_details?.email
+        || metadata.client_email
+        || null,
+    });
     await supabaseAdmin
       .from("provider_invoices")
       .update({
         payment_status: isPlanComplete ? "paid" : "processing",
         paid_at: isPlanComplete ? now : null,
         client_action_status: isPlanComplete ? "paid" : "accepted",
+        ...(seekerUserId && !existingInvoice?.customer_id ? { customer_id: seekerUserId } : {}),
       })
       .eq("id", invoiceId);
-  }
-
-  const { data: plan } = await supabaseAdmin
-    .from("provider_payment_plans")
-    .select("customer_id, created_by, title")
-    .eq("id", planId)
-    .maybeSingle();
-
-  if (isPlanComplete) {
-    await consumeSeekerPaidTransaction(supabaseAdmin, plan?.customer_id);
+    if (isPlanComplete) {
+      await consumeSeekerPaidTransaction(supabaseAdmin, seekerUserId);
+    }
+  } else if (isPlanComplete) {
+    const seekerUserId = await resolveSeekerUserId(supabaseAdmin, {
+      customerId: plan?.customer_id,
+      email:
+        clientEmailFromMetadata(plan?.metadata)
+        || session.customer_email
+        || session.customer_details?.email
+        || metadata.client_email
+        || null,
+    });
+    await consumeSeekerPaidTransaction(supabaseAdmin, seekerUserId);
   }
 
   if (plan?.customer_id) {

@@ -39,11 +39,19 @@ This tree: `app_key = 'medical'` only. `plan` enum is `flex | lifestyle | projec
 
 A transaction is consult paid / invoice paid / completed paid service.
 
-Not a transaction: wallet top-up, bid, chat, invite.
+Not a transaction: wallet top-up, bid, chat, invite, unpaid calendar confirm (`AppointmentCalendar` chat message).
 
-Call site: Stripe webhook paid-complete paths (`markProviderPosPaid` when `provider_invoices.customer_id` is present; payment-plan completion when `provider_payment_plans.customer_id` is present).
+Lifestyle 8-cap is not done in UI alone. The existing paid-complete path must call `try_consume_seeker_transaction` **server-side**. Not a browser RPC. `EXECUTE` stays `service_role` only. Fail-closed `app_key=medical` (hardcoded in the helper). Skip if no seeker `user_id` can be resolved. Do not invent one.
 
-Leave `create-wallet-checkout` cents allowlist `[2500…50000]` and its fail-closed medical `app_key` alone.
+Call sites:
+
+1. `create-pos-checkout` internal_balance, after `provider_invoices.payment_status=paid`.
+2. `stripe-webhook` `markProviderPosPaid`, after invoice paid.
+3. `stripe-webhook` `markProviderPaymentPlanItemPaid`, when the plan is complete (invoice paid, or no-invoice fallback).
+
+Seeker `user_id` resolution, same as payment plans: existing `customer_id`, else `profiles.email` from invoice/plan `client_email` or Stripe session email. Missing match → skip.
+
+Leave `create-wallet-checkout` cents allowlist `[2500…50000]` and its fail-closed medical `app_key` alone. Do not add wallet consume.
 
 ## Checkout
 

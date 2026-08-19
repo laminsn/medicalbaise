@@ -9,6 +9,10 @@ import {
   getSafeOrigin,
   rejectNonPostMethod,
 } from "../_shared/security.ts";
+import {
+  consumeSeekerPaidTransaction,
+  resolveSeekerUserId,
+} from "../_shared/seekerSubscriptions.ts";
 
 type PosCheckoutBody = {
   amount: number;
@@ -87,11 +91,16 @@ serve(async (req) => {
       });
     }
 
+    const seekerUserId = await resolveSeekerUserId(supabaseAdmin, {
+      email: body.clientEmail || null,
+    });
+
     const { data: invoice, error: invoiceError } = await supabaseAdmin
       .from("provider_invoices")
       .insert({
         provider_id: provider.id,
         active_job_id: body.activeJobId || null,
+        customer_id: seekerUserId,
         subcontractor_id: body.subcontractorId || null,
         created_by: user.id,
         currency,
@@ -179,6 +188,8 @@ serve(async (req) => {
           paid_at: new Date().toISOString(),
         })
         .eq("id", invoice.id);
+
+      await consumeSeekerPaidTransaction(supabaseAdmin, seekerUserId);
 
       await supabaseAdmin.from("provider_ledger_entries").insert({
         provider_id: provider.id,
