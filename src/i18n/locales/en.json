@@ -1824,15 +1824,15 @@
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "Default. No monthly charge."
+        "description": "R$0 + 5% (R$27 min)"
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "Eight completed paid services each month"
+        "description": "R$99 / 8 completed paid services"
       },
       "project": {
         "name": "Project",
-        "description": "Unlimited completed paid services"
+        "description": "R$499 unlimited"
       }
     },
     "features": {

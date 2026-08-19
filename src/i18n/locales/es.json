@@ -1824,15 +1824,15 @@
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "Predeterminado. Sin cargo mensual."
+        "description": "R$0 + 5% (mín. R$27)"
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "Ocho servicios pagos completados cada mes"
+        "description": "R$99 / 8 servicios pagos completados"
       },
       "project": {
         "name": "Project",
-        "description": "Servicios pagos completados ilimitados"
+        "description": "R$499 ilimitado"
       }
     },
     "features": {

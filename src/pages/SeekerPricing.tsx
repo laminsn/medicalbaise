@@ -1,53 +1,47 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, ExternalLink, Loader2, Sparkles, Star, Workflow } from 'lucide-react';
-import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useSeekerSubscription } from '@/hooks/useSeekerSubscription';
-import {
-  LIFESTYLE_TRANSACTION_LIMIT,
-  SEEKER_PLANS,
-  formatSeekerBrl,
-  type SeekerPlan,
-} from '@/lib/constants/seekerPlans';
+import { LIFESTYLE_TRANSACTION_LIMIT } from '@/lib/constants/seekerPlans';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Check, Crown, Zap, Star, Loader2, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
 
-const PLAN_UI: Array<{
-  id: SeekerPlan;
-  icon: typeof Star;
-  color: string;
-  bgColor: string;
-  popular: boolean;
-  features: string[];
-}> = [
+const PLANS = [
   {
-    id: 'flex',
+    id: 'flex' as const,
     icon: Star,
     color: 'text-muted-foreground',
     bgColor: 'bg-muted',
-    popular: false,
     features: ['payPerService', 'platformFee', 'noMonthlyCharge'],
+    price: 0,
+    popular: false,
+    priceId: undefined as string | undefined,
   },
   {
-    id: 'lifestyle',
-    icon: Sparkles,
+    id: 'lifestyle' as const,
+    icon: Crown,
     color: 'text-amber-500',
     bgColor: 'bg-amber-500/10',
+    features: ['eightPaidServices', 'usedOfLimit', 'zeroFee', 'monthlyBilling'],
+    price: 99,
     popular: true,
-    features: ['eightPaidServices', 'zeroFee', 'monthlyBilling'],
+    priceId: 'lifestyle',
   },
   {
-    id: 'project',
-    icon: Workflow,
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
-    popular: false,
+    id: 'project' as const,
+    icon: Zap,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
     features: ['unlimitedServices', 'zeroFee', 'monthlyBilling'],
+    price: 499,
+    popular: false,
+    priceId: 'project',
   },
 ];
 
@@ -55,22 +49,37 @@ export default function SeekerPricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
+  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { plan: currentPlan, transactionCount, startCheckout } = useSeekerSubscription();
-  const [upgrading, setUpgrading] = useState<SeekerPlan | null>(null);
+  const [upgrading, setUpgrading] = useState<string | null>(null);
 
-  const handleSelectPlan = async (planId: SeekerPlan) => {
+  const handleSelectPlan = async (plan: typeof PLANS[number]) => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    if (planId === 'flex' || planId === currentPlan) return;
 
-    setUpgrading(planId);
+    if (plan.id === 'flex' || plan.id === currentPlan) {
+      return;
+    }
+
+    if (!plan.priceId) return;
+
+    setUpgrading(plan.id);
     try {
-      if (planId !== 'lifestyle' && planId !== 'project') return;
-      await startCheckout(planId);
+      if (plan.id !== 'lifestyle' && plan.id !== 'project') return;
+      await startCheckout(plan.id);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('seekerPricing.checkoutFailed'));
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : isPt
+            ? 'Falha ao iniciar checkout'
+            : isEs
+              ? 'Error al iniciar el pago'
+              : 'Failed to start checkout',
+      );
     } finally {
       setUpgrading(null);
     }
@@ -79,12 +88,12 @@ export default function SeekerPricing() {
   return (
     <>
       <Helmet>
-        <title>{t('seekerPricing.title')} - MD Baise</title>
+        <title>{t('seekerPricing.title')} - Brasil Base</title>
         <meta name="description" content={t('seekerPricing.subtitle')} />
       </Helmet>
       <AppLayout showNav={false}>
         <div className="sticky top-0 z-40 bg-card border-b border-border px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/customer-dashboard')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-lg font-semibold">{t('seekerPricing.title')}</h1>
@@ -97,17 +106,9 @@ export default function SeekerPricing() {
           </div>
 
           <div className="space-y-4">
-            {PLAN_UI.map((plan) => {
+            {PLANS.map((plan) => {
               const Icon = plan.icon;
-              const config = SEEKER_PLANS[plan.id];
               const isCurrentPlan = plan.id === currentPlan;
-              const usedLabel =
-                plan.id === 'lifestyle'
-                  ? t('seekerPricing.usedOfLimit', {
-                      used: currentPlan === 'lifestyle' ? transactionCount : 0,
-                      limit: LIFESTYLE_TRANSACTION_LIMIT,
-                    })
-                  : null;
 
               return (
                 <Card
@@ -121,7 +122,7 @@ export default function SeekerPricing() {
                   )}
                   {isCurrentPlan && (
                     <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
-                      {t('seekerPricing.yourPlan')}
+                      {isPt ? 'Seu plano' : isEs ? 'Tu plan' : 'Your Plan'}
                     </Badge>
                   )}
                   <CardHeader className="pb-2">
@@ -132,56 +133,54 @@ export default function SeekerPricing() {
                         </div>
                         <div>
                           <CardTitle className="text-lg">{t(`seekerPricing.plans.${plan.id}.name`)}</CardTitle>
-                          <p className="text-sm text-muted-foreground">
-                            {t(`seekerPricing.plans.${plan.id}.description`)}
-                          </p>
+                          <p className="text-sm text-muted-foreground">{t(`seekerPricing.plans.${plan.id}.description`)}</p>
                         </div>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-baseline gap-1 mb-2">
+                    <div className="flex items-baseline gap-1 mb-4">
                       <span className="text-3xl font-bold">
-                        {config.monthlyBrl === 0
-                          ? formatSeekerBrl(0, i18n.language)
-                          : formatSeekerBrl(config.monthlyBrl, i18n.language)}
+                        {`R$${plan.price}`}
                       </span>
-                      {config.monthlyBrl > 0 && (
-                        <span className="text-muted-foreground">/{t('seekerPricing.month')}</span>
-                      )}
+                      {plan.price > 0 && <span className="text-muted-foreground">/{t('seekerPricing.month')}</span>}
                     </div>
-                    {usedLabel && (
-                      <p className="text-sm font-medium mb-3">{usedLabel}</p>
-                    )}
+
                     <ul className="space-y-2 mb-4">
                       {plan.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-2 text-sm">
                           <Check className="w-4 h-4 text-primary flex-shrink-0" />
                           <span>
-                            {feature === 'platformFee'
-                              ? t('seekerPricing.features.platformFee', {
-                                  percent: config.feePercent,
-                                  min: formatSeekerBrl(config.feeMinBrl, i18n.language),
+                            {feature === 'usedOfLimit'
+                              ? t('seekerPricing.usedOfLimit', {
+                                  used: currentPlan === 'lifestyle' ? transactionCount : 0,
+                                  limit: LIFESTYLE_TRANSACTION_LIMIT,
                                 })
-                              : t(`seekerPricing.features.${feature}`)}
+                              : feature === 'platformFee'
+                                ? t('seekerPricing.features.platformFee', {
+                                    percent: 5,
+                                    min: 'R$27',
+                                  })
+                                : t(`seekerPricing.features.${feature}`)}
                           </span>
                         </li>
                       ))}
                     </ul>
+
                     <Button
                       className="w-full gap-1.5"
                       variant={plan.popular ? 'default' : 'outline'}
-                      disabled={isCurrentPlan || !config.stripeCheckout || upgrading !== null}
-                      onClick={() => handleSelectPlan(plan.id)}
+                      disabled={isCurrentPlan || !plan.priceId || upgrading !== null}
+                      onClick={() => handleSelectPlan(plan)}
                     >
                       {upgrading === plan.id ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          {t('seekerPricing.openingCheckout')}
+                          {isPt ? 'Abrindo checkout...' : isEs ? 'Abriendo pago...' : 'Opening checkout...'}
                         </>
                       ) : isCurrentPlan ? (
                         t('seekerPricing.currentPlan')
-                      ) : config.stripeCheckout ? (
+                      ) : plan.priceId ? (
                         <>
                           <ExternalLink className="h-4 w-4" />
                           {t('seekerPricing.selectPlan')}

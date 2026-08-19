@@ -32,16 +32,3 @@ export const LIFESTYLE_TRANSACTION_LIMIT = SEEKER_PLANS.lifestyle.transactionLim
 export function isSeekerPlan(value: unknown): value is SeekerPlan {
   return value === 'flex' || value === 'lifestyle' || value === 'project';
 }
-
-export function formatSeekerBrl(amount: number, locale?: string): string {
-  try {
-    return new Intl.NumberFormat(locale || 'pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
-    }).format(amount);
-  } catch {
-    return `R$${amount}`;
-  }
-}
