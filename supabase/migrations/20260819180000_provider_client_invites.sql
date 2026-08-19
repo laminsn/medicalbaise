@@ -277,11 +277,12 @@ BEGIN
     RETURN jsonb_build_object('ok', false, 'error', 'NOT_A_PROVIDER');
   END IF;
 
-  IF p_app_key IN ('casa', 'medical', 'legal') THEN
-    v_platform := public.app_key_to_platform(p_app_key);
-    IF v_platform IS NULL OR v_provider.platform IS DISTINCT FROM v_platform THEN
-      RETURN jsonb_build_object('ok', false, 'error', 'APP_KEY_MISMATCH');
-    END IF;
+  -- Fail-closed: only mint when app_key maps onto this provider's platform.
+  -- tech/influencer are allowlisted on the column but have no baise_platform
+  -- mapping here, so they are rejected (no coerce, no cross-app mint).
+  v_platform := public.app_key_to_platform(p_app_key);
+  IF v_platform IS NULL OR v_provider.platform IS DISTINCT FROM v_platform THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'APP_KEY_MISMATCH');
   END IF;
 
   IF (SELECT count(*) FROM public.provider_client_invites
@@ -427,8 +428,6 @@ BEGIN
 
   IF (SELECT count(*) FROM public.provider_client_invite_redeem_attempts
        WHERE user_id = v_uid AND created_at > now() - interval '1 hour') >= 20 THEN
-    INSERT INTO public.provider_client_invite_redeem_attempts(user_id, app_key, outcome)
-    VALUES (v_uid, p_app_key, 'RATE_LIMITED');
     RETURN jsonb_build_object('ok', false, 'error', 'RATE_LIMITED');
   END IF;
 
@@ -446,6 +445,10 @@ BEGIN
 
   IF NOT FOUND THEN
     RETURN jsonb_build_object('ok', false, 'error', 'INVALID_TOKEN');
+  END IF;
+
+  IF v_inv.app_key IS DISTINCT FROM p_app_key THEN
+    RETURN jsonb_build_object('ok', false, 'error', 'APP_KEY_MISMATCH');
   END IF;
 
   -- Idempotent re-entry for the bound patient only.
@@ -482,9 +485,6 @@ BEGIN
     );
   END IF;
 
-  IF v_inv.app_key IS DISTINCT FROM p_app_key THEN
-    RETURN jsonb_build_object('ok', false, 'error', 'APP_KEY_MISMATCH');
-  END IF;
   IF v_inv.status = 'revoked' THEN
     RETURN jsonb_build_object('ok', false, 'error', 'REVOKED');
   END IF;
