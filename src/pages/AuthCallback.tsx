@@ -4,12 +4,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import {
+  persistSignupRole,
+  resolvePostAuthPath,
+  resolveSignupIntent,
+} from '@/lib/postAuthDestination';
 
 const db = supabase as any;
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -48,6 +53,20 @@ export default function AuthCallback() {
       }
 
       if (session?.user) {
+        const callbackSearch = window.location.search;
+        persistSignupRole(url.searchParams.get('role'));
+        const lng = url.searchParams.get('lng') || url.searchParams.get('locale') || url.searchParams.get('lang');
+        if (lng) void i18n.changeLanguage(lng);
+        const signupIntent = resolveSignupIntent(callbackSearch);
+        if (signupIntent === 'provider') persistSignupRole('provider');
+
+        const meta = session.user.user_metadata || {};
+        if (!meta.signup_intent) {
+          await supabase.auth.updateUser({
+            data: { signup_intent: signupIntent },
+          }).catch(() => null);
+        }
+
         const appKey = getBaiseAppKey();
         const inboundReferralCode = localStorage.getItem('baise_referral_code');
         const inboundReferralLanding = localStorage.getItem('baise_referral_landing');
@@ -63,7 +82,6 @@ export default function AuthCallback() {
 
         if (!profile) {
           // Profile missing — create one from OAuth metadata
-          const meta = session.user.user_metadata || {};
           const fullName = meta.full_name || meta.name || '';
           const firstName = meta.first_name || fullName.split(' ')[0] || '';
           const lastName = meta.last_name || fullName.split(' ').slice(1).join(' ') || '';
@@ -74,7 +92,7 @@ export default function AuthCallback() {
             first_name: firstName || null,
             last_name: lastName || null,
             avatar_url: meta.avatar_url || meta.picture || null,
-            user_type: 'customer',
+            user_type: signupIntent === 'provider' ? 'provider' : 'customer',
             handle: `user_${session.user.id.slice(0, 8)}`,
             referral_code: `REF${session.user.id.slice(0, 6).toUpperCase()}`,
             credits_balance: 0,
@@ -124,7 +142,7 @@ export default function AuthCallback() {
           localStorage.removeItem('baise_partner_landing');
         }
 
-        navigate('/', { replace: true });
+        navigate(resolvePostAuthPath(callbackSearch), { replace: true });
         return;
       }
 
@@ -136,7 +154,7 @@ export default function AuthCallback() {
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, [i18n, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">

@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { buildAuthCallbackUrl, resolveSignupIntent } from '@/lib/postAuthDestination';
 
 interface Profile {
   id: string;
@@ -187,6 +188,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const handle = `user_${userId.slice(0, 8)}`;
     const referralCode = `REF${userId.slice(0, 6).toUpperCase()}`;
+    const signupIntent = resolveSignupIntent(
+      typeof window !== 'undefined' ? window.location.search : '',
+    );
 
     const { data: newProfile, error } = await supabase
       .from('profiles')
@@ -196,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         first_name: firstName,
         last_name: lastName,
         avatar_url: userData?.avatar_url || null,
-        user_type: 'customer',
+        user_type: signupIntent === 'provider' ? 'provider' : 'customer',
         handle,
         referral_code: referralCode,
         credits_balance: 0,
@@ -224,10 +228,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, firstName?: string, lastName?: string, languages?: string[]) => {
-    const redirectUrl = `${window.location.origin}/auth/callback`;
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    const redirectUrl = buildAuthCallbackUrl(window.location.origin, search);
+    const signupIntent = resolveSignupIntent(search);
     const appKey = getBaiseAppKey();
     const attribution = getStoredAttribution();
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -240,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           app_key: appKey,
           signup_app: appKey,
           signup_url: window.location.origin,
-          signup_intent: 'client',
+          signup_intent: signupIntent,
           inbound_referral_code: attribution.inbound_referral_code,
           inbound_referral_landing: attribution.inbound_referral_landing,
           inbound_partner_code: attribution.inbound_partner_code,

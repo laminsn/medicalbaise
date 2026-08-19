@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, ShieldAlert, Camera, ScanFace } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,14 @@ import {
   getRemainingAttempts,
   formatLockoutTime,
 } from '@/lib/security';
+import {
+  buildAuthCallbackUrl,
+  consumeSignupRoleFromSearch,
+  isSignupMode,
+  persistSignupRole,
+  resolveAuthenticatedAuthVisitPath,
+  resolvePostAuthPath,
+} from '@/lib/postAuthDestination';
 
 const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
 
@@ -78,9 +86,25 @@ export default function Auth() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { signUp, signIn } = useAuth();
+  const { signUp, signIn, user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const search = typeof window !== 'undefined' ? window.location.search : `?${searchParams.toString()}`;
+  const bouncingAuthenticatedUser = Boolean(!authLoading && user);
+
+  useEffect(() => {
+    persistSignupRole(searchParams.get('role'));
+    consumeSignupRoleFromSearch(search);
+    if (isSignupMode(search)) setIsSignUp(true);
+    const lng = searchParams.get('lng') || searchParams.get('locale') || searchParams.get('lang');
+    if (lng) void i18n.changeLanguage(lng);
+  }, [i18n, search, searchParams]);
+
+  useEffect(() => {
+    if (authLoading || !user) return;
+    navigate(resolveAuthenticatedAuthVisitPath(search), { replace: true });
+  }, [authLoading, navigate, search, user]);
 
   const signUpSchema = z.object({
     email: z.string().email(t('auth.invalidEmail')),
@@ -102,10 +126,11 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
+      persistSignupRole(searchParams.get('role'));
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: buildAuthCallbackUrl(window.location.origin, search),
           queryParams: {
             prompt: 'select_account',
           },
@@ -132,7 +157,7 @@ export default function Auth() {
 
   const handleFaceAuthSuccess = () => {
     toast({ title: t('auth.welcomeBack') + '!' });
-    navigate('/');
+    navigate(resolvePostAuthPath(search));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,13 +211,21 @@ export default function Auth() {
             });
           }
         } else {
-          toast({
-            title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
-            description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
-            duration: 10000,
-          });
-          setIsSignUp(false);
-          setFormData(prev => ({ ...prev, password: '' }));
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            toast({
+              title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
+            });
+            navigate(resolvePostAuthPath(search));
+          } else {
+            toast({
+              title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
+              description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
+              duration: 10000,
+            });
+            setIsSignUp(false);
+            setFormData(prev => ({ ...prev, password: '' }));
+          }
         }
       } else {
         const result = signInSchema.safeParse(formData);
@@ -237,13 +270,21 @@ export default function Auth() {
           toast({
             title: t('auth.welcomeBack') + '!',
           });
-          navigate('/');
+          navigate(resolvePostAuthPath(search));
         }
       }
     } finally {
       setLoading(false);
     }
   };
+
+  if (authLoading || bouncingAuthenticatedUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">{t('common.loading')}</p>
+      </div>
+    );
+  }
 
   // Face auth login view
   if (showFaceAuth) {
