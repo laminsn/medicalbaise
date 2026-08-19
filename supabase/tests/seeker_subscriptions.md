@@ -83,7 +83,8 @@ Do not rewrite provider `TIER_BY_PRODUCT_ID`. Inherited Casa `prod_TwTA…` mapp
 - Live type/spacing: Plus Jakarta, radius 22px, padding 30px, price `clamp(52px,6vw,78px)`, fee-callout 31px / 78px / radius 13px, grid gap 14px, three-up.
 - Pay as you go / Baise+ names are replaced by Flex / Lifestyle / Project. Slugs remain `flex|lifestyle|project`.
 - `/seeker-pricing` + `seekerPricing.*` in `en` / `es` / `pt`.
-- MD `/pricing` stays provider-only for the Free/Pro/Elite/Enterprise USD ladder. A sibling **For patients** tab renders the marketing `.plan-card` Flex/Lifestyle/Project BRL trio. Do not convert provider USD ($0/$29/$59/$109) with USD×5.05. Provider-role checkout stays on the provider tab.
+- MD `/pricing` stays provider-only for the Free/Pro/Elite/Enterprise USD ladder. A sibling seeker **block** (not a restyle of the provider cards) renders the marketing `.plan-card` Flex/Lifestyle/Project BRL trio. Do not convert provider USD ($0/$29/$59/$109) with USD×5.05. Provider-role checkout stays on the provider ladder.
+- Seeker cards: uppercase plan eyebrow only (FLEX / LIFESTYLE / PROJECT). No second audience eyebrow on the cards. Flex Default pill optional. Lifestyle uses BEST FOR REPEAT BOOKINGS and `{used} / 8` in the fee chip. Project uses `#7c3aed` Pro-family chrome — never `.enterprise`, `--tech`, `From R$`, or red/yellow dual glow.
 - Lifestyle `{used} / 8` is `transaction_count` from the server SELECT list, rendered in `.fee-callout` only (no tick bar, no shadcn Progress).
 - `/pricing` provider cards stay the existing shadcn ladder. Checkout does not change `user_type` or provider tier.
 

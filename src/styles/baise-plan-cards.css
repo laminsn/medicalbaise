@@ -127,10 +127,14 @@
 }
 
 .seeker-pricing-source .plan-card.featured {
-  border-color: color-mix(in srgb, var(--plan-accent) 52%, white 7%);
+  border-color: color-mix(in srgb, var(--plan-accent) 62%, white 10%);
   box-shadow:
     inset 0 0 84px color-mix(in srgb, var(--plan-accent) 7%, transparent),
     0 28px 90px #00000057;
+}
+
+.seeker-pricing-source .plan-card[data-plan='Lifestyle'].featured {
+  border-color: color-mix(in srgb, var(--influencer) 70%, #fff 8%);
 }
 
 .seeker-pricing-source .plan-card > * {
@@ -346,5 +350,10 @@
 
   .seeker-pricing-source .button {
     margin-top: 28px;
+  }
+
+  .seeker-pricing-source.nested .pricing-seeker {
+    padding: 28px 18px;
+    border-radius: 22px;
   }
 }

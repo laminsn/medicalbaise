@@ -33,7 +33,7 @@ const PLANS = [
     id: 'lifestyle' as const,
     dataPlan: 'Lifestyle',
     monthly: 'R$99',
-    pillKey: 'seekerPricing.featuredPill' as const,
+    pillKey: 'seekerPricing.bestForRepeat' as const,
     featured: true,
     featureKeys: [
       'everythingInFlex',
@@ -128,7 +128,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
             const lifestyleUsed = currentPlan === 'lifestyle' ? transactionCount : 0;
             const feeCallout =
               plan.id === 'flex'
-                ? { strong: '5%', label: t('seekerPricing.feeMinShort') }
+                ? { strong: '5%', label: t('seekerPricing.feeMin') }
                 : plan.id === 'lifestyle'
                   ? {
                       strong: t('seekerPricing.usedCount', {
