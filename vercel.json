@@ -19,6 +19,9 @@
       ]
     }
   ],
+  "redirects": [
+    { "source": "/login", "destination": "/auth", "permanent": false }
+  ],
   "rewrites": [
     {
       "source": "/give-a-month-get-a-month",
