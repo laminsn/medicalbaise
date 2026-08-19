@@ -41,6 +41,25 @@ interface UploadStoryOptions {
   backgroundGradient?: string;
 }
 
+/** Unique topic per mount so remounts never .on() a subscribed channel. */
+function subscribeStoriesRealtime(onChange: () => void) {
+  const topic = `stories-realtime:${
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+  }`;
+
+  try {
+    return supabase
+      .channel(topic)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, onChange)
+      .subscribe();
+  } catch (error) {
+    console.error('stories realtime unavailable', error);
+    return null;
+  }
+}
+
 export function useStories() {
   const { user } = useAuth();
   const [stories, setStories] = useState<Story[]>([]);
@@ -140,15 +159,17 @@ export function useStories() {
   useEffect(() => {
     fetchStories();
 
-    const channel = supabase
-      .channel('stories-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, () => {
-        fetchStories();
-      })
-      .subscribe();
+    const channel = subscribeStoriesRealtime(() => {
+      void fetchStories();
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      if (!channel) return;
+      try {
+        void supabase.removeChannel(channel);
+      } catch (error) {
+        console.error('stories realtime cleanup failed', error);
+      }
     };
   }, [fetchStories]);
 

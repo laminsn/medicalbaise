@@ -33,7 +33,7 @@ export default function AuthCallback() {
         return;
       }
 
-      // PKCE flow: convert ?code=... into a session before anything else.
+      // Sole PKCE exchange (detectSessionInUrl is false). Do not add another.
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(
           window.location.href,
