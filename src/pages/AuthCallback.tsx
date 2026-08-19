@@ -5,9 +5,11 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import {
+  clearPersistedSignupRole,
   persistSignupRole,
   resolvePostAuthPath,
   resolveSignupIntent,
+  signupIntentFromMetadata,
 } from '@/lib/postAuthDestination';
 
 const db = supabase as any;
@@ -57,15 +59,11 @@ export default function AuthCallback() {
         persistSignupRole(url.searchParams.get('role'));
         const lng = url.searchParams.get('lng') || url.searchParams.get('locale') || url.searchParams.get('lang');
         if (lng) void i18n.changeLanguage(lng);
-        const signupIntent = resolveSignupIntent(callbackSearch);
-        if (signupIntent === 'provider') persistSignupRole('provider');
 
         const meta = session.user.user_metadata || {};
-        if (!meta.signup_intent) {
-          await supabase.auth.updateUser({
-            data: { signup_intent: signupIntent },
-          }).catch(() => null);
-        }
+        const signupIntent =
+          signupIntentFromMetadata(meta) || resolveSignupIntent(callbackSearch);
+        if (signupIntent === 'provider') persistSignupRole('provider');
 
         const appKey = getBaiseAppKey();
         const inboundReferralCode = localStorage.getItem('baise_referral_code');
@@ -81,6 +79,12 @@ export default function AuthCallback() {
           .maybeSingle();
 
         if (!profile) {
+          if (!meta.signup_intent) {
+            await supabase.auth.updateUser({
+              data: { signup_intent: signupIntent },
+            }).catch(() => null);
+          }
+
           // Profile missing — create one from OAuth metadata
           const fullName = meta.full_name || meta.name || '';
           const firstName = meta.first_name || fullName.split(' ')[0] || '';
@@ -142,6 +146,7 @@ export default function AuthCallback() {
           localStorage.removeItem('baise_partner_landing');
         }
 
+        clearPersistedSignupRole();
         navigate(resolvePostAuthPath(callbackSearch), { replace: true });
         return;
       }
