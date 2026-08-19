@@ -155,6 +155,7 @@ const App = () => (
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/invite/:token" element={<ClientInviteWelcome />} />
+                    <Route path="/invite" element={<ClientInviteWelcome />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/unsubscribe" element={<Unsubscribe />} />
                     <Route path="/browse" element={<Browse />} />

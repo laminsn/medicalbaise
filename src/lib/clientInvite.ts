@@ -3,6 +3,8 @@
  * This app mints app_key=medical only. Never coerce to casa.
  */
 
+import { sanitizeRedirectUrl } from './security';
+
 export const CLIENT_INVITE_APP_KEY = 'medical' as const;
 
 export const CLIENT_INVITE_APP_ALLOWLIST = [
@@ -19,9 +21,13 @@ export type ClientInviteChannel = 'email' | 'whatsapp' | 'sms' | 'copy';
 export const CLIENT_INVITE_WELCOME_COPY =
   'Invite clients to your services and the Baise app community.';
 
-export const CLIENT_INVITE_TOKEN_STORAGE_KEY = 'baise.client_invite.token';
+/** Path-scoped cookie so /auth/callback does not receive the raw token. */
+export const CLIENT_INVITE_COOKIE = 'baise_invite';
+/** Auth round-trip only. Not the 7-day invite expiry. */
+export const CLIENT_INVITE_COOKIE_MAX_AGE_SEC = 15 * 60;
 
 const TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
+const INVITE_PATH_RE = /^\/invite\/([A-Za-z0-9_-]{32,128})\/?$/;
 
 export function isAllowedClientInviteAppKey(value: unknown): value is ClientInviteAppKey {
   return typeof value === 'string' && (CLIENT_INVITE_APP_ALLOWLIST as readonly string[]).includes(value);
@@ -54,33 +60,91 @@ export function buildClientInviteWelcomeUrl(rawToken: string, origin = window.lo
  */
 export function inviteResumePath(token: string): string {
   if (!isWellFormedInviteToken(token)) return '/customer-dashboard';
-  return `/invite/${encodeURIComponent(token)}`;
+  return sanitizeInviteReturn(`/invite/${encodeURIComponent(token)}`);
+}
+
+/** Same-origin invite path only. sanitizeRedirectUrl still applies. */
+export function sanitizeInviteReturn(raw: string | null | undefined): string {
+  if (!raw) return '/customer-dashboard';
+  const sanitized = sanitizeRedirectUrl(raw);
+  const match = sanitized.match(INVITE_PATH_RE);
+  return match ? `/invite/${match[1]}` : '/customer-dashboard';
 }
 
 export function persistInviteToken(token: string): void {
-  if (!isWellFormedInviteToken(token)) return;
-  try {
-    sessionStorage.setItem(CLIENT_INVITE_TOKEN_STORAGE_KEY, token);
-  } catch {
-    // private mode
-  }
+  if (typeof document === 'undefined' || !isWellFormedInviteToken(token)) return;
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${CLIENT_INVITE_COOKIE}=${encodeURIComponent(token)}; Path=/invite; Max-Age=${CLIENT_INVITE_COOKIE_MAX_AGE_SEC}; SameSite=Lax${secure}`;
 }
 
-export function readPersistedInviteToken(): string | null {
-  try {
-    const value = sessionStorage.getItem(CLIENT_INVITE_TOKEN_STORAGE_KEY);
+export function readInviteCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  const parts = document.cookie.split(';');
+  for (const part of parts) {
+    const [name, ...rest] = part.trim().split('=');
+    if (name !== CLIENT_INVITE_COOKIE) continue;
+    const value = decodeURIComponent(rest.join('='));
     return isWellFormedInviteToken(value) ? value : null;
-  } catch {
-    return null;
   }
+  return null;
 }
 
 export function clearPersistedInviteToken(): void {
-  try {
-    sessionStorage.removeItem(CLIENT_INVITE_TOKEN_STORAGE_KEY);
-  } catch {
-    // ignore
+  if (typeof document === 'undefined') return;
+  document.cookie = `${CLIENT_INVITE_COOKIE}=; Path=/invite; Max-Age=0; SameSite=Lax`;
+}
+
+/** Re-read :token, ?token=, then the Path=/invite cookie. Never localStorage. */
+export function readInviteTokenFromLocation(input: {
+  pathToken?: string | null;
+  pathname?: string;
+  search?: string;
+}): string | null {
+  const candidates = [input.pathToken, null, null] as Array<string | null>;
+  if (input.pathToken) {
+    try {
+      candidates[0] = decodeURIComponent(input.pathToken);
+    } catch {
+      candidates[0] = input.pathToken;
+    }
   }
+  const pathname = input.pathname || '';
+  const pathMatch = pathname.match(/^\/invite\/([^/?#]+)/);
+  if (pathMatch) {
+    try {
+      candidates[1] = decodeURIComponent(pathMatch[1]);
+    } catch {
+      candidates[1] = pathMatch[1];
+    }
+  }
+  const rawSearch = input.search || '';
+  const params = new URLSearchParams(rawSearch.startsWith('?') ? rawSearch.slice(1) : rawSearch);
+  candidates[2] = params.get('token');
+
+  for (const value of candidates) {
+    if (isWellFormedInviteToken(value)) return value;
+  }
+  return readInviteCookie();
+}
+
+/** Google redirectTo carries a sanitized invite return so the hop is not storage-only. */
+export function buildGoogleInviteRedirectTo(
+  token: string | null | undefined,
+  origin = typeof window !== 'undefined' ? window.location.origin : '',
+): string {
+  const callback = `${origin}/auth/callback`;
+  if (!isWellFormedInviteToken(token)) return callback;
+  const resume = sanitizeInviteReturn(inviteResumePath(token));
+  if (!INVITE_PATH_RE.test(resume)) return callback;
+  const next = encodeURIComponent(resume);
+  return `${callback}?next=${next}&token=${encodeURIComponent(token)}`;
+}
+
+export function resumePathAfterAuth(next: string | null | undefined, token: string | null | undefined): string {
+  if (isWellFormedInviteToken(token)) return sanitizeInviteReturn(inviteResumePath(token));
+  if (!next) return '/';
+  const sanitized = sanitizeInviteReturn(next);
+  return sanitized.startsWith('/invite/') ? sanitized : '/';
 }
 
 /** Share body is welcome copy + link only. No other clients' PII. */

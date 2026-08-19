@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -17,6 +17,7 @@ import {
   isWellFormedInviteToken,
   medicalInviteAppKey,
   persistInviteToken,
+  readInviteTokenFromLocation,
 } from '@/lib/clientInvite';
 
 const db = supabase as unknown as {
@@ -33,10 +34,19 @@ function formatAmount(amount: number | null | undefined, currency: string) {
 }
 
 export default function ClientInviteWelcome() {
-  const { token = '' } = useParams();
+  const { token: pathToken = '' } = useParams();
+  const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const appKey = medicalInviteAppKey();
-  const cleanToken = useMemo(() => decodeURIComponent(token).trim(), [token]);
+  const cleanToken = useMemo(
+    () =>
+      readInviteTokenFromLocation({
+        pathToken,
+        pathname: typeof window !== 'undefined' ? window.location.pathname : '',
+        search: searchParams.toString(),
+      }) || '',
+    [pathToken, searchParams],
+  );
   const validToken = isWellFormedInviteToken(cleanToken);
   const [preview, setPreview] = useState<PreviewClientInvite | null>(null);
   const [redeemed, setRedeemed] = useState<RedeemClientInvite | null>(null);

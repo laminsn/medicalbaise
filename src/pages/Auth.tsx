@@ -31,7 +31,7 @@ import {
   getRemainingAttempts,
   formatLockoutTime,
 } from '@/lib/security';
-import { inviteResumePath, isWellFormedInviteToken, persistInviteToken } from '@/lib/clientInvite';
+import { buildGoogleInviteRedirectTo, inviteResumePath, isWellFormedInviteToken, persistInviteToken } from '@/lib/clientInvite';
 
 const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
 
@@ -140,7 +140,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: buildGoogleInviteRedirectTo(inviteToken, window.location.origin),
           queryParams: {
             prompt: 'select_account',
           },
