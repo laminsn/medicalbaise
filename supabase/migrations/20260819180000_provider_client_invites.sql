@@ -176,7 +176,23 @@ REVOKE ALL ON TABLE public.provider_client_invite_items FROM PUBLIC, anon, authe
 REVOKE ALL ON TABLE public.provider_client_invite_sends FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON TABLE public.provider_client_invite_redeem_attempts FROM PUBLIC, anon, authenticated;
 
-GRANT SELECT ON TABLE public.provider_client_invites TO authenticated;
+-- Participants may SELECT invite rows they own/redeemed, but never token_hash.
+-- service_role + SECURITY DEFINER RPCs keep full-row access for hash-compare.
+GRANT SELECT (
+  id,
+  provider_id,
+  invited_by,
+  app_key,
+  status,
+  expires_at,
+  redeemed_by,
+  redeemed_at,
+  revoked_at,
+  metadata,
+  created_at,
+  updated_at
+) ON TABLE public.provider_client_invites TO authenticated;
+GRANT SELECT ON TABLE public.provider_client_invites TO service_role;
 GRANT SELECT ON TABLE public.provider_client_invite_items TO authenticated;
 GRANT SELECT ON TABLE public.provider_client_invite_sends TO authenticated;
 
