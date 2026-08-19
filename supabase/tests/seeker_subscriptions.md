@@ -68,13 +68,17 @@ Do not reuse MD provider `prod_TwYB…` / `price_1Syf5…` or Casa `prod_TwTA…
 
 ## Webhook
 
-Seeker branch writes **only** `seeker_subscriptions`.
+Pattern lives in the existing `supabase/functions/stripe-webhook/index.ts`. Do not copy a snapshot webhook file.
 
-Fail-closed `app_key` from metadata (`medical` required).
+`event.id` persist: insert into `stripe_webhook_events.id` after signature verify, before handlers. Duplicate `23505` → `{ received: true }` and skip. Handler throw deletes the row so Stripe can retry.
 
-Do not write `providers.subscription_tier`.
+Detect seeker **first**, then `break`. Never fall through to `providers.subscription_tier`. Signals: `role=seeker`, `type=seeker`, plan `flex|lifestyle|project`, matching `STRIPE_PRICE_SEEKER_*` when the id is `price_*`, or an existing `seeker_subscriptions` row for that Stripe subscription. Missing plan or unresolved user → log and `break`. Not return-true-only.
 
-Do not rewrite provider `TIER_BY_PRODUCT_ID`. Inherited Casa `prod_TwTA…` mapping stays as-is (elite/enterprise persist as pro via existing fallback).
+Seeker writes **only** `seeker_subscriptions`. Hardcoded `app_key=medical`. Slugs `flex|lifestyle|project`. Non-medical metadata `app_key` → log and `break`. Deleted seeker rows go to `flex` / `canceled`.
+
+Provider writes are map-only `TIER_BY_PRODUCT_ID`. Skip when `productId` is missing or not in the map. Never `|| "pro"`. Casa IDs stay as-is (`prod_TwTARyUfpaG4ct` pro, `prod_TwTBPPowJkNd38` elite, `prod_TwTBPPFYSvdcUa` enterprise) — do not remap. `customer.subscription.deleted` → `free` only for a mapped provider product.
+
+No `DO_NOT_DEPLOY`. No `|| casa`.
 
 ## UI
 

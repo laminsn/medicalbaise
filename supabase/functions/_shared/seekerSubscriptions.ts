@@ -59,6 +59,10 @@ export function requireMedicalAppKey(): string {
   return MEDICAL_APP_KEY;
 }
 
+export function isSeekerPlan(value: unknown): value is SeekerPlan {
+  return value === "flex" || value === "lifestyle" || value === "project";
+}
+
 export function isSeekerStripePlan(value: unknown): value is SeekerStripePlan {
   return value === "lifestyle" || value === "project";
 }
@@ -68,6 +72,25 @@ export function seekerPriceAllowlist(): Record<SeekerStripePlan, string> {
     lifestyle: String(Deno.env.get("STRIPE_PRICE_SEEKER_LIFESTYLE") || "").trim(),
     project: String(Deno.env.get("STRIPE_PRICE_SEEKER_PROJECT") || "").trim(),
   };
+}
+
+export function matchSeekerPriceId(priceId: unknown): SeekerStripePlan | null {
+  if (typeof priceId !== "string" || !priceId.startsWith("price_")) return null;
+  const allow = seekerPriceAllowlist();
+  if (allow.lifestyle && priceId === allow.lifestyle) return "lifestyle";
+  if (allow.project && priceId === allow.project) return "project";
+  return null;
+}
+
+export function isSeekerTypedStripeEvent(
+  metadata: Record<string, string> | null | undefined,
+  priceId?: unknown,
+): boolean {
+  const meta = metadata || {};
+  if (meta.role === SEEKER_ROLE) return true;
+  if (meta.type === "seeker") return true;
+  if (isSeekerPlan(meta.plan)) return true;
+  return matchSeekerPriceId(priceId) !== null;
 }
 
 export function resolveSeekerPriceId(plan: SeekerStripePlan): string {

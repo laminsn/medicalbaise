@@ -4,10 +4,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.0";
 import { getCorsHeaders } from "../_shared/security.ts";
 import {
   MEDICAL_APP_KEY,
-  SEEKER_ROLE,
   clientEmailFromMetadata,
   consumeSeekerPaidTransaction,
   isSeekerStripePlan,
+  isSeekerTypedStripeEvent,
+  isSeekerUserId,
+  matchSeekerPriceId,
   resolveSeekerUserId,
 } from "../_shared/seekerSubscriptions.ts";
 
@@ -354,7 +356,7 @@ async function markProviderPaymentPlanItemPaid(
       },
       target_email: null,
       target_phone: null,
-      target_app_key: Deno.env.get("BAISE_APP_KEY") || "casa",
+      target_app_key: MEDICAL_APP_KEY,
       target_locale: "en",
       target_audience: "client",
     });
@@ -456,6 +458,14 @@ async function markProviderPaymentPlanItemFailed(
   });
 }
 
+type AdminClient = ReturnType<typeof createClient>;
+
+type SeekerSubscriptionRow = {
+  id: string;
+  user_id: string;
+  plan: string;
+};
+
 function unixToIso(value: unknown): string | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return new Date(value * 1000).toISOString();
@@ -477,12 +487,78 @@ function subscriptionPeriod(subscription: Stripe.Subscription) {
   return { start, end };
 }
 
-function seekerMetadata(source: { metadata?: Stripe.Metadata | null } | null | undefined) {
-  return source?.metadata || {};
+function asMetadata(source: { metadata?: Stripe.Metadata | null } | null | undefined) {
+  return (source?.metadata || {}) as Record<string, string>;
+}
+
+function mergedMetadata(
+  ...sources: Array<{ metadata?: Stripe.Metadata | null } | null | undefined>
+) {
+  return Object.assign({}, ...sources.map((source) => asMetadata(source))) as Record<string, string>;
+}
+
+function stripePriceId(subscription: Stripe.Subscription | null | undefined): string | null {
+  const priceId = subscription?.items.data[0]?.price?.id;
+  return typeof priceId === "string" ? priceId : null;
+}
+
+function stripeProductId(subscription: Stripe.Subscription | null | undefined): string | null {
+  const product = subscription?.items.data[0]?.price?.product;
+  if (typeof product === "string") return product;
+  if (product && typeof product === "object" && "id" in product && typeof product.id === "string") {
+    return product.id;
+  }
+  return null;
+}
+
+function mappedProviderTier(productId: string | null | undefined): string | null {
+  if (!productId) return null;
+  return TIER_BY_PRODUCT_ID[productId] ?? null;
+}
+
+function isSeekerTyped(
+  metadata: Record<string, string>,
+  priceId: string | null | undefined,
+  existing?: SeekerSubscriptionRow | null,
+) {
+  if (existing) return true;
+  return isSeekerTypedStripeEvent(metadata, priceId);
+}
+
+function seekerAppKeyRejected(metadata: Record<string, string>) {
+  return Boolean(metadata.app_key) && metadata.app_key !== MEDICAL_APP_KEY;
+}
+
+async function lookupSeekerByStripeSubscription(
+  supabaseAdmin: AdminClient,
+  subscriptionId: string | null | undefined,
+): Promise<SeekerSubscriptionRow | null> {
+  if (!subscriptionId) return null;
+  const { data } = await supabaseAdmin
+    .from("seeker_subscriptions")
+    .select("id, user_id, plan")
+    .eq("stripe_subscription_id", subscriptionId)
+    .eq("app_key", MEDICAL_APP_KEY)
+    .maybeSingle();
+  return data ?? null;
+}
+
+async function persistStripeEventId(supabaseAdmin: AdminClient, event: Stripe.Event) {
+  const { error } = await supabaseAdmin.from("stripe_webhook_events").insert({
+    id: event.id,
+    event_type: event.type,
+  });
+  if (!error) return "inserted" as const;
+  if (error.code === "23505") return "duplicate" as const;
+  throw error;
+}
+
+async function forgetStripeEventId(supabaseAdmin: AdminClient, eventId: string) {
+  await supabaseAdmin.from("stripe_webhook_events").delete().eq("id", eventId);
 }
 
 async function writeSeekerSubscription(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: AdminClient,
   input: {
     userId: string;
     plan: "lifestyle" | "project";
@@ -538,62 +614,75 @@ async function writeSeekerSubscription(
 }
 
 async function applySeekerCheckoutSession(
-  supabaseAdmin: ReturnType<typeof createClient>,
-  stripe: Stripe,
+  supabaseAdmin: AdminClient,
   session: Stripe.Checkout.Session,
-): Promise<boolean> {
-  const metadata = seekerMetadata(session);
-  if (metadata.role !== SEEKER_ROLE) return false;
-  if (metadata.app_key !== MEDICAL_APP_KEY) {
-    console.error("seeker checkout fail-closed: app_key");
-    return true;
-  }
-  if (!isSeekerStripePlan(metadata.plan) || !metadata.user_id || !session.subscription) {
-    console.error("seeker checkout fail-closed: plan or user");
-    return true;
+  subscription: Stripe.Subscription | null,
+  eventId: string,
+) {
+  const metadata = mergedMetadata(subscription, session);
+  if (seekerAppKeyRejected(metadata)) {
+    console.error("seeker-typed stripe event fail-closed: app_key", {
+      eventId,
+      app_key: metadata.app_key,
+    });
+    return;
   }
 
-  const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+  const userId = isSeekerUserId(metadata.user_id) ? metadata.user_id : null;
+  if (!userId) {
+    console.error("seeker-typed stripe event fail-closed: unresolved user", { eventId });
+    return;
+  }
+
+  const plan = isSeekerStripePlan(metadata.plan)
+    ? metadata.plan
+    : matchSeekerPriceId(stripePriceId(subscription));
+  if (!plan || !subscription) {
+    console.error("seeker-typed stripe event fail-closed: missing plan", {
+      eventId,
+      plan: metadata.plan || null,
+    });
+    return;
+  }
+
   const period = subscriptionPeriod(subscription);
   await writeSeekerSubscription(supabaseAdmin, {
-    userId: metadata.user_id,
-    plan: metadata.plan,
+    userId,
+    plan,
     status: subscription.status === "active" ? "active" : subscription.status,
     stripeCustomerId: (session.customer as string) || null,
     stripeSubscriptionId: subscription.id,
-    stripePriceId: subscription.items.data[0]?.price?.id || null,
+    stripePriceId: stripePriceId(subscription),
     periodStart: period.start,
     periodEnd: period.end,
     cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
     resetCount: true,
   });
-  return true;
 }
 
 async function applySeekerSubscriptionLifecycle(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: AdminClient,
   subscription: Stripe.Subscription,
+  existing: SeekerSubscriptionRow | null,
   deleted: boolean,
-): Promise<boolean> {
-  const metadata = seekerMetadata(subscription);
-  const { data: existing } = await supabaseAdmin
-    .from("seeker_subscriptions")
-    .select("id, user_id, plan")
-    .eq("stripe_subscription_id", subscription.id)
-    .maybeSingle();
-
-  if (metadata.role !== SEEKER_ROLE && !existing) return false;
-
-  const appKey = metadata.app_key || (existing ? MEDICAL_APP_KEY : "");
-  if (appKey !== MEDICAL_APP_KEY) {
-    console.error("seeker subscription fail-closed: app_key");
-    return true;
+  eventId: string,
+) {
+  const metadata = asMetadata(subscription);
+  if (seekerAppKeyRejected(metadata)) {
+    console.error("seeker-typed stripe event fail-closed: app_key", {
+      eventId,
+      app_key: metadata.app_key,
+    });
+    return;
   }
 
-  const userId = metadata.user_id || existing?.user_id;
+  const existingUserId = existing?.user_id;
+  const userId = isSeekerUserId(metadata.user_id)
+    ? metadata.user_id
+    : (isSeekerUserId(existingUserId) ? existingUserId : null);
   if (!userId) {
-    console.error("seeker subscription fail-closed: user");
-    return true;
+    console.error("seeker-typed stripe event fail-closed: unresolved user", { eventId });
+    return;
   }
 
   if (deleted) {
@@ -609,13 +698,20 @@ async function applySeekerSubscriptionLifecycle(
       .eq("user_id", userId)
       .eq("app_key", MEDICAL_APP_KEY);
     if (error) throw error;
-    return true;
+    return;
   }
 
-  const plan = isSeekerStripePlan(metadata.plan) ? metadata.plan : existing?.plan;
-  if (!isSeekerStripePlan(plan)) {
-    console.error("seeker subscription fail-closed: plan");
-    return true;
+  const existingPlan = existing?.plan;
+  const plan = isSeekerStripePlan(metadata.plan)
+    ? metadata.plan
+    : (matchSeekerPriceId(stripePriceId(subscription))
+      || (isSeekerStripePlan(existingPlan) ? existingPlan : null));
+  if (!plan) {
+    console.error("seeker-typed stripe event fail-closed: missing plan", {
+      eventId,
+      plan: metadata.plan || existing?.plan || null,
+    });
+    return;
   }
 
   const period = subscriptionPeriod(subscription);
@@ -625,25 +721,28 @@ async function applySeekerSubscriptionLifecycle(
     status: subscription.status === "active" ? "active" : subscription.status,
     stripeCustomerId: (subscription.customer as string) || null,
     stripeSubscriptionId: subscription.id,
-    stripePriceId: subscription.items.data[0]?.price?.id || null,
+    stripePriceId: stripePriceId(subscription),
     periodStart: period.start,
     periodEnd: period.end,
     cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
   });
-  return true;
 }
 
 async function updateProviderSubscription(
-  supabaseAdmin: ReturnType<typeof createClient>,
-  stripe: Stripe,
+  supabaseAdmin: AdminClient,
   session: Stripe.Checkout.Session,
+  subscription: Stripe.Subscription,
+  eventId: string,
 ) {
   const customerEmail = session.customer_email || session.customer_details?.email;
-  if (!customerEmail || !session.subscription) return;
+  if (!customerEmail) return;
 
-  const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-  const productId = subscription.items.data[0]?.price?.product as string;
-  const tier = TIER_BY_PRODUCT_ID[productId] || "pro";
+  const productId = stripeProductId(subscription);
+  const tier = mappedProviderTier(productId);
+  if (!tier) {
+    console.error("stripe-webhook skip unmapped provider product", { eventId, productId });
+    return;
+  }
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")
@@ -660,6 +759,13 @@ async function updateProviderSubscription(
       stripe_customer_id: session.customer as string,
     })
     .eq("user_id", profile.user_id);
+}
+
+async function received(corsHeaders: Record<string, string>) {
+  return new Response(JSON.stringify({ received: true }), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
 
 serve(async (req) => {
@@ -701,14 +807,39 @@ serve(async (req) => {
   );
 
   try {
+    const persist = await persistStripeEventId(supabaseAdmin, event);
+    if (persist === "duplicate") {
+      return received(corsHeaders);
+    }
+  } catch (err) {
+    console.error("Webhook event.id persist failed:", err);
+    return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         await markProviderPosPaid(supabaseAdmin, session);
         await markProviderPaymentPlanItemPaid(supabaseAdmin, session);
-        const seekerHandled = await applySeekerCheckoutSession(supabaseAdmin, stripe, session);
-        if (!seekerHandled) {
-          await updateProviderSubscription(supabaseAdmin, stripe, session);
+
+        const subscription = session.subscription
+          ? await stripe.subscriptions.retrieve(session.subscription as string)
+          : null;
+        const metadata = mergedMetadata(subscription, session);
+        const priceId = stripePriceId(subscription);
+        const existing = await lookupSeekerByStripeSubscription(supabaseAdmin, subscription?.id);
+
+        if (isSeekerTyped(metadata, priceId, existing)) {
+          await applySeekerCheckoutSession(supabaseAdmin, session, subscription, event.id);
+          break;
+        }
+
+        if (subscription) {
+          await updateProviderSubscription(supabaseAdmin, session, subscription, event.id);
         }
         break;
       }
@@ -721,32 +852,66 @@ serve(async (req) => {
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        const seekerHandled = await applySeekerSubscriptionLifecycle(
-          supabaseAdmin,
-          subscription,
-          false,
-        );
-        if (seekerHandled) break;
-        const customerId = subscription.customer as string;
+        const metadata = asMetadata(subscription);
+        const priceId = stripePriceId(subscription);
+        const existing = await lookupSeekerByStripeSubscription(supabaseAdmin, subscription.id);
+
+        if (isSeekerTyped(metadata, priceId, existing)) {
+          await applySeekerSubscriptionLifecycle(
+            supabaseAdmin,
+            subscription,
+            existing,
+            false,
+            event.id,
+          );
+          break;
+        }
+
+        const productId = stripeProductId(subscription);
+        const tier = mappedProviderTier(productId);
+        if (!tier) {
+          console.error("stripe-webhook skip unmapped provider product", {
+            eventId: event.id,
+            productId,
+          });
+          break;
+        }
+
         if (subscription.status === "active") {
-          const productId = subscription.items.data[0]?.price?.product as string;
-          const tier = TIER_BY_PRODUCT_ID[productId] || "pro";
           await supabaseAdmin
             .from("providers")
             .update({ subscription_tier: tier })
-            .eq("stripe_customer_id", customerId);
+            .eq("stripe_customer_id", subscription.customer as string);
         }
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        const seekerHandled = await applySeekerSubscriptionLifecycle(
-          supabaseAdmin,
-          subscription,
-          true,
-        );
-        if (seekerHandled) break;
+        const metadata = asMetadata(subscription);
+        const priceId = stripePriceId(subscription);
+        const existing = await lookupSeekerByStripeSubscription(supabaseAdmin, subscription.id);
+
+        if (isSeekerTyped(metadata, priceId, existing)) {
+          await applySeekerSubscriptionLifecycle(
+            supabaseAdmin,
+            subscription,
+            existing,
+            true,
+            event.id,
+          );
+          break;
+        }
+
+        const productId = stripeProductId(subscription);
+        if (!mappedProviderTier(productId)) {
+          console.error("stripe-webhook skip unmapped provider subscription deleted", {
+            eventId: event.id,
+            productId,
+          });
+          break;
+        }
+
         await supabaseAdmin
           .from("providers")
           .update({ subscription_tier: "free" })
@@ -764,12 +929,10 @@ serve(async (req) => {
         console.log("Unhandled event type:", event.type);
     }
 
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return received(corsHeaders);
   } catch (err) {
     console.error("Webhook processing error:", err);
+    await forgetStripeEventId(supabaseAdmin, event.id);
     return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
