@@ -36,6 +36,7 @@ import { ProviderFinanceCommandCenter } from '@/components/provider/ProviderFina
 import { ProviderRetentionCommandCenter } from '@/components/provider/ProviderRetentionCommandCenter';
 import { ProviderActivationCommandCenter } from '@/components/provider/ProviderActivationCommandCenter';
 import { PartnerCampaignCommandCenter } from '@/components/partner/PartnerCampaignCommandCenter';
+import { ProviderClientInviteCard } from '@/components/provider/ProviderClientInviteCard';
 import {
   BarChart3,
   Calendar,
@@ -349,6 +350,7 @@ export default function ProviderDashboard() {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-6">
+            {currentProviderId && <ProviderClientInviteCard providerId={currentProviderId} />}
             <ProviderRetentionCommandCenter />
             <ProviderActivationCommandCenter />
             <ProviderCRMWorkspace />

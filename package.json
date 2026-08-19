@@ -10,6 +10,7 @@
     "build:dev": "VITE_BAISE_APP=medical vite build --mode development",
     "lint": "eslint .",
     "test:camera": "node --test src/lib/camera.test.ts",
+    "test:client-invite": "jiti src/lib/clientInvite.test.ts",
     "test:provider-onboarding": "jiti src/lib/providerOnboarding.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "check": "npm run lint -- --quiet && npm run typecheck && npm run test:camera && npm run test:provider-onboarding && npm run test:i18n && npm run build",

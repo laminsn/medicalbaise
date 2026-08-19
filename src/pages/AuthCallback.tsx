@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
+import { inviteResumePath, readPersistedInviteToken } from '@/lib/clientInvite';
 
 const db = supabase as any;
 
@@ -142,7 +143,8 @@ export default function AuthCallback() {
       }
 
       clearTimeout(timer);
-      go('/');
+      const inviteToken = readPersistedInviteToken();
+      go(inviteToken ? inviteResumePath(inviteToken) : '/');
       recordAttribution(session.user.id, session.user.email || null);
     };
 
