@@ -1808,6 +1808,43 @@
       "scheduledReports": "Informes por correo electrónico programados"
     }
   },
+  "seekerPricing": {
+    "title": "Planes para pacientes",
+    "subtitle": "Pague por cada servicio completado o elija un plan mensual para pacientes.",
+    "choosePlan": "Elija un plan para pacientes",
+    "month": "mes",
+    "mostPopular": "Más popular",
+    "selectPlan": "Seleccionar plan",
+    "currentPlan": "Plan actual",
+    "yourPlan": "Tu plan",
+    "openingCheckout": "Abriendo el pago...",
+    "checkoutFailed": "No se pudo iniciar el pago",
+    "cancelAnytime": "Cancele Lifestyle o Project cuando quiera. Flex sigue siendo el predeterminado.",
+    "usedOfLimit": "{{used}}/{{limit}} servicios pagos completados en este período",
+    "plans": {
+      "flex": {
+        "name": "Flex",
+        "description": "Predeterminado. Sin cargo mensual."
+      },
+      "lifestyle": {
+        "name": "Lifestyle",
+        "description": "Ocho servicios pagos completados cada mes"
+      },
+      "project": {
+        "name": "Project",
+        "description": "Servicios pagos completados ilimitados"
+      }
+    },
+    "features": {
+      "payPerService": "Pague solo cuando se cobre una consulta o factura",
+      "platformFee": "Tarifa de plataforma del {{percent}}%, mínimo {{min}}",
+      "noMonthlyCharge": "Sin suscripción mensual",
+      "eightPaidServices": "8 servicios pagos completados por mes",
+      "zeroFee": "0% de tarifa de plataforma en esos servicios",
+      "monthlyBilling": "Facturación mensual en reales brasileños",
+      "unlimitedServices": "Servicios pagos completados ilimitados"
+    }
+  },
   "reviews": {
     "title": "Reseñas",
     "subtitle": "Ver y gestionar tus reseñas",

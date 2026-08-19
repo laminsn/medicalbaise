@@ -31,7 +31,8 @@ import {
   CheckCircle,
   Search,
   MessageSquare,
-  ReceiptText
+  ReceiptText,
+  CreditCard
 } from 'lucide-react';
 
 export default function CustomerDashboard() {
@@ -193,6 +194,12 @@ export default function CustomerDashboard() {
               description: 'Review provider conversations and follow-ups.',
               icon: MessageSquare,
               onClick: () => navigate('/messages'),
+            },
+            {
+              label: t('seekerPricing.title'),
+              description: t('seekerPricing.subtitle'),
+              icon: CreditCard,
+              onClick: () => navigate('/seeker-pricing'),
             },
           ]}
         />

@@ -54,6 +54,7 @@ const MapView = lazy(() => import("./pages/MapView"));
 const Chat = lazy(() => import("./pages/Chat"));
 const SocialFeed = lazy(() => import("./pages/SocialFeed"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const SeekerPricing = lazy(() => import("./pages/SeekerPricing"));
 const Reviews = lazy(() => import("./pages/Reviews"));
 const ServicesSettings = lazy(() => import("./pages/ServicesSettings"));
 const ServiceEditor = lazy(() => import("./pages/ServiceEditor"));
@@ -195,6 +196,7 @@ const App = () => (
                     <Route path="/chat/:id" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                     <Route path="/feed" element={<ProtectedRoute><SocialFeed /></ProtectedRoute>} />
                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/seeker-pricing" element={<SeekerPricing />} />
                     <Route path="/reviews" element={<Reviews />} />
                     <Route path="/services" element={<ProtectedRoute><ServicesSettings /></ProtectedRoute>} />
                     <Route path="/services-settings" element={<ProtectedRoute><ServicesSettings /></ProtectedRoute>} />

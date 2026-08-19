@@ -1808,6 +1808,43 @@
       "scheduledReports": "Scheduled email reports"
     }
   },
+  "seekerPricing": {
+    "title": "Patient plans",
+    "subtitle": "Pay per completed service or choose a monthly patient plan.",
+    "choosePlan": "Choose a patient plan",
+    "month": "month",
+    "mostPopular": "Most Popular",
+    "selectPlan": "Select plan",
+    "currentPlan": "Current plan",
+    "yourPlan": "Your plan",
+    "openingCheckout": "Opening checkout...",
+    "checkoutFailed": "Could not start checkout",
+    "cancelAnytime": "Cancel Lifestyle or Project anytime. Flex stays the default.",
+    "usedOfLimit": "{{used}}/{{limit}} completed paid services this period",
+    "plans": {
+      "flex": {
+        "name": "Flex",
+        "description": "Default. No monthly charge."
+      },
+      "lifestyle": {
+        "name": "Lifestyle",
+        "description": "Eight completed paid services each month"
+      },
+      "project": {
+        "name": "Project",
+        "description": "Unlimited completed paid services"
+      }
+    },
+    "features": {
+      "payPerService": "Pay only when a consult or invoice is paid",
+      "platformFee": "{{percent}}% platform fee, {{min}} minimum",
+      "noMonthlyCharge": "No monthly subscription",
+      "eightPaidServices": "8 completed paid services per month",
+      "zeroFee": "0% platform fee on those services",
+      "monthlyBilling": "Billed monthly in Brazilian reais",
+      "unlimitedServices": "Unlimited completed paid services"
+    }
+  },
   "reviews": {
     "title": "Reviews",
     "subtitle": "View and manage your reviews",

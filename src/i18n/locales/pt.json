@@ -1808,6 +1808,43 @@
       "scheduledReports": "Relatórios agendados por email"
     }
   },
+  "seekerPricing": {
+    "title": "Planos do paciente",
+    "subtitle": "Pague por serviço concluído ou escolha um plano mensal de paciente.",
+    "choosePlan": "Escolha um plano de paciente",
+    "month": "mês",
+    "mostPopular": "Mais popular",
+    "selectPlan": "Selecionar plano",
+    "currentPlan": "Plano atual",
+    "yourPlan": "Seu plano",
+    "openingCheckout": "Abrindo o checkout...",
+    "checkoutFailed": "Não foi possível iniciar o checkout",
+    "cancelAnytime": "Cancele Lifestyle ou Project quando quiser. Flex continua o padrão.",
+    "usedOfLimit": "{{used}}/{{limit}} serviços pagos concluídos neste período",
+    "plans": {
+      "flex": {
+        "name": "Flex",
+        "description": "Padrão. Sem cobrança mensal."
+      },
+      "lifestyle": {
+        "name": "Lifestyle",
+        "description": "Oito serviços pagos concluídos por mês"
+      },
+      "project": {
+        "name": "Project",
+        "description": "Serviços pagos concluídos ilimitados"
+      }
+    },
+    "features": {
+      "payPerService": "Pague só quando a consulta ou a fatura for paga",
+      "platformFee": "Taxa de {{percent}}% da plataforma, mínimo de {{min}}",
+      "noMonthlyCharge": "Sem assinatura mensal",
+      "eightPaidServices": "8 serviços pagos concluídos por mês",
+      "zeroFee": "0% de taxa da plataforma nesses serviços",
+      "monthlyBilling": "Cobrança mensal em reais",
+      "unlimitedServices": "Serviços pagos concluídos ilimitados"
+    }
+  },
   "reviews": {
     "title": "Avaliações",
     "subtitle": "Visualize e gerencie suas avaliações",

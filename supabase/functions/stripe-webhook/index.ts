@@ -2,6 +2,12 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.0";
 import { getCorsHeaders } from "../_shared/security.ts";
+import {
+  MEDICAL_APP_KEY,
+  SEEKER_ROLE,
+  consumeSeekerPaidTransaction,
+  isSeekerStripePlan,
+} from "../_shared/seekerSubscriptions.ts";
 
 const TIER_BY_PRODUCT_ID: Record<string, string> = {
   prod_TwTARyUfpaG4ct: "pro",
@@ -58,6 +64,13 @@ async function markProviderPosPaid(
     .eq("id", invoiceId);
 
   if (invoiceError) throw invoiceError;
+
+  const { data: paidInvoice } = await supabaseAdmin
+    .from("provider_invoices")
+    .select("customer_id")
+    .eq("id", invoiceId)
+    .maybeSingle();
+  await consumeSeekerPaidTransaction(supabaseAdmin, paidInvoice?.customer_id);
 
   await supabaseAdmin.from("provider_ledger_entries").insert({
     provider_id: providerId,
@@ -240,6 +253,10 @@ async function markProviderPaymentPlanItemPaid(
     .eq("id", planId)
     .maybeSingle();
 
+  if (isPlanComplete) {
+    await consumeSeekerPaidTransaction(supabaseAdmin, plan?.customer_id);
+  }
+
   if (plan?.customer_id) {
     await supabaseAdmin.from("provider_communication_events").insert({
       provider_id: providerId,
@@ -399,6 +416,183 @@ async function markProviderPaymentPlanItemFailed(
   });
 }
 
+function unixToIso(value: unknown): string | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return new Date(value * 1000).toISOString();
+}
+
+function subscriptionPeriod(subscription: Stripe.Subscription) {
+  const item = subscription.items.data[0] as Stripe.SubscriptionItem & {
+    current_period_start?: number;
+    current_period_end?: number;
+  };
+  const start = unixToIso(
+    (subscription as Stripe.Subscription & { current_period_start?: number }).current_period_start
+      ?? item?.current_period_start,
+  );
+  const end = unixToIso(
+    (subscription as Stripe.Subscription & { current_period_end?: number }).current_period_end
+      ?? item?.current_period_end,
+  );
+  return { start, end };
+}
+
+function seekerMetadata(source: { metadata?: Stripe.Metadata | null } | null | undefined) {
+  return source?.metadata || {};
+}
+
+async function writeSeekerSubscription(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  input: {
+    userId: string;
+    plan: "lifestyle" | "project";
+    status: string;
+    stripeCustomerId: string | null;
+    stripeSubscriptionId: string | null;
+    stripePriceId: string | null;
+    periodStart: string | null;
+    periodEnd: string | null;
+    cancelAtPeriodEnd?: boolean;
+    resetCount?: boolean;
+  },
+) {
+  const { data: existing } = await supabaseAdmin
+    .from("seeker_subscriptions")
+    .select("id, transaction_count, current_period_start")
+    .eq("user_id", input.userId)
+    .eq("app_key", MEDICAL_APP_KEY)
+    .maybeSingle();
+
+  const periodChanged = Boolean(
+    existing?.current_period_start
+    && input.periodStart
+    && existing.current_period_start !== input.periodStart,
+  );
+  const transactionCount = input.resetCount || periodChanged ? 0 : existing?.transaction_count ?? 0;
+
+  const row = {
+    user_id: input.userId,
+    app_key: MEDICAL_APP_KEY,
+    plan: input.plan,
+    status: input.status,
+    stripe_customer_id: input.stripeCustomerId,
+    stripe_subscription_id: input.stripeSubscriptionId,
+    stripe_price_id: input.stripePriceId,
+    current_period_start: input.periodStart,
+    current_period_end: input.periodEnd,
+    cancel_at_period_end: Boolean(input.cancelAtPeriodEnd),
+    transaction_count: transactionCount,
+  };
+
+  if (existing?.id) {
+    const { error } = await supabaseAdmin
+      .from("seeker_subscriptions")
+      .update(row)
+      .eq("id", existing.id);
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await supabaseAdmin.from("seeker_subscriptions").insert(row);
+  if (error) throw error;
+}
+
+async function applySeekerCheckoutSession(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  stripe: Stripe,
+  session: Stripe.Checkout.Session,
+): Promise<boolean> {
+  const metadata = seekerMetadata(session);
+  if (metadata.role !== SEEKER_ROLE) return false;
+  if (metadata.app_key !== MEDICAL_APP_KEY) {
+    console.error("seeker checkout fail-closed: app_key");
+    return true;
+  }
+  if (!isSeekerStripePlan(metadata.plan) || !metadata.user_id || !session.subscription) {
+    console.error("seeker checkout fail-closed: plan or user");
+    return true;
+  }
+
+  const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+  const period = subscriptionPeriod(subscription);
+  await writeSeekerSubscription(supabaseAdmin, {
+    userId: metadata.user_id,
+    plan: metadata.plan,
+    status: subscription.status === "active" ? "active" : subscription.status,
+    stripeCustomerId: (session.customer as string) || null,
+    stripeSubscriptionId: subscription.id,
+    stripePriceId: subscription.items.data[0]?.price?.id || null,
+    periodStart: period.start,
+    periodEnd: period.end,
+    cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
+    resetCount: true,
+  });
+  return true;
+}
+
+async function applySeekerSubscriptionLifecycle(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  subscription: Stripe.Subscription,
+  deleted: boolean,
+): Promise<boolean> {
+  const metadata = seekerMetadata(subscription);
+  const { data: existing } = await supabaseAdmin
+    .from("seeker_subscriptions")
+    .select("id, user_id, plan")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+
+  if (metadata.role !== SEEKER_ROLE && !existing) return false;
+
+  const appKey = metadata.app_key || (existing ? MEDICAL_APP_KEY : "");
+  if (appKey !== MEDICAL_APP_KEY) {
+    console.error("seeker subscription fail-closed: app_key");
+    return true;
+  }
+
+  const userId = metadata.user_id || existing?.user_id;
+  if (!userId) {
+    console.error("seeker subscription fail-closed: user");
+    return true;
+  }
+
+  if (deleted) {
+    const { error } = await supabaseAdmin
+      .from("seeker_subscriptions")
+      .update({
+        plan: "flex",
+        status: "canceled",
+        stripe_subscription_id: null,
+        stripe_price_id: null,
+        cancel_at_period_end: false,
+      })
+      .eq("user_id", userId)
+      .eq("app_key", MEDICAL_APP_KEY);
+    if (error) throw error;
+    return true;
+  }
+
+  const plan = isSeekerStripePlan(metadata.plan) ? metadata.plan : existing?.plan;
+  if (!isSeekerStripePlan(plan)) {
+    console.error("seeker subscription fail-closed: plan");
+    return true;
+  }
+
+  const period = subscriptionPeriod(subscription);
+  await writeSeekerSubscription(supabaseAdmin, {
+    userId,
+    plan,
+    status: subscription.status === "active" ? "active" : subscription.status,
+    stripeCustomerId: (subscription.customer as string) || null,
+    stripeSubscriptionId: subscription.id,
+    stripePriceId: subscription.items.data[0]?.price?.id || null,
+    periodStart: period.start,
+    periodEnd: period.end,
+    cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
+  });
+  return true;
+}
+
 async function updateProviderSubscription(
   supabaseAdmin: ReturnType<typeof createClient>,
   stripe: Stripe,
@@ -472,7 +666,10 @@ serve(async (req) => {
         const session = event.data.object as Stripe.Checkout.Session;
         await markProviderPosPaid(supabaseAdmin, session);
         await markProviderPaymentPlanItemPaid(supabaseAdmin, session);
-        await updateProviderSubscription(supabaseAdmin, stripe, session);
+        const seekerHandled = await applySeekerCheckoutSession(supabaseAdmin, stripe, session);
+        if (!seekerHandled) {
+          await updateProviderSubscription(supabaseAdmin, stripe, session);
+        }
         break;
       }
 
@@ -484,6 +681,12 @@ serve(async (req) => {
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
+        const seekerHandled = await applySeekerSubscriptionLifecycle(
+          supabaseAdmin,
+          subscription,
+          false,
+        );
+        if (seekerHandled) break;
         const customerId = subscription.customer as string;
         if (subscription.status === "active") {
           const productId = subscription.items.data[0]?.price?.product as string;
@@ -498,6 +701,12 @@ serve(async (req) => {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
+        const seekerHandled = await applySeekerSubscriptionLifecycle(
+          supabaseAdmin,
+          subscription,
+          true,
+        );
+        if (seekerHandled) break;
         await supabaseAdmin
           .from("providers")
           .update({ subscription_tier: "free" })
