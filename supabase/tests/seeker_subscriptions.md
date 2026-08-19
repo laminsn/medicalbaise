@@ -14,15 +14,16 @@ Do not use `payg`, `free`, `pro`, `elite`, or `baise+` as a seeker slug.
 
 ## Table
 
-`public.seeker_subscriptions` columns: `id`, `user_id`, `app_key`, `plan`, `status`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, `current_period_start`, `current_period_end`, `cancel_at_period_end`, `transaction_count`, `created_at`, `updated_at`.
+`public.seeker_subscriptions` columns: `id`, `user_id`, `app_key`, `plan`, `status`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, `current_period_start`, `current_period_end`, `cancel_at_period_end`, `transactions_used`, `created_at`, `updated_at`.
 
 This tree: `app_key = 'medical'` only. `plan` enum is `flex | lifestyle | project`. Default plan is `flex`.
 
 ## RLS
 
 - Authenticated SELECT uses a column grant that omits `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`.
+- GRANT SELECT lists `transactions_used` (not `transaction_count`, not `transactions_used_this_period`). `transactions_limit` is not granted.
 - Own-row SELECT policy: `auth.uid() = user_id`.
-- No authenticated INSERT/UPDATE/DELETE. Clients cannot write `plan`, `status`, Stripe ids, or `transaction_count`.
+- No authenticated INSERT/UPDATE/DELETE. Clients cannot write `plan`, `status`, Stripe ids, or `transactions_used`.
 - `anon` has no SELECT (or any other privilege).
 - `service_role` writes the row.
 
@@ -89,7 +90,7 @@ No `DO_NOT_DEPLOY`. No `|| casa`.
 - `/seeker-pricing` + `seekerPricing.*` in `en` / `es` / `pt`.
 - MD `/pricing` stays provider-only for the Free/Pro/Elite/Enterprise USD ladder. A sibling seeker **block** (not a restyle of the provider cards) renders the marketing `.plan-card` Flex/Lifestyle/Project BRL trio. Do not convert provider USD ($0/$29/$59/$109) with USD×5.05. Provider-role checkout stays on the provider ladder.
 - Seeker cards: uppercase plan eyebrow only (FLEX / LIFESTYLE / PROJECT). No second audience eyebrow on the cards. Flex Default pill optional. Lifestyle uses BEST FOR REPEAT BOOKINGS and `{used} / 8` in the fee chip. Project uses `#7c3aed` Pro-family chrome — never `.enterprise`, `--tech`, `From R$`, or red/yellow dual glow.
-- Lifestyle `{used} / 8` is `transaction_count` from the server SELECT list, rendered in `.fee-callout` only (no tick bar, no shadcn Progress).
+- Lifestyle `{used} / 8` is `transactions_used` from the server SELECT list, rendered in `.fee-callout` only (no tick bar, no shadcn Progress). Never `transaction_count` or `transactions_used_this_period`.
 - `/pricing` provider cards stay the existing shadcn ladder. Checkout does not change `user_type` or provider tier.
 
 ## Out of scope

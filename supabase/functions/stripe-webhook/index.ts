@@ -574,7 +574,7 @@ async function writeSeekerSubscription(
 ) {
   const { data: existing } = await supabaseAdmin
     .from("seeker_subscriptions")
-    .select("id, transaction_count, current_period_start")
+    .select("id, transactions_used, current_period_start")
     .eq("user_id", input.userId)
     .eq("app_key", MEDICAL_APP_KEY)
     .maybeSingle();
@@ -584,7 +584,7 @@ async function writeSeekerSubscription(
     && input.periodStart
     && existing.current_period_start !== input.periodStart,
   );
-  const transactionCount = input.resetCount || periodChanged ? 0 : existing?.transaction_count ?? 0;
+  const transactionsUsed = input.resetCount || periodChanged ? 0 : existing?.transactions_used ?? 0;
 
   const row = {
     user_id: input.userId,
@@ -597,7 +597,7 @@ async function writeSeekerSubscription(
     current_period_start: input.periodStart,
     current_period_end: input.periodEnd,
     cancel_at_period_end: Boolean(input.cancelAtPeriodEnd),
-    transaction_count: transactionCount,
+    transactions_used: transactionsUsed,
   };
 
   if (existing?.id) {

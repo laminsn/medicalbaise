@@ -10,7 +10,7 @@ import {
 interface SeekerSubscriptionState {
   plan: SeekerPlan;
   status: string;
-  transactionCount: number;
+  transactionsUsed: number;
   currentPeriodEnd: string | null;
   loading: boolean;
 }
@@ -18,7 +18,7 @@ interface SeekerSubscriptionState {
 const emptyState: SeekerSubscriptionState = {
   plan: DEFAULT_SEEKER_PLAN,
   status: 'active',
-  transactionCount: 0,
+  transactionsUsed: 0,
   currentPeriodEnd: null,
   loading: true,
 };
@@ -35,7 +35,7 @@ export function useSeekerSubscription() {
 
     const { data, error } = await supabase
       .from('seeker_subscriptions')
-      .select('plan, status, transaction_count, current_period_end')
+      .select('plan, status, transactions_used, current_period_end')
       .eq('user_id', user.id)
       .eq('app_key', 'medical')
       .maybeSingle();
@@ -51,7 +51,7 @@ export function useSeekerSubscription() {
     setState({
       plan,
       status: data?.status || 'active',
-      transactionCount: data?.transaction_count ?? 0,
+      transactionsUsed: data?.transactions_used ?? 0,
       currentPeriodEnd: data?.current_period_end ?? null,
       loading: false,
     });

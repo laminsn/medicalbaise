@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.seeker_subscriptions (
   current_period_start timestamptz,
   current_period_end timestamptz,
   cancel_at_period_end boolean NOT NULL DEFAULT false,
-  transaction_count integer NOT NULL DEFAULT 0 CHECK (transaction_count >= 0),
+  transactions_used integer NOT NULL DEFAULT 0 CHECK (transactions_used >= 0),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (user_id, app_key)
@@ -87,7 +87,7 @@ GRANT SELECT (
   current_period_start,
   current_period_end,
   cancel_at_period_end,
-  transaction_count,
+  transactions_used,
   created_at,
   updated_at
 ) ON TABLE public.seeker_subscriptions TO authenticated;
@@ -136,7 +136,7 @@ BEGIN
     effective_plan := 'flex';
   END IF;
 
-  next_count := rec.transaction_count;
+  next_count := rec.transactions_used;
   IF rec.current_period_end IS NOT NULL AND rec.current_period_end <= now_ts THEN
     next_count := 0;
   END IF;
@@ -150,7 +150,7 @@ BEGIN
   END IF;
 
   UPDATE public.seeker_subscriptions s
-  SET transaction_count = next_count + 1
+  SET transactions_used = next_count + 1
   WHERE s.id = rec.id;
 
   RETURN true;

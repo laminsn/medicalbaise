@@ -81,7 +81,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
-  const { plan: currentPlan, transactionCount, startCheckout } = useSeekerSubscription();
+  const { plan: currentPlan, transactionsUsed, startCheckout } = useSeekerSubscription();
   const [upgrading, setUpgrading] = useState<SeekerPlan | null>(null);
 
   const handleSelectPlan = async (planId: SeekerPlan) => {
@@ -125,7 +125,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
           {PLANS.map((plan) => {
             const isCurrentPlan = plan.id === currentPlan;
             const features = plan.featureKeys.map((feature) => t(`seekerPricing.features.${feature}`));
-            const lifestyleUsed = currentPlan === 'lifestyle' ? transactionCount : 0;
+            const lifestyleUsed = currentPlan === 'lifestyle' ? transactionsUsed : 0;
             const feeCallout =
               plan.id === 'flex'
                 ? { strong: '5%', label: t('seekerPricing.feeMin') }
