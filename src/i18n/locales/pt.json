@@ -1769,6 +1769,8 @@
     "planSelected": "Plano selecionado",
     "paymentComingSoon": "Integração de pagamento em breve",
     "cancelAnytime": "Cancele a qualquer momento. Sem taxas ocultas.",
+    "forSeekers": "Para pacientes",
+    "forProviders": "Para prestadores",
     "plans": {
       "free": {
         "name": "Gratuito",
@@ -1806,6 +1808,79 @@
       "googleAnalytics": "Integração Google Analytics",
       "conversionDashboard": "Painel de análise de conversões",
       "scheduledReports": "Relatórios agendados por email"
+    }
+  },
+  "seekerPricing": {
+    "title": "Planos do paciente",
+    "subtitle": "Pague por serviço concluído ou escolha um plano mensal de paciente.",
+    "eyebrow": "Para clientes",
+    "heading": "Reserve uma vez — ou faça da Baise sua primeira escolha.",
+    "intro": "Sem tarifa para navegar. Sem tarifa para pedir orçamento. A tarifa padrão só começa quando um serviço é concluído.",
+    "choosePlan": "Escolha um plano de paciente",
+    "month": "mês",
+    "perMonth": "/mês",
+    "mostPopular": "Mais popular",
+    "bestForRepeat": "Ideal para reservas recorrentes",
+    "defaultPill": "Padrão",
+    "featuredPill": "Destaque",
+    "selectPlan": "Selecionar plano",
+    "currentPlan": "Plano atual",
+    "yourPlan": "Seu plano",
+    "openingCheckout": "Abrindo o checkout...",
+    "checkoutFailed": "Não foi possível iniciar o checkout",
+    "cancelAnytime": "Cancele Lifestyle ou Project quando quiser. Flex continua o padrão.",
+    "usedOfLimit": "{{used}}/{{limit}} serviços pagos concluídos neste período",
+    "usedCount": "{{used}} / {{limit}}",
+    "usedCountLabel": "serviços pagos concluídos neste período",
+    "includedBenefits": "Benefícios incluídos",
+    "feeMin": "Mínimo de R$27 em serviços concluídos",
+    "feeMinShort": "mín. R$27",
+    "eightTx": "8 serviços pagos concluídos",
+    "unlimited": "Ilimitado",
+    "unlimitedFee": "serviços pagos concluídos",
+    "plans": {
+      "flex": {
+        "name": "Flex",
+        "description": "Navegue e solicite serviços livremente. A tarifa Baise só se aplica depois que o serviço é concluído."
+      },
+      "lifestyle": {
+        "name": "Lifestyle",
+        "description": "8 serviços pagos concluídos por mês para reservas recorrentes."
+      },
+      "project": {
+        "name": "Project",
+        "description": "Serviços pagos concluídos ilimitados para o cuidado contínuo."
+      }
+    },
+    "features": {
+      "payPerService": "Pague só quando a consulta ou a fatura for paga",
+      "platformFee": "Taxa de {{percent}}% da plataforma, mínimo de {{min}}",
+      "noMonthlyCharge": "Sem assinatura mensal",
+      "eightPaidServices": "8 serviços pagos concluídos por mês",
+      "zeroFee": "0% de taxa da plataforma nesses serviços",
+      "monthlyBilling": "Cobrança mensal em reais",
+      "unlimitedServices": "Serviços pagos concluídos ilimitados",
+      "noBrowseFee": "Sem tarifa para navegar ou pedir orçamento",
+      "compareProfiles": "Compare perfis de prestadores e detalhes de serviços",
+      "completedReviews": "Veja avaliações de trabalhos concluídos e sinais visíveis de verificação",
+      "scheduleMessage": "Agende e troque mensagens dentro de um único registro de serviço",
+      "quotesTogether": "Mantenha orçamentos, faturas e recibos juntos",
+      "paymentTrail": "Mantenha um histórico documentado de reserva e pagamento",
+      "escalationPaths": "Use caminhos de reclamação, falta e escalonamento de segurança",
+      "representativeReview": "Solicite análise de um representante quando o autoatendimento não for suficiente",
+      "processingSeparate": "Veja o processamento do cartão separado antes do checkout",
+      "feeAfterComplete": "Pague a tarifa Baise somente após um serviço concluído",
+      "noMonthlyCommitment": "Não assuma compromisso mensal",
+      "everythingInFlex": "Tudo do Flex",
+      "everythingInLifestyle": "Tudo do Lifestyle",
+      "noBookingFee": "Não pague tarifa de reserva Baise",
+      "processingIncluded": "Inclua o processamento padrão do cartão em reservas elegíveis",
+      "prioritySupport": "Receba suporte prioritário para reservas",
+      "predictableCosts": "Mantenha os custos mensais de serviços mais previsíveis",
+      "trustSignals": "Compare perfis de prestadores e sinais de confiança",
+      "invoicesTogether": "Mantenha faturas, recibos e histórico de pagamento juntos",
+      "representativeWhenNeeded": "Solicite análise de um representante quando necessário",
+      "repeatContext": "Leve o contexto útil para reservas recorrentes"
     }
   },
   "reviews": {

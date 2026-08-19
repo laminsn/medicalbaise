@@ -1,0 +1,359 @@
+/* Cloned from https://baiseapps.vercel.app/pricing seeker plan-card chrome. Avis owns these tokens. */
+
+.seeker-pricing-source {
+  --bg: #0a0a0b;
+  --line: rgba(255, 255, 255, 0.11);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --casa: #1dbf73;
+  --medical: #00b8d4;
+  --legal: #7c3aed;
+  --tech: #ff3347;
+  --influencer: #f3ff3b;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  color: #f7f8f6;
+  font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.seeker-pricing-source .pricing-seeker {
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 2% 5%, rgba(29, 191, 115, 0.09), transparent 31%),
+    radial-gradient(circle at 98% 92%, rgba(0, 184, 212, 0.06), transparent 30%),
+    linear-gradient(145deg, #111415, #0e1011);
+  padding: 90px clamp(24px, 4vw, 62px);
+}
+
+.seeker-pricing-source .pricing-section-heading {
+  margin-bottom: 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.55fr);
+  gap: 70px;
+  align-items: end;
+}
+
+.seeker-pricing-source .eyebrow {
+  margin-bottom: 18px;
+  color: #8f9490;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.seeker-pricing-source .pricing-section-heading h2 {
+  max-width: 870px;
+  margin: 0;
+  font-size: clamp(43px, 5vw, 72px);
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+
+.seeker-pricing-source .pricing-section-heading > p {
+  margin: 0;
+  color: #9da29d;
+  font-size: 16px;
+}
+
+.seeker-pricing-source .seeker-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.seeker-pricing-source .plan-card {
+  --plan-accent: var(--medical);
+  position: relative;
+  min-height: 710px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 28%, rgba(255, 255, 255, 0.12));
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--plan-accent) 13%, transparent), transparent 31%),
+    linear-gradient(155deg, #181a1b, #0e1011 70%);
+  box-shadow: 0 22px 70px #0003;
+}
+
+.seeker-pricing-source .plan-card[data-plan='Flex'] {
+  --plan-accent: var(--casa);
+}
+
+.seeker-pricing-source .plan-card[data-plan='Lifestyle'] {
+  --plan-accent: var(--influencer);
+}
+
+.seeker-pricing-source .plan-card[data-plan='Project'] {
+  --plan-accent: var(--legal);
+  background:
+    radial-gradient(circle at 100% 0, rgba(124, 58, 237, 0.19), transparent 38%),
+    linear-gradient(155deg, #19181f, #0e0f11 70%);
+}
+
+.seeker-pricing-source .plan-card[data-plan='Project']::after {
+  background: var(--legal);
+}
+
+.seeker-pricing-source .plan-card::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  width: 320px;
+  height: 320px;
+  top: -220px;
+  right: -140px;
+  border-radius: 50%;
+  background: var(--plan-accent);
+  opacity: 0.2;
+  filter: blur(62px);
+}
+
+.seeker-pricing-source .plan-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 22px;
+  left: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--plan-accent);
+  box-shadow: 0 0 19px color-mix(in srgb, var(--plan-accent) 72%, transparent);
+}
+
+.seeker-pricing-source .plan-card.featured {
+  border-color: color-mix(in srgb, var(--plan-accent) 62%, white 10%);
+  box-shadow:
+    inset 0 0 84px color-mix(in srgb, var(--plan-accent) 7%, transparent),
+    0 28px 90px #00000057;
+}
+
+.seeker-pricing-source .plan-card[data-plan='Lifestyle'].featured {
+  border-color: color-mix(in srgb, var(--influencer) 70%, #fff 8%);
+}
+
+.seeker-pricing-source .plan-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.seeker-pricing-source .plan-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+}
+
+.seeker-pricing-source .plan-card-top > div {
+  display: grid;
+}
+
+.seeker-pricing-source .plan-card-top span {
+  color: #8d928d;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.seeker-pricing-source .plan-card-top strong {
+  margin-top: 18px;
+  font-size: clamp(52px, 6vw, 78px);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.seeker-pricing-source .plan-card-top strong small {
+  margin-left: 6px;
+  color: #7e837e;
+  font-size: 12px;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+.seeker-pricing-source .plan-card-top > b {
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 36%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--plan-accent) 14%, transparent);
+  color: color-mix(in srgb, var(--plan-accent) 70%, white);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.seeker-pricing-source .plan-card > p {
+  margin: 30px 0 20px;
+  color: #a3a8a3;
+}
+
+.seeker-pricing-source .fee-callout {
+  min-height: 78px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 20%, rgba(255, 255, 255, 0.11));
+  border-radius: 13px;
+  background: linear-gradient(110deg, color-mix(in srgb, var(--plan-accent) 9%, transparent), #ffffff09);
+}
+
+.seeker-pricing-source .fee-callout strong {
+  color: #fff;
+  font-size: 31px;
+  letter-spacing: -0.05em;
+}
+
+.seeker-pricing-source .fee-callout span {
+  color: #919691;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.seeker-pricing-source .plan-benefit-count {
+  margin: 23px 0 0;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--plan-accent) 20%, var(--line));
+}
+
+.seeker-pricing-source .plan-benefit-count span {
+  color: #777d78;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.seeker-pricing-source .plan-benefit-count b {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--plan-accent) 38%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--plan-accent) 12%, transparent);
+  color: color-mix(in srgb, var(--plan-accent) 60%, white);
+  font-size: 10px;
+}
+
+.seeker-pricing-source .plan-card ul {
+  margin: 17px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 11px;
+  list-style: none;
+}
+
+.seeker-pricing-source .plan-card li {
+  display: flex;
+  align-items: start;
+  gap: 9px;
+  color: #d6d9d5;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.seeker-pricing-source .plan-card li svg {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--plan-accent) 13%, transparent);
+  color: var(--plan-accent);
+}
+
+.seeker-pricing-source .button {
+  min-height: 50px;
+  margin-top: auto;
+  padding: 0 17px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  transition:
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    color 0.18s var(--ease);
+}
+
+.seeker-pricing-source .button-dark {
+  border-color: var(--line-strong);
+  background: #ffffff0e;
+  color: #fff;
+}
+
+.seeker-pricing-source .button-dark:hover:not(:disabled) {
+  background: #ffffff1a;
+  border-color: #ffffff52;
+}
+
+.seeker-pricing-source .button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.seeker-pricing-source .seeker-pricing-footnote {
+  margin: 22px 0 0;
+  color: #9da29d;
+  font-size: 12px;
+  text-align: center;
+}
+
+.seeker-pricing-source.nested .pricing-seeker {
+  margin-top: 0;
+  padding: 28px 18px;
+  border-radius: 22px;
+}
+
+@media (max-width: 1160px) {
+  .seeker-pricing-source .pricing-section-heading {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+}
+
+@media (max-width: 760px) {
+  .seeker-pricing-source .pricing-seeker {
+    padding: 76px 18px;
+    border-radius: 24px;
+  }
+
+  .seeker-pricing-source .seeker-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seeker-pricing-source .plan-card {
+    min-height: auto;
+    padding: 23px;
+  }
+
+  .seeker-pricing-source .plan-card-top {
+    flex-direction: column;
+  }
+
+  .seeker-pricing-source .button {
+    margin-top: 28px;
+  }
+
+  .seeker-pricing-source.nested .pricing-seeker {
+    padding: 28px 18px;
+    border-radius: 22px;
+  }
+}

@@ -1769,6 +1769,8 @@
     "planSelected": "Plan selected",
     "paymentComingSoon": "Payment integration coming soon",
     "cancelAnytime": "Cancel anytime. No hidden fees.",
+    "forSeekers": "For patients",
+    "forProviders": "For providers",
     "plans": {
       "free": {
         "name": "Free",
@@ -1806,6 +1808,79 @@
       "googleAnalytics": "Google Analytics integration",
       "conversionDashboard": "Conversion analytics dashboard",
       "scheduledReports": "Scheduled email reports"
+    }
+  },
+  "seekerPricing": {
+    "title": "Patient plans",
+    "subtitle": "Pay per completed service or choose a monthly patient plan.",
+    "eyebrow": "For service seekers",
+    "heading": "Book once—or make Baise your go-to.",
+    "intro": "No fee to browse. No fee to request a quote. The standard fee starts only when a service is completed.",
+    "choosePlan": "Choose a patient plan",
+    "month": "month",
+    "perMonth": "/month",
+    "mostPopular": "Most Popular",
+    "bestForRepeat": "Best for repeat bookings",
+    "defaultPill": "Default",
+    "featuredPill": "Featured",
+    "selectPlan": "Select plan",
+    "currentPlan": "Current plan",
+    "yourPlan": "Your plan",
+    "openingCheckout": "Opening checkout...",
+    "checkoutFailed": "Could not start checkout",
+    "cancelAnytime": "Cancel Lifestyle or Project anytime. Flex stays the default.",
+    "usedOfLimit": "{{used}}/{{limit}} completed paid services this period",
+    "usedCount": "{{used}} / {{limit}}",
+    "usedCountLabel": "completed paid services this period",
+    "includedBenefits": "Included benefits",
+    "feeMin": "R$27 minimum on completed services",
+    "feeMinShort": "R$27 min",
+    "eightTx": "8 completed paid services",
+    "unlimited": "Unlimited",
+    "unlimitedFee": "completed paid services",
+    "plans": {
+      "flex": {
+        "name": "Flex",
+        "description": "Browse and request services freely. The Baise fee applies only after a service is completed."
+      },
+      "lifestyle": {
+        "name": "Lifestyle",
+        "description": "8 completed paid services each month for repeat bookings."
+      },
+      "project": {
+        "name": "Project",
+        "description": "Unlimited completed paid services for ongoing care work."
+      }
+    },
+    "features": {
+      "payPerService": "Pay only when a consult or invoice is paid",
+      "platformFee": "{{percent}}% platform fee, {{min}} minimum",
+      "noMonthlyCharge": "No monthly subscription",
+      "eightPaidServices": "8 completed paid services per month",
+      "zeroFee": "0% platform fee on those services",
+      "monthlyBilling": "Billed monthly in Brazilian reais",
+      "unlimitedServices": "Unlimited completed paid services",
+      "noBrowseFee": "No fee to browse or request a quote",
+      "compareProfiles": "Compare provider profiles and service details",
+      "completedReviews": "See completed-work reviews and visible verification signals",
+      "scheduleMessage": "Schedule and message inside one service record",
+      "quotesTogether": "Keep quotes, invoices and receipts together",
+      "paymentTrail": "Retain a documented booking and payment trail",
+      "escalationPaths": "Use complaint, no-show and safety escalation paths",
+      "representativeReview": "Request representative review when self-service is not enough",
+      "processingSeparate": "See card processing separately before checkout",
+      "feeAfterComplete": "Pay the Baise fee only after a completed service",
+      "noMonthlyCommitment": "Make no monthly commitment",
+      "everythingInFlex": "Everything in Flex",
+      "everythingInLifestyle": "Everything in Lifestyle",
+      "noBookingFee": "Pay no Baise booking fee",
+      "processingIncluded": "Include standard card processing on eligible bookings",
+      "prioritySupport": "Receive priority booking support",
+      "predictableCosts": "Keep monthly service costs more predictable",
+      "trustSignals": "Compare provider profiles and trust signals",
+      "invoicesTogether": "Keep invoices, receipts and payment history together",
+      "representativeWhenNeeded": "Request representative review when needed",
+      "repeatContext": "Carry useful context into repeat bookings"
     }
   },
   "reviews": {

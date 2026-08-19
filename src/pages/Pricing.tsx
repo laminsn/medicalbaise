@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { SeekerPlanCards } from '@/components/pricing/SeekerPlanCards';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
@@ -59,11 +60,20 @@ const PLANS = [
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { tier: currentTier, startCheckout } = useSubscription();
   const [upgrading, setUpgrading] = useState<string | null>(null);
+
+  useEffect(() => {
+    const audience = searchParams.get('audience');
+    const target =
+      audience === 'provider' ? 'provider-pricing' : audience === 'seeker' ? 'seeker-pricing-block' : null;
+    if (!target) return;
+    document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [searchParams]);
 
   const handleSelectPlan = async (plan: typeof PLANS[number]) => {
     if (!user) {
@@ -110,8 +120,13 @@ export default function Pricing() {
         </div>
 
         <div className="px-4 py-6 pb-24">
+          <div id="seeker-pricing-block">
+            <SeekerPlanCards nested />
+          </div>
+
+          <section id="provider-pricing" className="mt-10" aria-labelledby="provider-pricing-heading">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2">{t('pricing.choosePlan')}</h2>
+            <h2 id="provider-pricing-heading" className="text-2xl font-bold mb-2">{t('pricing.choosePlan')}</h2>
             <p className="text-muted-foreground">{t('pricing.subtitle')}</p>
           </div>
 
@@ -196,6 +211,7 @@ export default function Pricing() {
           <p className="text-center text-xs text-muted-foreground mt-6">
             {t('pricing.cancelAnytime')}
           </p>
+          </section>
         </div>
       </AppLayout>
     </>

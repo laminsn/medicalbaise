@@ -2646,6 +2646,57 @@ export type Database = {
           },
         ]
       }
+      seeker_subscriptions: {
+        Row: {
+          app_key: string
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan: Database["public"]["Enums"]["seeker_plan"]
+          status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          transactions_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_key?: string
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["seeker_plan"]
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          transactions_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_key?: string
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["seeker_plan"]
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          transactions_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       service_categories: {
         Row: {
           color: string | null
@@ -3451,6 +3502,13 @@ export type Database = {
         }
         Returns: string
       }
+      try_consume_seeker_transaction: {
+        Args: {
+          app_key: string
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
@@ -3474,6 +3532,7 @@ export type Database = {
         | "full_payment_held"
         | "milestone_partial"
         | "completed"
+      seeker_plan: "flex" | "lifestyle" | "project"
       subscription_tier: "free" | "pro" | "elite" | "enterprise"
       urgency_level: "emergency" | "asap" | "flexible" | "scheduled"
       user_type: "customer" | "provider"
@@ -3628,6 +3687,7 @@ export const Constants = {
         "milestone_partial",
         "completed",
       ],
+      seeker_plan: ["flex", "lifestyle", "project"],
       subscription_tier: ["free", "pro", "elite", "enterprise"],
       urgency_level: ["emergency", "asap", "flexible", "scheduled"],
       user_type: ["customer", "provider"],
