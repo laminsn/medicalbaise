@@ -45,12 +45,12 @@ export default function CategoryDetail() {
       if (providerIds.length === 0) return [];
       const { data, error } = await supabase
         .from('providers')
-        .select('id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours, profiles!inner(first_name, last_name, avatar_url)')
+        .select('id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours')
         .in('id', providerIds);
       if (error) throw error;
-      return (data || []).map((p: any) => ({
+      return (data || []).map((p) => ({
         id: p.id,
-        name: p.business_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Provider',
+        name: p.business_name || 'Provider',
         rating: Number(p.avg_rating) || 0,
         reviews: p.total_reviews || 0,
         hourlyRate: 0,

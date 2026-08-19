@@ -71,7 +71,7 @@ export default function ProviderProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('providers')
-        .select('*, profiles!inner(first_name, last_name, avatar_url)')
+        .select('*')
         .eq('id', id!)
         .single();
       if (error) throw error;
@@ -94,9 +94,26 @@ export default function ProviderProfile() {
   const { data: providerReviews = [] } = useQuery({
     queryKey: ['provider-reviews', id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('reviews').select('*, profiles!reviews_customer_id_fkey(first_name, last_name, avatar_url)').eq('provider_id', id!).order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('reviews').select('*').eq('provider_id', id!).order('created_at', { ascending: false });
       if (error) throw error;
-      return data || [];
+      const rows = data || [];
+      const customerIds = [...new Set(rows.map((row) => row.customer_id))];
+      if (customerIds.length === 0) {
+        return rows.map((row) => ({ ...row, customer_display_name: '', customer_avatar_url: '' }));
+      }
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, first_name, last_name, avatar_url')
+        .in('user_id', customerIds);
+      const byUser = new Map((profiles || []).map((profile) => [profile.user_id, profile]));
+      return rows.map((row) => {
+        const profile = byUser.get(row.customer_id);
+        return {
+          ...row,
+          customer_display_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ').trim(),
+          customer_avatar_url: profile?.avatar_url || '',
+        };
+      });
     },
     enabled: !!id,
   });
@@ -123,8 +140,8 @@ export default function ProviderProfile() {
 
   const provider = providerData ? {
     ...providerData,
-    name: providerData.business_name || `${(providerData as any).profiles?.first_name || ''} ${(providerData as any).profiles?.last_name || ''}`.trim(),
-    avatar_url: (providerData as any).profiles?.avatar_url || '',
+    name: providerData.business_name || '',
+    avatar_url: providerData.avatar_url || '',
   } : null;
 
   const ratingDistribution = useMemo(() => {
@@ -461,36 +478,6 @@ export default function ProviderProfile() {
                 </CardContent>
               </Card>
 
-              {/* Performance Metrics */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t('providerProfile.performanceMetrics')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{t('providerProfile.completionRate')}</span>
-                      <span className="font-medium">{provider.completion_rate}%</span>
-                    </div>
-                    <Progress value={provider.completion_rate} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{t('providerProfile.punctuality')}</span>
-                      <span className="font-medium">{provider.on_time_rate}%</span>
-                    </div>
-                    <Progress value={provider.on_time_rate} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{t('providerProfile.repeatCustomers')}</span>
-                      <span className="font-medium">{provider.repeat_customer_rate}%</span>
-                    </div>
-                    <Progress value={provider.repeat_customer_rate} className="h-2" />
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* FAQ */}
               {providerFaqs.length > 0 && (
                 <Card>
@@ -516,7 +503,9 @@ export default function ProviderProfile() {
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium">{service.name}</h3>
+                        <h3 className="font-medium">
+                          {service.service_categories?.name_en || service.service_categories?.name_pt || service.description || ''}
+                        </h3>
                         <p className="text-sm text-muted-foreground">{service.description}</p>
                       </div>
                       <div className="text-right">
@@ -608,23 +597,23 @@ export default function ProviderProfile() {
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={review.avatar} />
-                        <AvatarFallback>{review.customer_name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={review.customer_avatar_url || undefined} alt={review.customer_display_name || t('providerProfile.client', 'Client')} />
+                        <AvatarFallback>{(review.customer_display_name || t('providerProfile.client', 'Client')).charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-sm">{review.customer_name}</p>
+                            <p className="font-medium text-sm">{review.customer_display_name || t('providerProfile.client', 'Client')}</p>
                             <div className="flex items-center gap-2">
                               <div className="flex gap-0.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <Star 
                                     key={star} 
-                                    className={`h-3 w-3 ${star <= review.rating ? 'text-amber-500 fill-amber-500' : 'text-muted'}`} 
+                                    className={`h-3 w-3 ${star <= review.overall_rating ? 'text-amber-500 fill-amber-500' : 'text-muted'}`} 
                                   />
                                 ))}
                               </div>
-                              {review.verified && (
+                              {review.is_verified && (
                                 <Badge variant="outline" className="text-xs h-5">
                                   <CheckCircle2 className="h-3 w-3 mr-1" />
                                   {t('providerProfile.verified')}
@@ -632,7 +621,9 @@ export default function ProviderProfile() {
                               )}
                             </div>
                           </div>
-                          <span className="text-xs text-muted-foreground">{review.date}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {review.created_at ? new Date(review.created_at).toLocaleDateString() : ''}
+                          </span>
                         </div>
                         <p className="text-sm mt-2">{review.comment}</p>
                         
@@ -646,7 +637,7 @@ export default function ProviderProfile() {
                         <div className="flex items-center gap-4 mt-3">
                           <Button variant="ghost" size="sm" className="h-8 text-xs">
                             <ThumbsUp className="h-3 w-3 mr-1" />
-                            {t('providerProfile.helpful')} ({review.helpful_count})
+                            {t('providerProfile.helpful')}
                           </Button>
                         </div>
                       </div>

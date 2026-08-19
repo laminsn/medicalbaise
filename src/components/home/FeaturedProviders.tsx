@@ -15,14 +15,14 @@ export function FeaturedProviders() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('providers')
-        .select('id, business_name, avg_rating, total_reviews, subscription_tier, profiles!inner(first_name, last_name, avatar_url)')
+        .select('id, business_name, avatar_url, avg_rating, total_reviews, subscription_tier')
         .order('avg_rating', { ascending: false })
         .limit(5);
       if (error) throw error;
-      return (data || []).map((p: any) => ({
+      return (data || []).map((p) => ({
         id: p.id,
-        business_name: p.business_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Provider',
-        avatar_url: p.profiles?.avatar_url || '',
+        business_name: p.business_name || 'Provider',
+        avatar_url: p.avatar_url || '',
         avg_rating: Number(p.avg_rating) || 0,
         total_reviews: p.total_reviews || 0,
         is_pro: p.subscription_tier !== 'free',

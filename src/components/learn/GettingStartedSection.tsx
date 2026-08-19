@@ -148,7 +148,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
   const [selectedGuide, setSelectedGuide] = useState<typeof gettingStartedGuides[0] | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const categoryLabels: Record<string, { en: string; pt: string }> = {
+  const categoryLabels: Record<string, { en: string; pt: string; es: string }> = {
     Account: { en: 'Account', pt: 'Conta', es: 'Cuenta' },
     Search: { en: 'Search', pt: 'Busca', es: 'Búsqueda' },
     Booking: { en: 'Booking', pt: 'Agendamento', es: 'Reservas' },
@@ -163,7 +163,7 @@ export function GettingStartedSection({ searchQuery }: GettingStartedSectionProp
     Compliance: { en: 'Compliance', pt: 'Conformidade', es: 'Cumplimiento' },
   };
 
-  const difficultyLabels: Record<string, { en: string; pt: string }> = {
+  const difficultyLabels: Record<string, { en: string; pt: string; es: string }> = {
     Beginner: { en: 'Beginner', pt: 'Iniciante', es: 'Principiante' },
     Intermediate: { en: 'Intermediate', pt: 'Intermediário', es: 'Intermedio' },
     Advanced: { en: 'Advanced', pt: 'Avançado', es: 'Avanzado' },

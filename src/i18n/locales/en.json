@@ -101,7 +101,9 @@
     "discard": "Discard",
     "invalidRequest": "Invalid request.",
     "and": "and",
-    "viewProfile": "View Profile"
+    "viewProfile": "View Profile",
+    "retry": "Try again",
+    "success": "Settings saved"
   },
   "nav": {
     "home": "Home",
@@ -115,7 +117,8 @@
     "map": "Map",
     "feed": "Feed",
     "help": "Help & Training",
-    "menu": "Menu"
+    "menu": "Menu",
+    "blog": "Blog"
   },
   "hub": {
     "metaTitle": "Baise Group — One trusted network for home, health, and legal services in Brazil",
@@ -458,7 +461,12 @@
     "resetError": "Error sending reset email",
     "resetSent": "Password reset email sent. Check your inbox.",
     "termsOfService": "Terms of Service",
-    "termsRequired": "Please accept the terms"
+    "termsRequired": "Please accept the terms",
+    "genericSignInError": "We could not complete sign-in. Please try again.",
+    "genericSignupResult": "If the address can be used, we sent the next step. You can also try signing in or resetting your password.",
+    "resetSentDescription": "If an account matches that email, a secure reset link will arrive shortly.",
+    "timeoutError": "The connection took too long. Check your internet and try signing in again.",
+    "wrongBrowserError": "Open the link in the same browser where you started sign-in. Taps inside WhatsApp often open a different browser."
   },
   "header": {
     "login": "Login",
@@ -631,7 +639,15 @@
     "warranty": "Warranty",
     "warrantyPlaceholder": "e.g., 90-day warranty",
     "yourPrice": "Your price",
-    "yourProposal": "Your proposal"
+    "yourProposal": "Your proposal",
+    "bestMatches": "Best matches",
+    "clientOpportunityCenter": "Client Opportunity Center",
+    "findNextClient": "Find your next client",
+    "loadError": "We could not load client opportunities. Please try again.",
+    "lowCompetition": "Low competition",
+    "newToday": "New today",
+    "pipelineValue": "Open value",
+    "quickFilters": "Quick opportunity filters"
   },
   "postJob": {
     "title": "Request Appointment",
@@ -1231,7 +1247,8 @@
     "specialOffers": "Special Offers",
     "contact": "Contact",
     "copyright": "© 2024 MD Baise. All rights reserved.",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "label": "Footer"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
@@ -1285,6 +1302,7 @@
     "verified": "Verified",
     "providerResponse": "Doctor's response",
     "helpful": "Helpful",
+    "client": "Client",
     "feed": "Updates",
     "noFeedPosts": "No updates yet",
     "noFeedPostsDesc": "This doctor hasn't shared any updates yet.",
@@ -1468,7 +1486,15 @@
     "noCreditedReferrals": "No credited referrals yet",
     "noPendingReferrals": "No pending referrals",
     "noReferralsYet": "No referrals yet",
-    "pendingUser": "Pending user"
+    "pendingUser": "Pending user",
+    "emailPlaceholder": "Send referral link by email",
+    "emailRequired": "Email required",
+    "emailRequiredDescription": "Enter the email address that should receive your referral link.",
+    "emailSendError": "Unable to send referral email",
+    "emailSent": "Referral email sent",
+    "emailSentDescription": "Your branded referral email was sent and added to referral tracking.",
+    "noReferrals": "No referrals yet. Share your code to start earning!",
+    "sendEmail": "Send email"
   },
   "favorites": {
     "title": "Favorites",
@@ -1569,7 +1595,10 @@
     "titlePlaceholder": "e.g., Great service",
     "uploadTitle": "Upload video testimonial",
     "uploading": "Uploading...",
-    "uploadDescription": "Share your experience with {{provider}}"
+    "uploadDescription": "Share your experience with {{provider}}",
+    "privateCta": "Send private feedback",
+    "privateDescription": "For medical privacy, feedback submitted through this page is not published on the profile.",
+    "privateTitle": "Private feedback"
   },
   "workApproval": {
     "approve": "Approve",
@@ -1599,7 +1628,16 @@
     "title": "Work approval",
     "upload": "Upload for approval",
     "uploadWork": "Upload work for approval",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "clearSignature": "Clear signature",
+    "noSignoffs": "No client sign-offs are waiting right now.",
+    "signError": "Could not save signature.",
+    "signHere": "Sign here",
+    "signOff": "Sign off",
+    "signSuccess": "Sign-off saved.",
+    "signatureRequired": "Please add your signature first.",
+    "signerName": "Your name",
+    "signoffsTitle": "Client sign-offs"
   },
   "scheduling": {
     "title": "Scheduled Services",
@@ -2137,7 +2175,44 @@
     "requestMessageTitle": "Appointment request",
     "requestSent": "Appointment request sent.",
     "sendRequest": "Send request",
-    "bookWith": "Book with"
+    "bookWith": "Book with",
+    "lifecycle": {
+      "addReminder": "Add reminder",
+      "channelError": "Turn on secure in-app messages, email, or opt out of appointment communications.",
+      "consent": "Receive appointment communications",
+      "consentDescription": "I agree to receive minimum-necessary confirmations, reminders, follow-ups, and thank-you messages. I can opt out at any time.",
+      "consentSaved": "Appointment communications are active. Medical details remain inside the secure portal.",
+      "email": "Email",
+      "emailDescription": "Receive generic branded email with a secure portal link.",
+      "followUp": "Follow-up reminders and thank-you messages",
+      "followUpDescription": "Receive generic after-appointment messages without medical details.",
+      "hours": "hours",
+      "hoursBefore": "Hours before appointment",
+      "inApp": "Secure in-app messages",
+      "inAppDescription": "Receive generic appointment updates after signing in.",
+      "offsetError": "Use unique reminder times between 15 minutes and 7 days.",
+      "optOutSaved": "Appointment communications are off and queued messages were cancelled.",
+      "patientTitle": "Appointment communications",
+      "privacy": "Messages never include symptoms, diagnoses, treatment, insurance information, or appointment notes. Details stay in the secure portal.",
+      "providerEnabled": "Enable appointment lifecycle messages",
+      "providerEnabledDescription": "Only patients who explicitly opt in can receive these messages.",
+      "providerFollowUp": "Follow-up and thank-you messages",
+      "providerFollowUpDescription": "Defaults: thank-you after 2 hours and follow-up after 24 hours.",
+      "providerReviews": "Neutral review request",
+      "providerReviewsDescription": "Sent after 48 hours only when the patient separately opts in. No rewards or credits.",
+      "providerTitle": "Provider appointment automation",
+      "reminderTimes": "Reminder times before appointment",
+      "reminders": "Appointment reminders",
+      "remindersDescription": "Providers default to 24 hours and 1 hour before the appointment.",
+      "reviews": "Optional review requests",
+      "reviewsDescription": "Review requests are neutral, never incentivized, and optional. Do not share medical details publicly.",
+      "save": "Save appointment communication settings",
+      "saveError": "No appointment communication settings were activated. Please try again.",
+      "timezone": "IANA time zone",
+      "timezoneNote": "Times use the provider time zone. Stored appointment instants keep daylight-saving changes consistent.",
+      "twoWay": "Two-way confirmation",
+      "twoWayDescription": "Patients can confirm, decline, or request a new time through a signed response page."
+    }
   },
   "doctorProfile": {
     "loading": "Loading doctor profile...",
@@ -2185,6 +2260,8 @@
     "verifiedActive": "Verified and Active",
     "alsoAcceptsSelfPay": "Also accepts self-pay patients",
     "verifiedPatient": "Verified Patient",
+    "patient": "Patient",
+    "minutes": "min",
     "quality": "Quality",
     "professionalism": "Professionalism",
     "punctuality": "Punctuality",
@@ -2392,7 +2469,10 @@
     "startingCamera": "Starting camera...",
     "typeSomething": "Type something...",
     "typeText": "Type text",
-    "yourStory": "Your story"
+    "yourStory": "Your story",
+    "retryCamera": "Camera did not start — tap to retry",
+    "tapToStart": "Tap to start camera",
+    "zoomUnsupported": "This camera does not expose zoom controls"
   },
   "medicalCategories": {
     "general-practice": {
@@ -3286,5 +3366,125 @@
       "title": "Build against it early",
       "body": "The endpoint is not accepting keys yet. Create an account now and your key will be waiting the day it opens."
     }
+  },
+  "partner": {
+    "dashboardTitle": "Partner Campaigns"
+  },
+  "pilotBanner": {
+    "cta": "Found a problem? Report it here →",
+    "label": "TEST MODE — Pilot Program",
+    "text": "No payments are real and your account is hidden from real clients."
+  },
+  "pilotIssue": {
+    "area": "Where did it happen?",
+    "areaPlaceholder": "e.g. invoices, proposals, chat",
+    "autoCapture": "We also send the page, browser, and screen size to speed up the fix.",
+    "detail": "Details",
+    "detailPlaceholder": "What you did, what you expected, and what happened.",
+    "errors": {
+      "body": "Tell us a bit more about what happened.",
+      "generic": "Could not send the report.",
+      "notTester": "Only test accounts can report issues here.",
+      "rate": "Too many reports in a row. Try again in an hour.",
+      "title": "Give a slightly more descriptive title.",
+      "tooBig": "File too large (max 100 MB): {{name}}"
+    },
+    "evidence": "Screenshots, photos, or a screen recording",
+    "evidenceHint": "Up to {{max}} files, 100 MB each. Only you and our team can see them.",
+    "privacy": "Do not send real client, patient, or case data. Use fictional information only.",
+    "sent": "Report sent. Thank you — our team has been notified.",
+    "sev": {
+      "blocker": "Blocks everything — I cannot continue",
+      "idea": "Idea / suggestion",
+      "major": "Serious — gets in the way a lot",
+      "minor": "Small — visual detail",
+      "normal": "Normal"
+    },
+    "severity": "Severity",
+    "submit": "Send report",
+    "subtitle": "The more detail, the faster we can fix it. Attach a screenshot or screen recording if you can.",
+    "title": "Report a problem",
+    "what": "What happened?",
+    "whatPlaceholder": "Summarize in one line"
+  },
+  "pilotStart": {
+    "badge": "Pilot Program",
+    "checklistLede": "It is not required and does not have to be today. This is just a guide to what helps us most.",
+    "checklistTitle": "What we want tested",
+    "ctask1": "Post a service request",
+    "ctask2": "Look for professionals in Browse",
+    "ctask3": "Chat with a professional",
+    "ctask4": "Report the first problem you find",
+    "go": "Go",
+    "h1": "Your test account is active",
+    "lede": "You have full professional access. Use the platform as you would for real — and tell us everything that breaks, confuses, or frustrates. That is exactly why you are here.",
+    "metaTitle": "Welcome to the pilot",
+    "reportBody": "The yellow banner at the top appears on every page. Click “Report it here” at any time — you can attach screenshots and recordings. It goes straight to our team.",
+    "reportTitle": "How to report a problem",
+    "rule1Body": "Your account is marked [TEST] and only appears to other testers. No real client will find or hire you.",
+    "rule1Title": "You are invisible",
+    "rule2Body": "No payment method is connected. Invoices, balances, and payouts are simulated and labeled as such.",
+    "rule2Title": "No money is real",
+    "rule3Body": "Never enter real client, patient, case, CPF, CNPJ, or bank data. Invent everything — that is expected.",
+    "rule3Title": "Fictional data only",
+    "rulesTitle": "Three things to know",
+    "settings": "Adjust my profile",
+    "start": "Start testing",
+    "task1": "Complete your profile and services",
+    "task2": "See other testers in Browse",
+    "task3": "Find a job and send a proposal",
+    "task4": "Chat with another tester",
+    "task5": "Create an invoice and mark it paid (simulated)",
+    "task6": "Report the first problem you find",
+    "thanks": "Thank you for setting time aside for this. Every problem you find is one a real client will not hit.",
+    "until": "Your access lasts until {{date}}."
+  },
+  "testCohort": {
+    "activate": "Activate access",
+    "businessName": "Business name (test)",
+    "businessPlaceholder": "e.g. Silva Plumbing",
+    "check": "Verify",
+    "codeLabel": "Test code",
+    "duration": "Duration: {{days}} days",
+    "errors": {
+      "alreadyTester": "Your account is already part of the test program.",
+      "expired": "This code has expired.",
+      "generic": "Could not activate the code.",
+      "inactive": "The test program is not active right now.",
+      "invalid": "Invalid code. Check it and try again.",
+      "rateLimited": "Too many attempts. Try again in an hour.",
+      "realAccount": "Your account already has an active subscription and cannot become a test account.",
+      "revoked": "This code was revoked. Talk to the team.",
+      "used": "This code has already been used.",
+      "wrongApp": "This code belongs to another Baise app."
+    },
+    "grants": "This code grants:",
+    "markerNote": "The [TEST] prefix will be added automatically.",
+    "roleClient": "Client",
+    "roleProvider": "Service provider",
+    "signIn": "Sign in",
+    "signInFirst": "Sign in to activate a test code.",
+    "subtitle": "Enter the one-time code you received. Your account will be marked as a test account and visible only to other testers.",
+    "success": "Test access activated.",
+    "syntheticDataWarning": "Use fictional data only. Do not enter real client, patient, case, or payment data.",
+    "title": "Test access"
+  },
+  "testimonialTrack": {
+    "askFrom": "Ask a client",
+    "cancelled": "Cancelled",
+    "done": "Received",
+    "empty": "No requests yet. After you finish a job, ask for a testimonial — that is what helps new clients choose you.",
+    "errors": {
+      "generic": "Could not send the request.",
+      "noCustomer": "Client not found."
+    },
+    "opened": "Opened",
+    "reminded": "Reminder sent — without creating a new request.",
+    "reminders": "{{n}} reminder(s)",
+    "requestedOn": "Requested on {{date}}",
+    "sent": "Testimonial request sent.",
+    "subtitle": "Ask someone you already served for a testimonial and track what happened. Resending does not create a new request — it becomes a reminder.",
+    "title": "Testimonial requests",
+    "waiting": "Waiting"
   }
 }

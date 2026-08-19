@@ -101,7 +101,9 @@
     "discard": "Descartar",
     "invalidRequest": "Solicitação inválida.",
     "and": "e",
-    "viewProfile": "Ver perfil"
+    "viewProfile": "Ver perfil",
+    "retry": "Tentar novamente",
+    "success": "Configurações salvas"
   },
   "nav": {
     "home": "Início",
@@ -115,7 +117,8 @@
     "map": "Mapa",
     "feed": "Feed",
     "help": "Ajuda",
-    "menu": "Menu"
+    "menu": "Menu",
+    "blog": "Blog"
   },
   "hub": {
     "metaTitle": "Baise Group — Uma rede confiável para serviços residenciais, de saúde e jurídicos no Brasil",
@@ -458,7 +461,12 @@
     "resetError": "Nao foi possivel enviar o link de redefinicao. Tente novamente.",
     "resetSent": "Link de redefinicao enviado. Confira seu e-mail.",
     "termsOfService": "Termos de servico",
-    "termsRequired": "Voce precisa aceitar os Termos de servico e a Politica de privacidade."
+    "termsRequired": "Voce precisa aceitar os Termos de servico e a Politica de privacidade.",
+    "genericSignInError": "Não foi possível concluir o login. Tente novamente.",
+    "genericSignupResult": "Se o endereço puder ser usado, enviamos o próximo passo. Você também pode tentar entrar ou redefinir a senha.",
+    "resetSentDescription": "Se existir uma conta com esse e-mail, um link seguro de redefinição chegará em breve.",
+    "timeoutError": "A conexão demorou demais. Verifique sua internet e tente entrar novamente.",
+    "wrongBrowserError": "Abra o link no mesmo navegador em que você começou o login. Toques em links dentro do WhatsApp costumam abrir outro navegador."
   },
   "header": {
     "login": "Entrar",
@@ -631,7 +639,15 @@
     "warranty": "Garantia",
     "warrantyPlaceholder": "Ex.: garantia de 90 dias",
     "yourPrice": "Seu preço",
-    "yourProposal": "Sua proposta"
+    "yourProposal": "Sua proposta",
+    "bestMatches": "Melhores correspondências",
+    "clientOpportunityCenter": "Central de oportunidades",
+    "findNextClient": "Encontre seu próximo cliente",
+    "loadError": "Não foi possível carregar as oportunidades. Tente novamente.",
+    "lowCompetition": "Baixa concorrência",
+    "newToday": "Novos hoje",
+    "pipelineValue": "Valor em aberto",
+    "quickFilters": "Filtros rápidos de oportunidade"
   },
   "postJob": {
     "title": "Solicitar Consulta",
@@ -1231,7 +1247,8 @@
     "specialOffers": "Ofertas especiais",
     "contact": "Contato",
     "copyright": "© 2024 MD Baise. Todos os direitos reservados.",
-    "rights": "Todos os direitos reservados."
+    "rights": "Todos os direitos reservados.",
+    "label": "Rodapé"
   },
   "errors": {
     "somethingWentWrong": "Algo deu errado",
@@ -1285,6 +1302,7 @@
     "verified": "Verificado",
     "providerResponse": "Resposta do profissional",
     "helpful": "Útil",
+    "client": "Cliente",
     "feed": "Feed",
     "noFeedPosts": "Nenhuma publicação ainda",
     "noFeedPostsDesc": "Este profissional ainda não compartilhou nenhum conteúdo.",
@@ -1468,7 +1486,15 @@
     "noCreditedReferrals": "Nenhuma indicação creditada ainda",
     "noPendingReferrals": "Nenhuma indicação pendente",
     "noReferralsYet": "Ainda não há indicações",
-    "pendingUser": "Usuário pendente"
+    "pendingUser": "Usuário pendente",
+    "emailPlaceholder": "Enviar link de indicação por e-mail",
+    "emailRequired": "E-mail obrigatório",
+    "emailRequiredDescription": "Informe o e-mail que deve receber seu link de indicação.",
+    "emailSendError": "Não foi possível enviar o e-mail de indicação",
+    "emailSent": "E-mail de indicação enviado",
+    "emailSentDescription": "Seu e-mail de indicação foi enviado e adicionado ao acompanhamento.",
+    "noReferrals": "Ainda não há indicações. Compartilhe seu código para começar a ganhar!",
+    "sendEmail": "Enviar e-mail"
   },
   "favorites": {
     "title": "Favoritos",
@@ -1569,7 +1595,10 @@
     "titlePlaceholder": "Ex.: Excelente atendimento",
     "uploadTitle": "Enviar depoimento em vídeo",
     "uploading": "Enviando...",
-    "uploadDescription": "Compartilhe sua experiência com {{provider}}"
+    "uploadDescription": "Compartilhe sua experiência com {{provider}}",
+    "privateCta": "Enviar feedback privado",
+    "privateDescription": "Por privacidade médica, o feedback enviado nesta página não é publicado no perfil.",
+    "privateTitle": "Feedback privado"
   },
   "workApproval": {
     "approve": "Aprovar",
@@ -1599,7 +1628,16 @@
     "title": "Aprovação de trabalho",
     "upload": "Enviar para aprovação",
     "uploadWork": "Enviar trabalho para aprovação",
-    "uploading": "Enviando..."
+    "uploading": "Enviando...",
+    "clearSignature": "Limpar assinatura",
+    "noSignoffs": "Nenhuma assinatura de cliente está aguardando agora.",
+    "signError": "Não foi possível salvar a assinatura.",
+    "signHere": "Assine aqui",
+    "signOff": "Confirmar assinatura",
+    "signSuccess": "Assinatura salva.",
+    "signatureRequired": "Adicione sua assinatura primeiro.",
+    "signerName": "Seu nome",
+    "signoffsTitle": "Assinaturas do cliente"
   },
   "scheduling": {
     "title": "Serviços Agendados",
@@ -2137,7 +2175,44 @@
     "requestMessageTitle": "Solicitação de consulta",
     "requestSent": "Solicitação de consulta enviada.",
     "sendRequest": "Enviar solicitação",
-    "bookWith": "Agendar com"
+    "bookWith": "Agendar com",
+    "lifecycle": {
+      "addReminder": "Adicionar lembrete",
+      "channelError": "Ative mensagens seguras no app, e-mail ou desative as comunicações de consulta.",
+      "consent": "Receber comunicações de consulta",
+      "consentDescription": "Concordo em receber confirmações, lembretes, acompanhamentos e agradecimentos com o mínimo necessário. Posso cancelar a qualquer momento.",
+      "consentSaved": "As comunicações de consulta estão ativas. Os detalhes médicos permanecem no portal seguro.",
+      "email": "E-mail",
+      "emailDescription": "Receba e-mail genérico da marca com um link seguro do portal.",
+      "followUp": "Lembretes de acompanhamento e mensagens de agradecimento",
+      "followUpDescription": "Receba mensagens genéricas após a consulta, sem detalhes médicos.",
+      "hours": "horas",
+      "hoursBefore": "Horas antes da consulta",
+      "inApp": "Mensagens seguras no app",
+      "inAppDescription": "Receba atualizações genéricas da consulta após entrar.",
+      "offsetError": "Use horários de lembrete únicos entre 15 minutos e 7 dias.",
+      "optOutSaved": "As comunicações de consulta estão desligadas e as mensagens na fila foram canceladas.",
+      "patientTitle": "Comunicações de consulta",
+      "privacy": "As mensagens nunca incluem sintomas, diagnósticos, tratamento, convênio ou anotações da consulta. Os detalhes ficam no portal seguro.",
+      "providerEnabled": "Ativar mensagens do ciclo da consulta",
+      "providerEnabledDescription": "Somente pacientes que optarem explicitamente podem receber essas mensagens.",
+      "providerFollowUp": "Acompanhamento e mensagens de agradecimento",
+      "providerFollowUpDescription": "Padrão: agradecimento após 2 horas e acompanhamento após 24 horas.",
+      "providerReviews": "Pedido neutro de avaliação",
+      "providerReviewsDescription": "Enviado após 48 horas somente se o paciente optar à parte. Sem recompensas ou créditos.",
+      "providerTitle": "Automação de consultas do profissional",
+      "reminderTimes": "Horários de lembrete antes da consulta",
+      "reminders": "Lembretes de consulta",
+      "remindersDescription": "O padrão dos profissionais é 24 horas e 1 hora antes da consulta.",
+      "reviews": "Pedidos opcionais de avaliação",
+      "reviewsDescription": "Os pedidos de avaliação são neutros, sem incentivo e opcionais. Não compartilhe detalhes médicos publicamente.",
+      "save": "Salvar configurações de comunicação da consulta",
+      "saveError": "Nenhuma configuração de comunicação da consulta foi ativada. Tente novamente.",
+      "timezone": "Fuso horário IANA",
+      "timezoneNote": "Os horários usam o fuso do profissional. Os instantes gravados mantêm o horário de verão consistente.",
+      "twoWay": "Confirmação de duas vias",
+      "twoWayDescription": "Pacientes podem confirmar, recusar ou pedir um novo horário em uma página de resposta assinada."
+    }
   },
   "doctorProfile": {
     "loading": "Carregando perfil do médico...",
@@ -2185,6 +2260,8 @@
     "verifiedActive": "Verificado e Ativo",
     "alsoAcceptsSelfPay": "Também aceita pacientes particulares",
     "verifiedPatient": "Paciente Verificado",
+    "patient": "Paciente",
+    "minutes": "min",
     "quality": "Qualidade",
     "professionalism": "Profissionalismo",
     "punctuality": "Pontualidade",
@@ -2392,7 +2469,10 @@
     "startingCamera": "Iniciando câmera...",
     "typeSomething": "Digite algo...",
     "typeText": "Digitar texto",
-    "yourStory": "Seu story"
+    "yourStory": "Seu story",
+    "retryCamera": "A câmera não iniciou — toque para tentar de novo",
+    "tapToStart": "Toque para iniciar a câmera",
+    "zoomUnsupported": "Esta câmera não expõe controles de zoom"
   },
   "medicalCategories": {
     "general-practice": {
@@ -3286,5 +3366,125 @@
       "title": "Comece a construir antes",
       "body": "O endpoint ainda não aceita chaves. Crie sua conta agora e sua chave estará pronta no dia da abertura."
     }
+  },
+  "partner": {
+    "dashboardTitle": "Campanhas de parceiros"
+  },
+  "pilotBanner": {
+    "cta": "Encontrou um problema? Relate aqui →",
+    "label": "MODO DE TESTE — Programa Piloto",
+    "text": "Nenhum pagamento é real e sua conta não aparece para clientes."
+  },
+  "pilotIssue": {
+    "area": "Onde aconteceu?",
+    "areaPlaceholder": "Ex.: faturas, propostas, chat",
+    "autoCapture": "Enviamos junto a página, o navegador e o tamanho da tela para agilizar a correção.",
+    "detail": "Detalhes",
+    "detailPlaceholder": "O que você fez, o que esperava, e o que aconteceu.",
+    "errors": {
+      "body": "Conte um pouco mais sobre o que aconteceu.",
+      "generic": "Não foi possível enviar o relato.",
+      "notTester": "Apenas contas de teste podem relatar problemas por aqui.",
+      "rate": "Muitos relatos seguidos. Tente de novo em uma hora.",
+      "title": "Dê um título um pouco mais descritivo.",
+      "tooBig": "Arquivo muito grande (máx. 100 MB): {{name}}"
+    },
+    "evidence": "Prints, fotos ou gravação de tela",
+    "evidenceHint": "Até {{max}} arquivos, 100 MB cada. Só você e nossa equipe conseguem ver.",
+    "privacy": "Não envie dados reais de clientes, pacientes ou processos. Use apenas informação fictícia.",
+    "sent": "Relato enviado. Obrigado — nossa equipe já foi notificada.",
+    "sev": {
+      "blocker": "Trava tudo — não consigo continuar",
+      "idea": "Ideia / sugestão",
+      "major": "Grave — atrapalha muito",
+      "minor": "Pequeno — detalhe visual",
+      "normal": "Normal"
+    },
+    "severity": "Gravidade",
+    "submit": "Enviar relato",
+    "subtitle": "Quanto mais detalhe, mais rápido corrigimos. Anexe print ou gravação de tela se puder.",
+    "title": "Relatar um problema",
+    "what": "O que aconteceu?",
+    "whatPlaceholder": "Resuma em uma linha"
+  },
+  "pilotStart": {
+    "badge": "Programa Piloto",
+    "checklistLede": "Não é obrigatório e não precisa ser hoje. É só um roteiro do que mais nos ajuda.",
+    "checklistTitle": "O que queremos ver testado",
+    "ctask1": "Publique um pedido de serviço",
+    "ctask2": "Procure profissionais em Explorar",
+    "ctask3": "Converse com um profissional",
+    "ctask4": "Relate o primeiro problema que encontrar",
+    "go": "Ir",
+    "h1": "Sua conta de teste está ativa",
+    "lede": "Você tem acesso profissional completo. Use a plataforma como usaria de verdade — e nos conte tudo que quebrar, confundir ou irritar. É exatamente para isso que você está aqui.",
+    "metaTitle": "Bem-vindo ao piloto",
+    "reportBody": "A faixa amarela no topo aparece em todas as páginas. Clique em “Relate aqui” a qualquer momento — você pode anexar prints e gravações de tela. Vai direto para nossa equipe.",
+    "reportTitle": "Como relatar um problema",
+    "rule1Body": "Sua conta tem a marca [TESTE] e só aparece para outros testadores. Nenhum cliente real vai encontrar ou contratar você.",
+    "rule1Title": "Você está invisível",
+    "rule2Body": "Não há forma de pagamento conectada. Faturas, saldos e repasses são simulados e ficam marcados como tal.",
+    "rule2Title": "Nenhum dinheiro é real",
+    "rule3Body": "Nunca insira dados reais de clientes, pacientes, processos, CPF, CNPJ ou banco. Invente tudo — é o esperado.",
+    "rule3Title": "Só dados fictícios",
+    "rulesTitle": "Três coisas para saber",
+    "settings": "Ajustar meu perfil",
+    "start": "Começar a testar",
+    "task1": "Complete seu perfil e seus serviços",
+    "task2": "Veja os outros testadores em Explorar",
+    "task3": "Encontre um trabalho e envie uma proposta",
+    "task4": "Converse com outro testador",
+    "task5": "Crie uma fatura e marque como paga (simulado)",
+    "task6": "Relate o primeiro problema que encontrar",
+    "thanks": "Obrigado por reservar seu tempo para isso. Cada problema que você encontrar é um problema que um cliente real não vai encontrar.",
+    "until": "Seu acesso vai até {{date}}."
+  },
+  "testCohort": {
+    "activate": "Ativar acesso",
+    "businessName": "Nome do negócio (teste)",
+    "businessPlaceholder": "Ex.: Encanador Silva",
+    "check": "Verificar",
+    "codeLabel": "Código de teste",
+    "duration": "Duração: {{days}} dias",
+    "errors": {
+      "alreadyTester": "Sua conta já faz parte do programa de testes.",
+      "expired": "Este código expirou.",
+      "generic": "Não foi possível ativar o código.",
+      "inactive": "O programa de testes não está ativo no momento.",
+      "invalid": "Código inválido. Verifique e tente novamente.",
+      "rateLimited": "Muitas tentativas. Tente novamente em uma hora.",
+      "realAccount": "Sua conta já possui uma assinatura ativa e não pode virar conta de teste.",
+      "revoked": "Este código foi revogado. Fale com a equipe.",
+      "used": "Este código já foi utilizado.",
+      "wrongApp": "Este código pertence a outro aplicativo Baise."
+    },
+    "grants": "Este código concede:",
+    "markerNote": "O prefixo [TESTE] será adicionado automaticamente.",
+    "roleClient": "Cliente",
+    "roleProvider": "Prestador de serviço",
+    "signIn": "Entrar",
+    "signInFirst": "Entre na sua conta para ativar um código de teste.",
+    "subtitle": "Insira o código de uso único que você recebeu. Sua conta será marcada como conta de teste e ficará visível apenas para outros testadores.",
+    "success": "Acesso de teste ativado.",
+    "syntheticDataWarning": "Use somente dados fictícios. Não insira dados reais de clientes, pacientes, processos ou pagamentos.",
+    "title": "Acesso de teste"
+  },
+  "testimonialTrack": {
+    "askFrom": "Pedir a um cliente",
+    "cancelled": "Cancelado",
+    "done": "Recebido",
+    "empty": "Nenhum pedido ainda. Depois de concluir um trabalho, peça um depoimento — é o que mais ajuda novos clientes a escolherem você.",
+    "errors": {
+      "generic": "Não foi possível enviar o pedido.",
+      "noCustomer": "Cliente não encontrado."
+    },
+    "opened": "Aberto",
+    "reminded": "Lembrete enviado — sem criar um novo pedido.",
+    "reminders": "{{n}} lembrete(s)",
+    "requestedOn": "Pedido em {{date}}",
+    "sent": "Pedido de depoimento enviado.",
+    "subtitle": "Peça um depoimento a quem você já atendeu e acompanhe o que aconteceu. Reenviar não cria um novo pedido — vira um lembrete.",
+    "title": "Pedidos de depoimento",
+    "waiting": "Aguardando"
   }
 }

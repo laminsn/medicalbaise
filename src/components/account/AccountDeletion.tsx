@@ -242,20 +242,8 @@ export function AccountRecoveryGate({
   const [date, setDate] = useState(scheduledAt || null);
 
   useEffect(() => {
-    if (date) return;
-    void supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return;
-      const result = await supabase
-        .from('account_deletion_requests')
-        .select('scheduled_purge_at')
-        .eq('user_id', data.user.id)
-        .eq('status', 'pending_deletion')
-        .order('requested_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      setDate(result.data?.scheduled_purge_at || null);
-    });
-  }, [date]);
+    if (scheduledAt) setDate(scheduledAt);
+  }, [scheduledAt]);
 
   const recover = async () => {
     setBusy(true);

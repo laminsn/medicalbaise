@@ -85,7 +85,7 @@ export default function DoctorProfile() {
 
       const { data, error } = await supabase
         .from('providers')
-        .select('*, profiles!inner(first_name, last_name, avatar_url, email)')
+        .select('*')
         .eq('id', id)
         .maybeSingle();
 
@@ -101,11 +101,28 @@ export default function DoctorProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reviews')
-        .select('*, profiles!reviews_customer_id_fkey(first_name, last_name, avatar_url)')
+        .select('*')
         .eq('provider_id', id!)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data || [];
+      const rows = data || [];
+      const customerIds = [...new Set(rows.map((row) => row.customer_id))];
+      if (customerIds.length === 0) {
+        return rows.map((row) => ({ ...row, customer_display_name: '', customer_avatar_url: '' }));
+      }
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, first_name, last_name, avatar_url')
+        .in('user_id', customerIds);
+      const byUser = new Map((profiles || []).map((profile) => [profile.user_id, profile]));
+      return rows.map((row) => {
+        const profile = byUser.get(row.customer_id);
+        return {
+          ...row,
+          customer_display_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ').trim(),
+          customer_avatar_url: profile?.avatar_url || '',
+        };
+      });
     },
     enabled: !!id,
   });
@@ -142,8 +159,8 @@ export default function DoctorProfile() {
 
   const doctor = doctorData ? {
     ...doctorData,
-    name: doctorData.business_name || `${(doctorData as any).profiles?.first_name || ''} ${(doctorData as any).profiles?.last_name || ''}`.trim(),
-    avatar_url: (doctorData as any).profiles?.avatar_url || '',
+    name: doctorData.business_name || '',
+    avatar_url: doctorData.avatar_url || '',
     specialty_name: '',
     specialty_name_en: '',
     tagline: doctorData.tagline || '',
@@ -415,7 +432,7 @@ export default function DoctorProfile() {
                   {doctor.crm_number}
                 </Badge>
               )}
-              {doctor.is_board_certified && (
+              {credentials.some((cred) => cred.credential_type === 'certification' && cred.is_verified) && (
                 <Badge variant="outline" className="bg-background/80 text-xs">
                   <Award className="h-3 w-3 mr-1 text-green-600" />
                   {t('doctorProfile.boardCertified')}
@@ -773,12 +790,8 @@ export default function DoctorProfile() {
                 <CardContent className="space-y-3">
                   {faqs.map((faq, index) => (
                     <div key={index} className="border-b last:border-0 pb-3 last:pb-0">
-                      <p className="font-medium text-sm">
-                        {isPt ? faq.question : faq.question_en}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {isPt ? faq.answer : faq.answer_en}
-                      </p>
+                      <p className="font-medium text-sm">{faq.question}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{faq.answer}</p>
                     </div>
                   ))}
                 </CardContent>
@@ -793,27 +806,27 @@ export default function DoctorProfile() {
                     <div className="flex justify-between items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-base">
-                          {isPt ? procedure.name : procedure.name_en}
+                          {isPt
+                            ? (procedure.service_categories?.name_pt || procedure.service_categories?.name_en || procedure.description || '')
+                            : (procedure.service_categories?.name_en || procedure.service_categories?.name_pt || procedure.description || '')}
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {isPt ? procedure.description : procedure.description_en}
-                        </p>
-                        <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 flex-shrink-0" />
-                            <span>{procedure.duration}</span>
-                          </div>
-                          {procedure.preparation && (
+                        {procedure.description && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {procedure.description}
+                          </p>
+                        )}
+                        {doctor.consultation_duration_minutes ? (
+                          <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
-                              <AlertCircle className="h-3 w-3 flex-shrink-0" />
-                              <span>{procedure.preparation}</span>
+                              <Clock className="h-3 w-3 flex-shrink-0" />
+                              <span>{doctor.consultation_duration_minutes} {t('doctorProfile.minutes', 'min')}</span>
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        ) : null}
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-primary text-lg whitespace-nowrap">
-                          {formatPrice(procedure.consultation_fee)}
+                          {formatPrice(procedure.fixed_price ?? procedure.hourly_rate ?? doctor.consultation_fee)}
                         </p>
                         <Button size="sm" className="mt-2 w-full min-w-[100px]" onClick={handleBookAppointment}>
                           <Calendar className="h-3 w-3 mr-1" />
@@ -836,18 +849,18 @@ export default function DoctorProfile() {
                   {credentials.map((cred) => (
                     <div key={cred.id} className="flex gap-3 pb-4 border-b last:border-0 last:pb-0">
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        {cred.type === 'education' && <GraduationCap className="h-5 w-5 text-primary" />}
-                        {cred.type === 'residency' && <Hospital className="h-5 w-5 text-primary" />}
-                        {cred.type === 'fellowship' && <Award className="h-5 w-5 text-primary" />}
-                        {cred.type === 'certification' && <BadgeCheck className="h-5 w-5 text-primary" />}
-                        {cred.type === 'membership' && <Users className="h-5 w-5 text-primary" />}
+                        {cred.credential_type === 'education' && <GraduationCap className="h-5 w-5 text-primary" />}
+                        {cred.credential_type === 'residency' && <Hospital className="h-5 w-5 text-primary" />}
+                        {cred.credential_type === 'fellowship' && <Award className="h-5 w-5 text-primary" />}
+                        {cred.credential_type === 'certification' && <BadgeCheck className="h-5 w-5 text-primary" />}
+                        {cred.credential_type === 'membership' && <Users className="h-5 w-5 text-primary" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm">
-                          {isPt ? cred.title : cred.title_en}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">{cred.institution}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{cred.year}</p>
+                        <h4 className="font-medium text-sm">{cred.title}</h4>
+                        <p className="text-sm text-muted-foreground">{cred.issuing_authority}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {cred.issue_date ? new Date(cred.issue_date).getFullYear() : ''}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -970,27 +983,27 @@ export default function DoctorProfile() {
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="h-10 w-10 flex-shrink-0">
-                        <AvatarImage src={review.avatar} alt={review.customer_name} />
-                        <AvatarFallback>{review.customer_name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={review.customer_avatar_url || undefined} alt={review.customer_display_name || t('doctorProfile.patient', 'Patient')} />
+                        <AvatarFallback>{(review.customer_display_name || t('doctorProfile.patient', 'Patient')).charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-sm truncate">{review.customer_name}</p>
+                            <p className="font-medium text-sm truncate">{review.customer_display_name || t('doctorProfile.patient', 'Patient')}</p>
                             <div className="flex items-center gap-2 flex-wrap">
                               <div className="flex gap-0.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <Star 
                                     key={star} 
                                     className={`h-3 w-3 ${
-                                      star <= review.rating 
+                                      star <= review.overall_rating 
                                         ? 'text-amber-500 fill-amber-500' 
                                         : 'text-muted-foreground'
                                     }`} 
                                   />
                                 ))}
                               </div>
-                              {review.verified && (
+                              {review.is_verified && (
                                 <Badge variant="outline" className="text-xs h-5">
                                   <CheckCircle2 className="h-3 w-3 mr-1" />
                                   {t('doctorProfile.verifiedPatient')}
@@ -998,7 +1011,9 @@ export default function DoctorProfile() {
                               )}
                             </div>
                           </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">{review.date}</span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {review.created_at ? new Date(review.created_at).toLocaleDateString(i18n.resolvedLanguage || i18n.language) : ''}
+                          </span>
                         </div>
                         
                         <p className="text-sm mt-2 leading-relaxed">{review.comment}</p>
@@ -1039,7 +1054,7 @@ export default function DoctorProfile() {
                         <div className="flex items-center gap-4 mt-3">
                           <Button variant="ghost" size="sm" className="h-8 text-xs">
                             <ThumbsUp className="h-3 w-3 mr-1" />
-                            {t('doctorProfile.helpful')} ({review.helpful_count})
+                            {t('doctorProfile.helpful')}
                           </Button>
                         </div>
                       </div>

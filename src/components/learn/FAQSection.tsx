@@ -28,7 +28,7 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categoryLabels: Record<string, { en: string; pt: string }> = {
+  const categoryLabels: Record<string, { en: string; pt: string; es: string }> = {
     all: { en: 'All', pt: 'Todos', es: 'Todos' },
     account: { en: 'Account', pt: 'Conta', es: 'Cuenta' },
     booking: { en: 'Bookings', pt: 'Agendamentos', es: 'Reservas' },

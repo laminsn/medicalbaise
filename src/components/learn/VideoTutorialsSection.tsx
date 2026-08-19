@@ -141,7 +141,7 @@ export function VideoTutorialsSection({ searchQuery }: VideoTutorialsSectionProp
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedVideo, setSelectedVideo] = useState<typeof videos[0] | null>(null);
 
-  const videoCategoryLabels: Record<string, { en: string; pt: string }> = {
+  const videoCategoryLabels: Record<string, { en: string; pt: string; es: string }> = {
     all: { en: 'All Videos', pt: 'Todos os vídeos', es: 'Todos los vídeos' },
     quickstart: { en: 'Quick Start', pt: 'Início rápido', es: 'Inicio rápido' },
     features: { en: 'Feature Deep Dives', pt: 'Recursos em profundidade', es: 'Funciones a fondo' },

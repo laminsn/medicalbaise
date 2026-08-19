@@ -24,9 +24,7 @@ import { getBaiseAppKey, getBaiseAppUrl } from "@/lib/providerCommunication";
 import { supabase } from "@/integrations/supabase/client";
 import contentLinks from "@/lib/content-links.json";
 import platforms from "@/lib/platforms.json";
-// @ts-expect-error Shared JavaScript modules intentionally ship without declarations.
 import { attemptNative, resolveDeepLink } from "@/lib/deep-links.mjs";
-// @ts-expect-error Shared JavaScript modules intentionally ship without declarations.
 import { renderContentHub } from "@/lib/content-hub.mjs";
 
 type AppKey = "casa" | "medical" | "legal";
