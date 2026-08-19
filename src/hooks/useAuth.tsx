@@ -2,7 +2,7 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
-import { buildAuthCallbackUrl, resolveSignupIntent } from '@/lib/postAuthDestination';
+import { buildAuthCallbackUrl, resolveSignupIntent, signupIntentFromMetadata } from '@/lib/postAuthDestination';
 
 interface Profile {
   id: string;
@@ -84,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               first_name: meta.first_name,
               last_name: meta.last_name,
               avatar_url: meta.avatar_url || meta.picture,
+              signup_intent: meta.signup_intent,
             });
           }, 0);
         } else {
@@ -104,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           first_name: meta.first_name,
           last_name: meta.last_name,
           avatar_url: meta.avatar_url || meta.picture,
+          signup_intent: meta.signup_intent,
         });
       }
       setLoading(false);
@@ -166,7 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (refreshedProfile) setProfile(refreshedProfile as Profile);
   };
 
-  const ensureProfile = async (userId: string, userData?: { email?: string; full_name?: string; avatar_url?: string; first_name?: string; last_name?: string }) => {
+  const ensureProfile = async (userId: string, userData?: { email?: string; full_name?: string; avatar_url?: string; first_name?: string; last_name?: string; signup_intent?: string }) => {
     // First try to fetch existing profile
     const { data: existingProfile } = await supabase
       .from('profiles')
@@ -188,9 +190,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const handle = `user_${userId.slice(0, 8)}`;
     const referralCode = `REF${userId.slice(0, 6).toUpperCase()}`;
-    const signupIntent = resolveSignupIntent(
-      typeof window !== 'undefined' ? window.location.search : '',
-    );
+    const signupIntent =
+      signupIntentFromMetadata({ signup_intent: userData?.signup_intent }) ||
+      resolveSignupIntent(typeof window !== 'undefined' ? window.location.search : '');
 
     const { data: newProfile, error } = await supabase
       .from('profiles')

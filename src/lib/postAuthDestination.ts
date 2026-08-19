@@ -1,4 +1,4 @@
-import { sanitizeRedirectUrl } from '@/lib/sanitize';
+import { sanitizeRedirectUrl } from '@/lib/security';
 
 /** First destination after login/signup for both seekers and providers. */
 export const SOCIAL_FEED_PATH = '/feed';
@@ -78,12 +78,16 @@ function isAuthOrHomePath(path: string): boolean {
   return AUTH_PATH_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+function isSafeInAppPath(path: string): boolean {
+  return path.startsWith('/') && !path.startsWith('//') && !path.includes('\\');
+}
+
 function explicitRedirectFromSearch(search = ''): string | null {
   const params = parseSearch(search);
   const raw = params.get('redirect') || params.get('redirectTo') || params.get('next');
   if (!raw) return null;
   const safe = sanitizeRedirectUrl(raw);
-  if (!safe || isAuthOrHomePath(safe)) return null;
+  if (!isSafeInAppPath(safe) || isAuthOrHomePath(safe)) return null;
   return safe;
 }
 
@@ -103,12 +107,30 @@ export function buildAuthCallbackUrl(origin: string, search = ''): string {
   const out = new URLSearchParams();
   const role = consumeSignupRoleFromSearch(search);
   if (role === 'provider') out.set('role', 'provider');
+  const safeRedirect = explicitRedirectFromSearch(search);
+  if (safeRedirect) out.set('redirect', safeRedirect);
   for (const key of LOCALE_QUERY_KEYS) {
     const value = params.get(key);
     if (value) out.set(key, value);
   }
   const qs = out.toString();
   return `${origin}/auth/callback${qs ? `?${qs}` : ''}`;
+}
+
+export function clearPersistedSignupRole(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(SIGNUP_ROLE_STORAGE_KEY);
+  } catch {
+    // sessionStorage may be unavailable
+  }
+}
+
+export function signupIntentFromMetadata(meta?: Record<string, unknown> | null): SignupIntent | null {
+  if (!meta) return null;
+  return normalizeRole(
+    String(meta.signup_intent || meta.user_type || meta.account_type || meta.role || ''),
+  );
 }
 
 export function isSignupMode(search = ''): boolean {

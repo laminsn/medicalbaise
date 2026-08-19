@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useFaceAuth } from '@/hooks/useFaceAuth';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { buildAuthCallbackUrl } from '@/lib/postAuthDestination';
 
 interface FaceAuthVerifyProps {
   onSuccess: () => void;
@@ -180,6 +181,10 @@ async function supabaseSignInWithOtp(email: string): Promise<{ error: Error | nu
       email,
       options: {
         shouldCreateUser: false,
+        emailRedirectTo: buildAuthCallbackUrl(
+          window.location.origin,
+          window.location.search,
+        ),
       },
     });
 

@@ -33,6 +33,7 @@ import {
 } from '@/lib/security';
 import {
   buildAuthCallbackUrl,
+  clearPersistedSignupRole,
   consumeSignupRoleFromSearch,
   isSignupMode,
   persistSignupRole,
@@ -103,6 +104,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (authLoading || !user) return;
+    clearPersistedSignupRole();
     navigate(resolveAuthenticatedAuthVisitPath(search), { replace: true });
   }, [authLoading, navigate, search, user]);
 
@@ -155,9 +157,14 @@ export default function Auth() {
     }
   };
 
+  const goToPostAuthDestination = () => {
+    clearPersistedSignupRole();
+    navigate(resolvePostAuthPath(search), { replace: true });
+  };
+
   const handleFaceAuthSuccess = () => {
     toast({ title: t('auth.welcomeBack') + '!' });
-    navigate(resolvePostAuthPath(search));
+    goToPostAuthDestination();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -216,7 +223,7 @@ export default function Auth() {
             toast({
               title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
             });
-            navigate(resolvePostAuthPath(search));
+            goToPostAuthDestination();
           } else {
             toast({
               title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
@@ -270,7 +277,7 @@ export default function Auth() {
           toast({
             title: t('auth.welcomeBack') + '!',
           });
-          navigate(resolvePostAuthPath(search));
+          goToPostAuthDestination();
         }
       }
     } finally {
