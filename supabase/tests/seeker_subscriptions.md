@@ -70,6 +70,8 @@ Do not rewrite provider `TIER_BY_PRODUCT_ID`. Inherited Casa `prod_TwTA…` mapp
 
 ## UI
 
+- Visual source of truth: https://baiseapps.vercel.app/pricing seeker `plan-card` chrome (type, spacing, BRL `R$0` / `R$99` / `R$499`, fee callout). Avis owns tokens.
+- Pay as you go / Baise+ names are replaced by Flex / Lifestyle / Project. Slugs remain `flex|lifestyle|project`.
 - `/seeker-pricing` + `seekerPricing.*` in `en` / `es` / `pt`.
 - Lifestyle `used/8` is `transaction_count` from the server SELECT list.
 - `/pricing` and other provider pages stay provider-only.

@@ -1811,9 +1811,14 @@
   "seekerPricing": {
     "title": "Planes para pacientes",
     "subtitle": "Pague por cada servicio completado o elija un plan mensual para pacientes.",
+    "eyebrow": "Para clientes",
+    "heading": "Reserva una vez o convierte a Baise en tu primera opción.",
+    "intro": "Sin cargo por explorar. Sin cargo por pedir una cotización. El cargo estándar solo comienza cuando se completa el servicio.",
     "choosePlan": "Elija un plan para pacientes",
     "month": "mes",
+    "perMonth": "/mes",
     "mostPopular": "Más popular",
+    "bestForRepeat": "Ideal para reservas recurrentes",
     "selectPlan": "Seleccionar plan",
     "currentPlan": "Plan actual",
     "yourPlan": "Tu plan",
@@ -1821,18 +1826,22 @@
     "checkoutFailed": "No se pudo iniciar el pago",
     "cancelAnytime": "Cancele Lifestyle o Project cuando quiera. Flex sigue siendo el predeterminado.",
     "usedOfLimit": "{{used}}/{{limit}} servicios pagos completados en este período",
+    "includedBenefits": "Beneficios incluidos",
+    "feeMin": "Mínimo de R$27 en servicios completados",
+    "eightTx": "8 servicios pagos completados",
+    "unlimitedFee": "Servicios pagos completados ilimitados",
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "R$0 + 5% (mín. R$27)"
+        "description": "Explora y solicita servicios libremente. El cargo Baise solo se aplica después de completar el servicio."
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "R$99 / 8 servicios pagos completados"
+        "description": "Una membresía mensual para quienes reservan con frecuencia y quieren el checkout más sencillo."
       },
       "project": {
         "name": "Project",
-        "description": "R$499 ilimitado"
+        "description": "Servicios pagos completados ilimitados para el cuidado continuo."
       }
     },
     "features": {
@@ -1842,7 +1851,28 @@
       "eightPaidServices": "8 servicios pagos completados por mes",
       "zeroFee": "0% de tarifa de plataforma en esos servicios",
       "monthlyBilling": "Facturación mensual en reales brasileños",
-      "unlimitedServices": "Servicios pagos completados ilimitados"
+      "unlimitedServices": "Servicios pagos completados ilimitados",
+      "noBrowseFee": "Sin cargo por explorar o pedir cotización",
+      "compareProfiles": "Compara perfiles de proveedores y detalles de servicios",
+      "completedReviews": "Consulta reseñas de trabajos completados y señales visibles de verificación",
+      "scheduleMessage": "Agenda y envía mensajes dentro de un solo registro de servicio",
+      "quotesTogether": "Mantén juntas cotizaciones, facturas y recibos",
+      "paymentTrail": "Conserva un historial documentado de reserva y pago",
+      "escalationPaths": "Usa vías de reclamo, ausencia y escalamiento de seguridad",
+      "representativeReview": "Solicita revisión de un representante cuando el autoservicio no sea suficiente",
+      "processingSeparate": "Ve el procesamiento de tarjeta por separado antes del checkout",
+      "feeAfterComplete": "Paga el cargo Baise solo después de un servicio completado",
+      "noMonthlyCommitment": "No asumas compromiso mensual",
+      "everythingInFlex": "Todo lo de Flex",
+      "everythingInLifestyle": "Todo lo de Lifestyle",
+      "noBookingFee": "No pagues cargo de reserva Baise",
+      "processingIncluded": "Incluye el procesamiento estándar de tarjeta en reservas elegibles",
+      "prioritySupport": "Recibe soporte prioritario para reservas",
+      "predictableCosts": "Mantén más predecibles los costos mensuales de servicios",
+      "trustSignals": "Compara perfiles de proveedores y señales de confianza",
+      "invoicesTogether": "Mantén juntos facturas, recibos e historial de pagos",
+      "representativeWhenNeeded": "Solicita revisión de un representante cuando sea necesario",
+      "repeatContext": "Conserva el contexto útil para reservas recurrentes"
     }
   },
   "reviews": {

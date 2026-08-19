@@ -3,45 +3,78 @@ import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useSeekerSubscription } from '@/hooks/useSeekerSubscription';
-import { LIFESTYLE_TRANSACTION_LIMIT } from '@/lib/constants/seekerPlans';
+import { LIFESTYLE_TRANSACTION_LIMIT, type SeekerPlan } from '@/lib/constants/seekerPlans';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Check, Crown, Zap, Star, Loader2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import '@/styles/baise-plan-cards.css';
 
 const PLANS = [
   {
     id: 'flex' as const,
-    icon: Star,
-    color: 'text-muted-foreground',
-    bgColor: 'bg-muted',
-    features: ['payPerService', 'platformFee', 'noMonthlyCharge'],
-    price: 0,
-    popular: false,
-    priceId: undefined as string | undefined,
+    dataPlan: 'Flex',
+    monthly: 'R$0',
+    bookingFee: '5%',
+    bookingLabelKey: 'seekerPricing.feeMin',
+    featured: false,
+    featureKeys: [
+      'noBrowseFee',
+      'compareProfiles',
+      'completedReviews',
+      'scheduleMessage',
+      'quotesTogether',
+      'paymentTrail',
+      'escalationPaths',
+      'representativeReview',
+      'processingSeparate',
+      'feeAfterComplete',
+      'noMonthlyCommitment',
+    ],
   },
   {
     id: 'lifestyle' as const,
-    icon: Crown,
-    color: 'text-amber-500',
-    bgColor: 'bg-amber-500/10',
-    features: ['eightPaidServices', 'usedOfLimit', 'zeroFee', 'monthlyBilling'],
-    price: 99,
-    popular: true,
-    priceId: 'lifestyle',
+    dataPlan: 'Lifestyle',
+    monthly: 'R$99',
+    bookingFee: '0%',
+    bookingLabelKey: 'seekerPricing.eightTx',
+    featured: true,
+    featureKeys: [
+      'usedOfLimit',
+      'everythingInFlex',
+      'noBookingFee',
+      'processingIncluded',
+      'prioritySupport',
+      'predictableCosts',
+      'trustSignals',
+      'scheduleMessage',
+      'invoicesTogether',
+      'escalationPaths',
+      'representativeWhenNeeded',
+      'repeatContext',
+    ],
   },
   {
     id: 'project' as const,
-    icon: Zap,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10',
-    features: ['unlimitedServices', 'zeroFee', 'monthlyBilling'],
-    price: 499,
-    popular: false,
-    priceId: 'project',
+    dataPlan: 'Project',
+    monthly: 'R$499',
+    bookingFee: '0%',
+    bookingLabelKey: 'seekerPricing.unlimitedFee',
+    featured: false,
+    featureKeys: [
+      'everythingInLifestyle',
+      'unlimitedServices',
+      'noBookingFee',
+      'processingIncluded',
+      'prioritySupport',
+      'predictableCosts',
+      'trustSignals',
+      'scheduleMessage',
+      'invoicesTogether',
+      'escalationPaths',
+      'representativeWhenNeeded',
+    ],
   },
 ];
 
@@ -52,24 +85,19 @@ export default function SeekerPricing() {
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { plan: currentPlan, transactionCount, startCheckout } = useSeekerSubscription();
-  const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState<SeekerPlan | null>(null);
 
-  const handleSelectPlan = async (plan: typeof PLANS[number]) => {
+  const handleSelectPlan = async (planId: SeekerPlan) => {
     if (!user) {
       navigate('/auth');
       return;
     }
+    if (planId === 'flex' || planId === currentPlan) return;
 
-    if (plan.id === 'flex' || plan.id === currentPlan) {
-      return;
-    }
-
-    if (!plan.priceId) return;
-
-    setUpgrading(plan.id);
+    setUpgrading(planId);
     try {
-      if (plan.id !== 'lifestyle' && plan.id !== 'project') return;
-      await startCheckout(plan.id);
+      if (planId !== 'lifestyle' && planId !== 'project') return;
+      await startCheckout(planId);
     } catch (err) {
       toast.error(
         err instanceof Error
@@ -99,105 +127,85 @@ export default function SeekerPricing() {
           <h1 className="text-lg font-semibold">{t('seekerPricing.title')}</h1>
         </div>
 
-        <div className="px-4 py-6 pb-24">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2">{t('seekerPricing.choosePlan')}</h2>
-            <p className="text-muted-foreground">{t('seekerPricing.subtitle')}</p>
-          </div>
+        <div className="seeker-pricing-source px-3 pb-24">
+          <section className="pricing-seeker" aria-labelledby="seeker-pricing">
+            <div className="pricing-section-heading">
+              <div>
+                <p className="eyebrow">{t('seekerPricing.eyebrow')}</p>
+                <h2 id="seeker-pricing">{t('seekerPricing.heading')}</h2>
+              </div>
+              <p>{t('seekerPricing.intro')}</p>
+            </div>
 
-          <div className="space-y-4">
-            {PLANS.map((plan) => {
-              const Icon = plan.icon;
-              const isCurrentPlan = plan.id === currentPlan;
+            <div className="seeker-pricing-grid">
+              {PLANS.map((plan) => {
+                const isCurrentPlan = plan.id === currentPlan;
+                const features = plan.featureKeys.map((feature) =>
+                  feature === 'usedOfLimit'
+                    ? t('seekerPricing.usedOfLimit', {
+                        used: currentPlan === 'lifestyle' ? transactionCount : 0,
+                        limit: LIFESTYLE_TRANSACTION_LIMIT,
+                      })
+                    : t(`seekerPricing.features.${feature}`),
+                );
 
-              return (
-                <Card
-                  key={plan.id}
-                  className={`relative transition-all ${plan.popular ? 'border-primary shadow-lg' : ''} ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}
-                >
-                  {plan.popular && (
-                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary">
-                      {t('seekerPricing.mostPopular')}
-                    </Badge>
-                  )}
-                  {isCurrentPlan && (
-                    <Badge className="absolute -top-2 right-4 bg-primary text-primary-foreground">
-                      {isPt ? 'Seu plano' : isEs ? 'Tu plan' : 'Your Plan'}
-                    </Badge>
-                  )}
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full ${plan.bgColor} flex items-center justify-center`}>
-                          <Icon className={`w-5 h-5 ${plan.color}`} />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">{t(`seekerPricing.plans.${plan.id}.name`)}</CardTitle>
-                          <p className="text-sm text-muted-foreground">{t(`seekerPricing.plans.${plan.id}.description`)}</p>
-                        </div>
+                return (
+                  <article
+                    key={plan.id}
+                    className={`plan-card ${plan.featured ? 'featured' : ''}`}
+                    data-plan={plan.dataPlan}
+                  >
+                    <div className="plan-card-top">
+                      <div>
+                        <span>{t(`seekerPricing.plans.${plan.id}.name`)}</span>
+                        <strong>
+                          {plan.monthly}
+                          <small>{t('seekerPricing.perMonth')}</small>
+                        </strong>
                       </div>
+                      {plan.featured && <b>{t('seekerPricing.bestForRepeat')}</b>}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-baseline gap-1 mb-4">
-                      <span className="text-3xl font-bold">
-                        {`R$${plan.price}`}
-                      </span>
-                      {plan.price > 0 && <span className="text-muted-foreground">/{t('seekerPricing.month')}</span>}
+                    <p>{t(`seekerPricing.plans.${plan.id}.description`)}</p>
+                    <div className="fee-callout">
+                      <strong>{plan.bookingFee}</strong>
+                      <span>{t(plan.bookingLabelKey)}</span>
                     </div>
-
-                    <ul className="space-y-2 mb-4">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-2 text-sm">
-                          <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                          <span>
-                            {feature === 'usedOfLimit'
-                              ? t('seekerPricing.usedOfLimit', {
-                                  used: currentPlan === 'lifestyle' ? transactionCount : 0,
-                                  limit: LIFESTYLE_TRANSACTION_LIMIT,
-                                })
-                              : feature === 'platformFee'
-                                ? t('seekerPricing.features.platformFee', {
-                                    percent: 5,
-                                    min: 'R$27',
-                                  })
-                                : t(`seekerPricing.features.${feature}`)}
-                          </span>
+                    <div className="plan-benefit-count">
+                      <span>{t('seekerPricing.includedBenefits')}</span>
+                      <b>{features.length}</b>
+                    </div>
+                    <ul>
+                      {features.map((feature) => (
+                        <li key={feature}>
+                          <Check />
+                          {feature}
                         </li>
                       ))}
                     </ul>
-
-                    <Button
-                      className="w-full gap-1.5"
-                      variant={plan.popular ? 'default' : 'outline'}
-                      disabled={isCurrentPlan || !plan.priceId || upgrading !== null}
-                      onClick={() => handleSelectPlan(plan)}
-                    >
-                      {upgrading === plan.id ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          {isPt ? 'Abrindo checkout...' : isEs ? 'Abriendo pago...' : 'Opening checkout...'}
-                        </>
-                      ) : isCurrentPlan ? (
-                        t('seekerPricing.currentPlan')
-                      ) : plan.priceId ? (
-                        <>
-                          <ExternalLink className="h-4 w-4" />
-                          {t('seekerPricing.selectPlan')}
-                        </>
-                      ) : (
-                        t('seekerPricing.currentPlan')
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          <p className="text-center text-xs text-muted-foreground mt-6">
-            {t('seekerPricing.cancelAnytime')}
-          </p>
+                    {plan.id !== 'flex' && (
+                      <button
+                        type="button"
+                        className="button button-dark"
+                        disabled={isCurrentPlan || upgrading !== null}
+                        onClick={() => handleSelectPlan(plan.id)}
+                      >
+                        {upgrading === plan.id ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {isPt ? 'Abrindo checkout...' : isEs ? 'Abriendo pago...' : 'Opening checkout...'}
+                          </>
+                        ) : isCurrentPlan ? (
+                          t('seekerPricing.currentPlan')
+                        ) : (
+                          t('seekerPricing.selectPlan')
+                        )}
+                      </button>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
         </div>
       </AppLayout>
     </>
