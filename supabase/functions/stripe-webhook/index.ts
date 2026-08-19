@@ -544,7 +544,7 @@ async function lookupSeekerByStripeSubscription(
 }
 
 async function persistStripeEventId(supabaseAdmin: AdminClient, event: Stripe.Event) {
-  // Shared table with Casa/Legal. PK is event_id. Duplicate 23505 → 200.
+  // Shannon: Casa shape only. Do not insert `id`. Do not write stripe_webhook_events.
   const { error } = await supabaseAdmin.from("stripe_events").insert({
     event_id: event.id,
   });

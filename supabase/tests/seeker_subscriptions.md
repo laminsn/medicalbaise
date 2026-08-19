@@ -71,7 +71,7 @@ Do not reuse MD provider `prod_TwYB…` / `price_1Syf5…` or Casa `prod_TwTA…
 
 Pattern lives in the existing `supabase/functions/stripe-webhook/index.ts`. Do not copy a snapshot webhook file.
 
-`event.id` persist: insert into `stripe_events.event_id` after signature verify, before handlers (same table as Casa/Legal). Duplicate `23505` → `{ received: true }` and skip. Handler throw deletes the row so Stripe can retry. Do not CREATE `stripe_webhook_events`. Shared-safe CREATE lives on Casa (apply-once). See `supabase/SHARED_SAFE.md`.
+`event.id` persist: Casa shape only — `stripe_events.insert({ event_id: event.id })` after `constructEvent`, before handlers. Do not insert `id` (Legal’s shape). Do not write `stripe_webhook_events`. Duplicate `23505` → `{ received: true }` and skip. Handler throw deletes that `event_id` so Stripe can retry. Do not CREATE `stripe_events` or `seeker_subscriptions` on this tree. Casa owns the one apply-once SQL. See `supabase/SHARED_SAFE.md`.
 
 Detect seeker **first**, then `break`. Never fall through to `providers.subscription_tier`. Signals: `role=seeker`, `type=seeker`, plan `flex|lifestyle|project`, matching `STRIPE_PRICE_SEEKER_*` when the id is `price_*`, or an existing `seeker_subscriptions` row for that Stripe subscription. Missing plan or unresolved user → log and `break`. Not return-true-only.
 
