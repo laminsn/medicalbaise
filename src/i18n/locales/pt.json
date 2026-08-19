@@ -1836,20 +1836,22 @@
     "feeMin": "Mínimo de R$27 em serviços concluídos",
     "feeMinShort": "mín. R$27",
     "eightTx": "8 serviços pagos concluídos",
+    "eightIncluded": "8 incluídas / mês",
+    "perTransaction": "por transação",
     "unlimited": "Ilimitado",
     "unlimitedFee": "serviços pagos concluídos",
     "plans": {
       "flex": {
         "name": "Flex",
-        "description": "Navegue e solicite serviços livremente. A tarifa Baise só se aplica depois que o serviço é concluído."
+        "description": "5% por transação."
       },
       "lifestyle": {
         "name": "Lifestyle",
-        "description": "8 serviços pagos concluídos por mês para reservas recorrentes."
+        "description": "0% por transação. 8 incluídas / mês."
       },
       "project": {
         "name": "Project",
-        "description": "Serviços pagos concluídos ilimitados para o cuidado contínuo."
+        "description": "Ilimitado."
       }
     },
     "features": {
@@ -1875,7 +1877,10 @@
       "everythingInLifestyle": "Tudo do Lifestyle",
       "noBookingFee": "Não pague tarifa de reserva Baise",
       "processingIncluded": "Inclua o processamento padrão do cartão em reservas elegíveis",
-      "prioritySupport": "Receba suporte prioritário para reservas",
+      "prioritySupport": "Suporte prioritário.",
+      "priorityOffers": "Ofertas prioritárias.",
+      "topProviders": "Acesso aos prestadores com melhor desempenho.",
+      "seenFirst": "Seja visto primeiro quando você publicar um pedido.",
       "predictableCosts": "Mantenha os custos mensais de serviços mais previsíveis",
       "trustSignals": "Compare perfis de prestadores e sinais de confiança",
       "invoicesTogether": "Mantenha faturas, recibos e histórico de pagamento juntos",
