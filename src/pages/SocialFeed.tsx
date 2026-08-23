@@ -7,6 +7,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { removeUniqueChannel, subscribeUniqueChannel } from '@/lib/subscribeUniqueChannel';
 import { SocialPostCard } from '@/components/social/SocialPostCard';
 import { CreatePostDialog } from '@/components/social/CreatePostDialog';
 import { AdManagerDialog } from '@/components/social/AdManagerDialog';
@@ -121,18 +122,16 @@ export default function SocialFeed() {
   useEffect(() => {
     fetchPosts();
 
-    // Subscribe to realtime updates
-    const channel = supabase
-      .channel('social-posts')
-      .on(
+    const channel = subscribeUniqueChannel('social-posts', (ch) =>
+      ch.on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'social_posts' },
         () => fetchPosts()
       )
-      .subscribe();
+    );
 
     return () => {
-      supabase.removeChannel(channel);
+      removeUniqueChannel(channel);
     };
   }, [t]);
 
