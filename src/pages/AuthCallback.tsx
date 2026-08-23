@@ -5,7 +5,9 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import {
+  clearPersistedLastPrompt,
   clearPersistedSignupRole,
+  consumeLastPromptFromSearch,
   persistSignupRole,
   resolvePostAuthPath,
   resolveSignupIntent,
@@ -57,6 +59,7 @@ export default function AuthCallback() {
       if (session?.user) {
         const callbackSearch = window.location.search;
         persistSignupRole(url.searchParams.get('role'));
+        consumeLastPromptFromSearch(callbackSearch);
         const lng = url.searchParams.get('lng') || url.searchParams.get('locale') || url.searchParams.get('lang');
         if (lng) void i18n.changeLanguage(lng);
 
@@ -146,8 +149,10 @@ export default function AuthCallback() {
           localStorage.removeItem('baise_partner_landing');
         }
 
+        const destination = resolvePostAuthPath(callbackSearch);
         clearPersistedSignupRole();
-        navigate(resolvePostAuthPath(callbackSearch), { replace: true });
+        clearPersistedLastPrompt();
+        navigate(destination, { replace: true });
         return;
       }
 

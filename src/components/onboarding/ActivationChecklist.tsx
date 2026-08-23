@@ -1,6 +1,7 @@
 import { Check, Circle, ExternalLink } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { persistLastPromptFromPath } from '@/lib/postAuthDestination';
 import { onboardingConfig, type OnboardingStepKey } from './onboardingConfig';
 import type { OnboardingProgress } from './useOnboarding';
 
@@ -61,7 +62,10 @@ export function ActivationChecklist({ progress, percent, profileComplete, hasSer
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(step.descriptionKey)}</p>
                 {!done && (
                   <div className="mt-2 flex flex-wrap gap-3">
-                    <button type="button" onClick={() => onNavigate(step.destination)} className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+                    <button type="button" onClick={() => {
+                      persistLastPromptFromPath(step.destination);
+                      onNavigate(step.destination);
+                    }} className="inline-flex items-center gap-1 text-xs font-bold text-primary">
                       {t('onboarding.open')} <ExternalLink className="h-3 w-3" />
                     </button>
                     {step.autoDetect === 'none' && (

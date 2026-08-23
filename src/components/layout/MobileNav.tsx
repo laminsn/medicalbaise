@@ -30,8 +30,8 @@ export function MobileNav() {
           const Icon = item.icon;
           
           // Redirect to auth if not logged in for protected routes
-          const href = !user && ['/post-job', '/messages', '/profile'].includes(item.path) 
-            ? '/auth' 
+          const href = !user && ['/messages', '/profile'].includes(item.path)
+            ? '/auth'
             : item.path;
 
           return (

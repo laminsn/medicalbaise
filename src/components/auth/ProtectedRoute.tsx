@@ -2,6 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Loader2 } from 'lucide-react';
+import { persistLastPromptFromPath } from '@/lib/postAuthDestination';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,7 +23,11 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   }
 
   if (!user) {
-    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+    const prompt = persistLastPromptFromPath(location.pathname);
+    const params = new URLSearchParams(location.search);
+    if (prompt) params.set('prompt', prompt);
+    const qs = params.toString();
+    return <Navigate to={`/auth${qs ? `?${qs}` : ''}`} state={{ from: location.pathname }} replace />;
   }
 
   if (requireAdmin && !isAdmin) {

@@ -33,7 +33,9 @@ import {
 } from '@/lib/security';
 import {
   buildAuthCallbackUrl,
+  clearPersistedLastPrompt,
   clearPersistedSignupRole,
+  consumeLastPromptFromSearch,
   consumeSignupRoleFromSearch,
   isSignupMode,
   persistSignupRole,
@@ -97,6 +99,7 @@ export default function Auth() {
   useEffect(() => {
     persistSignupRole(searchParams.get('role'));
     consumeSignupRoleFromSearch(search);
+    consumeLastPromptFromSearch(search);
     if (isSignupMode(search)) setIsSignUp(true);
     const lng = searchParams.get('lng') || searchParams.get('locale') || searchParams.get('lang');
     if (lng) void i18n.changeLanguage(lng);
@@ -104,8 +107,10 @@ export default function Auth() {
 
   useEffect(() => {
     if (authLoading || !user) return;
+    const destination = resolveAuthenticatedAuthVisitPath(search);
     clearPersistedSignupRole();
-    navigate(resolveAuthenticatedAuthVisitPath(search), { replace: true });
+    clearPersistedLastPrompt();
+    navigate(destination, { replace: true });
   }, [authLoading, navigate, search, user]);
 
   const signUpSchema = z.object({
@@ -129,6 +134,7 @@ export default function Auth() {
     setGoogleLoading(true);
     try {
       persistSignupRole(searchParams.get('role'));
+      consumeLastPromptFromSearch(search);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -158,8 +164,10 @@ export default function Auth() {
   };
 
   const goToPostAuthDestination = () => {
+    const destination = resolvePostAuthPath(search);
     clearPersistedSignupRole();
-    navigate(resolvePostAuthPath(search), { replace: true });
+    clearPersistedLastPrompt();
+    navigate(destination, { replace: true });
   };
 
   const handleFaceAuthSuccess = () => {
