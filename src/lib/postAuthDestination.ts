@@ -2,13 +2,25 @@ import { sanitizeRedirectUrl } from '@/lib/security';
 
 /** First destination after login/signup for both seekers and providers. */
 export const SOCIAL_FEED_PATH = '/feed';
+export const PAYOUTS_PATH = '/payouts';
+export const POST_JOB_PATH = '/post-job';
 
 export const SIGNUP_ROLE_STORAGE_KEY = 'baise_signup_role';
+export const LAST_PROMPT_STORAGE_KEY = 'baise_last_prompt';
 
 const LOCALE_QUERY_KEYS = ['lng', 'locale', 'lang'] as const;
 const AUTH_PATH_PREFIXES = ['/auth', '/login', '/signin', '/sign-in', '/log-in', '/signup'];
 
 export type SignupIntent = 'provider' | 'client';
+
+/** Last completed onboarding prompt. Destinations are fixed. */
+export type OnboardingPrompt = 'share' | 'get-money' | 'get-things-done';
+
+const PROMPT_PATHS: Record<OnboardingPrompt, string> = {
+  share: SOCIAL_FEED_PATH,
+  'get-money': PAYOUTS_PATH,
+  'get-things-done': POST_JOB_PATH,
+};
 
 function parseSearch(search = ''): URLSearchParams {
   const raw = search.startsWith('?') ? search.slice(1) : search;
@@ -47,6 +59,94 @@ export function consumeSignupRoleFromSearch(search = ''): SignupIntent | null {
   const fromQuery = normalizeRole(parseSearch(search).get('role'));
   if (fromQuery === 'provider') persistSignupRole('provider');
   return fromQuery ?? readPersistedSignupRole();
+}
+
+function normalizePrompt(value: string | null | undefined): OnboardingPrompt | null {
+  const raw = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_]+/g, '-')
+    .replace(/\s+/g, ' ');
+  if (!raw) return null;
+  if (raw === 'share' || raw === 'sharing') return 'share';
+  if (
+    raw === 'get-money' ||
+    raw === 'get money' ||
+    raw === 'money' ||
+    raw === 'payouts' ||
+    raw === PAYOUTS_PATH
+  ) {
+    return 'get-money';
+  }
+  if (
+    raw === 'get-things-done' ||
+    raw === 'get things done' ||
+    raw === 'things-done' ||
+    raw === 'things done' ||
+    raw === 'post-job' ||
+    raw === POST_JOB_PATH
+  ) {
+    return 'get-things-done';
+  }
+  return null;
+}
+
+export function readPersistedLastPrompt(): OnboardingPrompt | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return normalizePrompt(window.sessionStorage.getItem(LAST_PROMPT_STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
+
+/** Persist last onboarding prompt across Google OAuth, same storage as role. */
+export function persistLastPrompt(prompt: string | null | undefined): OnboardingPrompt | null {
+  if (typeof window === 'undefined') return null;
+  const normalized = normalizePrompt(prompt);
+  if (!normalized) return null;
+  try {
+    window.sessionStorage.setItem(LAST_PROMPT_STORAGE_KEY, normalized);
+  } catch {
+    // sessionStorage may be unavailable (private mode)
+  }
+  return normalized;
+}
+
+export function persistLastPromptFromPath(path: string | null | undefined): OnboardingPrompt | null {
+  const pathname = String(path || '').split('?')[0].split('#')[0] || '/';
+  if (pathname === SOCIAL_FEED_PATH || pathname.startsWith(`${SOCIAL_FEED_PATH}/`)) {
+    return persistLastPrompt('share');
+  }
+  if (pathname === PAYOUTS_PATH || pathname.startsWith(`${PAYOUTS_PATH}/`)) {
+    return persistLastPrompt('get-money');
+  }
+  if (pathname === POST_JOB_PATH || pathname.startsWith(`${POST_JOB_PATH}/`)) {
+    return persistLastPrompt('get-things-done');
+  }
+  return null;
+}
+
+export function consumeLastPromptFromSearch(search = ''): OnboardingPrompt | null {
+  const fromQuery = normalizePrompt(parseSearch(search).get('prompt'));
+  if (fromQuery) persistLastPrompt(fromQuery);
+  return fromQuery ?? readPersistedLastPrompt();
+}
+
+export function pathForOnboardingPrompt(prompt: OnboardingPrompt | null | undefined, search = ''): string | null {
+  if (!prompt) return null;
+  const path = PROMPT_PATHS[prompt];
+  if (!path) return null;
+  return `${path}${localeQueryString(search)}`;
+}
+
+export function clearPersistedLastPrompt(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(LAST_PROMPT_STORAGE_KEY);
+  } catch {
+    // sessionStorage may be unavailable
+  }
 }
 
 /**
@@ -91,22 +191,28 @@ function explicitRedirectFromSearch(search = ''): string | null {
   return safe;
 }
 
-/** Default after email/Google/biometric login+signup: social feed, not home or a role dashboard. */
+/** Default after email/Google/biometric login+signup: last prompt, else social feed. */
 export function resolvePostAuthPath(search = ''): string {
-  return explicitRedirectFromSearch(search) || getDefaultPostAuthPath(search);
+  return (
+    explicitRedirectFromSearch(search) ||
+    pathForOnboardingPrompt(consumeLastPromptFromSearch(search), search) ||
+    getDefaultPostAuthPath(search)
+  );
 }
 
-/** Logged-in visit to /auth (including provider CTA query) goes to feed, never /. */
+/** Logged-in visit to /auth honors last prompt or feed, never /. */
 export function resolveAuthenticatedAuthVisitPath(search = ''): string {
   return resolvePostAuthPath(search);
 }
 
-/** OAuth / email-confirm return URL that keeps role=provider and locale. */
+/** OAuth / email-confirm return URL that keeps prompt, role=provider, and locale. */
 export function buildAuthCallbackUrl(origin: string, search = ''): string {
   const params = parseSearch(search);
   const out = new URLSearchParams();
   const role = consumeSignupRoleFromSearch(search);
   if (role === 'provider') out.set('role', 'provider');
+  const prompt = consumeLastPromptFromSearch(search);
+  if (prompt) out.set('prompt', prompt);
   const safeRedirect = explicitRedirectFromSearch(search);
   if (safeRedirect) out.set('redirect', safeRedirect);
   for (const key of LOCALE_QUERY_KEYS) {
