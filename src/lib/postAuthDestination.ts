@@ -200,7 +200,7 @@ export function resolvePostAuthPath(search = ''): string {
   );
 }
 
-/** Logged-in visit to /auth (including provider CTA query) goes to feed, never /. */
+/** Logged-in visit to /auth honors last prompt or feed, never /. */
 export function resolveAuthenticatedAuthVisitPath(search = ''): string {
   return resolvePostAuthPath(search);
 }
