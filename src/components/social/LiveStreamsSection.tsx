@@ -7,6 +7,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { LiveStreamViewer } from './LiveStreamViewer';
 import { LiveStream } from '@/hooks/useLiveStream';
 import { supabase } from '@/integrations/supabase/client';
+import { removeUniqueChannel, subscribeUniqueChannel } from '@/lib/subscribeUniqueChannel';
 import { useAuth } from '@/hooks/useAuth';
 
 interface LiveStreamsSectionProps {
@@ -58,20 +59,19 @@ export function LiveStreamsSection({ specialtyFilter, locationFilter }: LiveStre
   useEffect(() => {
     fetchLiveStreams();
 
-    const channel = supabase
-      .channel('live-streams-feed')
-      .on(
+    const channel = subscribeUniqueChannel('live-streams-feed', (ch) =>
+      ch.on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'live_streams' },
         () => fetchLiveStreams()
       )
-      .subscribe();
+    );
 
     // Fallback polling every 15 seconds
     const pollInterval = setInterval(fetchLiveStreams, 15000);
 
     return () => {
-      supabase.removeChannel(channel);
+      removeUniqueChannel(channel);
       clearInterval(pollInterval);
     };
   }, []);
