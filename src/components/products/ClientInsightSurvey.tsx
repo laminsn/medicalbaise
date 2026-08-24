@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -14,6 +14,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { getBaiseAppKey, getLocaleKey } from '@/lib/providerCommunication';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import {
+  INSIGHT_REVENUE_HIGH_BRL,
+  INSIGHT_REVENUE_MID_BRL,
+  INSIGHT_REVENUE_UNDER_BRL,
+} from '@/lib/constants/displayAmounts';
 
 const db = supabase as any;
 
@@ -106,11 +113,67 @@ const surveyCopy = {
   },
 };
 
-const revenueOptions = {
-  en: ['Prefer not to say', 'Under R$5k/month', 'R$5k-R$15k/month', 'R$15k-R$40k/month', 'R$40k+/month', 'Business revenue varies'],
-  pt: ['Prefiro nao informar', 'Abaixo de R$5 mil/mes', 'R$5 mil-R$15 mil/mes', 'R$15 mil-R$40 mil/mes', 'R$40 mil+/mes', 'Faturamento varia'],
-  es: ['Prefiero no decir', 'Menos de R$5 mil/mes', 'R$5 mil-R$15 mil/mes', 'R$15 mil-R$40 mil/mes', 'R$40 mil+/mes', 'Ingresos variables'],
+const REVENUE_OPTION_IDS = ['prefer_not', 'under_5000', '5000_15000', '15000_40000', '40000_plus', 'varies'] as const;
+
+const LEGACY_REVENUE_TO_ID: Record<string, string> = {
+  'Prefer not to say': 'prefer_not',
+  'Under R$5k/month': 'under_5000',
+  'R$5k-R$15k/month': '5000_15000',
+  'R$15k-R$40k/month': '15000_40000',
+  'R$40k+/month': '40000_plus',
+  'Business revenue varies': 'varies',
+  'Prefiro nao informar': 'prefer_not',
+  'Abaixo de R$5 mil/mes': 'under_5000',
+  'R$5 mil-R$15 mil/mes': '5000_15000',
+  'R$15 mil-R$40 mil/mes': '15000_40000',
+  'R$40 mil+/mes': '40000_plus',
+  'Faturamento varia': 'varies',
+  'Prefiero no decir': 'prefer_not',
+  'Menos de R$5 mil/mes': 'under_5000',
+  'Ingresos variables': 'varies',
 };
+
+function revenueOptionLabels(
+  locale: 'en' | 'pt' | 'es',
+  under: string,
+  mid: string,
+  high: string,
+): Record<(typeof REVENUE_OPTION_IDS)[number], string> {
+  if (locale === 'pt') {
+    return {
+      prefer_not: 'Prefiro nao informar',
+      under_5000: `Abaixo de ${under}/mes`,
+      '5000_15000': `${under}-${mid}/mes`,
+      '15000_40000': `${mid}-${high}/mes`,
+      '40000_plus': `${high}+/mes`,
+      varies: 'Faturamento varia',
+    };
+  }
+  if (locale === 'es') {
+    return {
+      prefer_not: 'Prefiero no decir',
+      under_5000: `Menos de ${under}/mes`,
+      '5000_15000': `${under}-${mid}/mes`,
+      '15000_40000': `${mid}-${high}/mes`,
+      '40000_plus': `${high}+/mes`,
+      varies: 'Ingresos variables',
+    };
+  }
+  return {
+    prefer_not: 'Prefer not to say',
+    under_5000: `Under ${under}/month`,
+    '5000_15000': `${under}-${mid}/month`,
+    '15000_40000': `${mid}-${high}/month`,
+    '40000_plus': `${high}+/month`,
+    varies: 'Business revenue varies',
+  };
+}
+
+function normalizeRevenueId(value?: string | null): string {
+  if (!value) return '';
+  if ((REVENUE_OPTION_IDS as readonly string[]).includes(value)) return value;
+  return LEGACY_REVENUE_TO_ID[value] || value;
+}
 
 const lifestyleOptions = {
   en: ['Busy professional', 'Business owner', 'Family organizer', 'Frequent traveler', 'New to Brazil', 'Planning a major change'],
@@ -140,10 +203,15 @@ function getGoalText(value: unknown) {
 
 export function ClientInsightSurvey() {
   const { i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
   const { user } = useAuth();
   const appKey = getBaiseAppKey();
   const locale = getLocaleKey(i18n.language);
   const copy = surveyCopy[locale];
+  const under = formatDisplayPrice(INSIGHT_REVENUE_UNDER_BRL, { currency, rates });
+  const mid = formatDisplayPrice(INSIGHT_REVENUE_MID_BRL, { currency, rates });
+  const high = formatDisplayPrice(INSIGHT_REVENUE_HIGH_BRL, { currency, rates });
+  const revenueLabels = revenueOptionLabels(locale, under, mid, high);
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [occupation, setOccupation] = useState('');
@@ -177,16 +245,31 @@ export function ClientInsightSurvey() {
   const isDue = Boolean(profile?.next_survey_due_at && new Date(profile.next_survey_due_at).getTime() <= Date.now());
   const formOpen = !profile || isDue || showForm;
 
+  useEffect(() => {
+    if (!profile) return;
+    setOccupation(profile.occupation || '');
+    setRevenueRange(normalizeRevenueId(profile.revenue_range));
+    setCountry(profile.country || '');
+    setStateRegion(profile.state || profile.region || '');
+    setCity(profile.city || '');
+    setSelectedLifestyle(profile.lifestyle_tags || []);
+    setFamilySize(profile.family_size != null ? String(profile.family_size) : '');
+    setLifeGoals(getGoalText(profile.life_goals));
+    setEducationLevel(profile.education_level || '');
+  }, [profile]);
+
   const savedBadges = useMemo(() => {
     if (!profile) return [];
+    const revenueId = normalizeRevenueId(profile.revenue_range);
+    const revenueLabel = revenueLabels[revenueId as keyof typeof revenueLabels] || profile.revenue_range;
     return [
       profile.occupation,
-      profile.revenue_range,
+      revenueLabel,
       [profile.city, profile.state || profile.region, profile.country].filter(Boolean).join(', '),
       ...(profile.lifestyle_tags || []).slice(0, 2),
       getGoalText(profile.life_goals),
     ].filter(Boolean).slice(0, 4) as string[];
-  }, [profile]);
+  }, [profile, revenueLabels]);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -318,11 +401,11 @@ export function ClientInsightSurvey() {
             <Label>{copy.revenue}</Label>
             <Select value={revenueRange} onValueChange={setRevenueRange}>
               <SelectTrigger>
-                <SelectValue placeholder={profile?.revenue_range || copy.revenue} />
+                <SelectValue placeholder={revenueLabels[normalizeRevenueId(profile?.revenue_range) as keyof typeof revenueLabels] || copy.revenue} />
               </SelectTrigger>
               <SelectContent>
-                {revenueOptions[locale].map((option) => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                {REVENUE_OPTION_IDS.map((optionId) => (
+                  <SelectItem key={optionId} value={optionId}>{revenueLabels[optionId]}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

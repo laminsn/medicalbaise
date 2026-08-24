@@ -424,7 +424,7 @@ export const PROMO_CAMPAIGNS: PromoCampaign[] = [
     rules: [
       'Minimum 5,000 followers.',
       'Minimum two and maximum four posts per month.',
-      'R$150 for approved posts, plus R$150 after 10,000+ views.',
+      '{{amount}} for approved posts, plus {{amount}} after 10,000+ views.',
       'Tracked commission after eligible premium or service-client retention milestones.',
       'Applications reviewed within 48 hours.',
     ],

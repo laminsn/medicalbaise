@@ -1,12 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.join(process.cwd(), 'src');
+const ROOTS = [path.join(process.cwd(), 'src'), path.join(process.cwd(), 'api')];
 const FORBIDDEN = [
   { pattern: /5\.05\b/, hint: 'baked USD/BRL 5.05' },
   { pattern: /5\.2043\b/, hint: 'baked USD/BRL 5.2043' },
   { pattern: /convertFromUSD/, hint: 'legacy USD conversion helper' },
   { pattern: /navigator\.language\s*\|\|[\s\S]{0,80}currency|LOCALE_CURRENCY_MAP/, hint: 'navigator.language → currency' },
+];
+
+const SRC_AMOUNT_FORBIDDEN = [
+  { pattern: /R\$50\b/, hint: 'literal R$50' },
+  { pattern: /R\$100\b/, hint: 'literal R$100' },
+  { pattern: /R\$150\b/, hint: 'literal R$150' },
+  { pattern: /R\$5k/, hint: 'literal R$5k' },
+  { pattern: /R\$5,000/, hint: 'literal R$5,000' },
+  { pattern: /R\$5\.000/, hint: 'literal R$5.000' },
 ];
 
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.json']);
@@ -20,7 +29,7 @@ function walk(dir, out = []) {
   return out;
 }
 
-const files = walk(ROOT);
+const files = ROOTS.flatMap((root) => (fs.existsSync(root) ? walk(root) : []));
 const failures = [];
 
 for (const filePath of files) {
@@ -31,6 +40,14 @@ for (const filePath of files) {
       failures.push(`${path.relative(process.cwd(), filePath)}: ${rule.hint}`);
     }
   }
+  const relative = path.relative(process.cwd(), filePath);
+  if (!relative.endsWith('ClientInsightSurvey.tsx')) {
+    for (const rule of SRC_AMOUNT_FORBIDDEN) {
+      if (rule.pattern.test(source)) {
+        failures.push(`${relative}: ${rule.hint}`);
+      }
+    }
+  }
 }
 
 if (failures.length > 0) {
@@ -39,15 +56,18 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-const I18N_DIR = path.join(ROOT, 'i18n', 'locales');
+const I18N_DIR = path.join(process.cwd(), 'src', 'i18n', 'locales');
 const I18N_FORBIDDEN = [
   { pattern: /R\$0\b/, hint: 'literal R$0' },
   { pattern: /R\$10\b/, hint: 'literal R$10' },
   { pattern: /R\$20\b/, hint: 'literal R$20' },
   { pattern: /R\$27\b/, hint: 'literal R$27' },
+  { pattern: /R\$50\b/, hint: 'literal R$50' },
   { pattern: /R\$99\b/, hint: 'literal R$99' },
   { pattern: /R\$100\b/, hint: 'literal R$100' },
+  { pattern: /R\$150\b/, hint: 'literal R$150' },
   { pattern: /R\$499\b/, hint: 'literal R$499' },
+  { pattern: /R\$5k/, hint: 'literal R$5k' },
   { pattern: /R\$5,000/, hint: 'literal R$5,000' },
   { pattern: /R\$5\.000/, hint: 'literal R$5.000' },
   { pattern: /\(R\$\)/, hint: 'hardcoded (R$) label' },
@@ -69,5 +89,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('No baked 5.05 / 5.2043 / convertFromUSD / navigator currency map in src.');
-console.log('No leftover R$0/R$10/R$20/R$27/R$99/R$100/R$499/R$5,000/R$5.000/(R$) in src/i18n.');
+console.log('No baked 5.05 / 5.2043 / convertFromUSD / navigator currency map in src or api.');
+console.log('No leftover R$0/R$10/R$20/R$27/R$50/R$99/R$100/R$150/R$499/R$5k/R$5,000/R$5.000/(R$) in src/i18n.');
+console.log('No leftover R$50/R$100/R$150/R$5k/R$5,000/R$5.000 display literals in src.');

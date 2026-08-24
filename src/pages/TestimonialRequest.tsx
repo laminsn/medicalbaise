@@ -27,6 +27,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { generateSafeFileName, validateFileUpload } from '@/lib/security';
 import { getBaiseAppKey, getBaiseAppUrl } from '@/lib/providerCommunication';
 import { localizedPublicPath } from '@/lib/publicPageSeo';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import {
+  TESTIMONIAL_GOOGLE_CREDIT_BRL,
+  TESTIMONIAL_TOTAL_CREDIT_BRL,
+  TESTIMONIAL_VIDEO_CREDIT_BRL,
+  fillDisplayAmount,
+} from '@/lib/constants/displayAmounts';
 
 type LocaleKey = 'en' | 'es' | 'pt';
 type RewardType = 'google_review' | 'video_testimonial';
@@ -51,28 +59,28 @@ const brandName = {
 const COPY = {
   en: {
     title: 'Share your experience',
-    description: 'Submit a Google review or video testimonial after a completed Baise service and earn up to R$150 in future service credit once approved.',
+    description: 'Submit a Google review or video testimonial after a completed Baise service and earn up to {{amount}} in future service credit once approved.',
     badge: 'Client testimonial request',
     eyebrow: 'Your experience helps the next client choose with confidence.',
     headline: 'Tell us how your service went.',
     intro: 'After a completed service, you can help another client choose a trusted provider and earn future service credit after Baise approval.',
     googleTitle: 'Google review',
-    googleCredit: 'R$50 future service credit',
+    googleCredit: '{{amount}} future service credit',
     googleBody: 'Leave one Google review for your completed service. After approval, the credit is added for future Baise services.',
     googleButton: 'Open Google reviews',
     googlePending: 'Google review link coming soon',
     googleConfirm: 'I posted my Google review',
     videoTitle: 'Video testimonial',
-    videoCredit: 'R$100 future service credit',
+    videoCredit: '{{amount}} future service credit',
     videoBody: 'Upload one short testimonial video sharing what was helpful, professional, or worth recommending.',
     totalCredit: 'Total available credit',
-    totalCreditValue: 'R$150',
+    totalCreditValue: '{{amount}}',
     rulesTitle: 'Simple credit rules',
     rules: [
       'One Google review credit per client.',
       'One video testimonial credit per client.',
       'Credits are approved after review and apply to future services.',
-      'Maximum testimonial credit is R$150 per client.',
+      'Maximum testimonial credit is {{amount}} per client.',
     ],
     uploadTitle: 'Upload your testimonial video',
     uploadHint: 'MP4, WebM, or MOV. Max 50MB.',
@@ -94,28 +102,28 @@ const COPY = {
   },
   es: {
     title: 'Comparte tu experiencia',
-    description: 'Envía una reseña de Google o un vídeo testimonial después de un servicio completado en Baise y gana hasta R$150 en crédito para servicios futuros una vez aprobado.',
+    description: 'Envía una reseña de Google o un vídeo testimonial después de un servicio completado en Baise y gana hasta {{amount}} en crédito para servicios futuros una vez aprobado.',
     badge: 'Solicitud de testimonio',
     eyebrow: 'Tu experiencia ayuda al próximo cliente a elegir con confianza.',
     headline: 'Cuéntanos cómo fue tu servicio.',
     intro: 'Después de un servicio completado, puedes ayudar a otro cliente a elegir un proveedor confiable y ganar crédito futuro después de la aprobación de Baise.',
     googleTitle: 'Reseña de Google',
-    googleCredit: 'R$50 de crédito para servicios futuros',
+    googleCredit: '{{amount}} de crédito para servicios futuros',
     googleBody: 'Deja una reseña de Google por tu servicio completado. Después de la aprobación, el crédito se agrega para futuros servicios Baise.',
     googleButton: 'Abrir reseñas de Google',
     googlePending: 'Link de Google disponible pronto',
     googleConfirm: 'Ya publiqué mi reseña',
     videoTitle: 'Vídeo testimonial',
-    videoCredit: 'R$100 de crédito para servicios futuros',
+    videoCredit: '{{amount}} de crédito para servicios futuros',
     videoBody: 'Sube un vídeo corto contando qué fue útil, profesional o digno de recomendar.',
     totalCredit: 'Crédito total disponible',
-    totalCreditValue: 'R$150',
+    totalCreditValue: '{{amount}}',
     rulesTitle: 'Reglas simples del crédito',
     rules: [
       'Un crédito por reseña de Google por cliente.',
       'Un crédito por vídeo testimonial por cliente.',
       'Los créditos se aprueban después de revisión y aplican a servicios futuros.',
-      'El crédito máximo por testimonios es R$150 por cliente.',
+      'El crédito máximo por testimonios es {{amount}} por cliente.',
     ],
     uploadTitle: 'Sube tu vídeo testimonial',
     uploadHint: 'MP4, WebM o MOV. Máximo 50MB.',
@@ -137,28 +145,28 @@ const COPY = {
   },
   pt: {
     title: 'Compartilhe sua experiência',
-    description: 'Envie uma avaliação no Google ou um vídeo depoimento depois de um serviço concluído na Baise e ganhe até R$150 em crédito para serviços futuros após aprovação.',
+    description: 'Envie uma avaliação no Google ou um vídeo depoimento depois de um serviço concluído na Baise e ganhe até {{amount}} em crédito para serviços futuros após aprovação.',
     badge: 'Pedido de depoimento do cliente',
     eyebrow: 'Sua experiência ajuda o próximo cliente a escolher com confiança.',
     headline: 'Conte como foi o seu serviço.',
     intro: 'Depois de um serviço concluído, você pode ajudar outro cliente a escolher um prestador confiável e ganhar crédito futuro após a aprovação da Baise.',
     googleTitle: 'Avaliação no Google',
-    googleCredit: 'R$50 de crédito para serviços futuros',
+    googleCredit: '{{amount}} de crédito para serviços futuros',
     googleBody: 'Deixe uma avaliação no Google sobre o serviço concluído. Depois da aprovação, o crédito é adicionado para futuros serviços Baise.',
     googleButton: 'Abrir avaliações do Google',
     googlePending: 'Link do Google em breve',
     googleConfirm: 'Publiquei minha avaliação',
     videoTitle: 'Vídeo depoimento',
-    videoCredit: 'R$100 de crédito para serviços futuros',
+    videoCredit: '{{amount}} de crédito para serviços futuros',
     videoBody: 'Envie um vídeo curto contando o que foi útil, profissional ou vale recomendar.',
     totalCredit: 'Crédito total disponível',
-    totalCreditValue: 'R$150',
+    totalCreditValue: '{{amount}}',
     rulesTitle: 'Regras simples do crédito',
     rules: [
       'Um crédito por avaliação no Google por cliente.',
       'Um crédito por vídeo depoimento por cliente.',
       'Os créditos são aprovados após análise e valem para serviços futuros.',
-      'O crédito máximo por depoimentos é R$150 por cliente.',
+      'O crédito máximo por depoimentos é {{amount}} por cliente.',
     ],
     uploadTitle: 'Envie seu vídeo depoimento',
     uploadHint: 'MP4, WebM ou MOV. Máximo 50MB.',
@@ -194,13 +202,27 @@ const normalizeLocale = (language: string): LocaleKey => {
 
 export default function TestimonialRequest({ defaultLocale }: TestimonialRequestProps) {
   const { i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
   const { user, profile, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const appKey = getBaiseAppKey();
   const brand = brandName[appKey];
   const locale = defaultLocale || normalizeLocale(i18n.resolvedLanguage || i18n.language || 'en');
-  const copy = COPY[locale];
+  const googleAmount = formatDisplayPrice(TESTIMONIAL_GOOGLE_CREDIT_BRL, { currency, rates });
+  const videoAmount = formatDisplayPrice(TESTIMONIAL_VIDEO_CREDIT_BRL, { currency, rates });
+  const totalAmount = formatDisplayPrice(TESTIMONIAL_TOTAL_CREDIT_BRL, { currency, rates });
+  const copy = useMemo(() => {
+    const rawCopy = COPY[locale];
+    return {
+      ...rawCopy,
+      description: fillDisplayAmount(rawCopy.description, totalAmount),
+      googleCredit: fillDisplayAmount(rawCopy.googleCredit, googleAmount),
+      videoCredit: fillDisplayAmount(rawCopy.videoCredit, videoAmount),
+      totalCreditValue: fillDisplayAmount(rawCopy.totalCreditValue, totalAmount),
+      rules: rawCopy.rules.map((rule) => fillDisplayAmount(rule, totalAmount)),
+    };
+  }, [googleAmount, locale, totalAmount, videoAmount]);
 
   const providerId = searchParams.get('providerId') || searchParams.get('provider_id') || '';
   const jobId = searchParams.get('jobId') || searchParams.get('job_id') || '';
@@ -229,10 +251,10 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
   const canClaimGoogle = Boolean(user && hasProviderContext && !googleReward);
 
   const proofStats = useMemo(() => [
-    { label: copy.googleTitle, value: 'R$50' },
-    { label: copy.videoTitle, value: 'R$100' },
+    { label: copy.googleTitle, value: googleAmount },
+    { label: copy.videoTitle, value: videoAmount },
     { label: copy.totalCredit, value: copy.totalCreditValue },
-  ], [copy]);
+  ], [copy, googleAmount, videoAmount]);
 
   useEffect(() => {
     if (!defaultLocale) return;
@@ -359,7 +381,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
     if (!canClaimGoogle) return;
     setIsClaimingGoogle(true);
     try {
-      await recordReward('google_review', 50, {
+      await recordReward('google_review', TESTIMONIAL_GOOGLE_CREDIT_BRL, {
         google_review_url: googleReviewUrl || null,
         provider_name: providerName || null,
         claimed_from: 'testimonial_request_page',
@@ -404,7 +426,7 @@ export default function TestimonialRequest({ defaultLocale }: TestimonialRequest
 
       if (testimonialError) throw testimonialError;
 
-      await recordReward('video_testimonial', 100, {
+      await recordReward('video_testimonial', TESTIMONIAL_VIDEO_CREDIT_BRL, {
         video_testimonial_id: testimonial?.id || null,
         provider_name: providerName || null,
         file_name: fileName,

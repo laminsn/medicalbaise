@@ -169,7 +169,7 @@ export const sops: SOP[] = [
       { step: 3, title: 'Payment Capture', description: 'System captures authorized payment amount after mutual confirmation.', notes: 'Capture occurs automatically 24 hours after completion if no disputes.', timeEstimate: 'Automatic' },
       { step: 4, title: 'Fee Calculation', description: 'Platform fee (5-10% based on subscription) deducted from payment.', notes: 'Fee breakdown visible in transaction details. Lower fees for higher tiers.', timeEstimate: 'Automatic' },
       { step: 5, title: 'Balance Update', description: 'Net amount added to provider\'s available balance.', notes: 'Balance visible in Provider Dashboard > Payouts.', timeEstimate: 'Automatic' },
-      { step: 6, title: 'Payout Processing', description: 'System initiates bank transfer on scheduled payout day (weekly Friday default).', notes: 'Minimum R$50 threshold. Below minimum rolls to next payout.', timeEstimate: '1-3 business days' },
+      { step: 6, title: 'Payout Processing', description: 'System initiates bank transfer on scheduled payout day (weekly Friday default).', notes: 'Minimum {{amount}} threshold. Below minimum rolls to next payout.', timeEstimate: '1-3 business days' },
       { step: 7, title: 'Confirmation', description: 'Provider receives payout confirmation via email with breakdown.', notes: 'Bank deposits typically visible within 1-3 business days.', timeEstimate: 'Varies by bank' }
     ],
     qualityChecks: [

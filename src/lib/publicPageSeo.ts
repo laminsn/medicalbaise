@@ -86,17 +86,17 @@ export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppK
   influencer: {
     en: (app) => ({
       title: `Brazil Influencer Campaign | ${BRAND_SEO[app].name}`,
-      description: `Apply to become a ${BRAND_SEO[app].name} Brazil influencer. Approved influencers and creators earn R$150 per approved post, viral bonuses, tracked commissions, and give their audience access to ${appAudience[app].en}.`,
+      description: `Apply to become a ${BRAND_SEO[app].name} Brazil influencer. Approved influencers and creators earn {{amount}} per approved post, viral bonuses, tracked commissions, and give their audience access to ${appAudience[app].en}.`,
       imageAlt: `${BRAND_SEO[app].name} Brazil influencer campaign preview with creator payouts and tracked commissions.`,
     }),
     pt: (app) => ({
       title: `Campanha de Influenciadores no Brasil | ${BRAND_SEO[app].name}`,
-      description: `Inscreva-se para ser influenciador da ${BRAND_SEO[app].name} no Brasil. Influenciadores e criadores aprovados recebem R$150 por post aprovado, bônus viral, comissões rastreadas e ajudam o público a encontrar ${appAudience[app].pt}.`,
+      description: `Inscreva-se para ser influenciador da ${BRAND_SEO[app].name} no Brasil. Influenciadores e criadores aprovados recebem {{amount}} por post aprovado, bônus viral, comissões rastreadas e ajudam o público a encontrar ${appAudience[app].pt}.`,
       imageAlt: `Prévia da campanha de influenciadores da ${BRAND_SEO[app].name} com pagamentos e comissões rastreadas.`,
     }),
     es: (app) => ({
       title: `Campaña de Influencers en Brasil | ${BRAND_SEO[app].name}`,
-      description: `Postúlate para ser influencer de ${BRAND_SEO[app].name} en Brasil. Influencers y creadores aprobados ganan R$150 por publicación aprobada, bono viral, comisiones rastreadas y ayudan a su audiencia a encontrar ${appAudience[app].es}.`,
+      description: `Postúlate para ser influencer de ${BRAND_SEO[app].name} en Brasil. Influencers y creadores aprobados ganan {{amount}} por publicación aprobada, bono viral, comisiones rastreadas y ayudan a su audiencia a encontrar ${appAudience[app].es}.`,
       imageAlt: `Vista previa de la campaña de influencers de ${BRAND_SEO[app].name} con pagos y comisiones rastreadas.`,
     }),
   },
@@ -120,18 +120,18 @@ export const PUBLIC_PAGE_SEO: Record<PublicPageKey, Record<SeoLocale, (app: AppK
   testimonial: {
     en: (app) => ({
       title: `Share Your Experience | ${BRAND_SEO[app].name}`,
-      description: `After a completed ${BRAND_SEO[app].name} service, leave a Google review or upload a short testimonial video and earn up to R$150 in approved future service credit.`,
-      imageAlt: `${BRAND_SEO[app].name} testimonial request preview with R$150 service credit offer.`,
+      description: `After a completed ${BRAND_SEO[app].name} service, leave a Google review or upload a short testimonial video and earn up to {{amount}} in approved future service credit.`,
+      imageAlt: `${BRAND_SEO[app].name} testimonial request preview with {{amount}} service credit offer.`,
     }),
     pt: (app) => ({
       title: `Compartilhe sua Experiência | ${BRAND_SEO[app].name}`,
-      description: `Depois de um serviço concluído na ${BRAND_SEO[app].name}, deixe uma avaliação no Google ou envie um vídeo depoimento e ganhe até R$150 em crédito aprovado para serviços futuros.`,
-      imageAlt: `Prévia do pedido de depoimento da ${BRAND_SEO[app].name} com crédito de até R$150.`,
+      description: `Depois de um serviço concluído na ${BRAND_SEO[app].name}, deixe uma avaliação no Google ou envie um vídeo depoimento e ganhe até {{amount}} em crédito aprovado para serviços futuros.`,
+      imageAlt: `Prévia do pedido de depoimento da ${BRAND_SEO[app].name} com crédito de até {{amount}}.`,
     }),
     es: (app) => ({
       title: `Comparte tu Experiencia | ${BRAND_SEO[app].name}`,
-      description: `Después de un servicio completado en ${BRAND_SEO[app].name}, deja una reseña en Google o sube un video testimonial y gana hasta R$150 en crédito aprobado para servicios futuros.`,
-      imageAlt: `Vista previa de solicitud de testimonio de ${BRAND_SEO[app].name} con crédito de hasta R$150.`,
+      description: `Después de un servicio completado en ${BRAND_SEO[app].name}, deja una reseña en Google o sube un video testimonial y gana hasta {{amount}} en crédito aprobado para servicios futuros.`,
+      imageAlt: `Vista previa de solicitud de testimonio de ${BRAND_SEO[app].name} con crédito de hasta {{amount}}.`,
     }),
   },
   referral: {

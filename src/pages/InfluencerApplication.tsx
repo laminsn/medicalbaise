@@ -29,6 +29,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/publicPageSeo';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import { INFLUENCER_POST_PAY_BRL, INFLUENCER_VIRAL_BONUS_BRL } from '@/lib/constants/displayAmounts';
 
 type PlatformRow = {
   platform: string;
@@ -112,11 +115,14 @@ type InfluencerApplicationProps = {
 export default function InfluencerApplication({ defaultLocale }: InfluencerApplicationProps) {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
   const [searchParams] = useSearchParams();
   const appKey = getBaiseAppKey();
   const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
   const campaignPath = localizedPublicPath('/influencer-partners', locale);
   const applicationPath = localizedPublicPath('/influencer-application', locale);
+  const postPay = formatDisplayPrice(INFLUENCER_POST_PAY_BRL, { currency, rates });
+  const viralBonus = formatDisplayPrice(INFLUENCER_VIRAL_BONUS_BRL, { currency, rates });
   const [form, setForm] = useState(initialForm);
   const [platforms, setPlatforms] = useState<PlatformRow[]>([{ ...emptyPlatform }]);
   const [campaignInterests, setCampaignInterests] = useState<string[]>(['brazil_influencer']);
@@ -295,7 +301,7 @@ export default function InfluencerApplication({ defaultLocale }: InfluencerAppli
               Your influencer partner application is in review. Qualified creators are reviewed within 48 hours. If approved, your campaign, tracking link, QR code, coupon code, rules, and performance dashboard will appear in your partner portal.
             </p>
             <div className="mt-6 grid gap-3 rounded-lg border border-white/12 bg-black/20 p-4 text-left text-sm text-white/68 sm:grid-cols-3">
-              <span>R$150 post review</span>
+              <span>{postPay} post review</span>
               <span>10,000-view bonus eligibility</span>
               <span>Tracked commission setup</span>
             </div>
@@ -453,8 +459,8 @@ export default function InfluencerApplication({ defaultLocale }: InfluencerAppli
                 <SummaryRow label="Total followers" value={totalFollowers.toLocaleString()} strong={totalFollowers >= 5000} />
                 <SummaryRow label="Platforms" value={String(platforms.length)} />
                 <SummaryRow label="Campaign lanes" value={String(campaignInterests.length)} />
-                <SummaryRow label="Post pay" value="R$150" />
-                <SummaryRow label="Viral bonus" value="R$150 at 10,000 views" />
+                <SummaryRow label="Post pay" value={postPay} />
+                <SummaryRow label="Viral bonus" value={`${viralBonus} at 10,000 views`} />
                 <SummaryRow label="Post cadence" value="2-4 per month" />
               </div>
 
@@ -471,7 +477,7 @@ export default function InfluencerApplication({ defaultLocale }: InfluencerAppli
               </Button>
 
               <p className="mt-4 text-center text-xs leading-5 text-black/48">
-                Approval is required before R$150 post pay, viral incentives, commission links, QR codes, or coupon codes are activated.
+                Approval is required before {postPay} post pay, viral incentives, commission links, QR codes, or coupon codes are activated.
               </p>
             </div>
           </aside>

@@ -1176,7 +1176,7 @@ export const tutorials: Tutorial[] = [
       {
         step: 5,
         title: 'Choose Payout Schedule',
-        content: 'Select how often you receive payments: Weekly (every Friday), Bi-weekly, Monthly. Minimum payout threshold: R$50. Pending amounts below threshold roll over to the next payout.',
+        content: 'Select how often you receive payments: Weekly (every Friday), Bi-weekly, Monthly. Minimum payout threshold: {{amount}}. Pending amounts below threshold roll over to the next payout.',
         tips: ['Weekly payouts help with cash flow', 'Monitor payout reports for accuracy']
       },
       {

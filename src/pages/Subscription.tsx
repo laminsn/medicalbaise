@@ -15,7 +15,9 @@ import {
   Users, Loader2, ExternalLink, Settings,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice, formatPrice } from '@/lib/currency';
+import { SUBSCRIPTION_TIERS } from '@/lib/constants';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 interface PlanConfig {
   id: SubscriptionTier;
@@ -57,7 +59,7 @@ const PLANS: PlanConfig[] = [
       'All Free features',
       'Up to 5 service listings',
       '20 bids per month',
-      'Bid on jobs up to $1,000',
+      'bidUpTo5000',
       'Schedule video meetings',
       'Add-on services',
     ],
@@ -107,6 +109,8 @@ export default function Subscription() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
+  const bidCap = formatDisplayPrice(SUBSCRIPTION_TIERS.pro.maxBidAmount, { currency, rates });
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [searchParams] = useSearchParams();
@@ -133,7 +137,6 @@ export default function Subscription() {
         'All Free features': 'Todos os recursos do plano gratuito',
         'Up to 5 service listings': 'Até 5 anúncios de serviços',
         '20 bids per month': '20 propostas por mês',
-        'Bid on jobs up to $1,000': 'Enviar propostas para solicitações até $1.000',
         'Schedule video meetings': 'Agendar videochamadas',
         'Add-on services': 'Serviços adicionais',
         'For established businesses': 'Para negócios estabelecidos',
@@ -170,7 +173,6 @@ export default function Subscription() {
         'All Free features': 'Todas las funciones del plan gratis',
         'Up to 5 service listings': 'Hasta 5 servicios publicados',
         '20 bids per month': '20 propuestas por mes',
-        'Bid on jobs up to $1,000': 'Enviar propuestas en solicitudes de hasta $1.000',
         'Schedule video meetings': 'Programar videollamadas',
         'Add-on services': 'Servicios adicionales',
         'For established businesses': 'Para negocios consolidados',
@@ -388,7 +390,11 @@ export default function Subscription() {
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
                           <Check className="h-4 w-4 text-primary" />
-                          <span>{localizePlanText(feature)}</span>
+                          <span>
+                            {feature === 'bidUpTo5000'
+                              ? t('pricing.features.bidUpTo5000', { amount: bidCap })
+                              : localizePlanText(feature)}
+                          </span>
                         </li>
                       ))}
                     </ul>
