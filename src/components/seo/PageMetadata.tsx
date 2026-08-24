@@ -10,6 +10,9 @@ import {
   normalizeSeoLocale,
   publicPageImagePath,
 } from '@/lib/publicPageSeo';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import { INFLUENCER_POST_PAY_BRL, TESTIMONIAL_TOTAL_CREDIT_BRL, fillDisplayAmount } from '@/lib/constants/displayAmounts';
 
 type PageMetadataProps = {
   page: PublicPageKey;
@@ -55,15 +58,20 @@ export function PageMetadata({
 }: PageMetadataProps) {
   const appKey = getBaiseAppKey();
   const seoLocale = normalizeSeoLocale(locale);
+  const { currency, rates } = useDisplayCurrency();
   const brand = BRAND_SEO[appKey];
   const meta = getPublicPageSeo(page, appKey, seoLocale);
+  const seoAmount = formatDisplayPrice(
+    page === 'testimonial' ? TESTIMONIAL_TOTAL_CREDIT_BRL : INFLUENCER_POST_PAY_BRL,
+    { currency, rates },
+  );
   const localeMeta = LOCALE_META[seoLocale];
   const canonicalPath = path || (typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : '/');
   const pageUrl = absoluteUrl(getBaiseAppUrl(), canonicalPath);
   const shareImage = absoluteUrl(getBaiseAppUrl(), imagePath || publicPageImagePath(page, seoLocale));
   const resolvedTitle = title || meta.title;
-  const resolvedDescription = description || meta.description;
-  const resolvedImageAlt = imageAlt || meta.imageAlt;
+  const resolvedDescription = fillDisplayAmount(description || meta.description, seoAmount);
+  const resolvedImageAlt = fillDisplayAmount(imageAlt || meta.imageAlt, seoAmount);
 
   useEffect(() => {
     document.documentElement.lang = localeMeta.htmlLang;

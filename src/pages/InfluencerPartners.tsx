@@ -23,6 +23,9 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import { SeoLocale, localizedPublicPath, normalizeSeoLocale } from '@/lib/publicPageSeo';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import { INFLUENCER_POST_PAY_BRL, INFLUENCER_VIRAL_BONUS_BRL } from '@/lib/constants/displayAmounts';
 
 type OptInResult = {
   application_id: string;
@@ -39,44 +42,57 @@ const brandName = {
   legal: 'Legal Baise',
 } as const;
 
-const benefits = [
+const benefitIcons = {
+  pay: BadgeDollarSign,
+  viral: Trophy,
+  commission: Link2,
+  gift: Gift,
+  users: Users,
+  calendar: CalendarDays,
+} as const;
+
+function influencerBenefits(postPay: string, viralBonus: string) {
+  return [
+    {
+      icon: benefitIcons.pay,
+      title: `${postPay} per approved post`,
+      body: `Apply, get approved, post from the campaign brief, and earn ${postPay} for each approved campaign post.`,
+    },
+    {
+      icon: benefitIcons.viral,
+      title: `${viralBonus} viral benchmark bonus`,
+      body: `When an approved post reaches 10,000 verified views or more, you earn an additional ${viralBonus}.`,
+    },
   {
-    icon: BadgeDollarSign,
-    title: 'R$150 per approved post',
-    body: 'Apply, get approved, post from the campaign brief, and earn R$150 for each approved campaign post.',
-  },
-  {
-    icon: Trophy,
-    title: 'R$150 viral benchmark bonus',
-    body: 'When an approved post reaches 10,000 verified views or more, you earn an additional R$150.',
-  },
-  {
-    icon: Link2,
+    icon: benefitIcons.commission,
     title: 'Commission after real retention',
     body: 'Earn conversion commission after referred users stay premium or book paid services for three consecutive months.',
   },
   {
-    icon: Gift,
+    icon: benefitIcons.gift,
     title: 'Free month for your audience',
     body: 'Your link, QR code, or coupon gives new users a free month on the first paid tier or a no-service-fee first eligible transaction.',
   },
   {
-    icon: Users,
+    icon: benefitIcons.users,
     title: 'All creator lanes welcome',
     body: 'UGC creators, homemakers, chefs, fitness trainers, lifestyle voices, local experts, and niche creators can apply.',
   },
   {
-    icon: CalendarDays,
+    icon: benefitIcons.calendar,
     title: '2 to 4 posts per month',
     body: 'This is a month-to-month campaign. Approved creators post at least twice and no more than four times per month.',
   },
-];
+  ];
+}
 
-const proofStats = [
-  { label: 'Minimum followers', value: '5,000+' },
-  { label: 'Per approved post', value: 'R$150' },
-  { label: 'Viral bonus', value: 'R$150' },
-];
+function influencerProofStats(postPay: string, viralBonus: string) {
+  return [
+    { label: 'Minimum followers', value: '5,000+' },
+    { label: 'Per approved post', value: postPay },
+    { label: 'Viral bonus', value: viralBonus },
+  ];
+}
 
 const steps = [
   'Apply to join the Brazil creator campaign.',
@@ -111,6 +127,7 @@ type InfluencerPartnersProps = {
 export default function InfluencerPartners({ defaultLocale }: InfluencerPartnersProps) {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
   const appKey = getBaiseAppKey();
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,6 +135,10 @@ export default function InfluencerPartners({ defaultLocale }: InfluencerPartners
   const brand = brandName[appKey];
   const locale = defaultLocale || normalizeSeoLocale(i18n.resolvedLanguage || i18n.language);
   const applicationPath = localizedPublicPath('/influencer-application', locale);
+  const postPay = formatDisplayPrice(INFLUENCER_POST_PAY_BRL, { currency, rates });
+  const viralBonus = formatDisplayPrice(INFLUENCER_VIRAL_BONUS_BRL, { currency, rates });
+  const benefits = influencerBenefits(postPay, viralBonus);
+  const proofStats = influencerProofStats(postPay, viralBonus);
 
   useEffect(() => {
     if (!defaultLocale) return;
@@ -196,7 +217,7 @@ export default function InfluencerPartners({ defaultLocale }: InfluencerPartners
 
             <div className="max-w-4xl">
               <p className="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-300">
-                R$150 posts. Viral bonuses. Tracked commissions.
+                {postPay} posts. Viral bonuses. Tracked commissions.
               </p>
               <h1 className="max-w-4xl text-4xl font-semibold tracking-tight sm:text-6xl lg:text-7xl">
                 Become a Baise Brazil influencer.

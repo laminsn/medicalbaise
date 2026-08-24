@@ -25,6 +25,9 @@ import {
   type CampaignChannel,
   type ChannelAsset,
 } from '@/content/blogCampaignCalendar';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import { INFLUENCER_POST_PAY_BRL, fillDisplayAmount } from '@/lib/constants/displayAmounts';
 
 const channelIcon: Record<CampaignChannel, typeof Mail> = {
   email: Mail,
@@ -88,6 +91,8 @@ function paragraphPreview(asset: ChannelAsset) {
 }
 
 export function AdminContentCampaignCalendar() {
+  const { currency, rates } = useDisplayCurrency();
+  const influencerPay = formatDisplayPrice(INFLUENCER_POST_PAY_BRL, { currency, rates });
   const [selectedWeek, setSelectedWeek] = useState(1);
   const campaign = useMemo(
     () => BLOG_WEEKLY_CAMPAIGNS.find((item) => item.weekNumber === selectedWeek) || BLOG_WEEKLY_CAMPAIGNS[0],
@@ -175,6 +180,11 @@ export function AdminContentCampaignCalendar() {
                       );
                     })}
                   </div>
+                  <ul className="mt-3 space-y-1 text-xs leading-5 text-muted-foreground">
+                    {promo.rules.map((rule) => (
+                      <li key={rule}>{fillDisplayAmount(rule, influencerPay)}</li>
+                    ))}
+                  </ul>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <p className="text-xs text-muted-foreground">{promo.rules.length} campaign rules attached</p>
                     <Button asChild variant="outline" size="sm">
