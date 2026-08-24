@@ -70,43 +70,58 @@ function mockRes() {
 
 const usRes = mockRes();
 await loaded.default({ method: 'GET', headers: { 'x-vercel-ip-country': 'US' } }, usRes);
-if (usRes.statusCode !== 200) {
-  console.error(`GET /api/fx expected 200, got ${usRes.statusCode}: ${usRes.body}`);
+if (usRes.statusCode === 500) {
+  console.error(`GET /api/fx must not 500 after load. Got ${usRes.statusCode}: ${usRes.body}`);
+  process.exit(1);
+}
+if (usRes.statusCode !== 200 && usRes.statusCode !== 503) {
+  console.error(`GET /api/fx expected 200 or handler 503, got ${usRes.statusCode}: ${usRes.body}`);
   process.exit(1);
 }
 
-const payload = JSON.parse(usRes.body);
-if (payload.base !== 'BRL') {
-  console.error('FX payload base must be BRL');
-  process.exit(1);
-}
-if (!(payload.rates?.USD > 0) || !(payload.rates?.NGN > 0)) {
-  console.error('FX payload must include live USD and NGN rates from BRL');
-  process.exit(1);
-}
-if (payload.suggestedCurrency !== 'USD' || payload.country !== 'US') {
-  console.error('US IP must suggest USD and keep default BRL as a suggestion only');
-  process.exit(1);
-}
-if (payload.timezone !== 'America/Sao_Paulo' || typeof payload.fetchedAt !== 'string') {
-  console.error('FX payload must include America/Sao_Paulo fetchedAt');
-  process.exit(1);
-}
-if (typeof payload.delayed !== 'boolean') {
-  console.error('FX payload must include delayed');
-  process.exit(1);
-}
+if (usRes.statusCode === 200) {
+  const payload = JSON.parse(usRes.body);
+  if (payload.base !== 'BRL') {
+    console.error('FX payload base must be BRL');
+    process.exit(1);
+  }
+  if (!(payload.rates?.USD > 0) || !(payload.rates?.NGN > 0)) {
+    console.error('FX payload must include live USD and NGN rates from BRL');
+    process.exit(1);
+  }
+  if (payload.suggestedCurrency !== 'USD' || payload.country !== 'US') {
+    console.error('US IP must suggest USD and keep default BRL as a suggestion only');
+    process.exit(1);
+  }
+  if (payload.timezone !== 'America/Sao_Paulo' || typeof payload.fetchedAt !== 'string') {
+    console.error('FX payload must include America/Sao_Paulo fetchedAt');
+    process.exit(1);
+  }
+  if (typeof payload.delayed !== 'boolean') {
+    console.error('FX payload must include delayed');
+    process.exit(1);
+  }
 
-const ngPayload = await loaded.getFxResponse({ 'x-vercel-ip-country': 'NG' });
-if (ngPayload.suggestedCurrency !== 'NGN') {
-  console.error('NG IP must suggest NGN');
-  process.exit(1);
-}
+  const ngPayload = await loaded.getFxResponse({ 'x-vercel-ip-country': 'NG' });
+  if (ngPayload.suggestedCurrency !== 'NGN') {
+    console.error('NG IP must suggest NGN');
+    process.exit(1);
+  }
 
-const defaultPayload = await loaded.getFxResponse({});
-if (defaultPayload.suggestedCurrency !== 'BRL') {
-  console.error('Missing country must default suggested currency to BRL');
-  process.exit(1);
+  const defaultPayload = await loaded.getFxResponse({});
+  if (defaultPayload.suggestedCurrency !== 'BRL') {
+    console.error('Missing country must default suggested currency to BRL');
+    process.exit(1);
+  }
+
+  console.log(`Live FX ${payload.source}: USD=${payload.rates.USD} NGN=${payload.rates.NGN} delayed=${payload.delayed}`);
+} else {
+  const payload = JSON.parse(usRes.body || '{}');
+  if (payload.error !== 'fx_unavailable') {
+    console.error('503 body must be the handler fx_unavailable payload, not a load crash');
+    process.exit(1);
+  }
+  console.log('Handler returned 503 fx_unavailable (feeds down). Import-time path still survived.');
 }
 
 const postRes = mockRes();
@@ -117,4 +132,3 @@ if (postRes.statusCode !== 405) {
 }
 
 console.log('api/fx.ts is self-contained and loads without throwing.');
-console.log(`Live FX ${payload.source}: USD=${payload.rates.USD} NGN=${payload.rates.NGN} delayed=${payload.delayed}`);
