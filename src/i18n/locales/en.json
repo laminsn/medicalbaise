@@ -111,7 +111,7 @@
     "suggested": "Suggested",
     "defaultNote": "Prices are charged in BRL. Display currency is optional.",
     "rateDelayed": "Rate delayed",
-    "rateStamp": "1 BRL = {{rate}} {{currency}} · {{time}} America/Sao_Paulo · {{source}}",
+    "rateStamp": "1 BRL = {{rate}} {{currency}} · updated {{time}}",
     "names": {
       "BRL": "Brazilian real",
       "USD": "US dollar",

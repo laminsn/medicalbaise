@@ -609,7 +609,7 @@ export const faqs: FAQ[] = [
   {
     id: 33,
     question: 'How does the referral program work?',
-    answer: 'Share your unique referral code with friends and family. When someone signs up using your code and completes their first appointment, both you and the new user receive R$20 in platform credits. There\'s no limit to how many people you can refer. Track your referrals and earnings in Profile > Referrals.',
+    answer: 'Share your unique referral code with friends and family. When someone signs up using your code and completes their first appointment, both you and the new user receive {{amount}} in platform credits. There\'s no limit to how many people you can refer. Track your referrals and earnings in Profile > Referrals.',
     category: 'features'
   },
   {
@@ -1086,7 +1086,7 @@ export const tutorials: Tutorial[] = [
       {
         step: 6,
         title: 'Track Favorites and Referrals',
-        content: 'The "Favorites" section shows providers you\'ve saved. "Referrals" displays your referral code and tracks credits earned from successful referrals. Share your code to earn R$20 for each new user who completes an appointment.',
+        content: 'The "Favorites" section shows providers you\'ve saved. "Referrals" displays your referral code and tracks credits earned from successful referrals. Share your code to earn {{amount}} for each new user who completes an appointment.',
         tips: ['Favorite providers for quick rebooking', 'Share referral code on social media']
       }
     ]

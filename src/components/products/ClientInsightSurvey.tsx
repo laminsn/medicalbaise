@@ -21,6 +21,11 @@ import {
   INSIGHT_REVENUE_MID_BRL,
   INSIGHT_REVENUE_UNDER_BRL,
 } from '@/lib/constants/displayAmounts';
+import {
+  REVENUE_OPTION_IDS,
+  normalizeRevenueId,
+  revenueOptionLabels,
+} from '@/lib/insightRevenue';
 
 const db = supabase as any;
 
@@ -112,68 +117,6 @@ const surveyCopy = {
     hide: 'Ahora no',
   },
 };
-
-const REVENUE_OPTION_IDS = ['prefer_not', 'under_5000', '5000_15000', '15000_40000', '40000_plus', 'varies'] as const;
-
-const LEGACY_REVENUE_TO_ID: Record<string, string> = {
-  'Prefer not to say': 'prefer_not',
-  'Under R$5k/month': 'under_5000',
-  'R$5k-R$15k/month': '5000_15000',
-  'R$15k-R$40k/month': '15000_40000',
-  'R$40k+/month': '40000_plus',
-  'Business revenue varies': 'varies',
-  'Prefiro nao informar': 'prefer_not',
-  'Abaixo de R$5 mil/mes': 'under_5000',
-  'R$5 mil-R$15 mil/mes': '5000_15000',
-  'R$15 mil-R$40 mil/mes': '15000_40000',
-  'R$40 mil+/mes': '40000_plus',
-  'Faturamento varia': 'varies',
-  'Prefiero no decir': 'prefer_not',
-  'Menos de R$5 mil/mes': 'under_5000',
-  'Ingresos variables': 'varies',
-};
-
-function revenueOptionLabels(
-  locale: 'en' | 'pt' | 'es',
-  under: string,
-  mid: string,
-  high: string,
-): Record<(typeof REVENUE_OPTION_IDS)[number], string> {
-  if (locale === 'pt') {
-    return {
-      prefer_not: 'Prefiro nao informar',
-      under_5000: `Abaixo de ${under}/mes`,
-      '5000_15000': `${under}-${mid}/mes`,
-      '15000_40000': `${mid}-${high}/mes`,
-      '40000_plus': `${high}+/mes`,
-      varies: 'Faturamento varia',
-    };
-  }
-  if (locale === 'es') {
-    return {
-      prefer_not: 'Prefiero no decir',
-      under_5000: `Menos de ${under}/mes`,
-      '5000_15000': `${under}-${mid}/mes`,
-      '15000_40000': `${mid}-${high}/mes`,
-      '40000_plus': `${high}+/mes`,
-      varies: 'Ingresos variables',
-    };
-  }
-  return {
-    prefer_not: 'Prefer not to say',
-    under_5000: `Under ${under}/month`,
-    '5000_15000': `${under}-${mid}/month`,
-    '15000_40000': `${mid}-${high}/month`,
-    '40000_plus': `${high}+/month`,
-    varies: 'Business revenue varies',
-  };
-}
-
-function normalizeRevenueId(value?: string | null): string {
-  if (!value) return '';
-  if ((REVENUE_OPTION_IDS as readonly string[]).includes(value)) return value;
-  return LEGACY_REVENUE_TO_ID[value] || value;
-}
 
 const lifestyleOptions = {
   en: ['Busy professional', 'Business owner', 'Family organizer', 'Frequent traveler', 'New to Brazil', 'Planning a major change'],

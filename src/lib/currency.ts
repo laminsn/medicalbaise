@@ -12,6 +12,7 @@ import {
   convertBrl,
   formatDisplayPriceFromBrl,
   formatMoneyAmount,
+  formatRateCaption,
   numberLocaleFromLanguage,
 } from '@/lib/currencyFormat';
 
@@ -22,6 +23,7 @@ export {
   isDisplayCurrency,
   convertBrl,
   formatMoneyAmount,
+  formatRateCaption,
   type DisplayCurrency,
   type FxPayload,
   type FxRates,

@@ -101,6 +101,15 @@ if (usRes.statusCode === 200) {
     console.error('FX payload must include delayed');
     process.exit(1);
   }
+  if (!payload.checks || typeof payload.checks !== 'object') {
+    console.error('FX payload must include checks object');
+    process.exit(1);
+  }
+  const ptaxUsdBrl = payload.checks.ptaxUsdBrl;
+  if (ptaxUsdBrl != null && !(ptaxUsdBrl > 0)) {
+    console.error('checks.ptaxUsdBrl must be a live positive PTAX USD/BRL or null');
+    process.exit(1);
+  }
 
   const ngPayload = await loaded.getFxResponse({ 'x-vercel-ip-country': 'NG' });
   if (ngPayload.suggestedCurrency !== 'NGN') {

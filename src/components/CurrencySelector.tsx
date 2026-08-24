@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
-import { DISPLAY_CURRENCIES, getNumberLocale, type DisplayCurrency } from '@/lib/currency';
+import { DISPLAY_CURRENCIES, formatRateCaption, getNumberLocale, type DisplayCurrency } from '@/lib/currency';
 
 const CURRENCY_META: Record<DisplayCurrency, { label: string }> = {
   BRL: { label: 'BRL' },
@@ -18,7 +18,13 @@ const CURRENCY_META: Record<DisplayCurrency, { label: string }> = {
 
 export function CurrencySelector() {
   const { t } = useTranslation();
-  const { currency, setCurrency, suggestedCurrency, delayed, fetchedAt, source, rates } = useDisplayCurrency();
+  const { currency, setCurrency, suggestedCurrency, delayed, fetchedAt, rates } = useDisplayCurrency();
+  const rateCaption = formatRateCaption({
+    currency,
+    rates,
+    fetchedAt,
+    locale: getNumberLocale(),
+  });
 
   return (
     <DropdownMenu>
@@ -52,14 +58,9 @@ export function CurrencySelector() {
         ))}
         <div className="border-t border-border px-2 py-2 text-xs text-muted-foreground">
           <p>{t('currency.defaultNote')}</p>
-          {currency !== 'BRL' && rates && fetchedAt && (
+          {rateCaption && (
             <p className="mt-1">
-              {t('currency.rateStamp', {
-                rate: new Intl.NumberFormat(getNumberLocale(), { maximumFractionDigits: 6 }).format(rates[currency]),
-                currency,
-                time: fetchedAt,
-                source: source || '',
-              })}
+              {t('currency.rateStamp', rateCaption)}
             </p>
           )}
           {delayed && <p className="mt-1 text-amber-600">{t('currency.rateDelayed')}</p>}

@@ -6,6 +6,10 @@ import { MessageSquare, HelpCircle, User, Calendar, CreditCard, Video, Shield, S
 import { faqs } from '@/data/learningCenterData';
 import { faqCategories } from '@/data/learningCenterSOPsVideos';
 import { useTranslation } from 'react-i18next';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { formatDisplayPrice } from '@/lib/currency';
+import { REFERRAL_CREDIT_BRL } from '@/lib/constants/referral';
+import { fillDisplayAmount } from '@/lib/constants/displayAmounts';
 
 interface FAQSectionProps {
   searchQuery: string;
@@ -24,6 +28,8 @@ const iconMap: Record<string, any> = {
 
 export function FAQSection({ searchQuery }: FAQSectionProps) {
   const { i18n } = useTranslation();
+  const { currency, rates } = useDisplayCurrency();
+  const referralAmount = formatDisplayPrice(REFERRAL_CREDIT_BRL, { currency, rates });
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -39,9 +45,10 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
   };
 
   const filteredFAQs = faqs.filter((faq) => {
+    const answer = fillDisplayAmount(faq.answer, referralAmount);
     const matchesSearch =
       faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+      answer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -88,7 +95,7 @@ export function FAQSection({ searchQuery }: FAQSectionProps) {
               </div>
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground pb-4">
-              {faq.answer}
+              {fillDisplayAmount(faq.answer, referralAmount)}
             </AccordionContent>
           </AccordionItem>
         ))}
