@@ -27,6 +27,9 @@ describe('normalizeRevenueId', () => {
     assert.equal(normalizeRevenueId('Faturamento varia'), 'varies');
 
     assert.equal(normalizeRevenueId(`Menos de ${rs}5 mil/mes`), 'under_5000');
+    assert.equal(normalizeRevenueId(`${rs}5 mil-${rs}15 mil/mes`), '5000_15000');
+    assert.equal(normalizeRevenueId(`${rs}15 mil-${rs}40 mil/mes`), '15000_40000');
+    assert.equal(normalizeRevenueId(`${rs}40 mil+/mes`), '40000_plus');
     assert.equal(normalizeRevenueId('Prefiero no decir'), 'prefer_not');
     assert.equal(normalizeRevenueId('Ingresos variables'), 'varies');
   });
