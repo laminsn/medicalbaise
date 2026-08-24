@@ -900,7 +900,7 @@ export const URGENCY_LEVELS = [
   { id: 'scheduled', label: 'Scheduled', description: 'Specific date' },
 ] as const;
 
-// Prices in USD — converted to local currency at display time
+// Provider subscription display amounts in BRL. Isolated from seeker plans.
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Basic',

@@ -1052,23 +1052,21 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
             {/* Credential Verification */}
             <div className="space-y-4 border-t border-border pt-6">
               <h3 className="text-lg font-semibold text-foreground">
-                {t('provider.credentialVerification', 'Credential Verification')}
+                {t('provider.credentialVerification')}
               </h3>
 
               <p className="text-sm text-muted-foreground">
-                {t('provider.credentialDescription', 'We reserve the right to request verification documents at any time, including for random compliance checks or in response to complaints.')}
+                {t('provider.credentialDescription')}
               </p>
 
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex items-start gap-3">
                 <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-foreground">
-                    {isPt ? 'Suas informações são 100% confidenciais' : 'Your information is 100% confidential'}
+                    {t('provider.informationConfidential')}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {isPt
-                      ? 'Documentos são criptografados, nunca compartilhados com terceiros e usados exclusivamente para fins de verificação. Uma vez verificados, você receberá um selo de Credenciais Verificadas no seu perfil.'
-                      : 'Documents are encrypted, never shared with third parties, and used solely for verification purposes. Once verified, you will receive a Verified Credentials badge on your profile.'}
+                    {t('provider.documentsEncrypted')}
                   </p>
                 </div>
               </div>
@@ -1082,22 +1080,22 @@ export function BecomeProviderForm({ open, onOpenChange, onSuccess }: BecomeProv
                   required
                 />
                 <label htmlFor="credential_certification" className="text-sm text-foreground">
-                  {t('provider.credentialCertify', 'I certify that all information provided is accurate and truthful. I can provide supporting documentation (certificates, diplomas, degrees, licenses, awards, and/or certifications) upon request to verify my qualifications.')}
+                  {t('provider.credentialCertify')}
                   <span className="text-destructive"> *</span>
                 </label>
               </div>
               {form.formState.errors.credential_certification && (
                 <p className="text-sm text-destructive">
-                  {t('provider.credentialRequired', 'You must certify your credentials to continue.')}
+                  {t('provider.credentialRequired')}
                 </p>
               )}
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  {t('provider.uploadCredentials', 'Upload Credentials (optional)')}
+                  {t('provider.uploadCredentials')}
                 </label>
                 <p className="text-xs text-muted-foreground">
-                  {t('provider.uploadDescription', 'Upload certificates, diplomas, licenses, or other credentials. Accepted formats: PDF, JPG, PNG (max 10MB each).')}
+                  {t('provider.uploadDescription')}
                 </p>
                 <input
                   type="file"

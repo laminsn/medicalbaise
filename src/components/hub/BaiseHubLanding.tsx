@@ -24,7 +24,7 @@ import {
   Users,
   WalletCards,
 } from 'lucide-react';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { LocaleControls } from '@/components/LocaleControls';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { BaiseAppCard, type BaiseApp } from './BaiseAppCard';
@@ -308,7 +308,7 @@ export default function BaiseHubLanding() {
               </div>
             </Link>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <LanguageSelector />
+              <LocaleControls />
               {user ? (
                 <Link to="/profile">
                   <Button

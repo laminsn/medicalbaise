@@ -55,11 +55,11 @@ export default function Payouts() {
   const getStatusBadge = (status: PayoutHistory['status']) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{isPt ? 'Concluído' : isEs ? 'Completado' : 'Completed'}</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">{t('payouts.completed')}</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">{isPt ? 'Pendente' : isEs ? 'Pendiente' : 'Pending'}</Badge>;
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">{t('payouts.pending')}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{isPt ? 'Falhou' : isEs ? 'Falló' : 'Failed'}</Badge>;
+        return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">{t('payouts.failed')}</Badge>;
     }
   };
 
@@ -82,7 +82,7 @@ export default function Payouts() {
   return (
     <>
       <Helmet>
-        <title>{isPt ? 'Pagamentos - Brasil Base' : isEs ? 'Cobros - Brasil Base' : 'Payouts - Brasil Base'}</title>
+        <title>{t('payouts.title')} - Medical Baise</title>
       </Helmet>
       <AppLayout>
         <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -212,7 +212,7 @@ export default function Payouts() {
                         {method.isDefault && (
                           <Badge variant="secondary" className="bg-primary/10 text-primary">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
-                            {isPt ? 'Padrão' : isEs ? 'Predeterminado' : 'Default'}
+                            {t('payouts.default')}
                           </Badge>
                         )}
                         <Button variant="ghost" size="sm">

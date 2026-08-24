@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { LocaleControls } from '@/components/LocaleControls';
 
 interface InfluencerCampaignShellProps {
   brand: string;
@@ -20,7 +20,7 @@ export function InfluencerCampaignShell({ brand, children }: InfluencerCampaignS
           <span className="text-sm font-semibold tracking-tight text-white sm:text-base">{brand}</span>
         </div>
         <div className="rounded-md border border-white/12 bg-white/[0.06] [&_button]:text-white [&_button:hover]:bg-white/10 [&_button:hover]:text-white">
-          <LanguageSelector />
+          <LocaleControls />
         </div>
       </div>
 

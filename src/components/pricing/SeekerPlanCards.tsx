@@ -5,14 +5,17 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useSeekerSubscription } from '@/hooks/useSeekerSubscription';
-import { LIFESTYLE_TRANSACTION_LIMIT, type SeekerPlan } from '@/lib/constants/seekerPlans';
+import { LIFESTYLE_TRANSACTION_LIMIT, SEEKER_PLANS, type SeekerPlan } from '@/lib/constants/seekerPlans';
+import { formatDisplayPrice } from '@/lib/currency';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { DisplayRateNote } from '@/components/pricing/DisplayRateNote';
 import '@/styles/baise-plan-cards.css';
 
 const PLANS = [
   {
     id: 'flex' as const,
     dataPlan: 'Flex',
-    monthly: 'R$0',
+    monthlyBrl: SEEKER_PLANS.flex.monthlyBrl,
     pillKey: 'seekerPricing.defaultPill' as const,
     featured: false,
     featureKeys: [
@@ -32,7 +35,7 @@ const PLANS = [
   {
     id: 'lifestyle' as const,
     dataPlan: 'Lifestyle',
-    monthly: 'R$99',
+    monthlyBrl: SEEKER_PLANS.lifestyle.monthlyBrl,
     pillKey: 'seekerPricing.bestForRepeat' as const,
     featured: true,
     featureKeys: [
@@ -52,7 +55,7 @@ const PLANS = [
   {
     id: 'project' as const,
     dataPlan: 'Project',
-    monthly: 'R$499',
+    monthlyBrl: SEEKER_PLANS.project.monthlyBrl,
     pillKey: null,
     featured: false,
     featureKeys: [
@@ -82,6 +85,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { plan: currentPlan, transactionsUsed, startCheckout } = useSeekerSubscription();
+  const { currency } = useDisplayCurrency();
   const [upgrading, setUpgrading] = useState<SeekerPlan | null>(null);
 
   const handleSelectPlan = async (planId: SeekerPlan) => {
@@ -112,7 +116,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
 
   return (
     <div className={`seeker-pricing-source ${nested ? 'nested' : ''}`}>
-      <section className="pricing-seeker" aria-labelledby="seeker-pricing">
+      <section className="pricing-seeker" aria-labelledby="seeker-pricing" data-display-currency={currency}>
         <div className="pricing-section-heading">
           <div>
             <p className="eyebrow">{t('seekerPricing.eyebrow')}</p>
@@ -128,7 +132,12 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
             const lifestyleUsed = currentPlan === 'lifestyle' ? transactionsUsed : 0;
             const feeCallout =
               plan.id === 'flex'
-                ? { strong: '5%', label: t('seekerPricing.feeMin') }
+                ? {
+                    strong: `${SEEKER_PLANS.flex.feePercent}%`,
+                    label: t('seekerPricing.feeMin', {
+                      min: formatDisplayPrice(SEEKER_PLANS.flex.feeMinBrl),
+                    }),
+                  }
                 : plan.id === 'lifestyle'
                   ? {
                       strong: t('seekerPricing.usedCount', {
@@ -150,7 +159,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
                   <div>
                     <span>{t(`seekerPricing.plans.${plan.id}.name`)}</span>
                     <strong>
-                      {plan.monthly}
+                      {formatDisplayPrice(plan.monthlyBrl)}
                       <small>{t('seekerPricing.perMonth')}</small>
                     </strong>
                   </div>
@@ -196,6 +205,7 @@ export function SeekerPlanCards({ nested = false }: SeekerPlanCardsProps) {
             );
           })}
         </div>
+        <DisplayRateNote className="seeker-pricing-footnote" />
         <p className="seeker-pricing-footnote">{t('seekerPricing.cancelAnytime')}</p>
       </section>
     </div>

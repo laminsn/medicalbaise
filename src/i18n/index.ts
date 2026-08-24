@@ -32,4 +32,15 @@ i18n
     },
   });
 
+const HTML_LANG: Record<string, string> = { en: 'en', pt: 'pt-BR', es: 'es' };
+
+function applyHtmlLang(lng?: string) {
+  if (typeof document === 'undefined') return;
+  const code = (lng || i18n.resolvedLanguage || i18n.language || 'pt').split('-')[0];
+  document.documentElement.lang = HTML_LANG[code] || code;
+}
+
+applyHtmlLang();
+i18n.on('languageChanged', applyHtmlLang);
+
 export default i18n;

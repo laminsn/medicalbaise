@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { LocaleControls } from '@/components/LocaleControls';
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 import { FaceAuthVerify } from '@/components/auth/FaceAuthVerify';
 import {
@@ -47,8 +47,6 @@ const FACE_LOGIN_ACK_KEY = 'baise.faceLoginAck';
 
 export default function Auth() {
   const { t, i18n } = useTranslation();
-  const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
-  const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showFaceAuth, setShowFaceAuth] = useState(false);
@@ -116,13 +114,13 @@ export default function Auth() {
   const signUpSchema = z.object({
     email: z.string().email(t('auth.invalidEmail')),
     password: z.string()
-      .min(8, t('auth.passwordMin', 'Password must be at least 8 characters'))
+      .min(8, t('auth.passwordMin'))
       .max(128)
-      .regex(/[A-Z]/, t('auth.passwordUppercase', 'Must contain an uppercase letter'))
-      .regex(/[a-z]/, t('auth.passwordLowercase', 'Must contain a lowercase letter'))
-      .regex(/[0-9]/, t('auth.passwordNumber', 'Must contain a number')),
-    firstName: z.string().min(2, t('auth.firstNameTooShort', 'First name must be at least 2 characters')),
-    lastName: z.string().min(2, t('auth.lastNameTooShort', 'Last name must be at least 2 characters')),
+      .regex(/[A-Z]/, t('auth.passwordUppercase'))
+      .regex(/[a-z]/, t('auth.passwordLowercase'))
+      .regex(/[0-9]/, t('auth.passwordNumber')),
+    firstName: z.string().min(2, t('auth.firstNameTooShort')),
+    lastName: z.string().min(2, t('auth.lastNameTooShort')),
   });
 
   const signInSchema = z.object({
@@ -155,7 +153,7 @@ export default function Auth() {
     } catch (err) {
       toast({
         title: t('auth.errorSigningIn'),
-        description: err instanceof Error ? err.message : isPt ? 'Erro desconhecido' : isEs ? 'Error desconocido' : 'Unknown error',
+        description: err instanceof Error ? err.message : t('auth.unknownError'),
         variant: 'destructive',
       });
     } finally {
@@ -181,8 +179,8 @@ export default function Auth() {
 
     if (isSignUp && !termsAccepted) {
       toast({
-        title: t('auth.termsRequired', 'Please accept the terms'),
-        description: t('auth.mustAcceptTerms', 'You must accept the Terms of Service and Privacy Policy to create an account.'),
+        title: t('auth.termsRequired'),
+        description: t('auth.mustAcceptTerms'),
         variant: 'destructive',
       });
       return;
@@ -229,13 +227,13 @@ export default function Auth() {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user) {
             toast({
-              title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
+              title: t('auth.accountCreatedSuccess'),
             });
             goToPostAuthDestination();
           } else {
             toast({
-              title: t('auth.accountCreatedSuccess', 'Account created successfully!'),
-              description: t('auth.checkEmailToVerify', 'Please check your email inbox (and spam folder) for a verification link. Click the link to activate your account, then sign in.'),
+              title: t('auth.accountCreatedSuccess'),
+              description: t('auth.checkEmailToVerify'),
               duration: 10000,
             });
             setIsSignUp(false);
@@ -314,7 +312,7 @@ export default function Auth() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <LanguageSelector />
+          <LocaleControls />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
           <FaceAuthVerify onSuccess={handleFaceAuthSuccess} />
@@ -342,7 +340,7 @@ export default function Auth() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <LanguageSelector />
+        <LocaleControls />
       </div>
 
       {/* Content */}
@@ -382,18 +380,18 @@ export default function Auth() {
                   <ScanFace className="w-5 h-5 text-primary" aria-hidden="true" />
                 </div>
                 <AlertDialogTitle>
-                  {t('security.faceLoginInfoTitle', 'Face login requires an account')}
+                  {t('security.faceLoginInfoTitle')}
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-left pt-1">
-                {t('security.faceLoginInfoLead', "First time? Here's how face login works:")}
+                {t('security.faceLoginInfoLead')}
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <ol className="space-y-3 text-sm text-foreground" aria-label="Face login setup steps">
+            <ol className="space-y-3 text-sm text-foreground" aria-label={t('security.faceLoginInfoLead')}>
               {[
-                t('security.faceLoginInfoStep1', "Create a full account with your email — face login can't create one for you."),
-                t('security.faceLoginInfoStep2', 'Sign in once, then enroll your face in Settings → Face Login.'),
-                t('security.faceLoginInfoStep3', 'After that, you can use your face to sign in on any device with a webcam.'),
+                t('security.faceLoginInfoStep1'),
+                t('security.faceLoginInfoStep2'),
+                t('security.faceLoginInfoStep3'),
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-[11px] font-bold flex-shrink-0">
@@ -405,10 +403,10 @@ export default function Auth() {
             </ol>
             <AlertDialogFooter className="flex-col-reverse sm:flex-row gap-2">
               <AlertDialogCancel onClick={handleFaceLoginCreateAccount} className="mt-0">
-                {t('security.faceLoginInfoCreate', 'Create account first')}
+                {t('security.faceLoginInfoCreate')}
               </AlertDialogCancel>
               <AlertDialogAction onClick={handleFaceLoginContinue}>
-                {t('security.faceLoginInfoContinue', 'I have an account — continue')}
+                {t('security.faceLoginInfoContinue')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -507,7 +505,7 @@ export default function Auth() {
               <Input
                 id="email"
                 type="email"
-                placeholder={isPt ? 'seu@email.com' : isEs ? 'tu@email.com' : 'your@email.com'}
+                placeholder={t('auth.emailPlaceholder')}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="pl-10"
@@ -529,20 +527,20 @@ export default function Auth() {
                   className="text-xs text-primary p-0 h-auto"
                   onClick={async () => {
                     if (!formData.email) {
-                      toast({ title: t('auth.enterEmailFirst', 'Please enter your email first'), variant: 'destructive' });
+                      toast({ title: t('auth.enterEmailFirst'), variant: 'destructive' });
                       return;
                     }
                     const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
                       redirectTo: `${window.location.origin}/reset-password`,
                     });
                     if (error) {
-                      toast({ title: t('auth.resetError', 'Error sending reset email'), variant: 'destructive' });
+                      toast({ title: t('auth.resetError'), variant: 'destructive' });
                     } else {
-                      toast({ title: t('auth.resetSent', 'Password reset email sent. Check your inbox.') });
+                      toast({ title: t('auth.resetSent') });
                     }
                   }}
                 >
-                  {t('auth.forgotPassword', 'Forgot password?')}
+                  {t('auth.forgotPassword')}
                 </Button>
               )}
             </div>
@@ -599,13 +597,13 @@ export default function Auth() {
                 className="mt-1 h-4 w-4 rounded border-border"
               />
               <label htmlFor="terms" className="text-xs text-muted-foreground">
-                {t('auth.agreeToTerms', 'I agree to the')}{' '}
+                {t('auth.agreeToTerms')}{' '}
                 <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  {t('auth.termsOfService', 'Terms of Service')}
+                  {t('auth.termsOfService')}
                 </a>{' '}
-                {t('common.and', 'and')}{' '}
+                {t('common.and')}{' '}
                 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  {t('auth.privacyPolicy', 'Privacy Policy')}
+                  {t('auth.privacyPolicy')}
                 </a>
               </label>
             </div>

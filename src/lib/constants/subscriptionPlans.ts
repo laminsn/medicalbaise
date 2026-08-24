@@ -1,4 +1,5 @@
-// Prices in USD — converted to local currency at display time
+// Provider subscription display amounts in BRL. Isolated from seeker plans.
+// Do not invent a new ladder or multiply these by a baked FX rate.
 export const SUBSCRIPTION_PLANS = {
   pro: {
     product_id: "prod_TwYB832UJEVdae",

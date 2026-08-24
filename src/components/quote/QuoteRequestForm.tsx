@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 import { useNavigate } from 'react-router-dom';
 import { CalendarIcon, MapPin, DollarSign, Clock, Send } from 'lucide-react';
 import { format } from 'date-fns';
@@ -67,6 +68,7 @@ export function QuoteRequestForm({
   onClose,
 }: QuoteRequestFormProps) {
   const { t, i18n } = useTranslation();
+  const { currency } = useDisplayCurrency();
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -224,7 +226,7 @@ export function QuoteRequestForm({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              {t('quote.budgetRange')}
+              {t('quote.budgetRange', { currency })}
             </Label>
             <div className="grid grid-cols-2 gap-3">
               <div>
