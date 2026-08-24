@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { removeUniqueChannel, subscribeUniqueChannel } from '@/lib/subscribeUniqueChannel';
 import { useAuth } from '@/hooks/useAuth';
 import { useBrowserNotifications } from '@/hooks/useBrowserNotifications';
 import { useLocation } from 'react-router-dom';
@@ -40,9 +42,9 @@ export const useMessageNotifications = () => {
 
       // Subscribe only to conversations where the user is a participant
       // We listen for inserts where sender is NOT the current user
-      const channel = supabase
-        .channel('user-messages')
-        .on(
+      // Unique topic per mount — prefix only, never the bare static topic
+      const channel = subscribeUniqueChannel('user-messages', (ch) =>
+        ch.on(
           'postgres_changes',
           {
             event: 'INSERT',
@@ -103,18 +105,24 @@ export const useMessageNotifications = () => {
             });
           }
         )
-        .subscribe();
+      );
 
       return channel;
     };
 
-    let channelRef: ReturnType<typeof supabase.channel> | null = null;
-    setupSubscription().then(ch => { channelRef = ch; });
+    let cancelled = false;
+    let channelRef: RealtimeChannel | null = null;
+    void setupSubscription().then((ch) => {
+      if (cancelled) {
+        removeUniqueChannel(ch);
+        return;
+      }
+      channelRef = ch;
+    });
 
     return () => {
-      if (channelRef) {
-        supabase.removeChannel(channelRef);
-      }
+      cancelled = true;
+      removeUniqueChannel(channelRef);
     };
   }, [user, isGranted, sendNotification]);
 };
