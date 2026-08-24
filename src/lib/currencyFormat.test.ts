@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { formatDisplayPriceFromBrl, numberLocaleFromLanguage } from './currencyFormat.ts';
+import { formatDisplayPriceFromBrl, formatRateCaption, numberLocaleFromLanguage } from './currencyFormat.ts';
 import { suggestCurrencyForCountry } from './fx/types.ts';
 
 describe('BRL-default display FX', () => {
@@ -57,5 +57,37 @@ describe('BRL-default display FX', () => {
     assert.equal(suggestCurrencyForCountry('NG'), 'NGN');
     assert.equal(suggestCurrencyForCountry('BR'), 'BRL');
     assert.equal(suggestCurrencyForCountry(null), 'BRL');
+  });
+
+  it('shows a live rate numeral on BRL-first open', () => {
+    const brl = formatRateCaption({
+      currency: 'BRL',
+      language: 'en',
+      fetchedAt: '2026-08-24T13:02:31-03:00',
+      rates: { USD: 0.193403, NGN: 261.167286 },
+    });
+    assert.ok(brl);
+    assert.equal(brl.currency, 'USD');
+    assert.match(brl.rate, /0\.193403/);
+    assert.equal(brl.time, '2026-08-24T13:02:31-03:00');
+
+    const usd = formatRateCaption({
+      currency: 'USD',
+      language: 'en',
+      fetchedAt: '2026-08-24T13:02:31-03:00',
+      rates: { USD: 0.193403, NGN: 261.167286 },
+    });
+    assert.equal(usd?.currency, 'USD');
+
+    const ngn = formatRateCaption({
+      currency: 'NGN',
+      language: 'en',
+      fetchedAt: '2026-08-24T13:02:31-03:00',
+      rates: { USD: 0.193403, NGN: 261.167286 },
+    });
+    assert.equal(ngn?.currency, 'NGN');
+    assert.match(ngn?.rate || '', /261/);
+
+    assert.equal(formatRateCaption({ currency: 'BRL', rates: null, fetchedAt: '2026-08-24T13:02:31-03:00' }), null);
   });
 });

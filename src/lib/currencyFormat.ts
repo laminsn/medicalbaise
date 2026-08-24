@@ -33,6 +33,39 @@ export function convertBrl(amountBrl: number, currency: FormatCurrency, rates: F
   return amountBrl * rate;
 }
 
+export type RateCaption = {
+  rate: string;
+  currency: 'USD' | 'NGN';
+  time: string;
+};
+
+/**
+ * Live FX caption values. Never null just because display currency is BRL —
+ * BRL-first open still quotes 1 BRL in USD from /api/fx.
+ */
+export function formatRateCaption(options: {
+  currency?: FormatCurrency;
+  rates?: FormatRates | null;
+  fetchedAt?: string | null;
+  locale?: string;
+  language?: string;
+}): RateCaption | null {
+  const rates = options.rates ?? null;
+  const fetchedAt = options.fetchedAt;
+  if (!rates || !fetchedAt) return null;
+
+  const quoteCurrency: 'USD' | 'NGN' = options.currency === 'NGN' ? 'NGN' : 'USD';
+  const rate = rates[quoteCurrency];
+  if (!(rate > 0)) return null;
+
+  const locale = options.locale || numberLocaleFromLanguage(options.language);
+  return {
+    rate: new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(rate),
+    currency: quoteCurrency,
+    time: fetchedAt,
+  };
+}
+
 export function formatDisplayPriceFromBrl(
   amountBrl: number,
   options: {

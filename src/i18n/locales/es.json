@@ -111,7 +111,7 @@
     "suggested": "Sugerida",
     "defaultNote": "Los precios se cobran en BRL. La moneda de visualización es opcional.",
     "rateDelayed": "Tipo de cambio retrasado",
-    "rateStamp": "1 BRL = {{rate}} {{currency}} · {{time}} America/Sao_Paulo · {{source}}",
+    "rateStamp": "1 BRL = {{rate}} {{currency}} · actualizado {{time}}",
     "names": {
       "BRL": "Real brasileño",
       "USD": "Dólar estadounidense",
