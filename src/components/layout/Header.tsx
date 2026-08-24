@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sheet';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { LocaleControls } from '@/components/LocaleControls';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -81,8 +81,7 @@ export function Header() {
           {/* Theme Toggle */}
           <ThemeToggle />
           
-          {/* Language Selector */}
-          <LanguageSelector />
+          <LocaleControls />
 
           {user ? (
             <>

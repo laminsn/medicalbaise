@@ -1,6 +1,37 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin, type PreviewServer, type ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { getFxResponse } from "./src/lib/fx/getFxResponse";
+
+function fxApiPlugin(): Plugin {
+  const attach = (server: ViteDevServer | PreviewServer) => {
+    server.middlewares.use(async (req, res, next) => {
+      const url = req.url?.split("?")[0];
+      if (url !== "/api/fx") {
+        next();
+        return;
+      }
+      try {
+        const payload = await getFxResponse((req.headers || {}) as Record<string, string | string[] | undefined>);
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
+        res.end(JSON.stringify(payload));
+      } catch {
+        res.statusCode = 503;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.end(JSON.stringify({ error: "fx_unavailable", delayed: true }));
+      }
+    });
+  };
+
+  return {
+    name: "baise-fx-api",
+    configureServer: attach,
+    configurePreviewServer: attach,
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -32,7 +63,7 @@ export default defineConfig(({ mode }) => ({
       "Cross-Origin-Resource-Policy": "same-origin",
     },
   },
-  plugins: [react()],
+  plugins: [react(), fxApiPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

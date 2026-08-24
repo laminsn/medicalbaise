@@ -27,7 +27,8 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice, formatPrice } from '@/lib/currency';
+import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
 
 interface Job {
   id: string;
@@ -222,7 +223,9 @@ export default function JobsMarketplace() {
                       {t('jobs.freePlanNoProposals')}
                     </p>
                     <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                      {t('jobs.upgradeToProDescription')}
+                      {t('jobs.upgradeToProDescription', {
+                        price: formatDisplayPrice(SUBSCRIPTION_PLANS.pro.price),
+                      })}
                     </p>
                     <Button size="sm" className="mt-2" onClick={() => navigate('/pricing')}>
                       <Crown className="w-4 h-4 mr-1" /> {t('jobs.makeUpgrade')}

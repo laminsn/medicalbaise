@@ -14,8 +14,20 @@ const languages = [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
 ];
 
+const HTML_LANG: Record<string, string> = {
+  en: 'en',
+  pt: 'pt-BR',
+  es: 'es',
+};
+
+function applyHtmlLang(code: string) {
+  if (typeof document === 'undefined') return;
+  const language = (code || 'pt').split('-')[0];
+  document.documentElement.lang = HTML_LANG[language] || language;
+}
+
 export function LanguageSelector() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const resolved = i18n.resolvedLanguage || i18n.language || '';
   const currentLanguage =
@@ -25,6 +37,7 @@ export function LanguageSelector() {
 
   const pickLanguage = (code: string) => {
     void i18n.changeLanguage(code);
+    applyHtmlLang(code);
     try {
       localStorage.setItem('i18nextLng', code);
     } catch {
@@ -39,7 +52,7 @@ export function LanguageSelector() {
           variant="ghost"
           size="sm"
           className="gap-1.5 text-muted-foreground"
-          aria-label="Change language"
+          aria-label={t('language.changeLanguage')}
         >
           <Globe className="w-4 h-4" />
           <span className="text-sm">{currentLanguage.flag}</span>

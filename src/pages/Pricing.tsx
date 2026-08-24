@@ -12,7 +12,8 @@ import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, Crown, Zap, Building2, Star, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice } from '@/lib/currency';
+import { DisplayRateNote } from '@/components/pricing/DisplayRateNote';
 
 const PLANS = [
   {
@@ -108,7 +109,7 @@ export default function Pricing() {
   return (
     <>
       <Helmet>
-        <title>{t('pricing.title')} - Brasil Base</title>
+        <title>{t('pricing.title')} - Medical Baise</title>
         <meta name="description" content={t('pricing.subtitle')} />
       </Helmet>
       <AppLayout showNav={false}>
@@ -166,7 +167,7 @@ export default function Pricing() {
                   <CardContent>
                     <div className="flex items-baseline gap-1 mb-4">
                       <span className="text-3xl font-bold">
-                        {plan.price === 0 ? t('pricing.free') : formatPrice(plan.price)}
+                        {plan.price === 0 ? t('pricing.free') : formatDisplayPrice(plan.price)}
                       </span>
                       {plan.price > 0 && <span className="text-muted-foreground">/{t('pricing.month')}</span>}
                     </div>
@@ -208,6 +209,7 @@ export default function Pricing() {
             })}
           </div>
 
+          <DisplayRateNote className="text-center mt-4" />
           <p className="text-center text-xs text-muted-foreground mt-6">
             {t('pricing.cancelAnytime')}
           </p>

@@ -54,6 +54,21 @@ const SUSPICIOUS_TRANSLATIONS = [
     value: 'ApelanteDesc',
     hint: 'Recurring descriptions should use "recurrente/programado".',
   },
+  {
+    locale: 'es',
+    value: 'Colgantes',
+    hint: 'Use "Pendientes" for pending items, not "Colgantes".',
+  },
+  {
+    locale: 'es',
+    value: 'Alimentar',
+    hint: 'Use "Feed" for the medical marketplace feed, not "Alimentar".',
+  },
+  {
+    locale: 'es',
+    value: 'Hogar',
+    hint: 'Use "Inicio" for home navigation, not "Hogar".',
+  },
 ];
 
 function readJson(filePath) {

@@ -27,7 +27,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice, formatPrice } from '@/lib/currency';
+import { REFERRAL_CREDIT_BRL } from '@/lib/constants/referral';
 
 const REFERRAL_TIERS = [
   { count: 5, bonus: 50, totalEarned: 150, badgeKey: null },
@@ -141,7 +142,11 @@ export function ReferralDashboard() {
   };
 
   const shareVia = (platform: string) => {
-    const message = t('referral.shareMessage', { code: referralCode, link: referralLink });
+    const message = t('referral.shareMessage', {
+      code: referralCode,
+      link: referralLink,
+      amount: formatDisplayPrice(REFERRAL_CREDIT_BRL),
+    });
     const encodedMessage = encodeURIComponent(message);
     const encodedUrl = encodeURIComponent(referralUrl);
     
@@ -216,7 +221,7 @@ export function ReferralDashboard() {
             <div>
               <CardTitle>{t('referral.programTitle')}</CardTitle>
               <CardDescription>
-                {t('referral.programDescription')}
+                {t('referral.programDescription', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) })}
               </CardDescription>
             </div>
           </div>
@@ -387,7 +392,7 @@ export function ReferralDashboard() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>{totalReferrals} {t('referral.referrals')}</span>
-              <span className="text-muted-foreground">{nextTier.count} {t('referral.forBonus', { amount: nextTier.bonus })}</span>
+              <span className="text-muted-foreground">{nextTier.count} {t('referral.forBonus', { amount: formatDisplayPrice(nextTier.bonus) })}</span>
             </div>
             <Progress value={progressToNextTier} className="h-2" />
             {nextTier.badgeKey && (
@@ -554,8 +559,8 @@ export function ReferralDashboard() {
         <CardContent className="pt-6">
           <h4 className="font-medium mb-2">{t('referral.programTerms')}</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• {t('referral.term1')}</li>
-            <li>• {t('referral.term2')}</li>
+            <li>• {t('referral.term1', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) })}</li>
+            <li>• {t('referral.term2', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) })}</li>
             <li>• {t('referral.term3')}</li>
             <li>• {t('referral.term4')}</li>
           </ul>

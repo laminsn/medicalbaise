@@ -14,6 +14,7 @@ import { NotificationPermissionBanner } from "@/components/notifications/Notific
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { AttributionTracker } from "@/components/analytics/AttributionTracker";
+import { DisplayCurrencyProvider } from "@/contexts/DisplayCurrencyContext";
 const BaiseHubLanding = lazy(() => import("./components/hub/BaiseHubLanding"));
 const Index = lazy(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -138,6 +139,7 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            <DisplayCurrencyProvider>
             <BrowserRouter>
               <AttributionTracker />
               <CampaignAwareHIPAADisclaimer />
@@ -228,6 +230,7 @@ const App = () => (
                 <CampaignAwareNotificationPermissionBanner />
               </MessageNotificationProvider>
             </BrowserRouter>
+            </DisplayCurrencyProvider>
           </TooltipProvider>
         </CallProvider>
       </AuthProvider>

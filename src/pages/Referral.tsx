@@ -4,6 +4,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { PageMetadata } from '@/components/seo/PageMetadata';
 import { ReferralDashboard } from '@/components/referral/ReferralDashboard';
 import { useAuth } from '@/hooks/useAuth';
+import { formatDisplayPrice } from '@/lib/currency';
+import { REFERRAL_CREDIT_BRL } from '@/lib/constants/referral';
 import { Button } from '@/components/ui/button';
 import { Gift, ArrowLeft } from 'lucide-react';
 
@@ -23,7 +25,7 @@ export default function Referral() {
             </div>
             <h2 className="text-xl font-semibold mb-2">{t('referral.referAndEarn')}</h2>
             <p className="text-muted-foreground mb-6">
-              {t('referral.loginToAccess')}
+              {t('referral.loginToAccess', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) })}
             </p>
             <Button onClick={() => navigate('/auth')} className="w-full max-w-xs">
               {t('referral.login')}
