@@ -12,6 +12,10 @@ export type FxRates = {
   NGN: number;
 };
 
+export type FxChecks = {
+  ptaxUsdBrl: number | null;
+};
+
 export type FxPayload = {
   base: 'BRL';
   rates: FxRates;
@@ -21,6 +25,7 @@ export type FxPayload = {
   delayed: boolean;
   suggestedCurrency: DisplayCurrency;
   country: string | null;
+  checks?: FxChecks;
 };
 
 export function isDisplayCurrency(value: unknown): value is DisplayCurrency {

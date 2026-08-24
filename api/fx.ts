@@ -27,6 +27,10 @@ type FxRates = {
   NGN: number;
 };
 
+type FxChecks = {
+  ptaxUsdBrl: number | null;
+};
+
 type FxPayload = {
   base: 'BRL';
   rates: FxRates;
@@ -36,6 +40,7 @@ type FxPayload = {
   delayed: boolean;
   suggestedCurrency: DisplayCurrency;
   country: string | null;
+  checks: FxChecks;
 };
 
 type LastGood = {
@@ -188,7 +193,7 @@ async function fetchFawazBrl(): Promise<{ rates: FxRates; source: string } | nul
   }
 }
 
-async function fetchBcbPtaxUsdPerBrl(): Promise<number | null> {
+async function fetchBcbPtax(): Promise<{ usdBrl: number; usdPerBrl: number } | null> {
   const end = new Date();
   const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000);
   const fmt = (date: Date) => {
@@ -213,7 +218,7 @@ async function fetchBcbPtaxUsdPerBrl(): Promise<number | null> {
     const venda = asPositiveRate(row?.cotacaoVenda);
     if (!compra && !venda) return null;
     const usdBrl = compra && venda ? (compra + venda) / 2 : ((compra || venda) as number);
-    return 1 / usdBrl;
+    return { usdBrl, usdPerBrl: 1 / usdBrl };
   } catch {
     return null;
   }
@@ -241,6 +246,7 @@ async function buildFxSnapshot(): Promise<Omit<FxPayload, 'suggestedCurrency' | 
         timezone: SAO_PAULO_TZ,
         source: lastGood.source,
         delayed: true,
+        checks: { ptaxUsdBrl: null },
       };
     }
     throw new Error('No live FX feed and no last-good rate');
@@ -248,10 +254,11 @@ async function buildFxSnapshot(): Promise<Omit<FxPayload, 'suggestedCurrency' | 
 
   const secondary =
     primary.source === 'open.er-api.com' ? await fetchFawazBrl() : await fetchOpenErApiBrl();
-  const ptaxUsd = await fetchBcbPtaxUsdPerBrl();
+  const ptax = await fetchBcbPtax();
   const ngnCheck = secondary?.rates.NGN || null;
+  const checks: FxChecks = { ptaxUsdBrl: ptax?.usdBrl ?? null };
 
-  const usdDrift = ptaxUsd ? drifted(primary.rates.USD, ptaxUsd) : false;
+  const usdDrift = ptax ? drifted(primary.rates.USD, ptax.usdPerBrl) : false;
   const ngnDrift = ngnCheck ? drifted(primary.rates.NGN, ngnCheck) : false;
   const delayed = usdDrift || ngnDrift;
 
@@ -263,6 +270,7 @@ async function buildFxSnapshot(): Promise<Omit<FxPayload, 'suggestedCurrency' | 
       timezone: SAO_PAULO_TZ,
       source: lastGood.source,
       delayed: true,
+      checks,
     };
     memoryCache = { expiresAt: Date.now() + FX_CACHE_TTL_MS, payload };
     return payload;
@@ -276,6 +284,7 @@ async function buildFxSnapshot(): Promise<Omit<FxPayload, 'suggestedCurrency' | 
     timezone: SAO_PAULO_TZ,
     source: primary.source,
     delayed,
+    checks,
   };
 
   if (!delayed) {

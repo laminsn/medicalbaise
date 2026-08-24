@@ -10,10 +10,13 @@ const FORBIDDEN = [
 ];
 
 const SRC_AMOUNT_FORBIDDEN = [
+  { pattern: /R\$20\b/, hint: 'literal R$20' },
   { pattern: /R\$50\b/, hint: 'literal R$50' },
   { pattern: /R\$100\b/, hint: 'literal R$100' },
   { pattern: /R\$150\b/, hint: 'literal R$150' },
   { pattern: /R\$5k/, hint: 'literal R$5k' },
+  { pattern: /R\$15k/, hint: 'literal R$15k' },
+  { pattern: /R\$40k/, hint: 'literal R$40k' },
   { pattern: /R\$5,000/, hint: 'literal R$5,000' },
   { pattern: /R\$5\.000/, hint: 'literal R$5.000' },
 ];
@@ -41,11 +44,9 @@ for (const filePath of files) {
     }
   }
   const relative = path.relative(process.cwd(), filePath);
-  if (!relative.endsWith('ClientInsightSurvey.tsx')) {
-    for (const rule of SRC_AMOUNT_FORBIDDEN) {
-      if (rule.pattern.test(source)) {
-        failures.push(`${relative}: ${rule.hint}`);
-      }
+  for (const rule of SRC_AMOUNT_FORBIDDEN) {
+    if (rule.pattern.test(source)) {
+      failures.push(`${relative}: ${rule.hint}`);
     }
   }
 }
@@ -68,6 +69,8 @@ const I18N_FORBIDDEN = [
   { pattern: /R\$150\b/, hint: 'literal R$150' },
   { pattern: /R\$499\b/, hint: 'literal R$499' },
   { pattern: /R\$5k/, hint: 'literal R$5k' },
+  { pattern: /R\$15k/, hint: 'literal R$15k' },
+  { pattern: /R\$40k/, hint: 'literal R$40k' },
   { pattern: /R\$5,000/, hint: 'literal R$5,000' },
   { pattern: /R\$5\.000/, hint: 'literal R$5.000' },
   { pattern: /\(R\$\)/, hint: 'hardcoded (R$) label' },
@@ -90,5 +93,5 @@ if (failures.length > 0) {
 }
 
 console.log('No baked 5.05 / 5.2043 / convertFromUSD / navigator currency map in src or api.');
-console.log('No leftover R$0/R$10/R$20/R$27/R$50/R$99/R$100/R$150/R$499/R$5k/R$5,000/R$5.000/(R$) in src/i18n.');
-console.log('No leftover R$50/R$100/R$150/R$5k/R$5,000/R$5.000 display literals in src.');
+console.log('No leftover R$0/R$10/R$20/R$27/R$50/R$99/R$100/R$150/R$499/R$5k/R$15k/R$40k/R$5,000/R$5.000/(R$) in src/i18n.');
+console.log('No leftover R$20/R$50/R$100/R$150/R$5k/R$15k/R$40k/R$5,000/R$5.000 display literals in src.');
