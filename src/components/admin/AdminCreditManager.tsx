@@ -10,10 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { DollarSign, Plus, Minus, Search, Loader2 } from 'lucide-react';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice, formatPrice } from '@/lib/currency';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 export function AdminCreditManager() {
   const { t, i18n } = useTranslation();
+  const { currency } = useDisplayCurrency();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [searchEmail, setSearchEmail] = useState('');
@@ -105,7 +107,10 @@ export function AdminCreditManager() {
       // Refresh displayed balance
       setFoundUser({ ...foundUser, credits_balance: currentBalance });
     } else {
-      toast.success(t('admin.creditsUpdated', { from: currentBalance, to: newBalance }));
+      toast.success(t('admin.creditsUpdated', {
+        from: formatDisplayPrice(currentBalance),
+        to: formatDisplayPrice(newBalance),
+      }));
       setFoundUser({ ...foundUser, credits_balance: newBalance });
       setAmount('');
       setReason('');
@@ -178,7 +183,7 @@ export function AdminCreditManager() {
                   </Select>
                 </div>
                 <div className="col-span-2 space-y-1">
-                  <Label>{t('admin.amount')}</Label>
+                  <Label>{t('admin.amount', { currency })}</Label>
                   <Input
                     type="number"
                     min="0"

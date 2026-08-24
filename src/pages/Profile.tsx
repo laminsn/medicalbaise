@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { formatPrice } from '@/lib/currency';
+import { formatDisplayPrice, formatPrice } from '@/lib/currency';
+import { REFERRAL_CREDIT_BRL } from '@/lib/constants/referral';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
@@ -24,6 +26,7 @@ export default function Profile() {
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  useDisplayCurrency();
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
   const [isProvider, setIsProvider] = useState(false);
   const [providerTier, setProviderTier] = useState<string | null>(null);
@@ -91,7 +94,7 @@ export default function Profile() {
     {
       section: t('profile.other'),
       items: [
-        { icon: Gift, label: t('profile.referFriends'), path: '/referral', badge: t('profile.earnReward') },
+        { icon: Gift, label: t('profile.referFriends'), path: '/referral', badge: t('profile.earnReward', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) }) },
         { icon: HelpCircle, label: t('profile.help'), path: '/help' },
         ...(isAdmin ? [{ icon: Shield, label: t('admin.adminDashboard'), path: '/admin', badge: 'Admin' }] : []),
       ],

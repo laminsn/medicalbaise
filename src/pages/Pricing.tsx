@@ -9,11 +9,13 @@ import { SeekerPlanCards } from '@/components/pricing/SeekerPlanCards';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscriptionPlans';
+import { SUBSCRIPTION_TIERS } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Check, Crown, Zap, Building2, Star, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDisplayPrice } from '@/lib/currency';
 import { DisplayRateNote } from '@/components/pricing/DisplayRateNote';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 const PLANS = [
   {
@@ -63,6 +65,7 @@ export default function Pricing() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
+  useDisplayCurrency();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const { tier: currentTier, startCheckout } = useSubscription();
@@ -176,7 +179,9 @@ export default function Pricing() {
                       {plan.features.map((feature) => (
                         <li key={feature} className="flex items-center gap-2 text-sm">
                           <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                          <span>{t(`pricing.features.${feature}`)}</span>
+                          <span>{t(`pricing.features.${feature}`, {
+                            amount: formatDisplayPrice(SUBSCRIPTION_TIERS.pro.maxBidAmount),
+                          })}</span>
                         </li>
                       ))}
                     </ul>

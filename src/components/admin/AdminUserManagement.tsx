@@ -17,6 +17,7 @@ import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { Search, Edit, Loader2, Save, User } from 'lucide-react';
 import { formatPrice } from '@/lib/currency';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 interface UserProfile {
   id: string;
@@ -37,6 +38,7 @@ interface UserProfile {
 
 export function AdminUserManagement() {
   const { t, i18n } = useTranslation();
+  const { currency } = useDisplayCurrency();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -289,7 +291,7 @@ export function AdminUserManagement() {
               </div>
 
               <div className="space-y-1">
-                <Label>{t('admin.creditsBalanceLabel')}</Label>
+                <Label>{t('admin.creditsBalanceLabel', { currency })}</Label>
                 <Input
                   type="number"
                   min="0"

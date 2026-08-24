@@ -2,9 +2,13 @@ import { Gift, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { formatDisplayPrice } from '@/lib/currency';
+import { PROMO_SAVE_MAX_BRL } from '@/lib/constants/referral';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 export function PromoSection() {
   const { t } = useTranslation();
+  useDisplayCurrency();
 
   return (
     <section className="px-4 py-6">
@@ -24,7 +28,7 @@ export function PromoSection() {
           </h3>
           
           <p className="text-sm opacity-90 mb-4">
-            {t('promo.description')}
+            {t('promo.description', { amount: formatDisplayPrice(PROMO_SAVE_MAX_BRL) })}
           </p>
           
           <Link to="/browse">

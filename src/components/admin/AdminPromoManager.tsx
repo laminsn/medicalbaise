@@ -10,9 +10,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { sanitizePostgrestValue } from '@/lib/sanitize';
 import { toast } from 'sonner';
 import { Gift, Users, Percent, Loader2, Send } from 'lucide-react';
+import { formatDisplayPrice } from '@/lib/currency';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { REFERRAL_CREDIT_BRL } from '@/lib/constants/referral';
 
 export function AdminPromoManager() {
   const { t, i18n } = useTranslation();
+  const { currency } = useDisplayCurrency();
   const isPt = i18n.resolvedLanguage?.startsWith('pt') || i18n.language.startsWith('pt');
   const isEs = i18n.resolvedLanguage?.startsWith('es') || i18n.language.startsWith('es');
   const [targetEmail, setTargetEmail] = useState('');
@@ -71,9 +75,9 @@ export function AdminPromoManager() {
       );
     } else {
       toast.success(t('admin.bonusApplied', {
-        amount: bonus,
+        amount: formatDisplayPrice(bonus),
         name: user.first_name || targetEmail,
-        balance: newBalance,
+        balance: formatDisplayPrice(newBalance),
       }));
       setTargetEmail('');
       setCreditAmount('');
@@ -118,7 +122,7 @@ export function AdminPromoManager() {
       if (!error && updated) successCount++;
     }
 
-    toast.success(t('admin.bulkApplied', { amount: bonus, count: successCount }));
+    toast.success(t('admin.bulkApplied', { amount: formatDisplayPrice(bonus), count: successCount }));
     setBulkAmount('');
     setBulkApplying(false);
   };
@@ -147,7 +151,7 @@ export function AdminPromoManager() {
           </div>
 
           <div className="space-y-1">
-            <Label>{t('admin.creditAmount')}</Label>
+            <Label>{t('admin.creditAmount', { currency })}</Label>
             <Input
               type="number"
               min="1"
@@ -188,7 +192,7 @@ export function AdminPromoManager() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <Label>{t('admin.bonusPerUser')}</Label>
+            <Label>{t('admin.bonusPerUser', { currency })}</Label>
             <Input
               type="number"
               min="1"
@@ -223,20 +227,20 @@ export function AdminPromoManager() {
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="font-medium">{t('admin.customerReferralTiers')}</p>
               <ul className="text-muted-foreground mt-1 space-y-0.5">
-                <li>{isPt ? '• R$20 por indicação' : isEs ? '• R$20 por referido' : '• R$20 per referral'}</li>
-                <li>{isPt ? '• 5 indicações → bônus de R$50' : isEs ? '• 5 referidos → bono de R$50' : '• 5 referrals → R$50 bonus'}</li>
-                <li>{isPt ? '• 10 indicações → bônus de R$150 + selo em destaque' : isEs ? '• 10 referidos → bono de R$150 + insignia destacada' : '• 10 referrals → R$150 bonus + Featured Badge'}</li>
-                <li>{isPt ? '• 20 indicações → bônus de R$400 + VIP por 6 meses' : isEs ? '• 20 referidos → bono de R$400 + VIP por 6 meses' : '• 20 referrals → R$400 bonus + VIP 6 months'}</li>
-                <li>{isPt ? '• 50 indicações → bônus de R$1.500 + VIP vitalício' : isEs ? '• 50 referidos → bono de R$1.500 + VIP de por vida' : '• 50 referrals → R$1,500 bonus + Lifetime VIP'}</li>
+                <li>• {t('admin.referralCreditEach', { amount: formatDisplayPrice(REFERRAL_CREDIT_BRL) })}</li>
+                <li>• {t('admin.referralCountBonus', { count: 5, amount: formatDisplayPrice(50) })}</li>
+                <li>• {t('admin.referralCountBonusPerk', { count: 10, amount: formatDisplayPrice(150), perk: t('referral.featuredBadge') })}</li>
+                <li>• {t('admin.referralCountBonusPerk', { count: 20, amount: formatDisplayPrice(400), perk: t('referral.vipStatus6Months') })}</li>
+                <li>• {t('admin.referralCountBonusPerk', { count: 50, amount: formatDisplayPrice(1500), perk: t('referral.lifetimeVip') })}</li>
               </ul>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="font-medium">{t('admin.providerReferralTiers')}</p>
               <ul className="text-muted-foreground mt-1 space-y-0.5">
-                <li>{isPt ? '• 3 indicações → R$100 + 1 mês grátis' : isEs ? '• 3 referidos → R$100 + 1 mes gratis' : '• 3 referrals → R$100 + 1 free month'}</li>
-                <li>{isPt ? '• 5 indicações → R$300 + 2 meses grátis' : isEs ? '• 5 referidos → R$300 + 2 meses gratis' : '• 5 referrals → R$300 + 2 free months'}</li>
-                <li>{isPt ? '• 10 indicações → R$800 + 3 meses grátis no Elite' : isEs ? '• 10 referidos → R$800 + 3 meses gratis en Elite' : '• 10 referrals → R$800 + 3 free months Elite'}</li>
-                <li>{isPt ? '• 20 indicações → R$2.000 + 6 meses grátis no Enterprise' : isEs ? '• 20 referidos → R$2.000 + 6 meses gratis en Enterprise' : '• 20 referrals → R$2,000 + 6 free months Enterprise'}</li>
+                <li>• {t('admin.providerReferralPerk', { count: 3, amount: formatDisplayPrice(100), perk: t('referral.freeMonth1') })}</li>
+                <li>• {t('admin.providerReferralPerk', { count: 5, amount: formatDisplayPrice(300), perk: t('referral.freeMonths2') })}</li>
+                <li>• {t('admin.providerReferralPerk', { count: 10, amount: formatDisplayPrice(800), perk: t('referral.freeMonths3Elite') })}</li>
+                <li>• {t('admin.providerReferralPerk', { count: 20, amount: formatDisplayPrice(2000), perk: t('referral.freeMonths6Enterprise') })}</li>
               </ul>
             </div>
             <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeHtml(t('admin.partnerNote')) }} />

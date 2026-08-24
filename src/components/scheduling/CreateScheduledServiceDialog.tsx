@@ -29,6 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useScheduledServices } from '@/hooks/useScheduledServices';
 import { getUserCurrency } from '@/lib/currency';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 
 interface CreateScheduledServiceDialogProps {
   open: boolean;
@@ -58,6 +59,7 @@ export function CreateScheduledServiceDialog({
   serviceName,
 }: CreateScheduledServiceDialogProps) {
   const { t } = useTranslation();
+  const { currency } = useDisplayCurrency();
   const { createScheduledService } = useScheduledServices();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -265,7 +267,7 @@ export function CreateScheduledServiceDialog({
 
           {/* Price per Visit */}
           <div className="space-y-2">
-            <Label>{t('scheduling.pricePerVisit')}</Label>
+            <Label>{t('scheduling.pricePerVisit', { currency })}</Label>
             <Input
               type="number"
               placeholder={`${getUserCurrency()} 0.00`}
