@@ -1,3 +1,5 @@
+// Used by Vite local /api/fx only. The Vercel function in api/fx.ts must stay
+// self-contained — importing this file from api/ crashes the serverless bundle.
 import { writeFileSync, readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import {

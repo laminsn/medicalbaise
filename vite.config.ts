@@ -1,7 +1,7 @@
 import { defineConfig, type Plugin, type PreviewServer, type ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { getFxResponse } from "./src/lib/fx/getFxResponse";
+import { getFxResponse } from "./api/fx";
 
 function fxApiPlugin(): Plugin {
   const attach = (server: ViteDevServer | PreviewServer) => {

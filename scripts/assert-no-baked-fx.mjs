@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.join(process.cwd(), 'src');
+const ROOTS = [path.join(process.cwd(), 'src'), path.join(process.cwd(), 'api')];
 const FORBIDDEN = [
   { pattern: /5\.05\b/, hint: 'baked USD/BRL 5.05' },
   { pattern: /5\.2043\b/, hint: 'baked USD/BRL 5.2043' },
@@ -20,7 +20,7 @@ function walk(dir, out = []) {
   return out;
 }
 
-const files = walk(ROOT);
+const files = ROOTS.flatMap((root) => (fs.existsSync(root) ? walk(root) : []));
 const failures = [];
 
 for (const filePath of files) {
@@ -39,7 +39,7 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-const I18N_DIR = path.join(ROOT, 'i18n', 'locales');
+const I18N_DIR = path.join(process.cwd(), 'src', 'i18n', 'locales');
 const I18N_FORBIDDEN = [
   { pattern: /R\$0\b/, hint: 'literal R$0' },
   { pattern: /R\$10\b/, hint: 'literal R$10' },
@@ -69,5 +69,5 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('No baked 5.05 / 5.2043 / convertFromUSD / navigator currency map in src.');
+console.log('No baked 5.05 / 5.2043 / convertFromUSD / navigator currency map in src or api.');
 console.log('No leftover R$0/R$10/R$20/R$27/R$99/R$100/R$499/R$5,000/R$5.000/(R$) in src/i18n.');
