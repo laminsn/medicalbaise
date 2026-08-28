@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:i18n": "node scripts/validate-i18n.mjs",
+    "test:auth-callback": "node --experimental-strip-types --test src/pages/AuthCallback.test.ts",
     "test:fx": "node --experimental-strip-types --test src/lib/currencyFormat.test.ts src/lib/insightRevenue.test.ts && node scripts/assert-no-baked-fx.mjs && node --experimental-strip-types scripts/assert-fx-api-self-contained.mjs",
     "generate:es-locale": "node scripts/generate-es-locale.mjs",
     "ios:sync": "npm run build && PATH=$HOME/.gem/ruby/2.6.0/bin:$PATH LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 cap sync ios",
