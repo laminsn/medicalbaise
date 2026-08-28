@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import {
@@ -18,7 +18,7 @@ const db = supabase as any;
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -174,8 +174,8 @@ export default function AuthCallback() {
           alt="Baise"
           className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg"
         />
-        <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-        <p className="text-muted-foreground">{t('auth.completingSignIn', 'Completing sign in...')}</p>
+        <LoaderCircle className="w-12 h-12 animate-spin mx-auto mb-4 text-[#F5FF3D]" />
+        <p className="text-muted-foreground">Completing sign in...</p>
       </div>
     </div>
   );
