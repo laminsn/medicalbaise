@@ -167,10 +167,15 @@ export default function AuthCallback() {
   }, [i18n, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="dark min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
+        <img
+          src="/favicon.svg"
+          alt="Baise"
+          className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg"
+        />
         <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-        <p className="text-muted-foreground">{t('auth.completingSignIn', 'Completing sign-in...')}</p>
+        <p className="text-muted-foreground">{t('auth.completingSignIn', 'Completing sign in...')}</p>
       </div>
     </div>
   );
