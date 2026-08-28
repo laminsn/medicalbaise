@@ -1,8 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
-import { Loader2 } from 'lucide-react';
 import { persistLastPromptFromPath } from '@/lib/postAuthDestination';
+import { AuthLoadingFrame } from '@/components/auth/AuthLoadingFrame';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,11 +15,7 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   const location = useLocation();
 
   if (authLoading || (requireAdmin && adminLoading)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <AuthLoadingFrame />;
   }
 
   if (!user) {

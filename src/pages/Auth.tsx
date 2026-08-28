@@ -13,6 +13,7 @@ import { LanguageFluencySelector } from '@/components/LanguageFluencySelector';
 import { LocaleControls } from '@/components/LocaleControls';
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 import { FaceAuthVerify } from '@/components/auth/FaceAuthVerify';
+import { AuthLoadingFrame } from '@/components/auth/AuthLoadingFrame';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -292,11 +293,7 @@ export default function Auth() {
   };
 
   if (authLoading || bouncingAuthenticatedUser) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">{t('common.loading')}</p>
-      </div>
-    );
+    return <AuthLoadingFrame />;
   }
 
   // Face auth login view
