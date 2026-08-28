@@ -10,6 +10,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CallProvider } from "@/contexts/CallContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AuthLoadingFrame } from "@/components/auth/AuthLoadingFrame";
 import { NotificationPermissionBanner } from "@/components/notifications/NotificationPermissionBanner";
 import { useMessageNotifications } from "@/hooks/useMessageNotifications";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
@@ -93,11 +94,7 @@ const MessageNotificationProvider = ({ children }: { children: React.ReactNode }
   return <>{children}</>;
 };
 
-const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center">
-    <div className="text-muted-foreground">Loading...</div>
-  </div>
-);
+const PageLoader = () => <AuthLoadingFrame />;
 
 const campaignLandingPaths = new Set([
   "/influencer-partners",

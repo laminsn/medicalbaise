@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { LoaderCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { AuthLoadingFrame } from '@/components/auth/AuthLoadingFrame';
 import { getBaiseAppKey } from '@/lib/providerCommunication';
 import {
   clearPersistedLastPrompt,
@@ -166,17 +166,5 @@ export default function AuthCallback() {
     handleAuthCallback();
   }, [i18n, navigate]);
 
-  return (
-    <div className="dark min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <img
-          src="/favicon.svg"
-          alt="Baise"
-          className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg"
-        />
-        <LoaderCircle className="w-12 h-12 animate-spin mx-auto mb-4 text-[#F5FF3D]" />
-        <p className="text-muted-foreground">Completing sign in...</p>
-      </div>
-    </div>
-  );
+  return <AuthLoadingFrame />;
 }
