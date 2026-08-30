@@ -544,9 +544,9 @@ async function lookupSeekerByStripeSubscription(
 }
 
 async function persistStripeEventId(supabaseAdmin: AdminClient, event: Stripe.Event) {
-  const { error } = await supabaseAdmin.from("stripe_webhook_events").insert({
-    id: event.id,
-    event_type: event.type,
+  // Shannon: Casa shape only. Do not insert `id`. Do not write stripe_webhook_events.
+  const { error } = await supabaseAdmin.from("stripe_events").insert({
+    event_id: event.id,
   });
   if (!error) return "inserted" as const;
   if (error.code === "23505") return "duplicate" as const;
@@ -554,7 +554,7 @@ async function persistStripeEventId(supabaseAdmin: AdminClient, event: Stripe.Ev
 }
 
 async function forgetStripeEventId(supabaseAdmin: AdminClient, eventId: string) {
-  await supabaseAdmin.from("stripe_webhook_events").delete().eq("id", eventId);
+  await supabaseAdmin.from("stripe_events").delete().eq("event_id", eventId);
 }
 
 async function writeSeekerSubscription(

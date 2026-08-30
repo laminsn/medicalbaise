@@ -16,7 +16,7 @@ Do not use `payg`, `free`, `pro`, `elite`, or `baise+` as a seeker slug.
 
 `public.seeker_subscriptions` columns: `id`, `user_id`, `app_key`, `plan`, `status`, `stripe_customer_id`, `stripe_subscription_id`, `stripe_price_id`, `current_period_start`, `current_period_end`, `cancel_at_period_end`, `transactions_used`, `created_at`, `updated_at`.
 
-This tree: `app_key = 'medical'` only. `plan` enum is `flex | lifestyle | project`. Default plan is `flex`.
+This tree: runtime `app_key = 'medical'` only (webhook writes, consume RPC args, client SELECT). SQL-level CHECK on the shared table (Casa apply-once) allows `casa|medical|legal`. `plan` enum is `flex | lifestyle | project`. Default plan is `flex`. Do not apply an isolated `CHECK (app_key = 'medical')` CREATE from this tree.
 
 ## RLS
 
@@ -29,7 +29,7 @@ This tree: `app_key = 'medical'` only. `plan` enum is `flex | lifestyle | projec
 
 ## `try_consume_seeker_transaction(app_key, user_id)`
 
-- Fail-closed unless `app_key = 'medical'`.
+- Fail-closed unless `app_key = 'medical'` at MD runtime (hardcoded helper arg). SQL CHECK on the shared table allows casa|medical|legal.
 - Missing user returns false.
 - Inactive rows consume as `flex`.
 - `lifestyle` returns false at 8 and does not increment.
@@ -71,7 +71,7 @@ Do not reuse MD provider `prod_TwYB…` / `price_1Syf5…` or Casa `prod_TwTA…
 
 Pattern lives in the existing `supabase/functions/stripe-webhook/index.ts`. Do not copy a snapshot webhook file.
 
-`event.id` persist: insert into `stripe_webhook_events.id` after signature verify, before handlers. Duplicate `23505` → `{ received: true }` and skip. Handler throw deletes the row so Stripe can retry.
+`event.id` persist: Casa shape only — `stripe_events.insert({ event_id: event.id })` after `constructEvent`, before handlers. Do not insert `id` (Legal’s shape). Do not write `stripe_webhook_events`. Duplicate `23505` → `{ received: true }` and skip. Handler throw deletes that `event_id` so Stripe can retry. Do not CREATE `stripe_events` or `seeker_subscriptions` on this tree. Casa owns the one apply-once SQL. See `supabase/SHARED_SAFE.md`.
 
 Detect seeker **first**, then `break`. Never fall through to `providers.subscription_tier`. Signals: `role=seeker`, `type=seeker`, plan `flex|lifestyle|project`, matching `STRIPE_PRICE_SEEKER_*` when the id is `price_*`, or an existing `seeker_subscriptions` row for that Stripe subscription. Missing plan or unresolved user → log and `break`. Not return-true-only.
 
