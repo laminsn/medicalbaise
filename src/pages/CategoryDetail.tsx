@@ -18,6 +18,7 @@ import {
   ChevronLeft, Users, Briefcase, Award, Loader2
 } from 'lucide-react';
 import { getLocalizedCategoryDescription, getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { fromProvidersPublic, withPublicProfiles } from '@/lib/publicDirectory';
 
 export default function CategoryDetail() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -43,11 +44,11 @@ export default function CategoryDetail() {
       if (svcError) throw svcError;
       const providerIds = [...new Set((services || []).map((s: any) => s.provider_id))];
       if (providerIds.length === 0) return [];
-      const { data, error } = await supabase
-        .from('providers')
-        .select('id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours, profiles!inner(first_name, last_name, avatar_url)')
+      const { data: rows, error } = await fromProvidersPublic()
+        .select('id, user_id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours')
         .in('id', providerIds);
       if (error) throw error;
+      const data = await withPublicProfiles(rows || []);
       return (data || []).map((p: any) => ({
         id: p.id,
         name: p.business_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Provider',

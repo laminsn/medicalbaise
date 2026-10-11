@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface FollowerStats {
   followersCount: number;
@@ -36,8 +37,7 @@ export function useFollowerStats(providerId: string | null | undefined): Followe
 
     // For "following" we'd need the provider's user_id first
     // Get provider's user_id, then count how many providers they follow
-    const { data: providerData } = await supabase
-      .from('providers')
+    const { data: providerData } = await fromProvidersPublic()
       .select('user_id')
       .eq('id', providerId)
       .maybeSingle();

@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { getDateFnsLocale, getLocalizedCategoryName } from '@/lib/i18n-utils';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface JobDetails {
   id: string;
@@ -139,8 +140,7 @@ export default function JobDetails() {
       if (bidsData && bidsData.length > 0) {
         // Fetch provider details for each bid
         const providerIds = bidsData.map(b => b.provider_id);
-        const { data: providersData } = await supabase
-          .from('providers')
+        const { data: providersData } = await fromProvidersPublic()
           .select('id, business_name, avg_rating, total_reviews, user_id')
           .in('id', providerIds);
 

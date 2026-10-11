@@ -48,6 +48,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getLocalizedCategoryName, isPortuguese, isSpanish } from '@/lib/i18n-utils';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 const BRAZILIAN_STATES = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
@@ -118,8 +119,7 @@ export default function Browse() {
   const { data: doctors, isLoading, error } = useQuery({
     queryKey: ['browse-doctors', selectedCategory, selectedState],
     queryFn: async () => {
-      let query = supabase
-        .from('providers')
+      let query = fromProvidersPublic()
         .select(`
           id,
           business_name,

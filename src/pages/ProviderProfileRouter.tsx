@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { supabase } from '@/integrations/supabase/client';
 import DoctorProfile from './DoctorProfile';
 import ProviderProfile from './ProviderProfile';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 export default function ProviderProfileRouter() {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +15,7 @@ export default function ProviderProfileRouter() {
     queryFn: async () => {
       if (!id) return null;
 
-      const { data, error } = await supabase
-        .from('providers')
+      const { data, error } = await fromProvidersPublic()
         .select('provider_type')
         .eq('id', id)
         .maybeSingle();

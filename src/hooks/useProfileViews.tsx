@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 export function useTrackProfileView(providerId: string | undefined, source: string = 'browse') {
   const { user } = useAuth();
@@ -12,8 +13,7 @@ export function useTrackProfileView(providerId: string | undefined, source: stri
     const trackView = async () => {
       try {
         // Check if this is the provider's own profile
-        const { data: provider } = await supabase
-          .from('providers')
+        const { data: provider } = await fromProvidersPublic()
           .select('user_id')
           .eq('id', providerId)
           .maybeSingle();

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fromProvidersPublic, withPublicProfiles } from '@/lib/publicDirectory';
 
 export function FeaturedProviders() {
   const { t } = useTranslation();
@@ -13,16 +14,16 @@ export function FeaturedProviders() {
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['featured-providers'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('providers')
-        .select('id, business_name, avg_rating, total_reviews, subscription_tier, profiles!inner(first_name, last_name, avatar_url)')
+      const { data: rows, error } = await fromProvidersPublic()
+        .select('id, user_id, business_name, avg_rating, total_reviews, subscription_tier, avatar_url')
         .order('avg_rating', { ascending: false })
         .limit(5);
       if (error) throw error;
+      const data = await withPublicProfiles(rows || []);
       return (data || []).map((p: any) => ({
         id: p.id,
         business_name: p.business_name || `${p.profiles?.first_name || ''} ${p.profiles?.last_name || ''}`.trim() || 'Provider',
-        avatar_url: p.profiles?.avatar_url || '',
+        avatar_url: p.profiles?.avatar_url || p.avatar_url || '',
         avg_rating: Number(p.avg_rating) || 0,
         total_reviews: p.total_reviews || 0,
         is_pro: p.subscription_tier !== 'free',
