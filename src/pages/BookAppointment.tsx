@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { formatPrice } from '@/lib/currency';
 import { AppointmentCalendar } from '@/components/appointments/AppointmentCalendar';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface ProviderProfile {
   id: string;
@@ -37,8 +38,7 @@ export default function BookAppointment() {
     queryKey: ['book-appointment-provider', id],
     queryFn: async () => {
       if (!id) return null;
-      const { data, error: fetchError } = await supabase
-        .from('providers')
+      const { data, error: fetchError } = await fromProvidersPublic()
         .select(
           'id, business_name, provider_type, consultation_fee, consultation_duration_minutes, teleconsultation_available, tagline, avatar_url, avg_rating, total_reviews, is_verified, city, state',
         )

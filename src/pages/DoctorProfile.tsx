@@ -52,6 +52,7 @@ import { useTrackProfileView } from '@/hooks/useProfileViews';
 import { toast } from 'sonner';
 import { MEDICAL_CATEGORIES } from '@/lib/constants/medical';
 import { isPortuguese } from '@/lib/i18n-utils';
+import { fromProvidersPublic, withPublicProfiles } from '@/lib/publicDirectory';
 
 // Rating distribution computed from reviews
 const computeRatingDistribution = (reviewsList: any[]) => {
@@ -87,13 +88,14 @@ export default function DoctorProfile() {
     queryFn: async () => {
       if (!id) return null;
 
-      const { data, error } = await supabase
-        .from('providers')
-        .select('*, profiles!inner(first_name, last_name, avatar_url, email)')
+      const { data: row, error } = await fromProvidersPublic()
+        .select('*')
         .eq('id', id)
         .maybeSingle();
 
       if (error) throw error;
+      if (!row) return null;
+      const [data] = await withPublicProfiles([row]);
       return data;
     },
     enabled: !!id,

@@ -54,6 +54,7 @@ import { useStartConversation } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrackProfileView } from '@/hooks/useProfileViews';
 import { toast } from 'sonner';
+import { fromProvidersPublic, withPublicProfiles } from '@/lib/publicDirectory';
 
 export default function ProviderProfile() {
   const { id } = useParams();
@@ -72,12 +73,12 @@ export default function ProviderProfile() {
   const { data: providerData, isLoading: isLoadingProvider } = useQuery({
     queryKey: ['provider-profile', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('providers')
-        .select('*, profiles!inner(first_name, last_name, avatar_url)')
+      const { data: row, error } = await fromProvidersPublic()
+        .select('*')
         .eq('id', id!)
         .single();
       if (error) throw error;
+      const [data] = await withPublicProfiles([row]);
       return data;
     },
     enabled: !!id,
