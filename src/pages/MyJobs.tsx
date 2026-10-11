@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getDateFnsLocale } from '@/lib/i18n-utils';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface Job {
   id: string;
@@ -80,8 +81,7 @@ export default function MyJobs() {
         
         const providersMap: Record<string, string> = {};
         if (providerIds.length > 0) {
-          const { data: providersData } = await supabase
-            .from('providers')
+          const { data: providersData } = await fromProvidersPublic()
             .select('id, business_name')
             .in('id', providerIds);
           

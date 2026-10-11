@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/hooks/useAuth';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 export default function HandleRedirect() {
   const { handle } = useParams<{ handle: string }>();
@@ -37,8 +38,7 @@ export default function HandleRedirect() {
       }
 
       // Check if this user is a provider
-      const { data: provider } = await supabase
-        .from('providers')
+      const { data: provider } = await fromProvidersPublic()
         .select('id')
         .eq('user_id', profile.user_id)
         .maybeSingle();
