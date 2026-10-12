@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useMemo } from 'react';
 import { formatPrice } from '@/lib/currency';
 import { useParams, Link } from 'react-router-dom';
@@ -35,17 +36,23 @@ export default function CategoryDetail() {
   const category = MEDICAL_CATEGORIES.find(cat => cat.id === categoryId);
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['category-providers', categoryId],
+    queryKey: ['category-providers', DISCOVERY_PLATFORM, categoryId],
     queryFn: async () => {
+      if (!category) return [];
       const { data: services, error: svcError } = await supabase
         .from('provider_services')
-        .select('provider_id, service_categories!inner(id)')
-        .eq('service_categories.id', categoryId!);
+        .select('provider_id, service_categories!inner(id), providers_public!inner(id)')
+        .eq('service_categories.id', categoryId!)
+        .eq('service_categories.platform', DISCOVERY_PLATFORM)
+        .eq('providers_public.platform', DISCOVERY_PLATFORM)
+        .eq('providers_public.is_active', true);
       if (svcError) throw svcError;
       const providerIds = [...new Set((services || []).map((s: any) => s.provider_id))];
       if (providerIds.length === 0) return [];
       const { data: rows, error } = await fromProvidersPublic()
         .select('id, user_id, business_name, avg_rating, total_reviews, is_verified, is_background_checked, response_time_hours')
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .in('id', providerIds);
       if (error) throw error;
       const data = await withPublicProfiles(rows || []);
@@ -60,7 +67,7 @@ export default function CategoryDetail() {
         backgroundChecked: p.is_background_checked || false,
       }));
     },
-    enabled: !!categoryId,
+    enabled: !!categoryId && !!category,
   });
 
   const filteredProviders = useMemo(() => {

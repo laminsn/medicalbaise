@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getDateFnsLocale, isPortuguese, isSpanish } from '@/lib/i18n-utils';
@@ -9,7 +10,7 @@ export function RecentJobs() {
   const dateLocale = getDateFnsLocale(i18n);
 
   const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ['recent-jobs-medical'],
+    queryKey: ['recent-jobs-medical', DISCOVERY_PLATFORM],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('jobs_posted')
@@ -21,9 +22,11 @@ export function RecentJobs() {
           urgency,
           created_at,
           location_address,
-          category:service_categories(name_en, name_pt),
+          category:service_categories!inner(name_en, name_pt),
           bids(count)
         `)
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('category.platform', DISCOVERY_PLATFORM)
         .eq('status', 'accepting_bids')
         .order('created_at', { ascending: false })
         .limit(3);

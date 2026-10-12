@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { Link } from 'react-router-dom';
 import { Clock, MapPin, Banknote, AlertCircle, Calendar, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +28,7 @@ export function RecentAppointments() {
   const dateLocale = getDateFnsLocale(i18n);
 
   const { data: appointments, isLoading, error } = useQuery({
-    queryKey: ['recent-appointments'],
+    queryKey: ['recent-appointments', DISCOVERY_PLATFORM],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('appointments')
@@ -42,6 +43,7 @@ export function RecentAppointments() {
           available_slots,
           created_at
         `)
+        .in('category_id', MEDICAL_CATEGORIES.map(category => category.id))
         .eq('status', 'open')
         .order('created_at', { ascending: false })
         .limit(5);

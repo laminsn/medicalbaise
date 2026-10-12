@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -31,11 +32,12 @@ const MapView = () => {
   const { data: mapboxToken } = useMapboxToken();
 
   const { data: categories } = useQuery({
-    queryKey: ['service-categories'],
+    queryKey: ['service-categories', DISCOVERY_PLATFORM],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('service_categories')
         .select('*')
+        .eq('platform', DISCOVERY_PLATFORM)
         .order('order_index');
       if (error) throw error;
       return (data as ServiceCategory[] | null) ?? [];

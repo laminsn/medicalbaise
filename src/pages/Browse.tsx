@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useMemo, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { formatPrice } from '@/lib/currency';
@@ -117,7 +118,7 @@ export default function Browse() {
 
   // Fetch doctors from database
   const { data: doctors, isLoading, error } = useQuery({
-    queryKey: ['browse-doctors', selectedCategory, selectedState],
+    queryKey: ['browse-doctors', DISCOVERY_PLATFORM, selectedCategory, selectedState],
     queryFn: async () => {
       let query = fromProvidersPublic()
         .select(`
@@ -145,6 +146,7 @@ export default function Browse() {
           accepts_new_patients,
           teleconsultation_available
         `)
+        .eq('platform', DISCOVERY_PLATFORM)
         .eq('is_active', true)
         .eq('provider_type', 'healthcare');
 

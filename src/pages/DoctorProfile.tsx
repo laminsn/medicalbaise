@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState } from 'react';
 import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -81,15 +82,16 @@ export default function DoctorProfile() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
 
-  useTrackProfileView(id, 'doctor_profile');
 
   const { data: doctorData, isLoading, error } = useQuery({
-    queryKey: ['doctor-profile', id],
+    queryKey: ['doctor-profile', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       if (!id) return null;
 
       const { data: row, error } = await fromProvidersPublic()
         .select('*')
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .eq('id', id)
         .maybeSingle();
 
@@ -102,8 +104,10 @@ export default function DoctorProfile() {
     staleTime: 5 * 60 * 1000,
   });
 
+  useTrackProfileView(doctorData?.id === id ? id : undefined, 'doctor_profile');
+
   const { data: reviews = [] } = useQuery({
-    queryKey: ['doctor-reviews', id],
+    queryKey: ['doctor-reviews', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('reviews')
@@ -113,37 +117,37 @@ export default function DoctorProfile() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && doctorData?.id === id,
   });
 
   const { data: credentials = [] } = useQuery({
-    queryKey: ['doctor-credentials', id],
+    queryKey: ['doctor-credentials', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase.from('provider_credentials').select('*').eq('provider_id', id!);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && doctorData?.id === id,
   });
 
   const { data: services = [] } = useQuery({
-    queryKey: ['doctor-services', id],
+    queryKey: ['doctor-services', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('provider_services').select('*, service_categories(name_pt, name_en)').eq('provider_id', id!);
+      const { data, error } = await supabase.from('provider_services').select('*, service_categories!inner(name_pt, name_en)').eq('service_categories.platform', DISCOVERY_PLATFORM).eq('provider_id', id!);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && doctorData?.id === id,
   });
 
   const { data: faqs = [] } = useQuery({
-    queryKey: ['doctor-faqs', id],
+    queryKey: ['doctor-faqs', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase.from('provider_faqs').select('*').eq('provider_id', id!).order('order_index');
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && doctorData?.id === id,
   });
 
   const doctor = doctorData ? {

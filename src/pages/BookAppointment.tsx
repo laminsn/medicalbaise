@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -35,13 +36,15 @@ export default function BookAppointment() {
   const { t } = useTranslation();
 
   const { data: provider, isLoading, error } = useQuery({
-    queryKey: ['book-appointment-provider', id],
+    queryKey: ['book-appointment-provider', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       if (!id) return null;
       const { data, error: fetchError } = await fromProvidersPublic()
         .select(
           'id, business_name, provider_type, consultation_fee, consultation_duration_minutes, teleconsultation_available, tagline, avatar_url, avg_rating, total_reviews, is_verified, city, state',
         )
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .eq('id', id)
         .maybeSingle();
 
