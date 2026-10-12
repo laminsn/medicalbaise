@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, MapPin, DollarSign, X, Image } from 'lucide-react';
@@ -89,12 +90,29 @@ export default function PostJob() {
       // Parse budget range
       const budgetInfo = BUDGET_RANGES.find(r => r.label === formData.budgetRange);
       
-      // Fetch category_id from database
-      const { data: categoryData } = await supabase
+      // Resolve only a category belonging to this division before publishing.
+      const selectedCategory = SERVICE_CATEGORIES.find(category => category.id === formData.category);
+      if (!selectedCategory) throw new Error('Category not found');
+      let categoryData: { id: string } | null = null;
+      const { data: categoryByEn, error: categoryEnError } = await supabase
         .from('service_categories')
         .select('id')
-        .or(`name_en.eq.${SERVICE_CATEGORIES.find(c => c.id === formData.category)?.name_en},name_pt.eq.${SERVICE_CATEGORIES.find(c => c.id === formData.category)?.name_pt}`)
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('name_en', selectedCategory.name_en)
         .maybeSingle();
+      if (categoryEnError) throw categoryEnError;
+      categoryData = categoryByEn;
+      if (!categoryData) {
+        const { data: categoryByPt, error: categoryPtError } = await supabase
+          .from('service_categories')
+          .select('id')
+          .eq('platform', DISCOVERY_PLATFORM)
+          .eq('name_pt', selectedCategory.name_pt)
+          .maybeSingle();
+        if (categoryPtError) throw categoryPtError;
+        categoryData = categoryByPt;
+      }
+      if (!categoryData) throw new Error('Category not found');
 
       // Build full address string
       const fullAddress = [
@@ -110,9 +128,10 @@ export default function PostJob() {
         .from('jobs_posted')
         .insert({
           customer_id: user.id,
+          platform: DISCOVERY_PLATFORM,
           title: formData.title,
           description: formData.description,
-          category_id: categoryData?.id || null,
+          category_id: categoryData.id,
           location_address: fullAddress,
           budget_min: budgetInfo?.min || null,
           budget_max: budgetInfo?.max || null,

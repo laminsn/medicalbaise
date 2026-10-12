@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useEffect } from 'react';
 import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -36,6 +37,7 @@ import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface JobDetails {
   id: string;
+  platform: string;
   title: string;
   description: string;
   location_address: string | null;
@@ -87,18 +89,26 @@ export default function JobDetails() {
   const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
+    let cancelled = false;
+    setProvider(null);
     const fetchJob = async () => {
       if (!id) return;
       
       setLoading(true);
+      setJob(null);
+      setBids([]);
+      setCustomerProfile(null);
       
       // Fetch job details
       const { data: jobData, error: jobError } = await supabase
         .from('jobs_posted')
-        .select('*')
+        .select('*, category:service_categories!inner(id)')
+        .eq('category.platform', DISCOVERY_PLATFORM)
+        .eq('platform', DISCOVERY_PLATFORM)
         .eq('id', id)
         .maybeSingle();
 
+      if (cancelled) return;
       if (jobError) {
 
         toast.error(t('jobs.errorLoadingJob'));
@@ -121,6 +131,7 @@ export default function JobDetails() {
         .eq('user_id', jobData.customer_id)
         .maybeSingle();
       
+      if (cancelled) return;
       setCustomerProfile(profileData);
 
       // Fetch bids with provider info
@@ -137,14 +148,18 @@ export default function JobDetails() {
         .eq('job_id', id)
         .order('submitted_at', { ascending: false });
 
+      if (cancelled) return;
       if (bidsData && bidsData.length > 0) {
         // Fetch provider details for each bid
         const providerIds = bidsData.map(b => b.provider_id);
         const { data: providersData } = await fromProvidersPublic()
           .select('id, business_name, avg_rating, total_reviews, user_id')
+          .eq('platform', DISCOVERY_PLATFORM)
+          .eq('is_active', true)
           .in('id', providerIds);
 
-        const bidsWithProviders = bidsData.map(bid => ({
+        if (cancelled) return;
+        const bidsWithProviders = bidsData.filter(bid => providersData?.some(p => p.id === bid.provider_id)).map(bid => ({
           ...bid,
           provider: providersData?.find(p => p.id === bid.provider_id)
         }));
@@ -161,12 +176,14 @@ export default function JobDetails() {
         .from('providers')
         .select('*')
         .eq('user_id', user.id)
+        .eq('platform', DISCOVERY_PLATFORM)
         .maybeSingle();
-      setProvider(data);
+      if (!cancelled) setProvider(data);
     };
 
     fetchJob();
     fetchProvider();
+    return () => { cancelled = true; };
   }, [id, user, navigate, t]);
 
   const canBid = provider && provider.subscription_tier !== 'free';
@@ -217,7 +234,7 @@ export default function JobDetails() {
 
   const handleAcceptBid = async (bidId: string) => {
     // Verify the current user is the job owner before accepting
-    if (!user || !job || job.customer_id !== user.id) {
+    if (!user || !job || job.id !== id || job.platform !== DISCOVERY_PLATFORM || job.customer_id !== user.id) {
       toast.error(t('jobs.errorAcceptingBid'));
       return;
     }
@@ -238,7 +255,8 @@ export default function JobDetails() {
       .from('jobs_posted')
       .update({ status: 'bid_accepted' })
       .eq('id', id)
-      .eq('customer_id', user.id);
+      .eq('customer_id', user.id)
+      .eq('platform', DISCOVERY_PLATFORM);
 
     toast.success(t('jobs.bidAcceptedSuccess'));
     
@@ -246,7 +264,7 @@ export default function JobDetails() {
     window.location.reload();
   };
 
-  if (loading) {
+  if (loading || (job && job.id !== id)) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">

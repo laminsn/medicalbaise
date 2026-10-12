@@ -1,8 +1,10 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -26,7 +28,6 @@ interface ProviderWithServices {
   location_lng: number | null;
   is_verified: boolean | null;
   subscription_tier: string | null;
-  provider_services: { category_id: string }[] | null;
 }
 
 const ProviderMap: React.FC<ProviderMapProps> = ({ 
@@ -49,10 +50,9 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
   const { data: mapboxToken, isLoading: tokenLoading } = useMapboxToken();
 
   const { data: providers, isLoading } = useQuery({
-    queryKey: ['providers-with-location', selectedCategory],
+    queryKey: ['providers-with-location', DISCOVERY_PLATFORM, selectedCategory],
     queryFn: async () => {
-      const query = supabase
-        .from('providers')
+      const query = fromProvidersPublic()
         .select(`
           id,
           business_name,
@@ -63,16 +63,10 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
           location_lng,
           service_radius_km,
           is_verified,
-          subscription_tier,
-          provider_services (
-            category_id,
-            service_categories (
-              id,
-              name_en,
-              name_pt
-            )
-          )
+          subscription_tier
         `)
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .not('location_lat', 'is', null)
         .not('location_lng', 'is', null);
 
@@ -80,13 +74,20 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
       if (error) throw error;
       const providerData = (data as ProviderWithServices[] | null) ?? [];
       
-      // Filter by category if selected
-      if (selectedCategory) {
-        return providerData.filter(provider => 
-          provider.provider_services?.some(
-            (service) => service.category_id === selectedCategory
-          )
-        );
+      // Only services with both parents in this division may match the map filter.
+      if (selectedCategory && providerData.length > 0) {
+        const providerIds = providerData.map(provider => provider.id);
+        const { data: serviceData, error: serviceError } = await supabase
+          .from('provider_services')
+          .select('provider_id, service_categories!inner(id), providers_public!inner(id)')
+          .eq('category_id', selectedCategory)
+          .eq('service_categories.platform', DISCOVERY_PLATFORM)
+          .eq('providers_public.platform', DISCOVERY_PLATFORM)
+          .eq('providers_public.is_active', true)
+          .in('provider_id', providerIds);
+        if (serviceError) throw serviceError;
+        const matchingIds = new Set(serviceData?.map(service => service.provider_id) || []);
+        return providerData.filter(provider => matchingIds.has(provider.id));
       }
       
       return providerData;

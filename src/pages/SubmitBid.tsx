@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useEffect } from 'react';
 import { formatPrice, getUserCurrency } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -41,6 +42,9 @@ export default function SubmitBid() {
   });
 
   useEffect(() => {
+    let cancelled = false;
+    setJob(null);
+    setProvider(null);
     const fetchData = async () => {
       if (!user || !id) return;
 
@@ -49,8 +53,11 @@ export default function SubmitBid() {
         .from('providers')
         .select('*')
         .eq('user_id', user.id)
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .maybeSingle();
 
+      if (cancelled) return;
       if (!providerData) {
         toast.error(t('jobs.mustBeProvider'));
         navigate('/jobs');
@@ -68,10 +75,13 @@ export default function SubmitBid() {
       // Fetch job
       const { data: jobData } = await supabase
         .from('jobs_posted')
-        .select('*')
+        .select('*, category:service_categories!inner(id)')
+        .eq('category.platform', DISCOVERY_PLATFORM)
+        .eq('platform', DISCOVERY_PLATFORM)
         .eq('id', id)
         .maybeSingle();
 
+      if (cancelled) return;
       if (!jobData) {
         toast.error(t('jobs.jobNotFound'));
         navigate('/jobs');
@@ -88,6 +98,7 @@ export default function SubmitBid() {
         .eq('provider_id', providerData.id)
         .maybeSingle();
 
+      if (cancelled) return;
       if (existingBid) {
         toast.error(t('jobs.alreadySubmittedBid'));
         navigate(`/job/${id}`);
@@ -96,10 +107,15 @@ export default function SubmitBid() {
     };
 
     fetchData();
+    return () => { cancelled = true; };
   }, [user, id, navigate, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user || !id || job?.id !== id || job?.platform !== DISCOVERY_PLATFORM || provider?.platform !== DISCOVERY_PLATFORM || provider?.user_id !== user.id) {
+      toast.error(t('jobs.jobNotFound'));
+      return;
+    }
     
     if (!formData.quotedPrice || !formData.proposalText) {
       toast.error(t('jobs.fillRequiredFields'));
@@ -133,7 +149,7 @@ export default function SubmitBid() {
     }
   };
 
-  if (!job || !provider) {
+  if (!job || job.id !== id || !provider || provider.user_id !== user?.id) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">

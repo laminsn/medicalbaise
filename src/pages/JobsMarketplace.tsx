@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -62,16 +63,22 @@ export default function JobsMarketplace() {
   const dateLocale = getDateFnsLocale(i18n);
 
   useEffect(() => {
+    let cancelled = false;
+    setProvider(null);
     const fetchJobs = async () => {
       setLoading(true);
+      setJobs([]);
       
       // Fetch jobs that are accepting bids
       const { data: jobsData, error } = await supabase
         .from('jobs_posted')
-        .select('*')
+        .select('*, category:service_categories!inner(id)')
+        .eq('category.platform', DISCOVERY_PLATFORM)
+        .eq('platform', DISCOVERY_PLATFORM)
         .eq('status', 'accepting_bids')
         .order('created_at', { ascending: false });
 
+      if (cancelled) return;
       if (error) {
 
         setLoading(false);
@@ -86,6 +93,7 @@ export default function JobsMarketplace() {
           .select('job_id')
           .in('job_id', jobIds);
 
+        if (cancelled) return;
         const bidCounts: Record<string, number> = {};
         bidsData?.forEach(bid => {
           bidCounts[bid.job_id] = (bidCounts[bid.job_id] || 0) + 1;
@@ -110,12 +118,14 @@ export default function JobsMarketplace() {
         .from('providers')
         .select('*')
         .eq('user_id', user.id)
+        .eq('platform', DISCOVERY_PLATFORM)
         .maybeSingle();
-      setProvider(data);
+      if (!cancelled) setProvider(data);
     };
 
     fetchJobs();
     fetchProvider();
+    return () => { cancelled = true; };
   }, [user]);
 
   const canBid = provider && provider.subscription_tier !== 'free';

@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { useState, useEffect, useMemo } from 'react';
 import { formatPrice } from '@/lib/currency';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -67,14 +68,15 @@ export default function ProviderProfile() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [isSchedulingDialogOpen, setIsSchedulingDialogOpen] = useState(false);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
-  const [pixelData, setPixelData] = useState<{ meta_pixel_id?: string; google_analytics_id?: string } | null>(null);
-  const { followersCount, followingCount } = useFollowerStats(id);
-
+  const [pixelRecord, setPixelData] = useState<{ providerId: string; meta_pixel_id?: string; google_analytics_id?: string } | null>(null);
+  
   const { data: providerData, isLoading: isLoadingProvider } = useQuery({
-    queryKey: ['provider-profile', id],
+    queryKey: ['provider-profile', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data: row, error } = await fromProvidersPublic()
         .select('*')
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .eq('id', id!)
         .single();
       if (error) throw error;
@@ -85,44 +87,47 @@ export default function ProviderProfile() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { followersCount, followingCount } = useFollowerStats(providerData?.id === id ? id : undefined);
+  const pixelData = pixelRecord?.providerId === id && providerData?.id === id ? pixelRecord : null;
+
   const { data: providerServices = [] } = useQuery({
-    queryKey: ['provider-services', id],
+    queryKey: ['provider-services', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('provider_services').select('*, service_categories(name_pt, name_en)').eq('provider_id', id!);
+      const { data, error } = await supabase.from('provider_services').select('*, service_categories!inner(name_pt, name_en)').eq('service_categories.platform', DISCOVERY_PLATFORM).eq('provider_id', id!);
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && providerData?.id === id,
   });
 
   const { data: providerReviews = [] } = useQuery({
-    queryKey: ['provider-reviews', id],
+    queryKey: ['provider-reviews', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase.from('reviews').select('*, profiles!reviews_customer_id_fkey(first_name, last_name, avatar_url)').eq('provider_id', id!).order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && providerData?.id === id,
   });
 
   const { data: providerPortfolio = [] } = useQuery({
-    queryKey: ['provider-portfolio', id],
+    queryKey: ['provider-portfolio', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase.from('portfolio_items').select('*').eq('provider_id', id!).order('order_index');
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && providerData?.id === id,
   });
 
   const { data: providerFaqs = [] } = useQuery({
-    queryKey: ['provider-faqs', id],
+    queryKey: ['provider-faqs', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       const { data, error } = await supabase.from('provider_faqs').select('*').eq('provider_id', id!).order('order_index');
       if (error) throw error;
       return data || [];
     },
-    enabled: !!id,
+    enabled: !!id && providerData?.id === id,
   });
 
   const provider = providerData ? {
@@ -145,21 +150,25 @@ export default function ProviderProfile() {
   }, [providerReviews]);
 
   // Track profile view when component mounts
-  useTrackProfileView(id, 'profile_page');
+  useTrackProfileView(providerData?.id === id ? id : undefined, 'profile_page');
 
   // Fetch pixel tracking data for enterprise providers
   useEffect(() => {
+    let cancelled = false;
+    setPixelData(null);
     const fetchPixelData = async () => {
-      if (!id) return;
+      if (!id || providerData?.id !== id) return;
 
       const { data } = await supabase
         .from('providers')
         .select('meta_pixel_id, google_analytics_id, subscription_tier')
+        .eq('platform', DISCOVERY_PLATFORM)
         .eq('id', id)
         .single();
 
-      if (data?.subscription_tier === 'enterprise') {
+      if (!cancelled && data?.subscription_tier === 'enterprise') {
         setPixelData({
+          providerId: id,
           meta_pixel_id: data.meta_pixel_id || undefined,
           google_analytics_id: data.google_analytics_id || undefined,
         });
@@ -167,18 +176,19 @@ export default function ProviderProfile() {
     };
 
     fetchPixelData();
-  }, [id]);
+    return () => { cancelled = true; };
+  }, [id, providerData?.id]);
 
   // Track pixel view event after pixels are initialized
   useEffect(() => {
-    if (pixelData && id) {
+    if (pixelData && id && provider?.id === id) {
       // Small delay to ensure pixels are loaded
       const timer = setTimeout(() => {
         trackConversion.profileView(id, provider.business_name);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [pixelData, id, provider.business_name]);
+  }, [pixelData, id, provider?.id, provider?.business_name]);
 
   const canMessage = provider?.subscription_tier === 'elite' || provider?.subscription_tier === 'enterprise';
 

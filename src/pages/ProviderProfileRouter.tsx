@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { Navigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
@@ -10,18 +11,20 @@ import { fromProvidersPublic } from '@/lib/publicDirectory';
 export default function ProviderProfileRouter() {
   const { id } = useParams<{ id: string }>();
 
-  const { data: providerType, isLoading } = useQuery({
-    queryKey: ['provider-type-by-id', id],
+  const { data: providerRecord, isLoading } = useQuery({
+    queryKey: ['provider-type-by-id', DISCOVERY_PLATFORM, id],
     queryFn: async () => {
       if (!id) return null;
 
       const { data, error } = await fromProvidersPublic()
-        .select('provider_type')
+        .select('id, provider_type')
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .eq('id', id)
         .maybeSingle();
 
       if (error) throw error;
-      return data?.provider_type ?? null;
+      return data ?? null;
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
@@ -41,7 +44,11 @@ export default function ProviderProfileRouter() {
     );
   }
 
-  if (providerType === 'healthcare') {
+  if (!providerRecord) {
+    return <Navigate to="/browse" replace />;
+  }
+
+  if (providerRecord.provider_type === 'healthcare') {
     return <DoctorProfile />;
   }
 

@@ -1,3 +1,4 @@
+import { DISCOVERY_PLATFORM } from '@/lib/discoveryScope';
 import { Link } from 'react-router-dom';
 import { Star, Heart, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,10 +13,12 @@ export function FeaturedProviders() {
   const { toggleFavorite, isFavorited } = useFavorites();
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['featured-providers'],
+    queryKey: ['featured-providers', DISCOVERY_PLATFORM],
     queryFn: async () => {
       const { data: rows, error } = await fromProvidersPublic()
         .select('id, user_id, business_name, avg_rating, total_reviews, subscription_tier, avatar_url')
+        .eq('platform', DISCOVERY_PLATFORM)
+        .eq('is_active', true)
         .order('avg_rating', { ascending: false })
         .limit(5);
       if (error) throw error;
