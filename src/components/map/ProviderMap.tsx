@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { escapeHtml } from '@/lib/sanitize';
 import { useMapboxToken } from '@/hooks/useMapboxToken';
+import { fromProvidersPublic } from '@/lib/publicDirectory';
 
 interface ProviderMapProps {
   onProviderClick?: (providerId: string) => void;
@@ -29,6 +29,57 @@ interface ProviderWithServices {
   provider_services: { category_id: string }[] | null;
 }
 
+const SOURCE_ID = 'provider-approximate-areas';
+const LAYER_ID = 'provider-approximate-areas';
+/** Neighborhood-sized disc. providers_public rounds coordinates to 2 decimals (~1.1 km); the client rounds again. */
+const APPROXIMATE_RADIUS_METERS = 1000;
+const HIGHLIGHTED_TIERS = new Set(['pro', 'elite', 'enterprise']);
+// Mapbox GL uses 512px tiles. Equatorial meters/pixel at zoom 20.
+const METERS_PER_PIXEL_AT_ZOOM_20_EQUATOR = 40075016.68557849 / (512 * 2 ** 20);
+
+function roundToApproximateCoordinate(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function radiusPixelsAtZoom20(latitude: number): number {
+  const metersPerPixel =
+    METERS_PER_PIXEL_AT_ZOOM_20_EQUATOR *
+    Math.max(Math.cos((latitude * Math.PI) / 180), 0.01);
+  return APPROXIMATE_RADIUS_METERS / metersPerPixel;
+}
+
+function extendBoundsByApproximateArea(bounds: mapboxgl.LngLatBounds, lng: number, lat: number) {
+  const latPad = APPROXIMATE_RADIUS_METERS / 111320;
+  const lngPad = latPad / Math.max(Math.cos((lat * Math.PI) / 180), 0.01);
+  bounds.extend([lng - lngPad, lat - latPad]);
+  bounds.extend([lng + lngPad, lat + latPad]);
+}
+
+function areaPopupHtml(
+  properties: GeoJSON.GeoJsonProperties,
+  reviewsLabel: string,
+  verifiedLabel: string,
+): string {
+  const name = escapeHtml(String(properties?.business_name ?? ''));
+  const tagline = properties?.tagline ? escapeHtml(String(properties.tagline)) : '';
+  const ratingNumber = Number(properties?.avg_rating);
+  const rating = Number.isFinite(ratingNumber) && ratingNumber >= 0 ? ratingNumber.toFixed(1) : '—';
+  const reviews = Number(properties?.total_reviews) || 0;
+  const verified = properties?.is_verified === true || properties?.is_verified === 'true';
+
+  return `
+    <div class="p-3 min-w-[200px] bg-card text-card-foreground rounded-lg">
+      <h3 class="font-semibold text-sm mb-1">${name}</h3>
+      ${tagline ? `<p class="text-xs text-muted-foreground mb-2">${tagline}</p>` : ''}
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-yellow-500">★ ${rating}</span>
+        <span class="text-muted-foreground">(${reviews} ${escapeHtml(reviewsLabel)})</span>
+      </div>
+      ${verified ? `<span class="inline-block mt-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">${escapeHtml(verifiedLabel)}</span>` : ''}
+    </div>
+  `;
+}
+
 const ProviderMap: React.FC<ProviderMapProps> = ({ 
   onProviderClick, 
   selectedCategory,
@@ -42,7 +93,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
   const verifiedLabel = t('providers.verified', isPt ? 'Verificado' : isEs ? 'Verificado' : 'Verified');
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -51,8 +102,7 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
   const { data: providers, isLoading } = useQuery({
     queryKey: ['providers-with-location', selectedCategory],
     queryFn: async () => {
-      const query = supabase
-        .from('providers')
+      const { data, error } = await fromProvidersPublic()
         .select(`
           id,
           business_name,
@@ -61,22 +111,15 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
           total_reviews,
           location_lat,
           location_lng,
-          service_radius_km,
           is_verified,
           subscription_tier,
           provider_services (
-            category_id,
-            service_categories (
-              id,
-              name_en,
-              name_pt
-            )
+            category_id
           )
         `)
         .not('location_lat', 'is', null)
         .not('location_lng', 'is', null);
 
-      const { data, error } = await query;
       if (error) throw error;
       const providerData = (data as ProviderWithServices[] | null) ?? [];
       
@@ -133,7 +176,8 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
     });
 
     return () => {
-      markersRef.current.forEach(marker => marker.remove());
+      popupRef.current?.remove();
+      popupRef.current = null;
       map.current?.remove();
       map.current = null;
     };
@@ -150,75 +194,131 @@ const ProviderMap: React.FC<ProviderMapProps> = ({
     }
   }, [center]);
 
-  // Add markers when providers data changes
+  // Draw an approximate 1 km area for each provider instead of an exact pin.
   useEffect(() => {
-    if (!map.current || !mapLoaded || !providers) return;
+    const mapInstance = map.current;
+    if (!mapInstance || !mapLoaded || !providers) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
-
-    // Add new markers
+    const features: GeoJSON.Feature<GeoJSON.Point>[] = [];
     providers.forEach((provider) => {
-      if (!provider.location_lat || !provider.location_lng) return;
-
-      const el = document.createElement('div');
-      el.className = 'provider-marker';
-      el.innerHTML = `
-        <div class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-transform hover:scale-110 ${
-          provider.subscription_tier === 'pro' || provider.subscription_tier === 'elite' || provider.subscription_tier === 'enterprise'
-            ? 'bg-primary border-2 border-primary-foreground shadow-lg shadow-primary/50'
-            : 'bg-secondary border-2 border-border'
-        }">
-          <span class="text-xs font-bold text-primary-foreground">
-            ${provider.avg_rating ? provider.avg_rating.toFixed(1) : '—'}
-          </span>
-        </div>
-      `;
-
-      const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
-        .setHTML(`
-          <div class="p-3 min-w-[200px] bg-card text-card-foreground rounded-lg">
-            <h3 class="font-semibold text-sm mb-1">${escapeHtml(provider.business_name || '')}</h3>
-            ${provider.tagline ? `<p class="text-xs text-muted-foreground mb-2">${escapeHtml(provider.tagline)}</p>` : ''}
-            <div class="flex items-center gap-2 text-xs">
-              <span class="text-yellow-500">★ ${provider.avg_rating?.toFixed(1) || '—'}</span>
-              <span class="text-muted-foreground">(${provider.total_reviews || 0} ${escapeHtml(reviewsLabel)})</span>
-            </div>
-            ${provider.is_verified ? `<span class="inline-block mt-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">${escapeHtml(verifiedLabel)}</span>` : ''}
-          </div>
-        `);
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([provider.location_lng, provider.location_lat])
-        .setPopup(popup)
-        .addTo(map.current!);
-
-      el.addEventListener('click', () => {
-        if (onProviderClick) {
-          onProviderClick(provider.id);
-        }
+      if (provider.location_lat == null || provider.location_lng == null || !provider.id) return;
+      const lat = roundToApproximateCoordinate(provider.location_lat);
+      const lng = roundToApproximateCoordinate(provider.location_lng);
+      const highlighted = HIGHLIGHTED_TIERS.has(provider.subscription_tier ?? '') ? 1 : 0;
+      features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [lng, lat],
+        },
+        properties: {
+          id: provider.id,
+          business_name: provider.business_name ?? '',
+          tagline: provider.tagline ?? '',
+          avg_rating: provider.avg_rating ?? -1,
+          total_reviews: provider.total_reviews ?? 0,
+          is_verified: Boolean(provider.is_verified),
+          highlighted,
+          radiusPx: radiusPixelsAtZoom20(lat),
+        },
       });
-
-      markersRef.current.push(marker);
     });
 
-    // Fit bounds to show all markers
-    if (providers.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      providers.forEach(provider => {
-        if (provider.location_lat && provider.location_lng) {
-          bounds.extend([provider.location_lng, provider.location_lat]);
-        }
+    const collection: GeoJSON.FeatureCollection<GeoJSON.Point> = {
+      type: 'FeatureCollection',
+      features,
+    };
+
+    const existingSource = mapInstance.getSource(SOURCE_ID) as mapboxgl.GeoJSONSource | undefined;
+    if (existingSource) {
+      existingSource.setData(collection);
+    } else {
+      mapInstance.addSource(SOURCE_ID, { type: 'geojson', data: collection });
+      mapInstance.addLayer({
+        id: LAYER_ID,
+        type: 'circle',
+        source: SOURCE_ID,
+        layout: {
+          'circle-sort-key': ['get', 'highlighted'],
+        },
+        paint: {
+          'circle-radius': [
+            'interpolate',
+            ['exponential', 2],
+            ['zoom'],
+            0,
+            0,
+            20,
+            ['get', 'radiusPx'],
+          ],
+          'circle-color': [
+            'case',
+            ['==', ['get', 'highlighted'], 1],
+            '#00b8d4',
+            '#737373',
+          ],
+          'circle-opacity': 0.35,
+          'circle-blur': 0.15,
+          'circle-pitch-alignment': 'map',
+          'circle-pitch-scale': 'map',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': [
+            'case',
+            ['==', ['get', 'highlighted'], 1],
+            '#00b8d4',
+            '#d4d4d4',
+          ],
+          'circle-stroke-opacity': 0.9,
+        },
       });
-      
+    }
+
+    const onClick = (event: mapboxgl.MapLayerMouseEvent) => {
+      const feature = event.features?.[0];
+      if (!feature || feature.geometry.type !== 'Point') return;
+      const [lng, lat] = feature.geometry.coordinates;
+      popupRef.current?.remove();
+      popupRef.current = new mapboxgl.Popup({ offset: 8, closeButton: false })
+        .setLngLat([lng, lat])
+        .setHTML(areaPopupHtml(feature.properties, reviewsLabel, verifiedLabel))
+        .addTo(mapInstance);
+      const id = feature.properties?.id;
+      if (typeof id === 'string' && onProviderClick) {
+        onProviderClick(id);
+      }
+    };
+    const onEnter = () => {
+      mapInstance.getCanvas().style.cursor = 'pointer';
+    };
+    const onLeave = () => {
+      mapInstance.getCanvas().style.cursor = '';
+    };
+
+    mapInstance.on('click', LAYER_ID, onClick);
+    mapInstance.on('mouseenter', LAYER_ID, onEnter);
+    mapInstance.on('mouseleave', LAYER_ID, onLeave);
+
+    if (features.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      features.forEach((feature) => {
+        const [lng, lat] = feature.geometry.coordinates;
+        extendBoundsByApproximateArea(bounds, lng, lat);
+      });
+
       if (!bounds.isEmpty()) {
-        map.current.fitBounds(bounds, {
+        mapInstance.fitBounds(bounds, {
           padding: 50,
           maxZoom: 14
         });
       }
     }
+
+    return () => {
+      mapInstance.off('click', LAYER_ID, onClick);
+      mapInstance.off('mouseenter', LAYER_ID, onEnter);
+      mapInstance.off('mouseleave', LAYER_ID, onLeave);
+      mapInstance.getCanvas().style.cursor = '';
+    };
   }, [providers, mapLoaded, onProviderClick, reviewsLabel, verifiedLabel]);
 
   if (isLoading || tokenLoading) {
